@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -14,8 +15,6 @@ import {
   AlertCircle,
   Filter,
   Phone,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import "../styles/appointments.css";
 
@@ -134,14 +133,47 @@ function Appointments() {
     ).length,
   };
 
+  /*
+   * ============================================================
+   * NOUVEAU RENDEZ-VOUS
+   * ============================================================
+   */
+
   const openAddModal = () => {
     setEditingAppointment(null);
     setForm(emptyForm);
     setShowModal(true);
   };
 
+  /*
+   * ============================================================
+   * RENDEZ POUR UN PATIENT
+   * ============================================================
+   */
+
+  const openPatientAppointmentModal = (appointment) => {
+    setEditingAppointment(null);
+
+    setForm({
+      ...emptyForm,
+      patient: appointment.patient,
+      phone: appointment.phone,
+      doctor: appointment.doctor,
+      service: appointment.service,
+    });
+
+    setShowModal(true);
+  };
+
+  /*
+   * ============================================================
+   * MODIFICATION
+   * ============================================================
+   */
+
   const openEditModal = (appointment) => {
     setEditingAppointment(appointment);
+
     setForm({
       patient: appointment.patient,
       phone: appointment.phone,
@@ -152,6 +184,7 @@ function Appointments() {
       motif: appointment.motif,
       status: appointment.status,
     });
+
     setShowModal(true);
   };
 
@@ -170,17 +203,23 @@ function Appointments() {
     }));
   };
 
+  /*
+   * ============================================================
+   * ENREGISTREMENT DU RENDEZ-VOUS
+   * ============================================================
+   */
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (
       !form.patient ||
-      !form.doctor ||
-      !form.service ||
       !form.date ||
       !form.time
     ) {
-      alert("Veuillez remplir tous les champs obligatoires.");
+      alert(
+        "Veuillez sélectionner un patient et renseigner la date et l'heure du rendez-vous."
+      );
       return;
     }
 
@@ -210,6 +249,12 @@ function Appointments() {
     closeModal();
   };
 
+  /*
+   * ============================================================
+   * SUPPRESSION
+   * ============================================================
+   */
+
   const deleteAppointment = (id) => {
     const confirmed = window.confirm(
       "Voulez-vous vraiment supprimer ce rendez-vous ?"
@@ -218,9 +263,17 @@ function Appointments() {
     if (!confirmed) return;
 
     setAppointments((previous) =>
-      previous.filter((appointment) => appointment.id !== id)
+      previous.filter(
+        (appointment) => appointment.id !== id
+      )
     );
   };
+
+  /*
+   * ============================================================
+   * CHANGEMENT DE STATUT
+   * ============================================================
+   */
 
   const updateStatus = (id, status) => {
     setAppointments((previous) =>
@@ -247,50 +300,38 @@ function Appointments() {
     });
   };
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "Confirmé":
-        return "status-confirmed";
-
-      case "En attente":
-        return "status-pending";
-
-      case "Annulé":
-        return "status-cancelled";
-
-      default:
-        return "";
-    }
-  };
-
   return (
     <div className="appointments-page">
+
+      {/* ======================================================
+          HEADER
+          ====================================================== */}
 
       <div className="appointments-header">
         <div>
           <div className="appointments-title-wrapper">
+
             <div className="appointments-main-icon">
               <CalendarDays size={26} />
             </div>
 
             <div>
               <h1>Rendez-vous</h1>
+
               <p>
                 Gérez les rendez-vous des patients et le planning
                 médical.
               </p>
             </div>
+
           </div>
         </div>
 
-        <button
-          className="btn-primary appointment-add-btn"
-          onClick={openAddModal}
-        >
-          <Plus size={19} />
-          Nouveau rendez-vous
-        </button>
       </div>
+
+      {/* ======================================================
+          STATISTIQUES
+          ====================================================== */}
 
       <div className="appointment-statistics">
 
@@ -340,6 +381,10 @@ function Appointments() {
 
       </div>
 
+      {/* ======================================================
+          FILTRES
+          ====================================================== */}
+
       <div className="appointments-filters">
 
         <div className="appointment-search">
@@ -362,10 +407,21 @@ function Appointments() {
               setStatusFilter(e.target.value)
             }
           >
-            <option value="Tous">Tous les statuts</option>
-            <option value="Confirmé">Confirmés</option>
-            <option value="En attente">En attente</option>
-            <option value="Annulé">Annulés</option>
+            <option value="Tous">
+              Tous les statuts
+            </option>
+
+            <option value="Confirmé">
+              Confirmés
+            </option>
+
+            <option value="En attente">
+              En attente
+            </option>
+
+            <option value="Annulé">
+              Annulés
+            </option>
           </select>
         </div>
 
@@ -381,7 +437,9 @@ function Appointments() {
           />
         </div>
 
-        {(search || dateFilter || statusFilter !== "Tous") && (
+        {(search ||
+          dateFilter ||
+          statusFilter !== "Tous") && (
           <button
             className="clear-filters-btn"
             onClick={() => {
@@ -396,28 +454,23 @@ function Appointments() {
 
       </div>
 
+      {/* ======================================================
+          TABLEAU
+          ====================================================== */}
+
       <div className="appointments-card">
 
         <div className="appointments-card-header">
+
           <div>
             <h2>Liste des rendez-vous</h2>
+
             <p>
               {filteredAppointments.length} rendez-vous
               affiché(s)
             </p>
           </div>
 
-          <div className="calendar-navigation">
-            <button type="button">
-              <ChevronLeft size={18} />
-            </button>
-
-            <span>Planning médical</span>
-
-            <button type="button">
-              <ChevronRight size={18} />
-            </button>
-          </div>
         </div>
 
         <div className="appointments-table-container">
@@ -431,7 +484,10 @@ function Appointments() {
                 <th>Date</th>
                 <th>Heure</th>
                 <th>Motif</th>
-                <th>Statut</th>
+
+                {/* MODIFICATION */}
+                <th>Rendez</th>
+
                 <th>Actions</th>
               </tr>
             </thead>
@@ -439,6 +495,7 @@ function Appointments() {
             <tbody>
 
               {filteredAppointments.length === 0 ? (
+
                 <tr>
                   <td
                     colSpan="7"
@@ -456,12 +513,16 @@ function Appointments() {
                     </span>
                   </td>
                 </tr>
+
               ) : (
+
                 filteredAppointments.map((appointment) => (
+
                   <tr key={appointment.id}>
 
                     {/* PATIENT */}
                     <td>
+
                       <div className="patient-cell">
 
                         <div className="patient-avatar">
@@ -469,6 +530,7 @@ function Appointments() {
                         </div>
 
                         <div>
+
                           <strong>
                             {appointment.patient}
                           </strong>
@@ -477,13 +539,16 @@ function Appointments() {
                             <Phone size={12} />
                             {appointment.phone}
                           </span>
+
                         </div>
 
                       </div>
+
                     </td>
 
                     {/* MEDECIN */}
                     <td>
+
                       <div className="doctor-cell">
 
                         <div className="doctor-icon">
@@ -491,6 +556,7 @@ function Appointments() {
                         </div>
 
                         <div>
+
                           <strong>
                             {appointment.doctor}
                           </strong>
@@ -498,14 +564,18 @@ function Appointments() {
                           <span>
                             {appointment.service}
                           </span>
+
                         </div>
 
                       </div>
+
                     </td>
 
                     {/* DATE */}
                     <td>
+
                       <div className="date-cell">
+
                         <CalendarDays size={16} />
 
                         <span>
@@ -513,56 +583,62 @@ function Appointments() {
                             appointment.date
                           )}
                         </span>
+
                       </div>
+
                     </td>
 
                     {/* HEURE */}
                     <td>
+
                       <div className="time-cell">
+
                         <Clock size={16} />
+
                         {appointment.time}
+
                       </div>
+
                     </td>
 
                     {/* MOTIF */}
                     <td>
+
                       <span className="motif-text">
                         {appointment.motif}
                       </span>
+
                     </td>
 
-                    {/* STATUT */}
+                    {/* ==================================================
+                        RENDEZ
+                        ================================================== */}
+
                     <td>
-                      <span
-                        className={`appointment-status ${getStatusClass(
-                          appointment.status
-                        )}`}
+
+                      <button
+                        type="button"
+                        className="patient-appointment-btn"
+                        onClick={() =>
+                          openPatientAppointmentModal(
+                            appointment
+                          )
+                        }
                       >
-                        {appointment.status ===
-                          "Confirmé" && (
-                          <CheckCircle2 size={14} />
-                        )}
+                        <CalendarDays size={15} />
+                        RENDEZ VOUS
+                      </button>
 
-                        {appointment.status ===
-                          "En attente" && (
-                          <AlertCircle size={14} />
-                        )}
-
-                        {appointment.status ===
-                          "Annulé" && (
-                          <XCircle size={14} />
-                        )}
-
-                        {appointment.status}
-                      </span>
                     </td>
 
                     {/* ACTIONS */}
                     <td>
+
                       <div className="appointment-actions">
 
                         {appointment.status !==
                           "Confirmé" && (
+
                           <button
                             className="action-confirm"
                             title="Confirmer"
@@ -575,6 +651,7 @@ function Appointments() {
                           >
                             <CheckCircle2 size={17} />
                           </button>
+
                         )}
 
                         <button
@@ -591,6 +668,7 @@ function Appointments() {
 
                         {appointment.status !==
                           "Annulé" && (
+
                           <button
                             className="action-cancel"
                             title="Annuler"
@@ -603,6 +681,7 @@ function Appointments() {
                           >
                             <XCircle size={17} />
                           </button>
+
                         )}
 
                         <button
@@ -618,10 +697,13 @@ function Appointments() {
                         </button>
 
                       </div>
+
                     </td>
 
                   </tr>
+
                 ))
+
               )}
 
             </tbody>
@@ -631,7 +713,12 @@ function Appointments() {
         </div>
       </div>
 
+      {/* ======================================================
+          MODAL RENDEZ-VOUS
+          ====================================================== */}
+
       {showModal && (
+
         <div
           className="appointment-modal-overlay"
           onMouseDown={(e) => {
@@ -643,9 +730,11 @@ function Appointments() {
 
           <div className="appointment-modal">
 
+            {/* HEADER MODAL */}
             <div className="appointment-modal-header">
 
               <div>
+
                 <div className="modal-title-icon">
                   <CalendarDays size={21} />
                 </div>
@@ -662,6 +751,7 @@ function Appointments() {
                     rendez-vous.
                   </p>
                 </div>
+
               </div>
 
               <button
@@ -673,155 +763,65 @@ function Appointments() {
 
             </div>
 
+            {/* ==================================================
+                FORMULAIRE SIMPLIFIE
+                ================================================== */}
+
             <form
               className="appointment-form"
               onSubmit={handleSubmit}
             >
 
-              {/* PATIENT */}
+              {/* PATIENT SELECTIONNE */}
               <div className="form-section">
-                <h3>Informations du patient</h3>
+
+                <h3>Patient concerné</h3>
 
                 <div className="form-grid">
 
                   <div className="form-group">
+
                     <label>
                       Patient
                       <span>*</span>
                     </label>
 
                     <div className="input-icon-wrapper">
+
                       <User size={17} />
 
                       <input
                         type="text"
                         name="patient"
                         value={form.patient}
-                        onChange={handleChange}
-                        placeholder="Nom et prénom du patient"
+                        readOnly
+                        placeholder="Patient"
                       />
+
                     </div>
-                  </div>
 
-                  <div className="form-group">
-                    <label>Téléphone</label>
-
-                    <div className="input-icon-wrapper">
-                      <Phone size={17} />
-
-                      <input
-                        type="text"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="Ex : 07 00 00 00 00"
-                      />
-                    </div>
                   </div>
 
                 </div>
-              </div>
 
-              {/* MEDECIN */}
-              <div className="form-section">
-                <h3>Informations médicales</h3>
-
-                <div className="form-grid">
-
-                  <div className="form-group">
-                    <label>
-                      Médecin
-                      <span>*</span>
-                    </label>
-
-                    <div className="input-icon-wrapper">
-                      <Stethoscope size={17} />
-
-                      <select
-                        name="doctor"
-                        value={form.doctor}
-                        onChange={handleChange}
-                      >
-                        <option value="">
-                          Sélectionner un médecin
-                        </option>
-
-                        <option>
-                          Dr. Yao Kouadio
-                        </option>
-
-                        <option>
-                          Dr. N'Guessan Alice
-                        </option>
-
-                        <option>
-                          Dr. Kouamé Paul
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>
-                      Service
-                      <span>*</span>
-                    </label>
-
-                    <select
-                      name="service"
-                      value={form.service}
-                      onChange={handleChange}
-                    >
-                      <option value="">
-                        Sélectionner un service
-                      </option>
-
-                      <option>
-                        Médecine générale
-                      </option>
-
-                      <option>
-                        Pédiatrie
-                      </option>
-
-                      <option>
-                        Cardiologie
-                      </option>
-
-                      <option>
-                        Gynécologie
-                      </option>
-
-                      <option>
-                        Maternité
-                      </option>
-
-                      <option>
-                        Laboratoire
-                      </option>
-
-                      <option>
-                        Pharmacie
-                      </option>
-                    </select>
-                  </div>
-
-                </div>
               </div>
 
               {/* DATE / HEURE */}
               <div className="form-section">
+
                 <h3>Date et heure</h3>
 
                 <div className="form-grid">
 
                   <div className="form-group">
+
                     <label>
                       Date
                       <span>*</span>
                     </label>
 
                     <div className="input-icon-wrapper">
+
                       <CalendarDays size={17} />
 
                       <input
@@ -830,16 +830,20 @@ function Appointments() {
                         value={form.date}
                         onChange={handleChange}
                       />
+
                     </div>
+
                   </div>
 
                   <div className="form-group">
+
                     <label>
                       Heure
                       <span>*</span>
                     </label>
 
                     <div className="input-icon-wrapper">
+
                       <Clock size={17} />
 
                       <input
@@ -848,10 +852,13 @@ function Appointments() {
                         value={form.time}
                         onChange={handleChange}
                       />
+
                     </div>
+
                   </div>
 
                 </div>
+
               </div>
 
               {/* MOTIF */}
@@ -860,7 +867,10 @@ function Appointments() {
                 <div className="form-grid">
 
                   <div className="form-group full-width">
-                    <label>Motif du rendez-vous</label>
+
+                    <label>
+                      Motif du rendez-vous
+                    </label>
 
                     <textarea
                       name="motif"
@@ -869,6 +879,7 @@ function Appointments() {
                       rows="3"
                       placeholder="Décrivez le motif du rendez-vous..."
                     />
+
                   </div>
 
                 </div>
@@ -879,13 +890,17 @@ function Appointments() {
               <div className="form-section">
 
                 <div className="form-group">
-                  <label>Statut</label>
+
+                  <label>
+                    Statut
+                  </label>
 
                   <select
                     name="status"
                     value={form.status}
                     onChange={handleChange}
                   >
+
                     <option>
                       En attente
                     </option>
@@ -897,7 +912,9 @@ function Appointments() {
                     <option>
                       Annulé
                     </option>
+
                   </select>
+
                 </div>
 
               </div>
@@ -931,6 +948,7 @@ function Appointments() {
           </div>
 
         </div>
+
       )}
 
     </div>

@@ -735,6 +735,89 @@
 
 
 /* ============================================================
+   SEXE DU PATIENT
+   ============================================================ */
+
+/*
+   Masculin : rouge
+   Femme    : bleu
+
+   Ces classes permettent de conserver la charte graphique
+   tout en distinguant clairement le sexe du patient.
+*/
+
+.sexe-masculin {
+  color: #dc2626 !important;
+
+  font-weight: 800 !important;
+}
+
+.sexe-femme {
+  color: #2563eb !important;
+
+  font-weight: 800 !important;
+}
+
+
+/* Badge sexe */
+
+.sexe-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding:
+    5px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+
+/* Badge Masculin */
+
+.sexe-badge-masculin {
+  color: #dc2626;
+
+  background: #fee2e2;
+}
+
+
+/* Badge Femme */
+
+.sexe-badge-femme {
+  color: #2563eb;
+
+  background: #dbeafe;
+}
+
+
+/* Select Masculin */
+
+.sexe-select-masculin {
+  color: #dc2626 !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* Select Femme */
+
+.sexe-select-femme {
+  color: #2563eb !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* ============================================================
    BOUTON ACTION TABLEAU
    ============================================================ */
 
@@ -765,7 +848,22 @@
 }
 
 
-/* Aucun résultat */
+/* ============================================================
+   BOUTON SUPPRESSION
+   ============================================================ */
+
+.row-action.delete {
+  color: #dc2626;
+}
+
+.row-action.delete:hover {
+  background: #fee2e2;
+}
+
+
+/* ============================================================
+   AUCUN RÉSULTAT
+   ============================================================ */
 
 .empty-row {
   height: 100px !important;
@@ -860,6 +958,13 @@
 }
 
 
+/* Montant rouge */
+
+.summary-value.red {
+  color: #dc2626;
+}
+
+
 /* Texte secondaire */
 
 .summary-note {
@@ -870,6 +975,39 @@
   color: #8ba0b1;
 
   font-size: 12px;
+}
+
+
+/* ============================================================
+   FORMULAIRE — SEXE
+   ============================================================ */
+
+.patient-form select[name="sexe"] {
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+/*
+   Couleur du texte lorsque Masculin est sélectionné.
+*/
+
+.patient-form select[name="sexe"].sexe-select-masculin {
+  color: #dc2626 !important;
+
+  border-color: #fca5a5;
+}
+
+
+/*
+   Couleur du texte lorsque Femme est sélectionnée.
+*/
+
+.patient-form select[name="sexe"].sexe-select-femme {
+  color: #2563eb !important;
+
+  border-color: #93c5fd;
 }
 
 
@@ -1037,5 +1175,15 @@
   .summary-card {
     padding:
       18px 20px;
+  }
+
+
+  /* Sexe sur mobile */
+
+  .sexe-badge {
+    padding:
+      4px 8px;
+
+    font-size: 11px;
   }
 }

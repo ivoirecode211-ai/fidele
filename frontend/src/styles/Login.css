@@ -1,0 +1,1095 @@
+/*
+ * ============================================================
+ * MA SANTÉ - PAGE DE CONNEXION
+ * ============================================================
+ *
+ * Fichier :
+ * src/styles/Login.css
+ *
+ * Image :
+ * public/images/login-background.png
+ *
+ * ============================================================
+ */
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  margin: 0;
+
+  font-family:
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.login-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  background: #edf7fb;
+}
+
+
+/* ============================================================
+   IMAGE DE FOND
+   ============================================================ */
+
+.login-background {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-image:
+    url("/images/login-background.png");
+
+  background-size: cover;
+
+  background-position: center center;
+
+  background-repeat: no-repeat;
+
+  z-index: 0;
+}
+
+
+/* ============================================================
+   VOILE SUR L'IMAGE
+   ============================================================ */
+
+.login-background-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  /*
+   * À gauche :
+   * l'image reste très visible.
+   *
+   * À droite :
+   * l'image devient progressivement claire
+   * pour faire ressortir le formulaire.
+   */
+  background:
+    linear-gradient(
+      90deg,
+
+      rgba(255, 255, 255, 0.02) 0%,
+
+      rgba(255, 255, 255, 0.03) 15%,
+
+      rgba(255, 255, 255, 0.05) 28%,
+
+      rgba(255, 255, 255, 0.12) 40%,
+
+      rgba(255, 255, 255, 0.28) 52%,
+
+      rgba(255, 255, 255, 0.52) 64%,
+
+      rgba(255, 255, 255, 0.76) 78%,
+
+      rgba(255, 255, 255, 0.91) 100%
+    );
+
+  z-index: 1;
+}
+
+
+/* ============================================================
+   CONTENU
+   ============================================================ */
+
+.login-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+  min-height: 100vh;
+
+  /*
+   * Deux colonnes exactement égales.
+   */
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  align-items: center;
+
+  padding:
+    30px 5%;
+}
+
+
+/* ============================================================
+   PARTIE GAUCHE
+   ============================================================ */
+
+.login-left {
+  width: 100%;
+
+  min-height: 500px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  padding-left: 30px;
+}
+
+
+/* ============================================================
+   SLOGAN
+   ============================================================ */
+
+.login-slogan {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  margin-top: 110px;
+
+  padding-left: 5px;
+
+  color: #ffffff;
+
+  font-size: 26px;
+
+  line-height: 1.3;
+
+  font-weight: 500;
+
+  text-shadow:
+    0 2px 6px rgba(0, 45, 70, 0.60),
+
+    0 1px 14px rgba(0, 60, 90, 0.40);
+}
+
+
+.login-slogan span {
+  display: block;
+}
+
+
+/* ============================================================
+   PARTIE DROITE
+   ============================================================ */
+
+.login-right {
+  width: 100%;
+
+  min-height: 500px;
+
+  /*
+   * CENTRAGE HORIZONTAL
+   */
+  display: flex;
+
+  justify-content: center;
+
+  /*
+   * CENTRAGE VERTICAL
+   */
+  align-items: center;
+
+  /*
+   * Aucun déplacement artificiel.
+   */
+  margin: 0;
+
+  padding: 0;
+}
+
+
+/* ============================================================
+   FORMULAIRE
+   ============================================================ */
+
+.login-form {
+  width: 100%;
+
+  max-width: 390px;
+
+  /*
+   * Important :
+   * margin auto permet de conserver
+   * le centrage du formulaire.
+   */
+  margin: 0 auto;
+
+  padding:
+    30px 38px 24px;
+
+  background:
+    rgba(255, 255, 255, 0.96);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.95);
+
+  border-radius: 9px;
+
+  box-shadow:
+    0 14px 38px
+    rgba(20, 92, 125, 0.15),
+
+    0 3px 12px
+    rgba(0, 80, 120, 0.07);
+
+  backdrop-filter: blur(10px);
+
+  -webkit-backdrop-filter: blur(10px);
+}
+
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+
+.login-brand {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  margin-bottom: 13px;
+}
+
+
+/* ============================================================
+   ICÔNE LOGO
+   ============================================================ */
+
+.login-brand-icon {
+  width: 43px;
+  height: 43px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0075bd,
+      #20c7a2
+    );
+
+  box-shadow:
+    0 4px 10px
+    rgba(0, 112, 180, 0.20);
+}
+
+
+/* ============================================================
+   TEXTE LOGO
+   ============================================================ */
+
+.login-brand-text {
+  display: flex;
+
+  flex-direction: column;
+
+  line-height: 1;
+}
+
+
+/* ============================================================
+   NOM MA SANTÉ
+   ============================================================ */
+
+.login-brand-name {
+  color: #0868a7;
+
+  font-size: 22px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.2px;
+}
+
+
+.login-brand-name strong {
+  color: #15866c;
+}
+
+
+/* ============================================================
+   SOUS-TITRE LOGO
+   ============================================================ */
+
+.login-brand-subtitle {
+  margin-top: 4px;
+
+  color: #2775a1;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   TITRE
+   ============================================================ */
+
+.login-title {
+  margin:
+    0 0 21px;
+
+  color: #164568;
+
+  font-size: 16px;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   ERREUR
+   ============================================================ */
+
+.login-error {
+  width: 100%;
+
+  padding:
+    9px 11px;
+
+  margin-bottom: 14px;
+
+  border:
+    1px solid #f3c7c7;
+
+  border-radius: 6px;
+
+  background: #fff0f0;
+
+  color: #b42323;
+
+  font-size: 11px;
+
+  line-height: 1.4;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   GROUPE FORMULAIRE
+   ============================================================ */
+
+.form-group {
+  width: 100%;
+
+  margin-bottom: 13px;
+}
+
+
+/* ============================================================
+   LABEL
+   ============================================================ */
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #294e68;
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   CONTENEUR INPUT
+   ============================================================ */
+
+.input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+
+/* ============================================================
+   ICÔNE INPUT
+   ============================================================ */
+
+.input-icon {
+  position: absolute;
+
+  left: 11px;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  color: #76a1b8;
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+
+.input-wrapper input {
+  display: block;
+
+  width: 100%;
+
+  height: 39px;
+
+  padding:
+    0 38px 0 34px;
+
+  border:
+    1px solid #c9e0ed;
+
+  border-radius: 7px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  color: #254c65;
+
+  font-family:
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+
+  transition:
+    border-color 0.2s ease,
+
+    box-shadow 0.2s ease,
+
+    background 0.2s ease;
+}
+
+
+/* ============================================================
+   PLACEHOLDER
+   ============================================================ */
+
+.input-wrapper input::placeholder {
+  color: #9db6c5;
+
+  opacity: 1;
+}
+
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+
+.input-wrapper input:focus {
+  border-color: #1986c1;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(25, 134, 193, 0.10);
+}
+
+
+/* ============================================================
+   BOUTON OEIL
+   ============================================================ */
+
+.password-toggle {
+  position: absolute;
+
+  right: 9px;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #76a1b8;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease;
+}
+
+
+.password-toggle:hover {
+  color: #0877b7;
+}
+
+
+.password-toggle:focus-visible {
+  color: #0877b7;
+
+  outline:
+    2px solid
+    rgba(8, 119, 183, 0.25);
+
+  outline-offset: 2px;
+
+  border-radius: 4px;
+}
+
+
+/* ============================================================
+   MOT DE PASSE OUBLIÉ
+   ============================================================ */
+
+.forgot-password-container {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  margin-top: -3px;
+
+  margin-bottom: 12px;
+}
+
+
+.forgot-password {
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #0879ba;
+
+  font-family:
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease;
+}
+
+
+.forgot-password:hover {
+  color: #05649b;
+
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   BOUTON CONNEXION
+   ============================================================ */
+
+.login-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 100%;
+
+  height: 39px;
+
+  padding:
+    0 15px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #0878bd,
+      #0870b5
+    );
+
+  color: #ffffff;
+
+  font-family:
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 12px
+    rgba(0, 107, 177, 0.18);
+
+  transition:
+    transform 0.15s ease,
+
+    box-shadow 0.15s ease,
+
+    background 0.15s ease;
+}
+
+
+/* ============================================================
+   HOVER BOUTON
+   ============================================================ */
+
+.login-button:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      90deg,
+      #086eac,
+      #05659f
+    );
+
+  box-shadow:
+    0 7px 16px
+    rgba(0, 107, 177, 0.25);
+}
+
+
+/* ============================================================
+   ACTIVE
+   ============================================================ */
+
+.login-button:active:not(:disabled) {
+  transform:
+    translateY(1px);
+
+  box-shadow:
+    0 3px 8px
+    rgba(0, 107, 177, 0.18);
+}
+
+
+/* ============================================================
+   DÉSACTIVÉ
+   ============================================================ */
+
+.login-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow:
+    0 4px 10px
+    rgba(0, 107, 177, 0.10);
+}
+
+
+/* ============================================================
+   TEXTE FINAL
+   ============================================================ */
+
+.login-bottom-text {
+  margin-top: 19px;
+
+  color: #63889d;
+
+  font-size: 9px;
+
+  line-height: 1.4;
+
+  font-weight: 400;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   TABLETTE
+   ============================================================ */
+
+@media (max-width: 1000px) {
+
+  .login-content {
+    grid-template-columns:
+      1fr 1fr;
+
+    gap: 20px;
+
+    padding:
+      30px 4%;
+  }
+
+
+  .login-left {
+    padding-left: 15px;
+  }
+
+
+  .login-right {
+    width: 100%;
+  }
+
+
+  .login-form {
+    max-width: 380px;
+
+    padding:
+      28px 30px 23px;
+  }
+
+
+  .login-slogan {
+    font-size: 23px;
+  }
+
+
+  .login-background-overlay {
+    background:
+      linear-gradient(
+        90deg,
+
+        rgba(255, 255, 255, 0.03) 0%,
+
+        rgba(255, 255, 255, 0.06) 25%,
+
+        rgba(255, 255, 255, 0.18) 42%,
+
+        rgba(255, 255, 255, 0.45) 58%,
+
+        rgba(255, 255, 255, 0.88) 100%
+      );
+  }
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+  .login-page {
+    min-height: 100vh;
+
+    overflow-y: auto;
+  }
+
+
+  .login-background {
+    background-position:
+      center center;
+  }
+
+
+  .login-background-overlay {
+    background:
+      linear-gradient(
+        180deg,
+
+        rgba(255, 255, 255, 0.08) 0%,
+
+        rgba(255, 255, 255, 0.22) 35%,
+
+        rgba(255, 255, 255, 0.62) 60%,
+
+        rgba(255, 255, 255, 0.94) 100%
+      );
+  }
+
+
+  .login-content {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    padding:
+      25px 18px;
+  }
+
+
+  .login-left {
+
+    width: 100%;
+
+    min-height: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    order: 2;
+  }
+
+
+  .login-slogan {
+
+    margin-top: 0;
+
+    padding: 0;
+
+    flex-direction: row;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    font-size: 16px;
+
+    text-align: center;
+  }
+
+
+  .login-right {
+
+    width: 100%;
+
+    max-width: 420px;
+
+    min-height: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    order: 1;
+  }
+
+
+  .login-form {
+
+    width: 100%;
+
+    max-width: 420px;
+
+    margin: 0 auto;
+
+    padding:
+      25px 25px 20px;
+
+    border-radius: 9px;
+  }
+}
+
+
+/* ============================================================
+   PETIT MOBILE
+   ============================================================ */
+
+@media (max-width: 450px) {
+
+  .login-content {
+    padding:
+      18px 12px;
+  }
+
+
+  .login-form {
+    padding:
+      22px 18px 18px;
+  }
+
+
+  .login-brand {
+    margin-bottom: 11px;
+  }
+
+
+  .login-brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+
+  .login-brand-name {
+    font-size: 20px;
+  }
+
+
+  .login-brand-subtitle {
+    font-size: 10px;
+  }
+
+
+  .login-title {
+    margin-bottom: 18px;
+
+    font-size: 15px;
+  }
+
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+
+  .input-wrapper input {
+    height: 38px;
+  }
+
+
+  .login-button {
+    height: 38px;
+  }
+
+
+  .login-slogan {
+    font-size: 14px;
+
+    gap: 7px;
+  }
+
+
+  .login-bottom-text {
+    font-size: 8px;
+  }
+}
+
+
+/* ============================================================
+   TRÈS PETIT ÉCRAN
+   ============================================================ */
+
+@media (max-width: 350px) {
+
+  .login-content {
+    padding:
+      12px 9px;
+  }
+
+
+  .login-form {
+    padding:
+      20px 15px 16px;
+  }
+
+
+  .login-brand-name {
+    font-size: 18px;
+  }
+
+
+  .login-title {
+    font-size: 14px;
+  }
+
+
+  .login-slogan {
+    font-size: 12px;
+
+    gap: 5px;
+  }
+}
