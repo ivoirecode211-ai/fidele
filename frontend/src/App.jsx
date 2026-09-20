@@ -289,6 +289,75 @@ export default function App() {
 
 
       {/* ======================================================
+          MODULES AVEC LEUR PROPRE LAYOUT COMPLET
+          ======================================================
+
+          Comme /direction, ces modules construisent leur propre
+          sidebar/en-tête spécialisés (espace médecin, pharmacie,
+          stocks, caisse) et ne doivent donc PAS être imbriqués
+          dans AppLayout : les deux chrome se superposaient sinon
+          (double sidebar, double en-tête).
+
+          ====================================================== */}
+
+      <Route
+        path="/consultations"
+        element={
+          <Protected>
+            <Consultations />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/pharmacy"
+        element={
+          <Protected>
+            <Pharmacy />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/stocks"
+        element={
+          <Protected>
+            <Stocks />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/caisse"
+        element={
+          <Protected>
+            <Caisse />
+          </Protected>
+        }
+      />
+
+
+      {/* ======================================================
+          PAGE PRINCIPALE DES MODULES
+          ======================================================
+
+          Comme /direction et les modules ci-dessus, cette page
+          construit son propre en-tête (pas de sidebar) : elle
+          reste donc, elle aussi, en dehors de AppLayout.
+
+          ====================================================== */}
+
+      <Route
+        path="/modules"
+        element={
+          <Protected>
+            <Modules />
+          </Protected>
+        }
+      />
+
+
+      {/* ======================================================
           APPLICATION PRINCIPALE
           ======================================================
 
@@ -336,36 +405,6 @@ export default function App() {
 
 
         {/* ====================================================
-            PAGE PRINCIPALE DES MODULES
-            ==================================================== */}
-
-        <Route
-          path="modules"
-          element={<Modules />}
-        />
-
-
-        {/* ====================================================
-            MODULE : CAISSE
-            ==================================================== */}
-
-        <Route
-          path="caisse"
-          element={<Caisse />}
-        />
-
-
-        {/* ====================================================
-            MODULE : GESTION DES STOCKS
-            ==================================================== */}
-
-        <Route
-          path="stocks"
-          element={<Stocks />}
-        />
-
-
-        {/* ====================================================
             MODULE : TABLEAU DE BORD
             ==================================================== */}
 
@@ -396,16 +435,6 @@ export default function App() {
 
 
         {/* ====================================================
-            MODULE : CONSULTATIONS
-            ==================================================== */}
-
-        <Route
-          path="consultations"
-          element={<Consultations />}
-        />
-
-
-        {/* ====================================================
             MODULE : HOSPITALISATION
             ==================================================== */}
 
@@ -432,16 +461,6 @@ export default function App() {
         <Route
           path="laboratory"
           element={<Laboratory />}
-        />
-
-
-        {/* ====================================================
-            MODULE : PHARMACIE
-            ==================================================== */}
-
-        <Route
-          path="pharmacy"
-          element={<Pharmacy />}
         />
 
 

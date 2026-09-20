@@ -7,8 +7,8 @@
   min-height: 100%;
   padding: 20px;
   box-sizing: border-box;
-  background: #f4f9fc;
-  color: #173852;
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* ============================================================
@@ -40,7 +40,7 @@
   background: linear-gradient(
     135deg,
     #087cca,
-    #0865a6
+    var(--primary)
   );
   color: white;
   box-shadow: 0 4px 12px rgba(8, 124, 202, 0.2);
@@ -55,7 +55,7 @@
 
 .archives-title-area p {
   margin: 3px 0 0;
-  color: #668496;
+  color: var(--muted);
   font-size: 10px;
 }
 
@@ -65,10 +65,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #d5eee4;
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: #f2fbf7;
-  color: #078c68;
+  background: var(--bg);
+  color: var(--green);
   font-size: 8px;
   font-weight: 600;
 }
@@ -92,65 +92,6 @@
   margin-bottom: 12px;
 }
 
-.archive-stat-card {
-  min-height: 62px;
-  padding: 9px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid #d7e9f2;
-  border-radius: 8px;
-  background: white;
-  box-sizing: border-box;
-  box-shadow: 0 2px 8px rgba(25, 86, 120, 0.04);
-}
-
-.archive-stat-icon {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.archive-stat-icon.blue {
-  background: #e2f3ff;
-  color: #087fce;
-}
-
-.archive-stat-icon.green {
-  background: #e1f8ed;
-  color: #079a70;
-}
-
-.archive-stat-icon.purple {
-  background: #eee8ff;
-  color: #7656d9;
-}
-
-.archive-stat-icon.orange {
-  background: #fff0dc;
-  color: #eb9215;
-}
-
-.archive-stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.archive-stat-content strong {
-  color: #315b77;
-  font-size: 14px;
-  line-height: 16px;
-}
-
-.archive-stat-content span {
-  margin-top: 2px;
-  color: #8198a7;
-  font-size: 7px;
-}
 
 /* ============================================================
    BARRE DE RECHERCHE
@@ -163,7 +104,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid #d8e9f1;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
   box-sizing: border-box;
@@ -177,9 +118,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #d7e6ed;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fbfdfe;
+  background: var(--surface);
   color: #7d95a3;
   box-sizing: border-box;
 }
@@ -207,8 +148,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #edf2f5;
-  color: #738996;
+  background: var(--primary-soft);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -234,11 +175,11 @@
   width: 100%;
   height: 100%;
   padding: 0 24px 0 8px;
-  border: 1px solid #d7e6ed;
+  border: 1px solid var(--border);
   border-radius: 6px;
   outline: none;
   appearance: none;
-  background: #fbfdfe;
+  background: var(--surface);
   color: #607d8d;
   font-family: inherit;
   font-size: 8px;
@@ -284,7 +225,7 @@
 
 .archives-panel {
   overflow: hidden;
-  border: 1px solid #d7e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
   box-shadow: 0 2px 8px rgba(25, 86, 120, 0.04);
@@ -297,7 +238,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border-bottom: 1px solid #e5eef3;
+  border-bottom: 1px solid var(--green-soft);
   box-sizing: border-box;
 }
 
@@ -322,7 +263,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9f5fb;
+  background: var(--primary-soft);
   color: #087cc8;
   font-size: 7px;
   font-weight: 700;
@@ -353,7 +294,7 @@
   min-height: 34px;
   padding: 5px 5px;
   border: none;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -370,7 +311,7 @@
 
 .archive-category:hover {
   border-radius: 5px;
-  background: #f2f9fc;
+  background: var(--bg);
 }
 
 .archive-category-icon {
@@ -381,7 +322,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9f5fb;
+  background: var(--primary-soft);
   color: #087bc8;
 }
 
@@ -395,7 +336,7 @@
 }
 
 .archive-category strong {
-  color: #78909e;
+  color: var(--muted);
   font-size: 7px;
   font-weight: 600;
 }
@@ -416,13 +357,13 @@
 }
 
 .archive-table thead {
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .archive-table th {
   height: 30px;
   padding: 0 8px;
-  border-bottom: 1px solid #e3edf2;
+  border-bottom: 1px solid var(--border);
   color: #8095a1;
   font-size: 7px;
   font-weight: 600;
@@ -433,7 +374,7 @@
 .archive-table td {
   height: 38px;
   padding: 4px 8px;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
   color: #547184;
   font-size: 7px;
   vertical-align: middle;
@@ -444,14 +385,14 @@
 }
 
 .archive-table tbody tr:hover {
-  background: #f9fcfe;
+  background: var(--surface);
 }
 
 .archive-date {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #728997;
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -473,7 +414,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8f5fc;
+  background: var(--primary-soft);
   color: #087cca;
 }
 
@@ -512,7 +453,7 @@
 }
 
 .archive-author {
-  color: #647f8f;
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -520,7 +461,7 @@
   width: 25px;
   height: 25px;
   padding: 0;
-  border: 1px solid #dbe9ef;
+  border: 1px solid var(--border);
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -531,7 +472,7 @@
 }
 
 .archive-eye-button:hover {
-  background: #eaf7fd;
+  background: var(--primary-soft);
 }
 
 .archive-empty {
@@ -559,7 +500,7 @@
 
 .archives-actions {
   padding: 10px;
-  border: 1px solid #d7e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
   box-shadow: 0 2px 8px rgba(25, 86, 120, 0.04);
@@ -642,7 +583,7 @@
   background: linear-gradient(
     135deg,
     #08ae7c,
-    #078e69
+    var(--green)
   );
 }
 
@@ -675,7 +616,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #d9e8ef;
+  border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
   box-sizing: border-box;
@@ -689,7 +630,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9f5fb;
+  background: var(--primary-soft);
   color: #087cca;
 }
 
@@ -712,7 +653,7 @@
 }
 
 .archives-security-icon {
-  color: #0a9d74;
+  color: var(--green);
 }
 
 /* ============================================================
@@ -747,7 +688,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e2edf3;
+  border-bottom: 1px solid var(--border);
   box-sizing: border-box;
 }
 
@@ -764,7 +705,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e7f5fc;
+  background: var(--primary-soft);
   color: #087dca;
 }
 
@@ -789,13 +730,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f4f6;
-  color: #6d8492;
+  background: var(--bg);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .archives-modal-close:hover {
-  background: #e6edf1;
+  background: var(--green-soft);
 }
 
 .archives-modal-body {
@@ -810,7 +751,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: #f8fcfe;
+  background: var(--bg);
   color: #91a5b1;
   text-align: center;
 }
@@ -842,11 +783,11 @@
 
 .archive-document-details > div {
   padding: 8px;
-  border: 1px solid #e1edf2;
+  border: 1px solid var(--border);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  background: #fbfdfe;
+  background: var(--surface);
 }
 
 .archive-document-details span {
@@ -866,7 +807,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 7px;
-  border-top: 1px solid #e2edf3;
+  border-top: 1px solid var(--border);
 }
 
 .archive-modal-cancel,
@@ -884,9 +825,9 @@
 }
 
 .archive-modal-cancel {
-  border: 1px solid #d5e2e9;
+  border: 1px solid var(--border);
   background: white;
-  color: #657f8e;
+  color: var(--muted);
 }
 
 .archive-modal-download {

@@ -1,19 +1,86 @@
 :root {
-  /* Palette MA SANTÉ inspirée de la maquette fournie. */
-  --primary: #0b5b9a;
-  --primary-dark: #073f70;
-  --primary-soft: #eaf4fb;
-  --green: #079b68;
-  --green-soft: #e9f8f1;
-  --text: #18324a;
-  --muted: #718398;
-  --bg: #f4f8fb;
+  /* ============================================================
+     CHARTE GRAPHIQUE — CLINIQUE
+     ============================================================
+     Bleu hôpital : échelle complète 50→950 (OKLCH, teinte 248°).
+     Pour habiller un autre établissement, ne changer que cette
+     échelle : tout le reste de l'application en dépend via les
+     alias de compatibilité ci-dessous.
+     ============================================================ */
+
+  --primary-50: #f1f8ff;
+  --primary-100: #e0effe;
+  --primary-200: #c2e0ff;
+  --primary-300: #98caf9;
+  --primary-400: #67aae9;
+  --primary-500: #368ad1;
+  --primary-600: #1671b7;
+  --primary-700: #0b5d98;
+  --primary-800: #0a4979;
+  --primary-900: #0c3557;
+  --primary-950: #08233a;
+
+  /* Neutres */
   --surface: #ffffff;
-  --border: #dce7ef;
-  --danger: #d94a4a;
-  --warning: #e39a28;
+  --surface-50: #f8fafc;
+  --surface-100: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --ink: #0f172a;
+  --ink-muted: #334155;
+  --ink-faint: #475569;
+
+  /* États — jamais décoratifs, réservés à un statut */
+  --green: #16a34a;
+  --green-hover: #15803d;
+  --green-soft: #f0fdf4;
+  --green-soft-text: #166534;
+  --green-soft-border: #bbf7d0;
+
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-soft: #fef2f2;
+  --danger-soft-text: #991b1b;
+  --danger-soft-border: #fecaca;
+  --danger-field-border: #f87171;
+
+  --warning: #f59e0b;
+  --warning-soft: #fffbeb;
+  --warning-soft-text: #92400e;
+  --warning-soft-text-strong: #b45309;
+  --warning-soft-border: #fde68a;
+
+  /* Rayons */
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  /* Ombres — toujours douces, décalées vers le bas */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .04);
+  --shadow-sidebar: 2px 0 12px rgba(0, 0, 0, .06);
+  --shadow-tuile: 0 10px 20px -8px rgba(22, 113, 183, .35);
+
+  --font: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* ============================================================
+     ALIAS DE COMPATIBILITÉ
+     ============================================================
+     Noms utilisés dans le reste du CSS de l'application.
+     Les repointer ici suffit à rhabiller tout l'existant avec
+     la nouvelle charte, sans retoucher fichier par fichier.
+     ============================================================ */
+
+  --primary: var(--primary-600);
+  --primary-dark: var(--primary-700);
+  --primary-soft: var(--primary-50);
+
+  --text: var(--ink);
+  --muted: var(--ink-muted);
+  --bg: var(--surface-100);
+  --border: var(--surface-200);
+
   --purple: #7359c7;
-  --shadow: 0 8px 24px rgba(22, 64, 98, .08);
-  --radius: 12px;
-  --font: "Segoe UI", Roboto, Arial, sans-serif;
+  --purple-soft: #f0edff;
+
+  --shadow: var(--shadow-card);
+  --radius: var(--radius-xl);
 }

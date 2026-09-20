@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { HeartPulse, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 
 export default function Login() {
   const { login } = useAuth();
@@ -30,7 +31,7 @@ export default function Login() {
     <div className="login-page">
       <div className="login-visual">
         <div className="visual-overlay">
-          <div className="brand-large"><HeartPulse size={44}/> <span>MA <b>SANTÉ</b></span></div>
+          <div className="brand-large"><Logo size={44} inverted/> <span>MA <b>SANTÉ</b></span></div>
           <h1>Une clinique plus organisée,<br/>plus humaine et plus intelligente</h1>
           <p>Une solution centralisée pour gérer les patients, les consultations, les soins, les finances et les ressources de la clinique.</p>
           <div className="login-points">
@@ -43,7 +44,7 @@ export default function Login() {
 
       <div className="login-card-wrap">
         <form className="login-card" onSubmit={submit}>
-          <div className="login-logo"><HeartPulse size={28}/></div>
+          <div className="login-logo"><Logo size={40}/></div>
           <h2>Bienvenue</h2>
           <p className="muted">Connectez-vous à votre espace MA SANTÉ</p>
 

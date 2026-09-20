@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "../styles/Laboratory.css";
 
 function Laboratory() {
@@ -12,14 +12,6 @@ function Laboratory() {
     observation: "",
   });
 
-  /*
-   * ============================================================
-   * DONNÉES DE DÉMONSTRATION
-   * ============================================================
-   *
-   * Ces données seront ensuite remplacées par les données
-   * provenant de Django / PostgreSQL.
-   */
   const analyses = [
     {
       id: "LAB-001",
@@ -95,11 +87,6 @@ function Laboratory() {
     },
   ];
 
-  /*
-   * ============================================================
-   * FILTRAGE DES ANALYSES
-   * ============================================================
-   */
   const filteredAnalyses = useMemo(() => {
     return analyses.filter((analysis) => {
       const searchValue = search.toLowerCase();
@@ -117,11 +104,6 @@ function Laboratory() {
     });
   }, [search, statusFilter]);
 
-  /*
-   * ============================================================
-   * CLASSE CSS SELON LE STATUT
-   * ============================================================
-   */
   const getStatusClass = (status) => {
     switch (status) {
       case "Terminée":
@@ -138,22 +120,12 @@ function Laboratory() {
     }
   };
 
-  /*
-   * ============================================================
-   * CLASSE CSS SELON LA PRIORITÉ
-   * ============================================================
-   */
   const getPriorityClass = (priority) => {
     return priority === "Urgente"
       ? "lab-priority-urgent"
       : "lab-priority-normal";
   };
 
-  /*
-   * ============================================================
-   * OUVRIR LE FORMULAIRE DE RÉSULTAT
-   * ============================================================
-   */
   const openResultForm = (analysis) => {
     setSelectedAnalysis(analysis);
 
@@ -165,21 +137,11 @@ function Laboratory() {
     setShowResultForm(true);
   };
 
-  /*
-   * ============================================================
-   * FERMER LE FORMULAIRE
-   * ============================================================
-   */
   const closeResultForm = () => {
     setShowResultForm(false);
     setSelectedAnalysis(null);
   };
 
-  /*
-   * ============================================================
-   * VALIDATION DU RÉSULTAT
-   * ============================================================
-   */
   const validateResult = (event) => {
     event.preventDefault();
 
@@ -193,17 +155,7 @@ function Laboratory() {
   return (
     <div className="laboratory-page">
 
-      {/* ======================================================
-          SIDEBAR
-          
-          IMPORTANT :
-          Le menu de navigation a été complètement supprimé.
-          
-          Il reste uniquement :
-          - Le logo MA SANTE
-          - Le nom de l'application
-          - Le pied de la barre latérale
-      ======================================================= */}
+      {/* Le menu de navigation a été volontairement supprimé de cette barre latérale. */}
 
       <aside className="laboratory-sidebar">
 
@@ -226,29 +178,6 @@ function Laboratory() {
 
         </div>
 
-        {/* 
-         * =====================================================
-         * ANCIEN MENU DE NAVIGATION SUPPRIMÉ
-         * =====================================================
-         *
-         * Accueil
-         * Rendez-vous
-         * Consultations
-         * Laboratoire
-         * Pharmacie
-         * Caisse
-         * Stocks
-         * Hospitalisation
-         * Ressources Humaines
-         * Équipements
-         * Maintenance
-         * Statistiques
-         * Intelligence Artificielle
-         * Paramètres
-         *
-         * Tout ce bloc a été supprimé.
-         */}
-
         {/* Footer de la sidebar */}
         <div className="laboratory-sidebar-footer">
 
@@ -264,15 +193,7 @@ function Laboratory() {
 
       </aside>
 
-      {/* ======================================================
-          CONTENU PRINCIPAL
-      ======================================================= */}
-
       <main className="laboratory-main">
-
-        {/* ====================================================
-            HEADER
-        ===================================================== */}
 
         <header className="laboratory-header">
 
@@ -310,10 +231,6 @@ function Laboratory() {
           </div>
 
         </header>
-
-        {/* ====================================================
-            STATISTIQUES
-        ===================================================== */}
 
         <section className="laboratory-statistics">
 
@@ -415,10 +332,6 @@ function Laboratory() {
 
         </section>
 
-        {/* ====================================================
-            BARRE D'ACTIONS
-        ===================================================== */}
-
         <section className="laboratory-toolbar">
 
           <div className="laboratory-search">
@@ -476,15 +389,7 @@ function Laboratory() {
 
         </section>
 
-        {/* ====================================================
-            CONTENU EN DEUX COLONNES
-        ===================================================== */}
-
         <section className="laboratory-content-grid">
-
-          {/* ==================================================
-              DEMANDES D'ANALYSES
-          =================================================== */}
 
           <div className="laboratory-table-card">
 
@@ -655,10 +560,6 @@ function Laboratory() {
 
           </div>
 
-          {/* ==================================================
-              RÉSULTATS RÉCENTS
-          =================================================== */}
-
           <aside className="recent-results-card">
 
             <div className="recent-results-header">
@@ -765,10 +666,6 @@ function Laboratory() {
 
         </section>
 
-        {/* ====================================================
-            ACTIONS RAPIDES
-        ===================================================== */}
-
         <section className="laboratory-quick-actions">
 
           <button>
@@ -787,10 +684,6 @@ function Laboratory() {
           </button>
 
         </section>
-
-        {/* ====================================================
-            MODAL RÉSULTAT
-        ===================================================== */}
 
         {showResultForm && selectedAnalysis && (
 

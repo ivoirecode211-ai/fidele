@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Users,
   UserPlus,
@@ -19,7 +19,7 @@ import {
   UserCheck,
 } from "lucide-react";
 
-import "../Styles/employees.css";
+import "../styles/employees.css";
 
 const initialEmployees = [
   {
@@ -141,10 +141,6 @@ function Employees() {
 
   const [form, setForm] = useState(emptyForm);
 
-  /* ==========================================================
-     STATISTIQUES
-     ========================================================== */
-
   const statistics = {
     total: employees.length,
 
@@ -164,10 +160,6 @@ function Employees() {
       (employee) => employee.sexe === "Femme"
     ).length,
   };
-
-  /* ==========================================================
-     FILTRES
-     ========================================================== */
 
   const filteredEmployees = useMemo(() => {
     return employees.filter((employee) => {
@@ -209,19 +201,11 @@ function Employees() {
     statusFilter,
   ]);
 
-  /* ==========================================================
-     MODAL AJOUT
-     ========================================================== */
-
   const openAddModal = () => {
     setEditingEmployee(null);
     setForm(emptyForm);
     setShowModal(true);
   };
-
-  /* ==========================================================
-     MODAL MODIFICATION
-     ========================================================== */
 
   const openEditModal = (employee) => {
     setEditingEmployee(employee);
@@ -242,18 +226,10 @@ function Employees() {
     setShowModal(true);
   };
 
-  /* ==========================================================
-     DETAILS
-     ========================================================== */
-
   const openDetails = (employee) => {
     setSelectedEmployee(employee);
     setShowDetails(true);
   };
-
-  /* ==========================================================
-     FERMER MODALES
-     ========================================================== */
 
   const closeModal = () => {
     setShowModal(false);
@@ -266,10 +242,6 @@ function Employees() {
     setSelectedEmployee(null);
   };
 
-  /* ==========================================================
-     CHANGEMENT FORMULAIRE
-     ========================================================== */
-
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -278,10 +250,6 @@ function Employees() {
       [name]: value,
     }));
   };
-
-  /* ==========================================================
-     ENREGISTRER
-     ========================================================== */
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -328,10 +296,6 @@ function Employees() {
     closeModal();
   };
 
-  /* ==========================================================
-     SUPPRESSION
-     ========================================================== */
-
   const deleteEmployee = (id) => {
     const confirmation = window.confirm(
       "Voulez-vous vraiment supprimer cet employé ?"
@@ -346,10 +310,6 @@ function Employees() {
     );
   };
 
-  /* ==========================================================
-     STATUT
-     ========================================================== */
-
   const changeStatus = (id, status) => {
     setEmployees((previous) =>
       previous.map((employee) =>
@@ -362,10 +322,6 @@ function Employees() {
       )
     );
   };
-
-  /* ==========================================================
-     FORMAT DATE
-     ========================================================== */
 
   const formatDate = (date) => {
     if (!date) {
@@ -380,10 +336,6 @@ function Employees() {
       year: "numeric",
     });
   };
-
-  /* ==========================================================
-     CLASSE STATUT
-     ========================================================== */
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -406,10 +358,6 @@ function Employees() {
 
   return (
     <div className="employees-page">
-
-      {/* ======================================================
-          HEADER
-          ====================================================== */}
 
       <div className="employees-header">
 
@@ -439,10 +387,6 @@ function Employees() {
         </button>
 
       </div>
-
-      {/* ======================================================
-          STATISTIQUES
-          ====================================================== */}
 
       <div className="employees-statistics">
 
@@ -501,10 +445,6 @@ function Employees() {
         </div>
 
       </div>
-
-      {/* ======================================================
-          FILTRES
-          ====================================================== */}
 
       <div className="employees-filters">
 
@@ -594,10 +534,6 @@ function Employees() {
         </div>
 
       </div>
-
-      {/* ======================================================
-          TABLEAU
-          ====================================================== */}
 
       <div className="employees-card">
 
@@ -838,10 +774,6 @@ function Employees() {
         </div>
 
       </div>
-
-      {/* ======================================================
-          MODAL AJOUT / MODIFICATION
-          ====================================================== */}
 
       {showModal && (
 
@@ -1192,10 +1124,6 @@ function Employees() {
         </div>
 
       )}
-
-      {/* ======================================================
-          MODAL DETAILS
-          ====================================================== */}
 
       {showDetails && selectedEmployee && (
 

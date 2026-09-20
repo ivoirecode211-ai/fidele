@@ -9,40 +9,7 @@
    VARIABLES
    ============================================================ */
 
-:root {
-
-  --doctor-blue: #006fc9;
-  --doctor-blue-dark: #073b66;
-  --doctor-blue-darker: #052f52;
-
-  --doctor-blue-light: #eaf6ff;
-  --doctor-blue-soft: #f3f9fd;
-
-  --green: #16a879;
-  --green-light: #dff7ed;
-
-  --orange: #f59e0b;
-  --orange-light: #fff0cf;
-
-  --red: #e5484d;
-  --red-light: #ffe3e3;
-
-  --purple: #7454d9;
-  --purple-light: #eee9ff;
-
-  --text: #173b5b;
-  --text-dark: #0c2d4a;
-  --text-light: #6f879b;
-
-  --border: #d8e8f3;
-  --white: #ffffff;
-
-  --background: #f3f9fd;
-
-  --shadow: 0 3px 14px rgba(19, 81, 122, 0.08);
-
-}
-
+/* Palette du module : voir src/styles/variables.css (source unique). */
 
 /* ============================================================
    RESET
@@ -60,7 +27,7 @@
 
   display: flex;
 
-  background: var(--background);
+  background: var(--bg);
 
   color: var(--text);
 
@@ -87,7 +54,7 @@
   background:
     linear-gradient(
       180deg,
-      #073e68 0%,
+      var(--primary-dark) 0%,
       #062e50 100%
     );
 
@@ -216,7 +183,7 @@
 
   background: transparent;
 
-  color: #d8ebf7;
+  color: var(--border);
 
   min-height: 43px;
 
@@ -361,7 +328,7 @@
 
   margin: 0;
 
-  color: #075da2;
+  color: var(--primary);
 
   font-size: 22px;
 
@@ -375,7 +342,7 @@
   margin:
     4px 0 0;
 
-  color: var(--text-light);
+  color: var(--muted);
 
   font-size: 12px;
 
@@ -425,7 +392,7 @@
   font-size: 13px;
 
   border:
-    3px solid #e5f3fc;
+    3px solid var(--primary-soft);
 
 }
 
@@ -465,7 +432,7 @@
 
   background: transparent;
 
-  color: #6e8ca3;
+  color: var(--muted);
 
   cursor: pointer;
 
@@ -526,7 +493,7 @@
 
   font-size: 11px;
 
-  color: var(--text-light);
+  color: var(--muted);
 
 }
 
@@ -554,7 +521,7 @@
 
 .consultation-counter span {
 
-  color: var(--doctor-blue);
+  color: var(--primary);
 
   font-size: 18px;
 
@@ -565,7 +532,7 @@
 
 .consultation-counter small {
 
-  color: var(--text-light);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -606,7 +573,7 @@
   background: white;
 
   border:
-    1px solid #cfe1ed;
+    1px solid var(--border);
 
   border-radius: 8px;
 
@@ -634,7 +601,7 @@
 
   padding-left: 13px;
 
-  color: #6b8ca3;
+  color: var(--muted);
 
   font-size: 21px;
 
@@ -817,16 +784,16 @@
 
 .quick-stat-icon.blue {
 
-  background: var(--doctor-blue-light);
+  background: var(--primary-soft);
 
-  color: var(--doctor-blue);
+  color: var(--primary);
 
 }
 
 
 .quick-stat-icon.green {
 
-  background: var(--green-light);
+  background: var(--green-soft);
 
   color: var(--green);
 
@@ -835,16 +802,16 @@
 
 .quick-stat-icon.orange {
 
-  background: var(--orange-light);
+  background: var(--warning-soft);
 
-  color: var(--orange);
+  color: var(--warning);
 
 }
 
 
 .quick-stat-icon.purple {
 
-  background: var(--purple-light);
+  background: var(--purple-soft);
 
   color: var(--purple);
 
@@ -914,7 +881,7 @@
   justify-content: space-between;
 
   border-bottom:
-    1px solid #e4eff5;
+    1px solid var(--primary-soft);
 
 }
 
@@ -945,7 +912,7 @@
 
 .table-date {
 
-  background: #eef7fd;
+  background: var(--primary-soft);
 
   color: #1973b7;
 
@@ -992,12 +959,12 @@
   padding:
     0 13px;
 
-  background: #f4f9fc;
+  background: var(--bg);
 
   color: #5c7488;
 
   border-bottom:
-    1px solid #dae9f2;
+    1px solid var(--border);
 
   text-align: left;
 
@@ -1016,7 +983,7 @@
     7px 13px;
 
   border-bottom:
-    1px solid #edf3f7;
+    1px solid var(--primary-soft);
 
   color: #38566e;
 
@@ -1037,7 +1004,7 @@
 
 .consultations-table tbody tr:hover {
 
-  background: #f8fcff;
+  background: var(--bg);
 
 }
 
@@ -1199,7 +1166,7 @@
 
   color: #07855b;
 
-  background: #d8f7e9;
+  background: var(--border);
 
 }
 
@@ -1217,7 +1184,7 @@
 
   color: #0873ca;
 
-  background: #dcefff;
+  background: var(--primary-soft);
 
 }
 
@@ -1226,7 +1193,7 @@
 
   color: #16825b;
 
-  background: #dcf7eb;
+  background: var(--green-soft);
 
 }
 
@@ -1262,7 +1229,7 @@
 
   justify-content: center;
 
-  background: #edf7fd;
+  background: var(--primary-soft);
 
   color: #0875bf;
 
@@ -1271,16 +1238,16 @@
 
 .row-action:hover {
 
-  background: #d8edfa;
+  background: var(--border);
 
 }
 
 
 .row-action.more {
 
-  background: #f3f6f8;
+  background: var(--bg);
 
-  color: #6e8798;
+  color: var(--muted);
 
 }
 
@@ -1311,7 +1278,7 @@
 
   height: 42px;
 
-  background: #edf6fc;
+  background: var(--primary-soft);
 
   color: #62a6d0;
 
@@ -1368,7 +1335,7 @@
 
   gap: 10px;
 
-  background: #fbfdff;
+  background: var(--surface);
 
 }
 
@@ -1381,9 +1348,9 @@
 
   border-radius: 7px;
 
-  background: #eaf6fd;
+  background: var(--primary-soft);
 
-  color: #075d9f;
+  color: var(--primary);
 
   cursor: pointer;
 
@@ -1408,7 +1375,7 @@
 
 .quick-action-btn:hover {
 
-  background: #d9eefb;
+  background: var(--border);
 
   transform: translateY(-1px);
 
@@ -1438,7 +1405,7 @@
 
   color: #0876c2;
 
-  background: #d5edfc;
+  background: var(--border);
 
 }
 
@@ -1498,7 +1465,7 @@
 
   border-radius: 8px;
 
-  background: var(--green-light);
+  background: var(--green-soft);
 
   color: var(--green);
 
@@ -1515,9 +1482,9 @@
 
 .info-title-icon.orange-icon {
 
-  background: var(--orange-light);
+  background: var(--warning-soft);
 
-  color: var(--orange);
+  color: var(--warning);
 
 }
 
@@ -1566,7 +1533,7 @@
     9px 0;
 
   border-top:
-    1px solid #edf3f7;
+    1px solid var(--primary-soft);
 
 }
 
@@ -1575,7 +1542,7 @@
 
   font-size: 10px;
 
-  color: #6f8798;
+  color: var(--muted);
 
 }
 
@@ -1605,7 +1572,7 @@
     9px 0;
 
   border-top:
-    1px solid #edf3f7;
+    1px solid var(--primary-soft);
 
 }
 
@@ -1614,7 +1581,7 @@
 
   color: #0b72ba;
 
-  background: #e8f5fd;
+  background: var(--primary-soft);
 
   border-radius: 5px;
 
@@ -1763,8 +1730,8 @@
   background:
     linear-gradient(
       180deg,
-      #f7fcff,
-      #ffffff
+      var(--bg),
+      var(--surface)
     );
 
 }
@@ -1774,7 +1741,7 @@
 
   margin: 0;
 
-  color: #124c73;
+  color: var(--primary-dark);
 
   font-size: 17px;
 
@@ -1803,9 +1770,9 @@
 
   border-radius: 6px;
 
-  background: #edf4f8;
+  background: var(--primary-soft);
 
-  color: #648094;
+  color: var(--muted);
 
   cursor: pointer;
 
@@ -1818,7 +1785,7 @@
 
 .modal-close:hover {
 
-  background: #dfeef6;
+  background: var(--border);
 
 }
 
@@ -1878,7 +1845,7 @@
   width: 100%;
 
   border:
-    1px solid #cfe0ea;
+    1px solid var(--border);
 
   border-radius: 7px;
 
@@ -1989,7 +1956,7 @@
 
 .btn-secondary:hover {
 
-  background: #f3f8fb;
+  background: var(--bg);
 
 }
 
@@ -2008,7 +1975,7 @@
 
   padding: 12px;
 
-  background: #f3f9fd;
+  background: var(--bg);
 
   border-radius: 8px;
 
@@ -2090,10 +2057,10 @@
 
   padding: 11px;
 
-  background: #fafcfd;
+  background: var(--surface);
 
   border:
-    1px solid #e1edf3;
+    1px solid var(--border);
 
   border-radius: 7px;
 
@@ -2139,7 +2106,7 @@
   width: 100%;
 
   border:
-    1px solid #d3e3eb;
+    1px solid var(--border);
 
   border-radius: 7px;
 
@@ -2186,7 +2153,7 @@
 
   padding: 13px;
 
-  background: #f3f9fd;
+  background: var(--bg);
 
   border-radius: 8px;
 
@@ -2236,7 +2203,7 @@
   padding: 13px;
 
   border:
-    1px solid #e1edf3;
+    1px solid var(--border);
 
   border-radius: 8px;
 
@@ -2260,7 +2227,7 @@
   margin:
     7px 0;
 
-  color: #6e8798;
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -2297,7 +2264,7 @@
 
   align-items: center;
 
-  background: #e9f5fc;
+  background: var(--primary-soft);
 
   color: #0876bf;
 

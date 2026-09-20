@@ -1,4 +1,7 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Logo from "../components/Logo";
 import {
   Home,
   Package,
@@ -20,6 +23,8 @@ import {
   ChevronRight,
   Menu,
   LayoutDashboard,
+  LayoutGrid,
+  LogOut,
 } from "lucide-react";
 
 import "../styles/pharmacy.css";
@@ -128,6 +133,14 @@ const menuItems = [
 ];
 
 function Pharmacy({ onNavigate }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
+
   const [activeMenu, setActiveMenu] = useState("Accueil");
 
   const [prescriptions, setPrescriptions] = useState(
@@ -227,14 +240,12 @@ function Pharmacy({ onNavigate }) {
   return (
     <div className="pharmacy-page">
 
-      {/* ================= SIDEBAR ================= */}
-
       <aside className="pharmacy-sidebar">
 
         <div className="pharmacy-sidebar-brand">
 
           <div className="mini-heart-logo">
-            <span>♥</span>
+            <Logo size={26} inverted />
           </div>
 
           <div>
@@ -281,6 +292,23 @@ function Pharmacy({ onNavigate }) {
 
         <div className="sidebar-footer">
 
+          <Link
+            to="/modules"
+            className="pharmacy-nav-item"
+          >
+            <LayoutGrid size={17} strokeWidth={2} />
+            <span>Retour aux modules</span>
+          </Link>
+
+          <button
+            type="button"
+            className="pharmacy-nav-item"
+            onClick={handleLogout}
+          >
+            <LogOut size={17} strokeWidth={2} />
+            <span>Déconnexion</span>
+          </button>
+
           <div className="online-dot" />
 
           <span>
@@ -290,8 +318,6 @@ function Pharmacy({ onNavigate }) {
         </div>
 
       </aside>
-
-      {/* ================= MAIN ================= */}
 
       <main className="pharmacy-main">
 
@@ -926,8 +952,6 @@ function Pharmacy({ onNavigate }) {
 
       </main>
 
-      {/* ================= MODAL ORDONNANCE ================= */}
-
       {selectedPrescription && (
 
         <div
@@ -1088,8 +1112,6 @@ function Pharmacy({ onNavigate }) {
 
       )}
 
-      {/* ================= MODAL SCANNER ================= */}
-
       {showScan && (
 
         <div
@@ -1165,8 +1187,6 @@ function Pharmacy({ onNavigate }) {
         </div>
 
       )}
-
-      {/* ================= MODAL TICKET ================= */}
 
       {showTicket && (
 
@@ -1285,8 +1305,6 @@ function Pharmacy({ onNavigate }) {
         </div>
 
       )}
-
-      {/* ================= TOAST ================= */}
 
       {toast && (
 

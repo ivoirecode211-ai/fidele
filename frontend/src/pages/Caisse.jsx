@@ -1,528 +1,350 @@
-import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Home,
+  UserRound,
+  FileText,
+  CreditCard,
+  History,
+  TrendingUp,
+  Search,
+  Plus,
+  ChevronRight,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Bell,
+  CalendarDays,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import Logo from "../components/Logo";
+import StatusBadge from "../components/StatusBadge";
+import FormEngine from "../forms/FormEngine";
+import { caisseAdmissionConfig } from "../forms/configs/caisseAdmission";
 import "../styles/Caisse.css";
 
-/*
-|--------------------------------------------------------------------------
-| Icônes
-|--------------------------------------------------------------------------
-*/
-function Icon({ name, size = 20 }) {
-  const commonProps = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": true,
-  };
+const STATUS_TONES = {
+  "En attente": "warning",
+  "En consultation": "info",
+  "Payé": "success",
+};
 
-  const icons = {
-    home: (
-      <>
-        <path d="m3 10 9-7 9 7" />
-        <path d="M5 9v11h14V9" />
-        <path d="M9 20v-6h6v6" />
-      </>
-    ),
+const SERVICE_LABELS = {
+  MEDECINE: "Médecine",
+  CHIRURGIE: "Chirurgie",
+  PEDIATRIE: "Pédiatrie",
+  URGENCES: "Urgences",
+};
 
-    patient: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-
-    billing: (
-      <>
-        <rect x="4" y="3" width="16" height="18" rx="2" />
-        <path d="M8 7h8" />
-        <path d="M8 11h8" />
-        <path d="M8 15h5" />
-      </>
-    ),
-
-    payment: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 10h18" />
-        <path d="M7 15h3" />
-      </>
-    ),
-
-    history: (
-      <>
-        <path d="M3 12a9 9 0 1 0 3-6.7" />
-        <path d="M3 4v6h6" />
-        <path d="M12 7v5l3 2" />
-      </>
-    ),
-
-    report: (
-      <>
-        <path d="M4 19V5" />
-        <path d="M4 19h17" />
-        <path d="m7 15 4-4 3 2 5-6" />
-      </>
-    ),
-
-    search: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </>
-    ),
-
-    plus: (
-      <>
-        <path d="M12 5v14" />
-        <path d="M5 12h14" />
-      </>
-    ),
-
-    arrow: (
-      <>
-        <path d="M5 12h14" />
-        <path d="m13 6 6 6-6 6" />
-      </>
-    ),
-  };
-
-  return <svg {...commonProps}>{icons[name]}</svg>;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Badge du statut
-|--------------------------------------------------------------------------
-*/
-function StatusBadge({ status }) {
-  let className = "status-badge";
-
-  if (status === "En attente") {
-    className += " status-waiting";
-  }
-
-  if (status === "En consultation") {
-    className += " status-consultation";
-  }
-
-  if (status === "Payé") {
-    className += " status-paid";
-  }
-
-  return <span className={className}>{status}</span>;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Données de démonstration
-|--------------------------------------------------------------------------
-*/
 const initialPatients = [
-  {
-    id: "001",
-    patient: "TRAORE Awa",
-    service: "Médecine",
-    doctor: "Dr. KOUAME",
-    status: "En attente",
-  },
-  {
-    id: "002",
-    patient: "KONE Ibrahim",
-    service: "Chirurgie",
-    doctor: "Dr. BAH",
-    status: "En consultation",
-  },
-  {
-    id: "003",
-    patient: "DIALLO Mariam",
-    service: "Pédiatrie",
-    doctor: "Dr. KONE",
-    status: "Payé",
-  },
-  {
-    id: "004",
-    patient: "YAO Claude",
-    service: "Médecine",
-    doctor: "Dr. KOUAME",
-    status: "En attente",
-  },
+  { id: "001", patient: "TRAORE Awa", service: "Médecine", doctor: "Dr. KOUAME", status: "En attente" },
+  { id: "002", patient: "KONE Ibrahim", service: "Chirurgie", doctor: "Dr. BAH", status: "En consultation" },
+  { id: "003", patient: "DIALLO Mariam", service: "Pédiatrie", doctor: "Dr. KONE", status: "Payé" },
+  { id: "004", patient: "YAO Claude", service: "Médecine", doctor: "Dr. KOUAME", status: "En attente" },
 ];
 
-/*
-|--------------------------------------------------------------------------
-| Page Caisse
-|--------------------------------------------------------------------------
-*/
+const SIDEBAR_COLLAPSE_KEY = "caisse_sidebar_collapsed";
+
+function readCollapsedPreference() {
+  try {
+    return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeCollapsedPreference(value) {
+  try {
+    localStorage.setItem(SIDEBAR_COLLAPSE_KEY, value ? "1" : "0");
+  } catch {
+    // Préférence non persistée (stockage indisponible) : sans conséquence, la session reste utilisable.
+  }
+}
+
 export default function Caisse() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [patients, setPatients] = useState(initialPatients);
+  const [view, setView] = useState("liste"); // "liste" | "formulaire"
+  const [collapsed, setCollapsed] = useState(readCollapsedPreference);
 
-  /*
-  |--------------------------------------------------------------------------
-  | Recherche patient
-  |--------------------------------------------------------------------------
-  */
-  const filteredPatients = useMemo(() => {
-    const value = search.trim().toLowerCase();
+  // Le mode réduit est un confort desktop : en dessous de 850px la sidebar
+  // redevient une barre horizontale pleine largeur, les libellés doivent rester visibles.
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 850px)");
 
-    if (!value) {
-      return patients;
+    function syncWithViewport(event) {
+      if (event.matches) setCollapsed(false);
     }
 
+    if (query.matches) setCollapsed(false);
+    query.addEventListener("change", syncWithViewport);
+    return () => query.removeEventListener("change", syncWithViewport);
+  }, []);
+
+  function toggleSidebar() {
+    setCollapsed((current) => {
+      const next = !current;
+      writeCollapsedPreference(next);
+      return next;
+    });
+  }
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
+
+  const filteredPatients = useMemo(() => {
+    const value = search.trim().toLowerCase();
+    if (!value) return patients;
+
     return patients.filter((item) =>
-      [
-        item.id,
-        item.patient,
-        item.service,
-        item.doctor,
-        item.status,
-      ]
+      [item.id, item.patient, item.service, item.doctor, item.status]
         .join(" ")
         .toLowerCase()
         .includes(value)
     );
   }, [search, patients]);
 
-  /*
-  |--------------------------------------------------------------------------
-  | Ajouter un patient
-  |--------------------------------------------------------------------------
-  | Pour le moment, ceci ajoute une donnée de démonstration.
-  | Plus tard, cette fonction sera connectée à l'API Django.
-  |--------------------------------------------------------------------------
-  */
-  const handleNewPatient = () => {
+  function handleAdmissionComplete(instance) {
+    const identification = instance.data?.identification || {};
+    const orientation = instance.data?.orientation || {};
     const nextNumber = String(patients.length + 1).padStart(3, "0");
 
     const newPatient = {
       id: nextNumber,
-      patient: "NOUVEAU PATIENT",
-      service: "Médecine",
+      patient:
+        `${identification.last_name || ""} ${identification.first_names || ""}`.trim() ||
+        "Patient",
+      service: SERVICE_LABELS[orientation.service] || orientation.service || "—",
       doctor: "À affecter",
       status: "En attente",
     };
 
-    setPatients((currentPatients) => [
-      ...currentPatients,
-      newPatient,
-    ]);
-  };
+    setPatients((current) => [...current, newPatient]);
+    setView("liste");
+  }
+
+  const initials = (user?.first_name?.[0] || user?.username?.[0] || "U").toUpperCase();
+  const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(" ") || "Utilisateur";
+  const roleLabel = user?.role_label || user?.role || "Caissier(ère)";
+
+  const today = useMemo(() => {
+    const label = new Date().toLocaleDateString("fr-FR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }, []);
 
   return (
     <div className="caisse-page">
-
-      {/* =========================================================
-          SIDEBAR
-      ========================================================= */}
-      <aside className="caisse-sidebar">
-
-        {/* Logo */}
+      <aside className={`caisse-sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="caisse-brand">
           <div className="brand-icon">
-            ♥
+            <Logo size={26} inverted />
           </div>
-
-          <div className="brand-text">
-            <span>MA</span>
-            <strong>SANTÉ</strong>
-          </div>
+          {!collapsed && (
+            <div className="brand-text">
+              <span>MA</span>
+              <strong>SANTÉ</strong>
+            </div>
+          )}
         </div>
 
-        {/* Menu */}
         <nav className="caisse-nav">
-
-          <Link
-            to="/modules"
-            className="caisse-nav-item"
-          >
-            <Icon name="home" />
-            <span>Accueil</span>
+          <Link to="/modules" className="caisse-nav-item" title="Accueil">
+            <Home size={18} strokeWidth={2} />
+            {!collapsed && <span>Accueil</span>}
           </Link>
 
-          <button
-            type="button"
-            className="caisse-nav-item active"
-          >
-            <Icon name="patient" />
-            <span>Enregistrer un patient</span>
+          <button type="button" className="caisse-nav-item active" title="Enregistrer un patient">
+            <UserRound size={18} strokeWidth={2} />
+            {!collapsed && <span>Enregistrer un patient</span>}
           </button>
 
-          <Link
-            to="/billing"
-            className="caisse-nav-item"
-          >
-            <Icon name="billing" />
-            <span>Facturation</span>
+          <Link to="/billing" className="caisse-nav-item" title="Facturation">
+            <FileText size={18} strokeWidth={2} />
+            {!collapsed && <span>Facturation</span>}
           </Link>
 
-          <button
-            type="button"
-            className="caisse-nav-item"
-          >
-            <Icon name="payment" />
-            <span>Paiements</span>
+          <button type="button" className="caisse-nav-item" title="Paiements">
+            <CreditCard size={18} strokeWidth={2} />
+            {!collapsed && <span>Paiements</span>}
           </button>
 
-          <button
-            type="button"
-            className="caisse-nav-item"
-          >
-            <Icon name="history" />
-            <span>Historique</span>
+          <button type="button" className="caisse-nav-item" title="Historique">
+            <History size={18} strokeWidth={2} />
+            {!collapsed && <span>Historique</span>}
           </button>
 
-          <button
-            type="button"
-            className="caisse-nav-item"
-          >
-            <Icon name="report" />
-            <span>Bilan</span>
+          <button type="button" className="caisse-nav-item" title="Bilan">
+            <TrendingUp size={18} strokeWidth={2} />
+            {!collapsed && <span>Bilan</span>}
           </button>
 
-          <Link
-            to="/reports"
-            className="caisse-nav-item"
-          >
-            <Icon name="report" />
-            <span>Rapports</span>
+          <Link to="/reports" className="caisse-nav-item" title="Rapports">
+            <TrendingUp size={18} strokeWidth={2} />
+            {!collapsed && <span>Rapports</span>}
           </Link>
 
+          <div className="caisse-nav-divider" />
+
+          <button type="button" className="caisse-nav-item" onClick={handleLogout} title="Déconnexion">
+            <LogOut size={18} strokeWidth={2} />
+            {!collapsed && <span>Déconnexion</span>}
+          </button>
         </nav>
+
+        <div className="caisse-sidebar-footer">
+          <div className="avatar small">{initials}</div>
+          {!collapsed && (
+            <div>
+              <strong>{fullName}</strong>
+              <small>{roleLabel}</small>
+            </div>
+          )}
+        </div>
       </aside>
 
-      {/* =========================================================
-          CONTENU PRINCIPAL
-      ========================================================= */}
       <main className="caisse-content">
-
-        {/* =======================================================
-            HEADER
-        ======================================================= */}
         <header className="caisse-header">
-
-          <div className="caisse-header-title">
-            <h1>Espace Caissier</h1>
-
-            <p>
-              Enregistrement / Accueil patient
-            </p>
-          </div>
-
-          {/* Profil caissière */}
-          <div className="cashier-profile">
-
-            <div className="cashier-avatar">
-              CF
-            </div>
-
-            <div className="cashier-info">
-              <strong>
-                COULIBALY Fatou
-              </strong>
-
-              <span>
-                Caissière
-              </span>
-            </div>
-
-          </div>
-
-        </header>
-
-        {/* =======================================================
-            CONTENU
-        ======================================================= */}
-        <section className="caisse-main">
-
-          {/* =====================================================
-              BARRE DE RECHERCHE + NOUVEAU PATIENT
-          ===================================================== */}
-          <div className="patient-toolbar">
-
-            <div className="search-box">
-
-              <Icon
-                name="search"
-                size={21}
-              />
-
-              <input
-                type="text"
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                placeholder="Rechercher un patient (nom, téléphone...)"
-              />
-
-            </div>
-
+          <div className="caisse-header-left">
             <button
               type="button"
-              className="new-patient-btn"
-              onClick={handleNewPatient}
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              title={collapsed ? "Afficher le menu" : "Réduire le menu"}
+              aria-label={collapsed ? "Afficher le menu" : "Réduire le menu"}
             >
-              <Icon
-                name="plus"
-                size={20}
-              />
-
-              <span>
-                Nouveau patient
-              </span>
+              {collapsed ? <PanelLeftOpen size={19} strokeWidth={2} /> : <PanelLeftClose size={19} strokeWidth={2} />}
             </button>
 
+            <div className="caisse-header-title">
+              <h1>Espace Caissier</h1>
+              <p>Accueil, enregistrement et encaissement des patients</p>
+            </div>
           </div>
 
-          {/* =====================================================
-              TABLEAU PATIENTS
-          ===================================================== */}
-          <div className="patients-card">
-
-            <div className="table-wrapper">
-
-              <table className="patients-table">
-
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Patient</th>
-                    <th>Service</th>
-                    <th>Affecté à</th>
-                    <th>Statut</th>
-                    <th></th>
-                  </tr>
-                </thead>
-
-                <tbody>
-
-                  {filteredPatients.map((item) => (
-                    <tr key={item.id}>
-
-                      <td>
-                        {item.id}
-                      </td>
-
-                      <td className="patient-name">
-                        {item.patient}
-                      </td>
-
-                      <td>
-                        {item.service}
-                      </td>
-
-                      <td>
-                        {item.doctor}
-                      </td>
-
-                      <td>
-                        <StatusBadge
-                          status={item.status}
-                        />
-                      </td>
-
-                      <td>
-                        <button
-                          type="button"
-                          className="row-action"
-                          aria-label={`Ouvrir ${item.patient}`}
-                        >
-                          <Icon
-                            name="arrow"
-                            size={17}
-                          />
-                        </button>
-                      </td>
-
-                    </tr>
-                  ))}
-
-                  {filteredPatients.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="6"
-                        className="empty-row"
-                      >
-                        Aucun patient trouvé.
-                      </td>
-                    </tr>
-                  )}
-
-                </tbody>
-
-              </table>
-
+          <div className="caisse-header-right">
+            <div className="caisse-date-chip">
+              <CalendarDays size={15} strokeWidth={2} />
+              <span>{today}</span>
             </div>
 
+            <button className="icon-button" title="Notifications" type="button">
+              <Bell size={18} strokeWidth={2} />
+              <span className="notification-dot" />
+            </button>
+
+            <div className="top-user">
+              <div className="avatar small">{initials}</div>
+              <div>
+                <strong>{fullName}</strong>
+                <small>{roleLabel}</small>
+              </div>
+            </div>
           </div>
+        </header>
 
-          {/* =====================================================
-              BILANS
-          ===================================================== */}
-          <section className="summary-grid">
+        <section className="caisse-main">
+          {view === "formulaire" ? (
+            <FormEngine
+              config={caisseAdmissionConfig}
+              onCancel={() => setView("liste")}
+              onComplete={handleAdmissionComplete}
+            />
+          ) : (
+            <>
+              <div className="patient-toolbar">
+                <div className="search-box">
+                  <Search size={19} strokeWidth={2} />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Rechercher un patient (nom, téléphone...)"
+                  />
+                </div>
 
-            {/* Bilan jour */}
-            <article className="summary-card">
+                <button type="button" className="new-patient-btn" onClick={() => setView("formulaire")}>
+                  <Plus size={18} strokeWidth={2} />
+                  <span>Nouveau patient</span>
+                </button>
+              </div>
 
-              <span className="summary-label">
-                Bilan du jour
-              </span>
+              <div className="patients-card">
+                <div className="table-wrapper">
+                  <table className="patients-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Service</th>
+                        <th>Affecté à</th>
+                        <th>Statut</th>
+                        <th></th>
+                      </tr>
+                    </thead>
 
-              <strong className="summary-value green">
-                450 000 FCFA
-              </strong>
+                    <tbody>
+                      {filteredPatients.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.id}</td>
+                          <td className="patient-name">{item.patient}</td>
+                          <td>{item.service}</td>
+                          <td>{item.doctor}</td>
+                          <td>
+                            <StatusBadge status={item.status} tone={STATUS_TONES[item.status]} />
+                          </td>
+                          <td>
+                            <button type="button" className="row-action" aria-label={`Ouvrir ${item.patient}`}>
+                              <ChevronRight size={16} strokeWidth={2} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
 
-              <span className="summary-note">
-                Recettes enregistrées aujourd'hui
-              </span>
+                      {filteredPatients.length === 0 && (
+                        <tr>
+                          <td colSpan="6" className="empty-row">
+                            Aucun patient trouvé.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-            </article>
+              <section className="summary-grid">
+                <article className="summary-card">
+                  <span className="summary-label">Bilan du jour</span>
+                  <strong className="summary-value green">450 000 FCFA</strong>
+                  <span className="summary-note">Recettes enregistrées aujourd'hui</span>
+                </article>
 
-            {/* Bilan semaine */}
-            <article className="summary-card">
+                <article className="summary-card">
+                  <span className="summary-label">Bilan semaine</span>
+                  <strong className="summary-value green">2 850 000 FCFA</strong>
+                  <span className="summary-note">Total des recettes de la semaine</span>
+                </article>
 
-              <span className="summary-label">
-                Bilan semaine
-              </span>
-
-              <strong className="summary-value green">
-                2 850 000 FCFA
-              </strong>
-
-              <span className="summary-note">
-                Total des recettes de la semaine
-              </span>
-
-            </article>
-
-            {/* Bilan mois */}
-            <article className="summary-card">
-
-              <span className="summary-label">
-                Bilan mois
-              </span>
-
-              <strong className="summary-value blue">
-                12 450 000 FCFA
-              </strong>
-
-              <span className="summary-note">
-                Total des recettes du mois
-              </span>
-
-            </article>
-
-          </section>
-
+                <article className="summary-card">
+                  <span className="summary-label">Bilan mois</span>
+                  <strong className="summary-value blue">12 450 000 FCFA</strong>
+                  <span className="summary-note">Total des recettes du mois</span>
+                </article>
+              </section>
+            </>
+          )}
         </section>
-
       </main>
-
     </div>
   );
 }

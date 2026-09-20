@@ -1,34 +1,3 @@
-
-/*
- * ============================================================
- * MA SANTÉ - MODULE COMPTABILITÉ / FACTURATION
- * ============================================================
- *
- * Fichier :
- *
- *     src/pages/Billing.jsx
- *
- * Feuille de style :
- *
- *     src/styles/billing.css
- *
- * Fonctionnalités :
- *
- * - Tableau de bord financier
- * - Chiffre d'affaires
- * - Factures
- * - Paiements
- * - Factures impayées
- * - Recherche
- * - Filtrage par statut
- * - Enregistrement d'une facture
- * - Enregistrement d'un paiement
- * - Consultation des factures
- * - Actions sur les factures
- *
- * ============================================================
- */
-
 import { useMemo, useState } from "react";
 
 import {
@@ -51,16 +20,11 @@ import {
   AlertCircle,
   X,
   ArrowUpRight,
-  ArrowDownRight,
   RefreshCw,
 } from "lucide-react";
 
 import "../styles/billing.css";
 
-
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
 
 const INITIAL_INVOICES = [
   {
@@ -138,10 +102,6 @@ const INITIAL_INVOICES = [
 ];
 
 
-/* ============================================================
-   FORMATER LES MONTANTS
-   ============================================================ */
-
 function formatCurrency(value) {
   return new Intl.NumberFormat("fr-FR", {
     minimumFractionDigits: 0,
@@ -149,10 +109,6 @@ function formatCurrency(value) {
   }).format(value) + " FCFA";
 }
 
-
-/* ============================================================
-   STATUT
-   ============================================================ */
 
 function getStatusLabel(status) {
   switch (status) {
@@ -170,10 +126,6 @@ function getStatusLabel(status) {
   }
 }
 
-
-/* ============================================================
-   BADGE DE STATUT
-   ============================================================ */
 
 function StatusBadge({ status }) {
   if (status === "PAID") {
@@ -203,64 +155,29 @@ function StatusBadge({ status }) {
 }
 
 
-/* ============================================================
-   COMPOSANT PRINCIPAL
-   ============================================================ */
-
 export default function Billing() {
 
-  /* ----------------------------------------------------------
-     FACTURES
-  ---------------------------------------------------------- */
 
   const [invoices, setInvoices] = useState(INITIAL_INVOICES);
 
 
-  /* ----------------------------------------------------------
-     RECHERCHE
-  ---------------------------------------------------------- */
-
   const [search, setSearch] = useState("");
 
-
-  /* ----------------------------------------------------------
-     FILTRE
-  ---------------------------------------------------------- */
 
   const [statusFilter, setStatusFilter] = useState("ALL");
 
 
-  /* ----------------------------------------------------------
-     MODAL FACTURE
-  ---------------------------------------------------------- */
-
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-
-  /* ----------------------------------------------------------
-     MODAL PAIEMENT
-  ---------------------------------------------------------- */
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
 
-  /* ----------------------------------------------------------
-     FACTURE SÉLECTIONNÉE
-  ---------------------------------------------------------- */
-
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
 
-  /* ----------------------------------------------------------
-     MENU ACTION
-  ---------------------------------------------------------- */
-
   const [openMenu, setOpenMenu] = useState(null);
 
-
-  /* ----------------------------------------------------------
-     FORMULAIRE FACTURE
-  ---------------------------------------------------------- */
 
   const [invoiceForm, setInvoiceForm] = useState({
     patient: "",
@@ -270,20 +187,12 @@ export default function Billing() {
   });
 
 
-  /* ----------------------------------------------------------
-     FORMULAIRE PAIEMENT
-  ---------------------------------------------------------- */
-
   const [paymentForm, setPaymentForm] = useState({
     invoiceId: "",
     amount: "",
     method: "Espèces",
   });
 
-
-  /* ==========================================================
-     STATISTIQUES
-     ========================================================== */
 
   const statistics = useMemo(() => {
 
@@ -322,10 +231,6 @@ export default function Billing() {
   }, [invoices]);
 
 
-  /* ==========================================================
-     FILTRAGE
-     ========================================================== */
-
   const filteredInvoices = useMemo(() => {
 
     const normalizedSearch =
@@ -356,10 +261,6 @@ export default function Billing() {
   }, [invoices, search, statusFilter]);
 
 
-  /* ==========================================================
-     OUVRIR MODAL PAIEMENT
-     ========================================================== */
-
   function handleOpenPayment(invoice) {
 
     setSelectedInvoice(invoice);
@@ -374,10 +275,6 @@ export default function Billing() {
 
   }
 
-
-  /* ==========================================================
-     ENREGISTRER FACTURE
-     ========================================================== */
 
   function handleCreateInvoice(event) {
 
@@ -429,10 +326,6 @@ export default function Billing() {
 
   }
 
-
-  /* ==========================================================
-     ENREGISTRER PAIEMENT
-     ========================================================== */
 
   function handleRegisterPayment(event) {
 
@@ -486,10 +379,6 @@ export default function Billing() {
   }
 
 
-  /* ==========================================================
-     TÉLÉCHARGEMENT FACTURE
-     ========================================================== */
-
   function handleDownload(invoice) {
 
     const content = [
@@ -535,18 +424,10 @@ export default function Billing() {
   }
 
 
-  /* ==========================================================
-     AFFICHAGE
-     ========================================================== */
-
   return (
 
     <div className="billing-page">
 
-
-      {/* ======================================================
-          EN-TÊTE
-      ====================================================== */}
 
       <div className="billing-header">
 
@@ -601,10 +482,6 @@ export default function Billing() {
 
       </div>
 
-
-      {/* ======================================================
-          CARTES STATISTIQUES
-      ====================================================== */}
 
       <section className="billing-stats-grid">
 
@@ -711,10 +588,6 @@ export default function Billing() {
 
       </section>
 
-
-      {/* ======================================================
-          RÉPARTITION
-      ====================================================== */}
 
       <section className="billing-overview-grid">
 
@@ -883,10 +756,6 @@ export default function Billing() {
 
       </section>
 
-
-      {/* ======================================================
-          FACTURES
-      ====================================================== */}
 
       <section className="billing-table-card">
 
@@ -1252,10 +1121,6 @@ export default function Billing() {
       </section>
 
 
-      {/* ======================================================
-          MODAL : NOUVELLE FACTURE
-      ====================================================== */}
-
       {showInvoiceModal && (
 
         <div
@@ -1431,10 +1296,6 @@ export default function Billing() {
 
       )}
 
-
-      {/* ======================================================
-          MODAL : PAIEMENT
-      ====================================================== */}
 
       {showPaymentModal && selectedInvoice && (
 
@@ -1632,10 +1493,6 @@ export default function Billing() {
 
       )}
 
-
-      {/* ======================================================
-          DÉTAIL DE LA FACTURE
-      ====================================================== */}
 
       {selectedInvoice && !showPaymentModal && !showInvoiceModal && (
 
@@ -1865,10 +1722,6 @@ export default function Billing() {
 
 }
 
-
-/* ============================================================
-   ICÔNE CALCULATRICE
-   ============================================================ */
 
 function CalculatorIcon() {
 

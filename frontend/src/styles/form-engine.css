@@ -1,0 +1,292 @@
+/* ============================================================
+   MOTEUR DE FORMULAIRE — chrome additif uniquement.
+   Les champs eux-mêmes réutilisent .field / .form-grid /
+   .form-actions / .primary-button / .secondary-button déjà
+   définis dans global.css.
+   ============================================================ */
+
+.form-engine {
+  width: 100%;
+}
+
+.spin {
+  animation: form-engine-spin 0.8s linear infinite;
+}
+
+@keyframes form-engine-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin { animation: none; }
+}
+
+.form-engine-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.form-engine-header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.form-engine-header p {
+  margin: 4px 0 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-engine-cancel {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--radius-xl);
+  background: var(--surface-100);
+  color: var(--ink-muted);
+}
+
+.form-engine-cancel:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.form-engine-status {
+  text-align: center;
+  color: var(--ink-muted);
+  padding: 40px 0;
+}
+
+.form-engine-error {
+  margin-top: 14px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-engine-step {
+  margin-top: 24px;
+}
+
+/* ---------------------------------------------------------
+   INDICATEUR DE PROGRESSION
+   --------------------------------------------------------- */
+
+.step-progress {
+  margin-top: 18px;
+}
+
+.step-progress-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.step-progress-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.step-progress-item::after {
+  content: "";
+  display: none;
+}
+
+.step-progress-dot {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.step-progress-item.done .step-progress-dot {
+  border-color: var(--primary-600);
+  background: var(--primary-600);
+  color: var(--surface);
+}
+
+.step-progress-item.current .step-progress-dot {
+  border-color: var(--primary-600);
+  color: var(--primary-600);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.step-progress-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.step-progress-item.current .step-progress-label {
+  color: var(--primary-700);
+}
+
+.step-progress-compact {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .step-progress-list {
+    display: none;
+  }
+
+  .step-progress-compact {
+    display: block;
+  }
+
+  .step-progress-compact span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+
+  .step-progress-bar {
+    margin-top: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--surface-200);
+    overflow: hidden;
+  }
+
+  .step-progress-bar-fill {
+    height: 100%;
+    background: var(--primary-600);
+    transition: width 0.2s ease;
+  }
+}
+
+/* ---------------------------------------------------------
+   CHAMPS RADIO / OUI-NON (styles absents de global.css)
+   --------------------------------------------------------- */
+
+.field-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.field-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.field-radio-option:has(input:checked) {
+  border-color: var(--primary-600);
+  background: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.field-radio-option input {
+  accent-color: var(--primary-600);
+}
+
+.field-help {
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+.field-switch {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: var(--radius-xl);
+  background: var(--surface-100);
+  width: max-content;
+}
+
+.field-switch button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field-switch button.active {
+  background: var(--surface);
+  color: var(--primary-700);
+  box-shadow: 0 0 0 2px var(--primary-100);
+}
+
+/* ---------------------------------------------------------
+   RÉSUMÉ
+   --------------------------------------------------------- */
+
+.form-summary-section {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-summary-section:last-child {
+  border-bottom: none;
+}
+
+.form-summary-section header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-summary-section h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.form-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.form-summary-row dt {
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.form-summary-row dd {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

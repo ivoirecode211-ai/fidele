@@ -5,8 +5,8 @@
 .pharmacy-page {
   min-height: 100vh;
   display: flex;
-  background: #f4f9fd;
-  color: #103b63;
+  background: var(--bg);
+  color: var(--primary-dark);
   font-family: "Segoe UI", Inter, Arial, sans-serif;
 }
 
@@ -20,10 +20,10 @@
   flex-direction: column;
   background: linear-gradient(
     180deg,
-    #073967 0%,
+    var(--primary-dark) 0%,
     #052d52 100%
   );
-  color: #fff;
+  color: var(--surface);
   box-shadow: 4px 0 18px
     rgba(5, 50, 86, 0.12);
 }
@@ -54,7 +54,7 @@
 }
 
 .mini-heart-logo span {
-  color: #fff;
+  color: var(--surface);
   font-size: 19px;
 }
 
@@ -92,7 +92,7 @@
   margin-bottom: 4px;
   padding: 0 13px;
   background: transparent;
-  color: #d3e6f3;
+  color: var(--border);
   font: inherit;
   font-size: 12px;
   text-align: left;
@@ -102,7 +102,7 @@
 
 .pharmacy-nav-item:hover {
   background: rgba(255, 255, 255, 0.09);
-  color: #fff;
+  color: var(--surface);
 }
 
 .pharmacy-nav-item.active {
@@ -111,7 +111,7 @@
     #087ee0,
     #0d6fc0
   );
-  color: #fff;
+  color: var(--surface);
   box-shadow: inset 3px 0 0 #4ed8ff;
 }
 
@@ -152,9 +152,9 @@
   padding: 12px 26px;
   background: linear-gradient(
     100deg,
-    #dff4ff 0%,
-    #eef9ff 55%,
-    #d9f1ff 100%
+    var(--primary-soft) 0%,
+    var(--bg) 55%,
+    var(--primary-soft) 100%
   );
   border-bottom: 1px solid #c8e3f3;
 }
@@ -167,14 +167,14 @@
 
 .pharmacy-header h1 {
   margin: 0;
-  color: #0758a0;
+  color: var(--primary);
   font-size: 23px;
   line-height: 1.1;
 }
 
 .pharmacy-header p {
   margin: 4px 0 0;
-  color: #6386a1;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -195,13 +195,13 @@
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    #d7e9f6,
+    var(--border),
     #86b7d4
   );
-  color: #07558e;
+  color: var(--primary);
   font-weight: 800;
   font-size: 12px;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   box-shadow: 0 2px 7px
     rgba(0, 70, 120, 0.16);
 }
@@ -217,15 +217,15 @@
 
 .pharmacist-profile span {
   margin-top: 2px;
-  color: #6687a0;
+  color: var(--muted);
   font-size: 10px;
 }
 
 .mobile-menu {
   display: none;
   border: 0;
-  background: #fff;
-  color: #075ca4;
+  background: var(--surface);
+  color: var(--primary);
   border-radius: 7px;
   padding: 7px;
 }
@@ -258,14 +258,14 @@
   display: grid;
   place-items: center;
   border-radius: 11px;
-  background: #e5f5ff;
+  background: var(--primary-soft);
   color: #0877cc;
   border: 1px solid #cce9fa;
 }
 
 .toolbar-title h2 {
   margin: 0;
-  color: #0c4773;
+  color: var(--primary-dark);
   font-size: 19px;
 }
 
@@ -290,10 +290,10 @@
   align-items: center;
   gap: 7px;
   padding: 0 10px;
-  border: 1px solid #cfe2ef;
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: #fff;
-  color: #6d8ca4;
+  background: var(--surface);
+  color: var(--muted);
 }
 
 .search-box input {
@@ -335,7 +335,7 @@
   padding: 0 14px;
   border: 0;
   border-radius: 6px;
-  color: #fff;
+  color: var(--surface);
   font: inherit;
   font-size: 11px;
   font-weight: 700;
@@ -375,12 +375,12 @@
   background: linear-gradient(
     135deg,
     #7658dc,
-    #694bc9
+    var(--purple)
   );
 }
 
 .secondary-btn {
-  background: #eef4f8;
+  background: var(--primary-soft);
   color: #55748a;
 }
 
@@ -403,7 +403,7 @@
 /* ================= CARD ================= */
 
 .card {
-  border: 1px solid #cfe6f5;
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: rgba(
     255,
@@ -423,7 +423,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 15px;
-  border-bottom: 1px solid #e2eef5;
+  border-bottom: 1px solid var(--border);
 }
 
 .card-header h3 {
@@ -449,10 +449,10 @@
 }
 
 .filter-tabs button {
-  border: 1px solid #dceaf2;
+  border: 1px solid var(--border);
   border-radius: 5px;
-  background: #f8fbfd;
-  color: #6d879b;
+  background: var(--bg);
+  color: var(--muted);
   padding: 6px 8px;
   font: inherit;
   font-size: 9px;
@@ -460,7 +460,7 @@
 }
 
 .filter-tabs button.selected {
-  background: #e8f5ff;
+  background: var(--primary-soft);
   border-color: #b9dcf3;
   color: #0875c9;
   font-weight: 700;
@@ -480,9 +480,9 @@
 
 .orders-table th {
   padding: 9px 10px;
-  background: #eef8fd;
-  color: #6a879c;
-  border-bottom: 1px solid #dcecf5;
+  background: var(--primary-soft);
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
   font-size: 9px;
   text-align: left;
   font-weight: 800;
@@ -490,14 +490,14 @@
 
 .orders-table td {
   padding: 9px 10px;
-  border-bottom: 1px solid #e9f1f5;
+  border-bottom: 1px solid var(--primary-soft);
   color: #365c76;
   font-size: 10px;
   vertical-align: middle;
 }
 
 .orders-table tbody tr:hover {
-  background: #f8fcff;
+  background: var(--bg);
 }
 
 .number-cell {
@@ -526,7 +526,7 @@
   place-items: center;
   flex: 0 0 26px;
   border-radius: 50%;
-  background: #e7f3fa;
+  background: var(--primary-soft);
   color: #1377b8;
 }
 
@@ -571,17 +571,17 @@
 }
 
 .status-badge.prepare {
-  background: #fff1d5;
+  background: var(--warning-soft);
   color: #d88b0c;
 }
 
 .status-badge.ready {
-  background: #dcf8e9;
-  color: #0aa56d;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .status-badge.served {
-  background: #e3f0ff;
+  background: var(--primary-soft);
   color: #1976c8;
 }
 
@@ -592,15 +592,15 @@
   height: 29px;
   display: grid;
   place-items: center;
-  border: 1px solid #d6e7f0;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   color: #1474b7;
   cursor: pointer;
 }
 
 .icon-action:hover {
-  background: #edf8ff;
+  background: var(--primary-soft);
 }
 
 /* ================= EMPTY ================= */
@@ -637,8 +637,8 @@
   display: flex;
   gap: 9px;
   padding: 12px 15px;
-  background: #f8fcfe;
-  border-top: 1px solid #e3eef4;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
 .card-footer-actions button {
@@ -656,9 +656,9 @@
   height: 31px;
   display: grid;
   place-items: center;
-  border: 1px solid #d6e8f2;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   color: #1678b8;
   cursor: pointer;
 }
@@ -672,7 +672,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  border-bottom: 1px solid #e8f0f4;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .stock-row:last-child {
@@ -685,13 +685,13 @@
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: #e8f7f2;
+  background: var(--green-soft);
   color: #10a37c;
 }
 
 .stock-icon.critical {
-  background: #fff0ee;
-  color: #dc5550;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .stock-info {
@@ -719,7 +719,7 @@
 }
 
 .stock-quantity.critical {
-  color: #db4b48;
+  color: var(--danger);
 }
 
 .stock-warning {
@@ -743,7 +743,7 @@
     #087fdd,
     #0870c8
   );
-  color: #fff;
+  color: var(--surface);
   font: inherit;
   font-size: 10px;
   font-weight: 700;
@@ -769,9 +769,9 @@
   align-items: center;
   gap: 11px;
   padding: 11px 13px;
-  border: 1px solid #d5e9f4;
+  border: 1px solid var(--border);
   border-radius: 9px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .stat-icon {
@@ -783,23 +783,23 @@
 }
 
 .stat-icon.blue {
-  background: #e7f4ff;
+  background: var(--primary-soft);
   color: #0879cf;
 }
 
 .stat-icon.orange {
-  background: #fff3dc;
-  color: #df941c;
+  background: var(--warning-soft);
+  color: var(--warning);
 }
 
 .stat-icon.green {
-  background: #e2f9ef;
+  background: var(--green-soft);
   color: #0bad79;
 }
 
 .stat-icon.red {
-  background: #fff0ef;
-  color: #dc554f;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .stat-card strong {
@@ -838,9 +838,9 @@
 .scan-modal,
 .ticket-modal {
   width: min(540px, 100%);
-  border: 1px solid #d0e7f3;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 20px 60px
     rgba(5, 50, 85, 0.25);
   overflow: hidden;
@@ -875,10 +875,10 @@
   display: grid;
   place-items: center;
   flex: 0 0 31px;
-  border: 1px solid #dbe9f0;
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: #f8fbfd;
-  color: #66869a;
+  background: var(--bg);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -892,14 +892,14 @@
   margin-top: 13px;
   padding: 10px;
   border-radius: 8px;
-  background: #f5fafc;
+  background: var(--bg);
 }
 
 .prescription-meta > span:first-child {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #658397;
+  color: var(--muted);
   font-size: 10px;
 }
 
@@ -921,7 +921,7 @@
   align-items: center;
   gap: 9px;
   padding: 7px 8px;
-  border-bottom: 1px solid #e9f1f5;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .modal-medicine > span {
@@ -930,7 +930,7 @@
   display: grid;
   place-items: center;
   border-radius: 6px;
-  background: #eaf5fb;
+  background: var(--primary-soft);
   color: #1578b5;
   font-size: 9px;
   font-weight: 800;
@@ -980,7 +980,7 @@
   place-items: center;
   margin: 8px auto 15px;
   border-radius: 20px;
-  background: #e8f7ff;
+  background: var(--primary-soft);
   color: #087bce;
 }
 
@@ -1032,7 +1032,7 @@
   justify-content: space-between;
   gap: 15px;
   padding: 9px 0;
-  border-bottom: 1px dashed #dce9ef;
+  border-bottom: 1px dashed var(--border);
   font-size: 10px;
 }
 
@@ -1063,7 +1063,7 @@
   padding: 12px 16px;
   border: 1px solid #bce9d9;
   border-radius: 8px;
-  background: #effcf7;
+  background: var(--bg);
   color: #087e60;
   box-shadow: 0 10px 30px
     rgba(12, 91, 72, 0.14);
@@ -1207,7 +1207,7 @@
   .pharmacy-page,
   .pharmacy-main,
   .pharmacy-content {
-    background: #fff !important;
+    background: var(--surface) !important;
   }
 
   .pharmacy-content {

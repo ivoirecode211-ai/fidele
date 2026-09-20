@@ -7,8 +7,8 @@
   min-height: 100%;
   padding: 20px;
   box-sizing: border-box;
-  background: #f4f9fc;
-  color: #173852;
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* ============================================================
@@ -36,14 +36,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #087dd1, #0757a3);
+  background: linear-gradient(135deg, #087dd1, var(--primary));
   color: white;
   box-shadow: 0 4px 12px rgba(8, 125, 209, 0.18);
 }
 
 .administration-title-area h1 {
   margin: 0;
-  color: #143f68;
+  color: var(--primary-dark);
   font-size: 22px;
   font-weight: 700;
 }
@@ -93,84 +93,6 @@
   margin-bottom: 15px;
 }
 
-.administration-stat-card {
-  min-height: 64px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  border: 1px solid #d8eaf4;
-  border-radius: 8px;
-  background: white;
-  box-sizing: border-box;
-}
-
-.administration-stat-icon {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.administration-stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.administration-stat-content strong {
-  font-size: 19px;
-  line-height: 20px;
-  font-weight: 700;
-}
-
-.administration-stat-content span {
-  margin-top: 3px;
-  color: #627f94;
-  font-size: 10px;
-  line-height: 13px;
-}
-
-/* Couleurs */
-
-.administration-stat-card.blue .administration-stat-icon {
-  background: #e6f3ff;
-  color: #0879ce;
-}
-
-.administration-stat-card.blue strong {
-  color: #096db7;
-}
-
-.administration-stat-card.green .administration-stat-icon {
-  background: #e1f9ef;
-  color: #08a478;
-}
-
-.administration-stat-card.green strong {
-  color: #07956d;
-}
-
-.administration-stat-card.purple .administration-stat-icon {
-  background: #eee8ff;
-  color: #7651df;
-}
-
-.administration-stat-card.purple strong {
-  color: #6744c9;
-}
-
-.administration-stat-card.orange .administration-stat-icon {
-  background: #fff1dd;
-  color: #ef921c;
-}
-
-.administration-stat-card.orange strong {
-  color: #db7d09;
-}
-
 /* ============================================================
    BARRE D'OUTILS
    ============================================================ */
@@ -190,10 +112,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #d4e5ef;
+  border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
-  color: #6c879b;
+  color: var(--muted);
   box-sizing: border-box;
 }
 
@@ -219,8 +141,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eef4f8;
-  color: #718b9d;
+  background: var(--primary-soft);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -228,8 +150,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #648096;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .administration-system-status > span {
@@ -258,7 +180,7 @@
 }
 
 .administration-panel {
-  border: 1px solid #d8eaf4;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: white;
   box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
@@ -272,7 +194,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #e4eef4;
+  border-bottom: 1px solid var(--primary-soft);
   box-sizing: border-box;
 }
 
@@ -286,7 +208,7 @@
 .administration-panel-header p {
   margin: 3px 0 0;
   color: #7892a4;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* ============================================================
@@ -303,7 +225,7 @@
   gap: 5px;
   background: #087fd5;
   color: white;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -326,32 +248,32 @@
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .administration-table thead {
-  background: #f4f9fc;
+  background: var(--bg);
 }
 
 .administration-table th {
   padding: 9px 7px;
   text-align: left;
   color: #54738b;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-  border-bottom: 1px solid #e1edf4;
+  border-bottom: 1px solid var(--border);
 }
 
 .administration-table td {
   padding: 8px 7px;
   color: #4a687e;
   white-space: nowrap;
-  border-bottom: 1px solid #edf3f7;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .administration-table tbody tr:hover {
-  background: #f9fcfe;
+  background: var(--surface);
 }
 
 .user-name-cell {
@@ -370,9 +292,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #d9ecfb, #b7dafa);
+  background: linear-gradient(135deg, var(--border), #b7dafa);
   color: #1767a5;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -380,37 +302,10 @@
   display: inline-flex;
   padding: 4px 7px;
   border-radius: 8px;
-  background: #edf4fa;
+  background: var(--primary-soft);
   color: #54728a;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
-}
-
-.administration-user-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 7px;
-  border-radius: 9px;
-  font-size: 8px;
-  font-weight: 600;
-}
-
-.administration-user-status.active {
-  background: #d9f8e9;
-  color: #079568;
-}
-
-.administration-user-status.inactive {
-  background: #f1f3f5;
-  color: #82919a;
-}
-
-.status-point {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
 }
 
 .user-actions {
@@ -423,24 +318,24 @@
   width: 25px;
   height: 25px;
   padding: 0;
-  border: 1px solid #dce9f1;
+  border: 1px solid var(--border);
   border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
-  color: #638096;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .user-actions button:hover {
-  background: #edf6fc;
+  background: var(--primary-soft);
   color: #0877c9;
 }
 
 .user-actions button.delete-action:hover {
-  background: #fff0f1;
-  color: #e13d4a;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .administration-empty {
@@ -512,7 +407,7 @@
 .roles-donut-center span {
   margin-top: 2px;
   color: #8297a5;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .roles-legend {
@@ -528,12 +423,12 @@
   justify-content: space-between;
   gap: 10px;
   color: #57738a;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .role-legend-row strong {
   color: #315773;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .role-legend-name {
@@ -587,13 +482,13 @@
 .system-setting-card {
   min-height: 91px;
   padding: 10px;
-  border: 1px solid #dcecf5;
+  border: 1px solid var(--border);
   border-radius: 7px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  background: #fbfdfe;
+  background: var(--surface);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -601,7 +496,7 @@
 
 .system-setting-card:hover {
   transform: translateY(-2px);
-  background: #f7fbfe;
+  background: var(--bg);
   box-shadow: 0 5px 14px rgba(23, 100, 145, 0.08);
 }
 
@@ -616,22 +511,22 @@
 }
 
 .system-setting-icon.blue {
-  background: #e4f2ff;
+  background: var(--primary-soft);
   color: #087dce;
 }
 
 .system-setting-icon.green {
-  background: #e0f8ed;
-  color: #08a177;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .system-setting-icon.purple {
-  background: #eee8ff;
+  background: var(--purple-soft);
   color: #7550dc;
 }
 
 .system-setting-icon.orange {
-  background: #fff0dc;
+  background: var(--warning-soft);
   color: #e78b16;
 }
 
@@ -642,13 +537,13 @@
 
 .system-setting-card strong {
   color: #2c5470;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .system-setting-card span {
   margin-top: 2px;
   color: #8198a7;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .system-setting-card > svg {
@@ -671,7 +566,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .document-row:last-child {
@@ -686,7 +581,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8f4ff;
+  background: var(--primary-soft);
   color: #087acb;
 }
 
@@ -700,7 +595,7 @@
 .document-info strong {
   overflow: hidden;
   color: #315671;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -709,15 +604,15 @@
 .document-info span {
   margin-top: 2px;
   color: #8a9eaa;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .document-type {
   padding: 3px 6px;
   border-radius: 4px;
-  background: #ffe9eb;
+  background: var(--danger-soft);
   color: #e43a49;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -735,7 +630,7 @@
 }
 
 .document-view:hover {
-  color: #055a96;
+  color: var(--primary);
 }
 
 .view-all-documents {
@@ -743,14 +638,14 @@
   margin: 0 12px 10px;
   padding: 7px 0;
   border: none;
-  border-top: 1px solid #edf3f6;
+  border-top: 1px solid var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   background: transparent;
   color: #0879ca;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -790,7 +685,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e3edf3;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header-title {
@@ -809,12 +704,12 @@
 }
 
 .modal-icon.blue {
-  background: #e5f3ff;
+  background: var(--primary-soft);
   color: #087bce;
 }
 
 .modal-icon.purple {
-  background: #eee8ff;
+  background: var(--purple-soft);
   color: #7450da;
 }
 
@@ -827,7 +722,7 @@
 .modal-header-title p {
   margin: 3px 0 0;
   color: #7e96a6;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .modal-close {
@@ -839,13 +734,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f7;
-  color: #6d8596;
+  background: var(--bg);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .modal-close:hover {
-  background: #e8eef2;
+  background: var(--green-soft);
   color: #294f69;
 }
 
@@ -872,7 +767,7 @@
 
 .form-group label {
   color: #3b5f76;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -881,13 +776,13 @@
   width: 100%;
   min-height: 37px;
   padding: 0 10px;
-  border: 1px solid #d5e4ed;
+  border: 1px solid var(--border);
   border-radius: 6px;
   outline: none;
   background: white;
   color: #2a506b;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 13px;
   box-sizing: border-box;
 }
 
@@ -907,7 +802,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid #d5e4ed;
+  border: 1px solid var(--border);
   border-radius: 6px;
   color: #7992a3;
   box-sizing: border-box;
@@ -939,8 +834,8 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  background: #f9fcfe;
-  color: #6d8ca0;
+  background: var(--surface);
+  color: var(--muted);
   position: relative;
 }
 
@@ -950,12 +845,12 @@
 
 .document-upload-zone strong {
   color: #42677e;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .document-upload-zone span {
   color: #92a5b1;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .document-upload-zone input {
@@ -987,19 +882,19 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .administration-cancel-button {
-  border: 1px solid #d5e2e9;
+  border: 1px solid var(--border);
   background: white;
   color: #617c8e;
 }
 
 .administration-cancel-button:hover {
-  background: #f4f8fa;
+  background: var(--bg);
 }
 
 .administration-save-button {
@@ -1009,7 +904,7 @@
 }
 
 .administration-save-button:hover {
-  background: linear-gradient(135deg, #0775c4, #055b9c);
+  background: linear-gradient(135deg, #0775c4, var(--primary));
 }
 
 /* ============================================================
@@ -1090,7 +985,7 @@
   }
 
   .administration-title-area p {
-    font-size: 10px;
+    font-size: 13px;
   }
 
   .administration-modal-overlay {

@@ -1,30 +1,4 @@
-/**
- * ============================================================
- * MA SANTÉ - MODULE INTELLIGENCE ARTIFICIELLE
- * ============================================================
- *
- * Module regroupant les outils d'intelligence artificielle
- * destinés à assister les professionnels de santé.
- *
- * Fonctionnalités prévues :
- * - Aide au diagnostic
- * - Prédiction des risques
- * - Assistant médical
- * - Analyse d'images
- * - Suggestions IA
- * - Analyse des données
- * - Gestion des modèles IA
- *
- * IMPORTANT :
- * Les informations affichées actuellement sont des données
- * de démonstration.
- *
- * Elles seront ensuite reliées aux API Django et PostgreSQL.
- * ============================================================
- */
-
-import React, { useMemo, useState } from "react";
-
+import { useMemo, useState } from "react";
 import {
   BrainCircuit,
   MessageCircle,
@@ -44,235 +18,74 @@ import {
   FileText,
   Info,
 } from "lucide-react";
-
 import "../styles/ia.css";
 
-/* ============================================================
-   OUTILS IA
-   ============================================================ */
+// Données de démonstration — seront reliées aux API Django/PostgreSQL.
 
 const AI_TOOLS = [
-  {
-    id: "diagnostic",
-    title: "Aide au diagnostic",
-    description: "Analyse des symptômes",
-    icon: Stethoscope,
-    color: "blue",
-  },
-  {
-    id: "risks",
-    title: "Prédiction des risques",
-    description: "Analyse des données",
-    icon: TrendingUp,
-    color: "green",
-  },
-  {
-    id: "assistant",
-    title: "Assistant médical",
-    description: "Réponses & conseils",
-    icon: MessageCircle,
-    color: "cyan",
-  },
-  {
-    id: "images",
-    title: "Analyse d'images",
-    description: "Radiologie & imagerie",
-    icon: ImageIcon,
-    color: "purple",
-  },
+  { id: "diagnostic", title: "Aide au diagnostic", description: "Analyse des symptômes", icon: Stethoscope, color: "blue" },
+  { id: "risks", title: "Prédiction des risques", description: "Analyse des données", icon: TrendingUp, color: "green" },
+  { id: "assistant", title: "Assistant médical", description: "Réponses & conseils", icon: MessageCircle, color: "cyan" },
+  { id: "images", title: "Analyse d'images", description: "Radiologie & imagerie", icon: ImageIcon, color: "purple" },
 ];
-
-/* ============================================================
-   SUGGESTIONS IA
-   ============================================================ */
 
 const AI_SUGGESTIONS = [
-  {
-    id: 1,
-    type: "warning",
-    title: "Risque d'hypertension détecté",
-    patient: "Patient : KONE Brahim (45 ans)",
-  },
-  {
-    id: 2,
-    type: "danger",
-    title: "Suspicion de diabète",
-    patient: "Patient : DIALLO Mariam (38 ans)",
-  },
-  {
-    id: 3,
-    type: "success",
-    title: "Suivi post-opératoire",
-    patient: "Patient : TRAORE Awa (52 ans)",
-  },
-  {
-    id: 4,
-    type: "info",
-    title: "Rendez-vous de contrôle",
-    patient: "Patient : YAO Claude (60 ans)",
-  },
+  { id: 1, type: "warning", title: "Risque d'hypertension détecté", patient: "Patient : KONE Brahim (45 ans)" },
+  { id: 2, type: "danger", title: "Suspicion de diabète", patient: "Patient : DIALLO Mariam (38 ans)" },
+  { id: 3, type: "success", title: "Suivi post-opératoire", patient: "Patient : TRAORE Awa (52 ans)" },
+  { id: 4, type: "info", title: "Rendez-vous de contrôle", patient: "Patient : YAO Claude (60 ans)" },
 ];
-
-/* ============================================================
-   MODÈLES IA
-   ============================================================ */
 
 const AI_MODELS = [
-  {
-    id: 1,
-    name: "Diagnostic médical",
-    status: "Actif",
-    icon: Stethoscope,
-  },
-  {
-    id: 2,
-    name: "Prédiction des risques",
-    status: "Actif",
-    icon: TrendingUp,
-  },
-  {
-    id: 3,
-    name: "Analyse d'images",
-    status: "Actif",
-    icon: ImageIcon,
-  },
-  {
-    id: 4,
-    name: "Assistant conversationnel",
-    status: "Actif",
-    icon: MessageCircle,
-  },
+  { id: 1, name: "Diagnostic médical", status: "Actif", icon: Stethoscope },
+  { id: 2, name: "Prédiction des risques", status: "Actif", icon: TrendingUp },
+  { id: 3, name: "Analyse d'images", status: "Actif", icon: ImageIcon },
+  { id: 4, name: "Assistant conversationnel", status: "Actif", icon: MessageCircle },
 ];
-
-/* ============================================================
-   DONNÉES DU GRAPHIQUE
-   ============================================================ */
 
 const ANALYSIS_DATA = [
-  {
-    date: "10/09",
-    reel: 20,
-    prediction: 21,
-  },
-  {
-    date: "11/09",
-    reel: 24,
-    prediction: 23,
-  },
-  {
-    date: "12/09",
-    reel: 18,
-    prediction: 20,
-  },
-  {
-    date: "13/09",
-    reel: 27,
-    prediction: 25,
-  },
-  {
-    date: "14/09",
-    reel: 22,
-    prediction: 23,
-  },
-  {
-    date: "15/09",
-    reel: 30,
-    prediction: 28,
-  },
-  {
-    date: "16/09",
-    reel: 26,
-    prediction: 29,
-  },
+  { date: "10/09", reel: 20, prediction: 21 },
+  { date: "11/09", reel: 24, prediction: 23 },
+  { date: "12/09", reel: 18, prediction: 20 },
+  { date: "13/09", reel: 27, prediction: 25 },
+  { date: "14/09", reel: 22, prediction: 23 },
+  { date: "15/09", reel: 30, prediction: 28 },
+  { date: "16/09", reel: 26, prediction: 29 },
 ];
 
-/* ============================================================
-   CARTE OUTIL IA
-   ============================================================ */
-
-function AIToolCard({
-  icon: Icon,
-  title,
-  description,
-  color,
-  onClick,
-}) {
+function AIToolCard({ icon: Icon, title, description, color, onClick }) {
   return (
-    <button
-      type="button"
-      className="ia-tool-card"
-      onClick={onClick}
-    >
+    <button type="button" className="ia-tool-card" onClick={onClick}>
       <div className={`ia-tool-icon ${color}`}>
         <Icon size={21} />
       </div>
-
       <strong>{title}</strong>
-
       <span>{description}</span>
-
-      <ChevronRight
-        size={13}
-        className="ia-tool-arrow"
-      />
+      <ChevronRight size={13} className="ia-tool-arrow" />
     </button>
   );
 }
 
-/* ============================================================
-   BADGE SUGGESTION
-   ============================================================ */
-
 function SuggestionIcon({ type }) {
   if (type === "warning") {
-    return (
-      <div className="ia-suggestion-icon warning">
-        <AlertTriangle size={15} />
-      </div>
-    );
+    return <div className="ia-suggestion-icon warning"><AlertTriangle size={15} /></div>;
   }
-
   if (type === "danger") {
-    return (
-      <div className="ia-suggestion-icon danger">
-        <AlertTriangle size={15} />
-      </div>
-    );
+    return <div className="ia-suggestion-icon danger"><AlertTriangle size={15} /></div>;
   }
-
   if (type === "success") {
-    return (
-      <div className="ia-suggestion-icon success">
-        <CheckCircle2 size={15} />
-      </div>
-    );
+    return <div className="ia-suggestion-icon success"><CheckCircle2 size={15} /></div>;
   }
-
-  return (
-    <div className="ia-suggestion-icon info">
-      <Clock3 size={15} />
-    </div>
-  );
+  return <div className="ia-suggestion-icon info"><Clock3 size={15} /></div>;
 }
-
-/* ============================================================
-   MODULE IA
-   ============================================================ */
 
 export default function Ia() {
   const [search, setSearch] = useState("");
   const [activeTool, setActiveTool] = useState(null);
 
-  /* ----------------------------------------------------------
-     RECHERCHE DES SUGGESTIONS
-     ---------------------------------------------------------- */
-
   const filteredSuggestions = useMemo(() => {
     const value = search.toLowerCase().trim();
-
-    if (!value) {
-      return AI_SUGGESTIONS;
-    }
+    if (!value) return AI_SUGGESTIONS;
 
     return AI_SUGGESTIONS.filter(
       (item) =>
@@ -281,45 +94,18 @@ export default function Ia() {
     );
   }, [search]);
 
-  /* ----------------------------------------------------------
-     OUVRIR UN OUTIL
-     ---------------------------------------------------------- */
-
-  const handleToolClick = (tool) => {
-    setActiveTool(tool);
-  };
-
-  /* ----------------------------------------------------------
-     FERMER OUTIL
-     ---------------------------------------------------------- */
-
-  const closeTool = () => {
-    setActiveTool(null);
-  };
-
-  /* ==========================================================
-     RENDU
-     ========================================================== */
+  const closeTool = () => setActiveTool(null);
 
   return (
     <div className="ia-page">
-      {/* ==================================================
-          EN-TÊTE
-         ================================================== */}
-
       <header className="ia-header">
         <div className="ia-title-area">
           <div className="ia-title-icon">
             <BrainCircuit size={25} />
           </div>
-
           <div>
             <h1>Intelligence artificielle</h1>
-
-            <p>
-              Des outils intelligents pour une
-              meilleure prise en charge
-            </p>
+            <p>Des outils intelligents pour une meilleure prise en charge</p>
           </div>
         </div>
 
@@ -329,10 +115,6 @@ export default function Ia() {
         </div>
       </header>
 
-      {/* ==================================================
-          OUTILS IA
-         ================================================== */}
-
       <section className="ia-tools-grid">
         {AI_TOOLS.map((tool) => (
           <AIToolCard
@@ -341,28 +123,20 @@ export default function Ia() {
             title={tool.title}
             description={tool.description}
             color={tool.color}
-            onClick={() => handleToolClick(tool)}
+            onClick={() => setActiveTool(tool)}
           />
         ))}
       </section>
 
-      {/* ==================================================
-          RECHERCHE
-         ================================================== */}
-
       <div className="ia-toolbar">
         <div className="ia-search">
           <Search size={15} />
-
           <input
             type="text"
             placeholder="Rechercher une suggestion, un patient..."
             value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
-            }
+            onChange={(event) => setSearch(event.target.value)}
           />
-
           {search && (
             <button
               type="button"
@@ -377,45 +151,26 @@ export default function Ia() {
 
         <div className="ia-last-update">
           <Clock3 size={13} />
-
           Dernière analyse :
           <strong>aujourd'hui à 09:42</strong>
         </div>
       </div>
 
-      {/* ==================================================
-          CONTENU PRINCIPAL
-         ================================================== */}
-
       <div className="ia-main-grid">
-        {/* =================================================
-            SUGGESTIONS IA
-           ================================================= */}
-
         <section className="ia-panel suggestions-panel">
           <div className="ia-panel-header">
             <div>
               <h2>
                 Suggestions IA
-                <span className="ia-today">
-                  Aujourd'hui
-                </span>
+                <span className="ia-today">Aujourd'hui</span>
               </h2>
-
-              <p>
-                Alertes et recommandations générées
-                par l'intelligence artificielle
-              </p>
+              <p>Alertes et recommandations générées par l'intelligence artificielle</p>
             </div>
 
             <button
               type="button"
               className="ia-view-all"
-              onClick={() =>
-                alert(
-                  "Affichage de toutes les suggestions IA."
-                )
-              }
+              onClick={() => alert("Affichage de toutes les suggestions IA.")}
             >
               Voir tout
               <ChevronRight size={13} />
@@ -424,32 +179,16 @@ export default function Ia() {
 
           <div className="ia-suggestions-list">
             {filteredSuggestions.map((suggestion) => (
-              <div
-                className="ia-suggestion-row"
-                key={suggestion.id}
-              >
-                <SuggestionIcon
-                  type={suggestion.type}
-                />
-
+              <div className="ia-suggestion-row" key={suggestion.id}>
+                <SuggestionIcon type={suggestion.type} />
                 <div className="ia-suggestion-content">
-                  <strong>
-                    {suggestion.title}
-                  </strong>
-
-                  <span>
-                    {suggestion.patient}
-                  </span>
+                  <strong>{suggestion.title}</strong>
+                  <span>{suggestion.patient}</span>
                 </div>
-
                 <button
                   type="button"
                   className="ia-suggestion-view"
-                  onClick={() =>
-                    alert(
-                      `Détails : ${suggestion.title}`
-                    )
-                  }
+                  onClick={() => alert(`Détails : ${suggestion.title}`)}
                 >
                   Voir
                 </button>
@@ -459,29 +198,18 @@ export default function Ia() {
             {filteredSuggestions.length === 0 && (
               <div className="ia-empty">
                 <Search size={22} />
-
-                <span>
-                  Aucune suggestion trouvée.
-                </span>
+                <span>Aucune suggestion trouvée.</span>
               </div>
             )}
           </div>
         </section>
 
-        {/* =================================================
-            ANALYSE DES DONNÉES
-           ================================================= */}
-
         <section className="ia-panel analysis-panel">
           <div className="ia-panel-header">
             <div>
               <h2>Analyse des données</h2>
-
-              <p>
-                Prédiction des admissions (7 jours)
-              </p>
+              <p>Prédiction des admissions (7 jours)</p>
             </div>
-
             <div className="ia-analysis-icon">
               <BarChart3 size={17} />
             </div>
@@ -503,140 +231,59 @@ export default function Ia() {
               <div className="ia-chart-grid-line line-10"></div>
               <div className="ia-chart-grid-line line-0"></div>
 
-              <svg
-                className="ia-chart-svg"
-                viewBox="0 0 700 210"
-                preserveAspectRatio="none"
-              >
+              <svg className="ia-chart-svg" viewBox="0 0 700 210" preserveAspectRatio="none">
                 <polyline
-                  points="
-                    10,108
-                    120,87
-                    230,120
-                    340,72
-                    450,98
-                    560,50
-                    680,73
-                  "
+                  points="10,108 120,87 230,120 340,72 450,98 560,50 680,73"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="3"
                 />
-
                 <polyline
-                  points="
-                    10,102
-                    120,94
-                    230,105
-                    340,82
-                    450,92
-                    560,58
-                    680,62
-                  "
+                  points="10,102 120,94 230,105 340,82 450,92 560,58 680,62"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeDasharray="7 5"
                   className="prediction-line"
                 />
-
-                <circle
-                  cx="10"
-                  cy="108"
-                  r="4"
-                />
-
-                <circle
-                  cx="120"
-                  cy="87"
-                  r="4"
-                />
-
-                <circle
-                  cx="230"
-                  cy="120"
-                  r="4"
-                />
-
-                <circle
-                  cx="340"
-                  cy="72"
-                  r="4"
-                />
-
-                <circle
-                  cx="450"
-                  cy="98"
-                  r="4"
-                />
-
-                <circle
-                  cx="560"
-                  cy="50"
-                  r="4"
-                />
-
-                <circle
-                  cx="680"
-                  cy="73"
-                  r="4"
-                />
+                <circle cx="10" cy="108" r="4" />
+                <circle cx="120" cy="87" r="4" />
+                <circle cx="230" cy="120" r="4" />
+                <circle cx="340" cy="72" r="4" />
+                <circle cx="450" cy="98" r="4" />
+                <circle cx="560" cy="50" r="4" />
+                <circle cx="680" cy="73" r="4" />
               </svg>
 
               <div className="ia-chart-x">
                 {ANALYSIS_DATA.map((item) => (
-                  <span key={item.date}>
-                    {item.date}
-                  </span>
+                  <span key={item.date}>{item.date}</span>
                 ))}
               </div>
             </div>
           </div>
 
           <div className="ia-chart-legend">
-            <span>
-              <i className="legend-real"></i>
-              Réel
-            </span>
-
-            <span>
-              <i className="legend-prediction"></i>
-              Prédiction
-            </span>
+            <span><i className="legend-real"></i>Réel</span>
+            <span><i className="legend-prediction"></i>Prédiction</span>
           </div>
         </section>
       </div>
 
-      {/* ==================================================
-          DEUXIÈME LIGNE
-         ================================================== */}
-
       <div className="ia-bottom-grid">
-        {/* =================================================
-            L'IA AU SERVICE DE LA SANTÉ
-           ================================================= */}
-
         <section className="ia-health-card">
           <div className="ia-health-icon">
             <Bot size={28} />
           </div>
-
           <div className="ia-health-content">
             <h2>L'IA au service de la santé</h2>
-
             <p>
-              Une technologie conçue pour rendre
-              la clinique plus performante, plus
-              intelligente et mieux organisée.
+              Une technologie conçue pour rendre la clinique plus performante,
+              plus intelligente et mieux organisée.
             </p>
-
             <button
               type="button"
-              onClick={() =>
-                alert(
-                  "Découvrez les fonctionnalités IA de MA SANTÉ."
-                )
-              }
+              onClick={() => alert("Découvrez les fonctionnalités IA de MA SANTÉ.")}
             >
               Découvrir
               <ChevronRight size={14} />
@@ -644,44 +291,25 @@ export default function Ia() {
           </div>
         </section>
 
-        {/* =================================================
-            MODÈLES IA
-           ================================================= */}
-
         <section className="ia-panel models-panel">
           <div className="ia-panel-header">
             <div>
               <h2>Modèles IA</h2>
-
-              <p>
-                État des modèles disponibles
-              </p>
+              <p>État des modèles disponibles</p>
             </div>
-
-            <Sparkles
-              size={17}
-              className="models-sparkle"
-            />
+            <Sparkles size={17} className="models-sparkle" />
           </div>
 
           <div className="ia-models-list">
             {AI_MODELS.map((model) => {
               const Icon = model.icon;
-
               return (
-                <div
-                  className="ia-model-row"
-                  key={model.id}
-                >
+                <div className="ia-model-row" key={model.id}>
                   <div className="ia-model-name">
                     <Icon size={13} />
-
                     <span>{model.name}</span>
                   </div>
-
-                  <span className="ia-model-status">
-                    {model.status}
-                  </span>
+                  <span className="ia-model-status">{model.status}</span>
                 </div>
               );
             })}
@@ -689,37 +317,19 @@ export default function Ia() {
         </section>
       </div>
 
-      {/* ==================================================
-          INFORMATION SÉCURITÉ
-         ================================================== */}
-
       <div className="ia-information">
         <div className="ia-information-icon">
           <Info size={17} />
         </div>
-
         <div>
-          <strong>
-            Assistance à la décision
-          </strong>
-
+          <strong>Assistance à la décision</strong>
           <span>
-            Les résultats produits par l'IA sont
-            des outils d'aide à la décision et ne
-            remplacent pas l'analyse d'un professionnel
-            de santé.
+            Les résultats produits par l'IA sont des outils d'aide à la décision
+            et ne remplacent pas l'analyse d'un professionnel de santé.
           </span>
         </div>
-
-        <ShieldCheck
-          size={19}
-          className="ia-information-check"
-        />
+        <ShieldCheck size={19} className="ia-information-check" />
       </div>
-
-      {/* ==================================================
-          MODAL OUTIL IA
-         ================================================== */}
 
       {activeTool && (() => {
         const ActiveToolIcon = activeTool.icon;
@@ -728,28 +338,18 @@ export default function Ia() {
           <div
             className="ia-modal-overlay"
             onMouseDown={(event) => {
-              if (
-                event.target === event.currentTarget
-              ) {
-                closeTool();
-              }
+              if (event.target === event.currentTarget) closeTool();
             }}
           >
             <div className="ia-modal">
               <div className="ia-modal-header">
                 <div className="ia-modal-title">
-                  <div
-                    className={`ia-modal-icon ${activeTool.color}`}
-                  >
+                  <div className={`ia-modal-icon ${activeTool.color}`}>
                     <ActiveToolIcon size={21} />
                   </div>
-
                   <div>
                     <h2>{activeTool.title}</h2>
-
-                    <p>
-                      {activeTool.description}
-                    </p>
+                    <p>{activeTool.description}</p>
                   </div>
                 </div>
 
@@ -768,46 +368,29 @@ export default function Ia() {
                   <div className="ia-placeholder-icon">
                     <BrainCircuit size={28} />
                   </div>
-
-                  <h3>
-                    Module {activeTool.title}
-                  </h3>
-
+                  <h3>Module {activeTool.title}</h3>
                   <p>
-                    Cette fonctionnalité est prête
-                    pour être connectée au moteur
+                    Cette fonctionnalité est prête pour être connectée au moteur
                     d'intelligence artificielle.
                   </p>
-
                   <div className="ia-development-info">
                     <FileText size={15} />
-
                     <span>
-                      L'API Django pourra traiter les
-                      données et retourner les résultats
-                      de l'analyse.
+                      L'API Django pourra traiter les données et retourner les
+                      résultats de l'analyse.
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="ia-modal-footer">
-                <button
-                  type="button"
-                  className="ia-modal-cancel"
-                  onClick={closeTool}
-                >
+                <button type="button" className="ia-modal-cancel" onClick={closeTool}>
                   Fermer
                 </button>
-
                 <button
                   type="button"
                   className="ia-modal-action"
-                  onClick={() =>
-                    alert(
-                      "Fonctionnalité IA prête à être connectée."
-                    )
-                  }
+                  onClick={() => alert("Fonctionnalité IA prête à être connectée.")}
                 >
                   <Sparkles size={15} />
                   Démarrer l'analyse

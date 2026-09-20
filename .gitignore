@@ -3,6 +3,9 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.*
+!.env.example
+.impeccable/
 node_modules/
 dist/
 *.sqlite3

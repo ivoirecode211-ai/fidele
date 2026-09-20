@@ -7,8 +7,8 @@
   min-height: 100%;
   padding: 20px;
   box-sizing: border-box;
-  background: #f4f9fc;
-  color: #173852;
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* ============================================================
@@ -50,7 +50,7 @@
 
 .hygiene-title-area p {
   margin: 3px 0 0;
-  color: #607f94;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -65,7 +65,7 @@
   gap: 6px;
   background: linear-gradient(135deg, #087fd4, #0568b4);
   color: white;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(8, 127, 212, 0.18);
@@ -88,90 +88,6 @@
   margin-bottom: 14px;
 }
 
-.hygiene-stat-card {
-  min-height: 63px;
-  padding: 10px 11px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #d9eaf3;
-  border-radius: 8px;
-  background: white;
-  box-sizing: border-box;
-}
-
-.hygiene-stat-icon {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hygiene-stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.hygiene-stat-content strong {
-  font-size: 19px;
-  line-height: 20px;
-  font-weight: 700;
-}
-
-.hygiene-stat-content span {
-  margin-top: 3px;
-  color: #71899a;
-  font-size: 9px;
-  line-height: 12px;
-}
-
-/* Stat vert */
-
-.hygiene-stat-card.green .hygiene-stat-icon {
-  background: #ddf8eb;
-  color: #08a378;
-}
-
-.hygiene-stat-card.green strong {
-  color: #07946d;
-}
-
-/* Stat bleu */
-
-.hygiene-stat-card.blue .hygiene-stat-icon {
-  background: #e5f3ff;
-  color: #087bcf;
-}
-
-.hygiene-stat-card.blue strong {
-  color: #0872bd;
-}
-
-/* Stat orange */
-
-.hygiene-stat-card.orange .hygiene-stat-icon {
-  background: #fff0dd;
-  color: #ed901d;
-}
-
-.hygiene-stat-card.orange strong {
-  color: #da7c0b;
-}
-
-/* Stat violet */
-
-.hygiene-stat-card.purple .hygiene-stat-icon {
-  background: #eee9ff;
-  color: #7656df;
-}
-
-.hygiene-stat-card.purple strong {
-  color: #6848ca;
-}
-
 /* ============================================================
    BARRE D'OUTILS
    ============================================================ */
@@ -191,10 +107,10 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid #d6e6ef;
+  border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
-  color: #7790a0;
+  color: var(--muted);
   box-sizing: border-box;
 }
 
@@ -205,7 +121,7 @@
   background: transparent;
   color: #315670;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .hygiene-search input::placeholder {
@@ -221,8 +137,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #edf3f6;
-  color: #718a9b;
+  background: var(--primary-soft);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -230,8 +146,8 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #7690a1;
-  font-size: 9px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .hygiene-date-info strong {
@@ -262,7 +178,7 @@
 
 .hygiene-panel {
   overflow: hidden;
-  border: 1px solid #d8e9f2;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: white;
   box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
@@ -275,7 +191,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #e4eef3;
+  border-bottom: 1px solid var(--green-soft);
   box-sizing: border-box;
 }
 
@@ -289,7 +205,7 @@
 .hygiene-panel-header p {
   margin: 3px 0 0;
   color: #8198a7;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 /* ============================================================
@@ -305,7 +221,7 @@
   gap: 5px;
   background: #087fd4;
   color: white;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -321,7 +237,7 @@
   gap: 3px;
   background: transparent;
   color: #087aca;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -339,32 +255,32 @@
   width: 100%;
   min-width: 610px;
   border-collapse: collapse;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .hygiene-table thead {
-  background: #f5fafc;
+  background: var(--bg);
 }
 
 .hygiene-table th {
   padding: 8px 7px;
   text-align: left;
   color: #5b788e;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
-  border-bottom: 1px solid #e0edf3;
+  border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
 .hygiene-table td {
   padding: 8px 7px;
   color: #58768b;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
   white-space: nowrap;
 }
 
 .hygiene-table tbody tr:hover {
-  background: #f9fcfd;
+  background: var(--bg);
 }
 
 .hygiene-table td strong {
@@ -372,51 +288,22 @@
   font-weight: 600;
 }
 
-.hygiene-task-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 7px;
-  border-radius: 7px;
-  font-size: 7px;
-  font-weight: 700;
-}
-
-.hygiene-task-status.completed {
-  background: #d9f8e8;
-  color: #07946a;
-}
-
-.hygiene-task-status.progress {
-  background: #dff2ff;
-  color: #0878c8;
-}
-
-.hygiene-task-status.planned {
-  background: #fff0d9;
-  color: #e48712;
-}
-
-.hygiene-task-status.late {
-  background: #ffe3e5;
-  color: #df3c4c;
-}
-
 .hygiene-edit-button {
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid #dceaf2;
+  border: 1px solid var(--border);
   border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
-  color: #658296;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .hygiene-edit-button:hover {
-  background: #edf6fb;
+  background: var(--primary-soft);
   color: #0879c9;
 }
 
@@ -439,7 +326,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .hygiene-product-row:last-child {
@@ -457,22 +344,22 @@
 }
 
 .hygiene-product-icon.blue {
-  background: #e5f3ff;
+  background: var(--primary-soft);
   color: #087bc9;
 }
 
 .hygiene-product-icon.green {
-  background: #ddf8ed;
-  color: #079b72;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .hygiene-product-icon.cyan {
-  background: #e1f8fa;
+  background: var(--primary-soft);
   color: #079ca5;
 }
 
 .hygiene-product-icon.purple {
-  background: #eee8ff;
+  background: var(--purple-soft);
   color: #7552d8;
 }
 
@@ -485,19 +372,19 @@
 
 .hygiene-product-info strong {
   color: #315873;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .hygiene-product-info span {
   margin-top: 2px;
   color: #8b9fa9;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .product-date {
-  color: #77909f;
-  font-size: 7px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .product-check {
@@ -523,12 +410,12 @@
 .waste-card {
   min-height: 104px;
   padding: 10px;
-  border: 1px solid #e0ebf1;
+  border: 1px solid var(--border);
   border-radius: 7px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: #fbfdfe;
+  background: var(--surface);
   box-sizing: border-box;
 }
 
@@ -543,37 +430,37 @@
 }
 
 .waste-icon.red {
-  background: #ffe8ea;
-  color: #e43d4b;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .waste-icon.orange {
-  background: #fff0dc;
+  background: var(--warning-soft);
   color: #e78b17;
 }
 
 .waste-icon.gray {
-  background: #edf1f3;
+  background: var(--green-soft);
   color: #657983;
 }
 
 .waste-card strong {
   color: #365a72;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .waste-quantity {
   margin-top: 3px;
-  color: #df3d4b;
-  font-size: 9px;
+  color: var(--danger);
+  font-size: 12px;
   font-weight: 700;
 }
 
 .waste-card small {
   margin-top: 4px;
   color: #8a9ca7;
-  font-size: 6px;
+  font-size: 11px;
 }
 
 /* ============================================================
@@ -599,13 +486,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0f5ff;
+  background: var(--primary-soft);
   color: #087dca;
 }
 
 .audit-icon.next {
-  background: #e9f8ef;
-  color: #079b71;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .audit-info {
@@ -616,22 +503,22 @@
 
 .audit-info strong {
   color: #365a72;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .audit-info span {
   margin-top: 2px;
   color: #8298a5;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .audit-status {
   padding: 4px 7px;
   border-radius: 7px;
   background: #d9f8e8;
-  color: #07936a;
-  font-size: 7px;
+  color: var(--green);
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -642,13 +529,13 @@
 .audit-separator {
   height: 1px;
   margin: 4px 0;
-  background: #edf3f6;
+  background: var(--primary-soft);
 }
 
 .audit-summary {
   margin-top: 10px;
   padding-top: 9px;
-  border-top: 1px solid #edf3f6;
+  border-top: 1px solid var(--primary-soft);
 }
 
 .audit-summary > div:first-child {
@@ -658,13 +545,13 @@
 }
 
 .audit-summary strong {
-  color: #07976e;
+  color: var(--green);
   font-size: 13px;
 }
 
 .audit-summary span {
   color: #8197a5;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .audit-progress {
@@ -672,7 +559,7 @@
   margin-top: 6px;
   overflow: hidden;
   border-radius: 5px;
-  background: #eaf1f4;
+  background: var(--primary-soft);
 }
 
 .audit-progress-bar {
@@ -699,8 +586,8 @@
   border-radius: 8px;
   background: linear-gradient(
     135deg,
-    #f9fffc,
-    #effbf6
+    var(--surface),
+    var(--bg)
   );
   box-sizing: border-box;
 }
@@ -713,8 +600,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #d9f7e9;
-  color: #07966d;
+  background: var(--border);
+  color: var(--green);
 }
 
 .summary-content {
@@ -725,13 +612,13 @@
 
 .summary-content strong {
   color: #28614e;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .summary-content span {
   margin-top: 3px;
   color: #749489;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .summary-score {
@@ -742,14 +629,14 @@
 }
 
 .summary-score strong {
-  color: #07966e;
+  color: var(--green);
   font-size: 18px;
 }
 
 .summary-score span {
   margin-top: 1px;
   color: #80978e;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 /* ============================================================
@@ -783,7 +670,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e3edf3;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-title {
@@ -799,8 +686,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0f7ed;
-  color: #07966d;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .modal-title h2 {
@@ -812,7 +699,7 @@
 .modal-title p {
   margin: 3px 0 0;
   color: #8298a6;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .modal-close {
@@ -824,13 +711,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f4f6;
-  color: #6d8493;
+  background: var(--bg);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .modal-close:hover {
-  background: #e7eef2;
+  background: var(--green-soft);
 }
 
 /* ============================================================
@@ -856,7 +743,7 @@
 
 .hygiene-form-group label {
   color: #42647a;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -865,13 +752,13 @@
   width: 100%;
   min-height: 36px;
   padding: 0 9px;
-  border: 1px solid #d5e4ec;
+  border: 1px solid var(--border);
   border-radius: 6px;
   outline: none;
   background: white;
   color: #345770;
   font-family: inherit;
-  font-size: 9px;
+  font-size: 12px;
   box-sizing: border-box;
 }
 
@@ -893,14 +780,14 @@
   align-items: center;
   gap: 7px;
   border-radius: 6px;
-  background: #f1faf7;
+  background: var(--bg);
   color: #4f8070;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .hygiene-form-note svg {
   flex-shrink: 0;
-  color: #07966e;
+  color: var(--green);
 }
 
 .hygiene-modal-actions {
@@ -918,19 +805,19 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .hygiene-cancel-button {
-  border: 1px solid #d4e1e8;
+  border: 1px solid var(--border);
   background: white;
-  color: #647e8e;
+  color: var(--muted);
 }
 
 .hygiene-cancel-button:hover {
-  background: #f4f8fa;
+  background: var(--bg);
 }
 
 .hygiene-save-button {
@@ -946,7 +833,7 @@
 .hygiene-save-button:hover {
   background: linear-gradient(
     135deg,
-    #079672,
+    var(--green),
     #067655
   );
 }
@@ -1025,7 +912,7 @@
   }
 
   .hygiene-title-area p {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .hygiene-modal-overlay {

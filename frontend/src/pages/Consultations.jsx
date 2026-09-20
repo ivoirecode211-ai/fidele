@@ -1,31 +1,9 @@
-/*
- * ============================================================
- * MA SANTÉ - ESPACE MÉDECIN / CONSULTATIONS
- * ============================================================
- *
- * Interface principale de l'espace médecin.
- *
- * Fonctionnalités :
- * - Affichage des consultations du jour
- * - Recherche d'un patient
- * - Filtrage des consultations
- * - Affichage du statut
- * - Nouvelle consultation
- * - Nouveau patient
- * - Dossier patient
- * - Ordonnance
- * - Compte rendu
- *
- * ============================================================
- */
-
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Logo from "../components/Logo";
 import "../styles/Consultations.css";
 
-
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
 
 const consultationsInitiales = [
   {
@@ -81,15 +59,15 @@ const consultationsInitiales = [
 ];
 
 
-/* ============================================================
-   COMPOSANT PRINCIPAL
-   ============================================================ */
-
 export default function Consultations() {
 
-  /* ----------------------------------------------------------
-     ÉTATS
-     ---------------------------------------------------------- */
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
 
   const [consultations, setConsultations] = useState(
     consultationsInitiales
@@ -107,10 +85,6 @@ export default function Consultations() {
     heure: "",
   });
 
-
-  /* ==========================================================
-     RECHERCHE
-     ========================================================== */
 
   const consultationsFiltrees = useMemo(() => {
 
@@ -130,10 +104,6 @@ export default function Consultations() {
   }, [recherche, consultations]);
 
 
-  /* ==========================================================
-     OUVERTURE D'UNE CONSULTATION
-     ========================================================== */
-
   const ouvrirConsultation = (consultation) => {
 
     setPatientSelectionne(consultation);
@@ -150,10 +120,6 @@ export default function Consultations() {
   };
 
 
-  /* ==========================================================
-     CHANGEMENT DU STATUT
-     ========================================================== */
-
   const changerStatut = (id, statut) => {
 
     setConsultations((liste) =>
@@ -165,10 +131,6 @@ export default function Consultations() {
     );
   };
 
-
-  /* ==========================================================
-     CRÉER UNE NOUVELLE CONSULTATION
-     ========================================================== */
 
   const enregistrerConsultation = (e) => {
 
@@ -207,25 +169,13 @@ export default function Consultations() {
     setModal(null);
   };
 
-  /* ==========================================================
-     FERMETURE MODALE
-     ========================================================== */
-
   const fermerModal = () => {
     setModal(null);
     setPatientSelectionne(null);
   };
 
-  /* ==========================================================
-     RENDU
-     ========================================================== */
-
   return (
     <div className="consultations-page">
-
-      {/* ======================================================
-          BARRE LATÉRALE
-          ====================================================== */}
 
       <aside className="medecin-sidebar">
 
@@ -233,7 +183,7 @@ export default function Consultations() {
         <div className="sidebar-logo">
 
           <div className="sidebar-heart">
-            ❤
+            <Logo size={26} inverted />
           </div>
 
           <div className="sidebar-brand">
@@ -307,6 +257,23 @@ export default function Consultations() {
         {/* Bas de sidebar */}
         <div className="sidebar-bottom">
 
+          <Link
+            to="/modules"
+            className="medecin-menu-item"
+          >
+            <span className="menu-icon">⌘</span>
+            <span>Retour aux modules</span>
+          </Link>
+
+          <button
+            type="button"
+            className="medecin-menu-item"
+            onClick={handleLogout}
+          >
+            <span className="menu-icon">⏻</span>
+            <span>Déconnexion</span>
+          </button>
+
           <div className="sidebar-version">
             MA SANTÉ v1.0
           </div>
@@ -316,15 +283,7 @@ export default function Consultations() {
       </aside>
 
 
-      {/* ======================================================
-          CONTENU PRINCIPAL
-          ====================================================== */}
-
       <main className="medecin-main">
-
-        {/* ====================================================
-            EN-TÊTE
-            ==================================================== */}
 
         <header className="medecin-header">
 
@@ -372,16 +331,8 @@ export default function Consultations() {
         </header>
 
 
-        {/* ====================================================
-            CONTENU
-            ==================================================== */}
-
         <section className="medecin-content">
 
-
-          {/* --------------------------------------------------
-              TITRE DE LA SECTION
-              -------------------------------------------------- */}
 
           <div className="section-heading">
 
@@ -409,10 +360,6 @@ export default function Consultations() {
 
           </div>
 
-
-          {/* --------------------------------------------------
-              BARRE D'ACTIONS
-              -------------------------------------------------- */}
 
           <div className="consultation-toolbar">
 
@@ -453,10 +400,6 @@ export default function Consultations() {
 
           </div>
 
-
-          {/* --------------------------------------------------
-              STATISTIQUES RAPIDES
-              -------------------------------------------------- */}
 
           <div className="quick-stats">
 
@@ -549,10 +492,6 @@ export default function Consultations() {
 
           </div>
 
-
-          {/* --------------------------------------------------
-              TABLEAU DES CONSULTATIONS
-              -------------------------------------------------- */}
 
           <div className="consultations-card">
 
@@ -763,10 +702,6 @@ export default function Consultations() {
             </div>
 
 
-            {/* ------------------------------------------------
-                ACTIONS RAPIDES
-                ------------------------------------------------ */}
-
             <div className="quick-actions">
 
               <button
@@ -865,10 +800,6 @@ export default function Consultations() {
 
           </div>
 
-
-          {/* --------------------------------------------------
-              INFORMATIONS DU JOUR
-              -------------------------------------------------- */}
 
           <div className="bottom-info-grid">
 
@@ -996,10 +927,6 @@ export default function Consultations() {
 
       </main>
 
-
-      {/* ======================================================
-          MODALES
-          ====================================================== */}
 
       {modal === "nouvelle" && (
 
@@ -1626,10 +1553,6 @@ export default function Consultations() {
       )}
 
 
-      {/* ------------------------------------------------------
-          MODALES PLACEHOLDER
-          ------------------------------------------------------ */}
-
       {[
         "patients",
         "examens",
@@ -1676,10 +1599,6 @@ export default function Consultations() {
   );
 }
 
-
-/* ============================================================
-   COMPOSANT MODALE
-   ============================================================ */
 
 function Modal({
   title,
@@ -1748,10 +1667,6 @@ function Modal({
 }
 
 
-/* ============================================================
-   CLASSE CSS DU STATUT
-   ============================================================ */
-
 function getStatusClass(statut) {
 
   switch (statut) {
@@ -1774,10 +1689,6 @@ function getStatusClass(statut) {
   }
 }
 
-
-/* ============================================================
-   TITRES DES MODALES
-   ============================================================ */
 
 function getModalTitle(modal) {
 

@@ -1,31 +1,4 @@
 
-/*
- * ============================================================
- * MA SANTÉ - ESPACE INFIRMIERS
- * ============================================================
- *
- * Fichier :
- *     src/pages/Nursing.jsx
- *
- * Feuille de style :
- *     src/styles/nursing.css
- *
- * Fonctionnalités :
- *
- * - Tableau de bord infirmier
- * - Patients hospitalisés / en surveillance
- * - Constantes vitales
- * - Soins à réaliser
- * - Médicaments / traitements
- * - Surveillance des patients
- * - Transmissions infirmières
- * - Recherche de patients
- * - Filtrage par état
- * - Ajout de constantes
- * - Ajout de transmission
- *
- * ============================================================
- */
 
 import { useMemo, useState } from "react";
 
@@ -34,14 +7,12 @@ import {
   AlertCircle,
   BedDouble,
   Bell,
-  CalendarClock,
   Check,
   CheckCircle2,
   ChevronRight,
   ClipboardList,
   Clock3,
   Droplets,
-  FileText,
   HeartPulse,
   Plus,
   RefreshCw,
@@ -51,8 +22,6 @@ import {
   Users,
   Weight,
   X,
-  Syringe,
-  Pill,
   Stethoscope,
   ShieldCheck,
   MessageSquareText,
@@ -60,10 +29,6 @@ import {
 
 import "../styles/nursing.css";
 
-
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
 
 const INITIAL_PATIENTS = [
   {
@@ -262,10 +227,6 @@ const INITIAL_TRANSMISSIONS = [
 ];
 
 
-/* ============================================================
-   FORMATER LES CONSTANTES
-   ============================================================ */
-
 function getPatientState(patient) {
   if (patient.priority === "URGENT") {
     return "urgent";
@@ -278,10 +239,6 @@ function getPatientState(patient) {
   return "stable";
 }
 
-
-/* ============================================================
-   BADGE PRIORITÉ
-   ============================================================ */
 
 function PriorityBadge({ priority }) {
 
@@ -312,79 +269,40 @@ function PriorityBadge({ priority }) {
 }
 
 
-/* ============================================================
-   COMPOSANT PRINCIPAL
-   ============================================================ */
-
 export default function Nursing() {
 
-  /* ----------------------------------------------------------
-     PATIENTS
-  ---------------------------------------------------------- */
 
   const [patients, setPatients] =
     useState(INITIAL_PATIENTS);
 
 
-  /* ----------------------------------------------------------
-     SOINS
-  ---------------------------------------------------------- */
-
   const [cares, setCares] =
     useState(INITIAL_CARES);
 
-
-  /* ----------------------------------------------------------
-     TRANSMISSIONS
-  ---------------------------------------------------------- */
 
   const [transmissions, setTransmissions] =
     useState(INITIAL_TRANSMISSIONS);
 
 
-  /* ----------------------------------------------------------
-     RECHERCHE
-  ---------------------------------------------------------- */
-
   const [search, setSearch] =
     useState("");
 
-
-  /* ----------------------------------------------------------
-     FILTRE PATIENTS
-  ---------------------------------------------------------- */
 
   const [patientFilter, setPatientFilter] =
     useState("ALL");
 
 
-  /* ----------------------------------------------------------
-     PATIENT SÉLECTIONNÉ
-  ---------------------------------------------------------- */
-
   const [selectedPatient, setSelectedPatient] =
     useState(null);
 
-
-  /* ----------------------------------------------------------
-     MODAL CONSTANTES
-  ---------------------------------------------------------- */
 
   const [showVitalsModal, setShowVitalsModal] =
     useState(false);
 
 
-  /* ----------------------------------------------------------
-     MODAL TRANSMISSION
-  ---------------------------------------------------------- */
-
   const [showTransmissionModal, setShowTransmissionModal] =
     useState(false);
 
-
-  /* ----------------------------------------------------------
-     FORMULAIRE CONSTANTES
-  ---------------------------------------------------------- */
 
   const [vitalsForm, setVitalsForm] = useState({
     temperature: "",
@@ -397,19 +315,11 @@ export default function Nursing() {
   });
 
 
-  /* ----------------------------------------------------------
-     FORMULAIRE TRANSMISSION
-  ---------------------------------------------------------- */
-
   const [transmissionForm, setTransmissionForm] =
     useState({
       text: "",
     });
 
-
-  /* ==========================================================
-     STATISTIQUES
-     ========================================================== */
 
   const stats = useMemo(() => {
 
@@ -445,10 +355,6 @@ export default function Nursing() {
 
   }, [patients, cares]);
 
-
-  /* ==========================================================
-     PATIENTS FILTRÉS
-     ========================================================== */
 
   const filteredPatients = useMemo(() => {
 
@@ -488,10 +394,6 @@ export default function Nursing() {
   }, [patients, search, patientFilter]);
 
 
-  /* ==========================================================
-     MARQUER UN SOIN
-     ========================================================== */
-
   function toggleCare(careId) {
 
     setCares((currentCares) =>
@@ -507,10 +409,6 @@ export default function Nursing() {
 
   }
 
-
-  /* ==========================================================
-     OUVRIR CONSTANTES
-     ========================================================== */
 
   function openVitalsModal(patient) {
 
@@ -530,10 +428,6 @@ export default function Nursing() {
 
   }
 
-
-  /* ==========================================================
-     ENREGISTRER CONSTANTES
-     ========================================================== */
 
   function handleSaveVitals(event) {
 
@@ -582,10 +476,6 @@ export default function Nursing() {
   }
 
 
-  /* ==========================================================
-     OUVRIR TRANSMISSION
-     ========================================================== */
-
   function openTransmissionModal(patient = null) {
 
     setSelectedPatient(patient);
@@ -598,10 +488,6 @@ export default function Nursing() {
 
   }
 
-
-  /* ==========================================================
-     ENREGISTRER TRANSMISSION
-     ========================================================== */
 
   function handleSaveTransmission(event) {
 
@@ -650,10 +536,6 @@ export default function Nursing() {
   }
 
 
-  /* ==========================================================
-     ACTUALISER
-     ========================================================== */
-
   function handleRefresh() {
 
     setSearch("");
@@ -663,18 +545,10 @@ export default function Nursing() {
   }
 
 
-  /* ==========================================================
-     AFFICHAGE
-     ========================================================== */
-
   return (
 
     <div className="nursing-page">
 
-
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
 
       <header className="nursing-header">
 
@@ -736,10 +610,6 @@ export default function Nursing() {
       </header>
 
 
-      {/* ======================================================
-          ALERTES
-      ====================================================== */}
-
       <div className="nursing-alert-banner">
 
         <div className="nursing-alert-icon">
@@ -762,10 +632,6 @@ export default function Nursing() {
 
       </div>
 
-
-      {/* ======================================================
-          STATISTIQUES
-      ====================================================== */}
 
       <section className="nursing-stats-grid">
 
@@ -872,16 +738,8 @@ export default function Nursing() {
       </section>
 
 
-      {/* ======================================================
-          ZONE PRINCIPALE
-      ====================================================== */}
-
       <div className="nursing-main-grid">
 
-
-        {/* ====================================================
-            PATIENTS
-        ==================================================== */}
 
         <section className="nursing-panel nursing-patients-panel">
 
@@ -1140,10 +998,6 @@ export default function Nursing() {
         </section>
 
 
-        {/* ====================================================
-            SOINS DU JOUR
-        ==================================================== */}
-
         <section className="nursing-panel">
 
           <div className="nursing-panel-header">
@@ -1263,16 +1117,8 @@ export default function Nursing() {
       </div>
 
 
-      {/* ======================================================
-          CONSTANTES + TRANSMISSIONS
-      ====================================================== */}
-
       <div className="nursing-bottom-grid">
 
-
-        {/* ====================================================
-            SURVEILLANCE
-        ==================================================== */}
 
         <section className="nursing-panel">
 
@@ -1419,10 +1265,6 @@ export default function Nursing() {
         </section>
 
 
-        {/* ====================================================
-            TRANSMISSIONS
-        ==================================================== */}
-
         <section className="nursing-panel">
 
           <div className="nursing-panel-header">
@@ -1508,10 +1350,6 @@ export default function Nursing() {
 
       </div>
 
-
-      {/* ======================================================
-          MODAL CONSTANTES
-      ====================================================== */}
 
       {showVitalsModal && selectedPatient && (
 
@@ -1802,10 +1640,6 @@ export default function Nursing() {
       )}
 
 
-      {/* ======================================================
-          MODAL TRANSMISSION
-      ====================================================== */}
-
       {showTransmissionModal && (
 
         <div
@@ -1950,10 +1784,6 @@ export default function Nursing() {
 
       )}
 
-
-      {/* ======================================================
-          MODAL DÉTAIL PATIENT
-      ====================================================== */}
 
       {selectedPatient &&
        !showVitalsModal &&
@@ -2193,10 +2023,6 @@ export default function Nursing() {
 
       )}
 
-
-      {/* ======================================================
-          PIED DE PAGE
-      ====================================================== */}
 
       <footer className="nursing-footer">
 

@@ -7,8 +7,8 @@
   min-height: 100%;
   padding: 20px;
   box-sizing: border-box;
-  background: #f4f9fc;
-  color: #173852;
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* ============================================================
@@ -51,7 +51,7 @@
 
 .ia-title-area p {
   margin: 3px 0 0;
-  color: #607f94;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -61,11 +61,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #d5eee4;
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: #f1fbf7;
-  color: #078b67;
-  font-size: 9px;
+  background: var(--bg);
+  color: var(--green);
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -92,7 +92,7 @@
   min-height: 74px;
   padding: 10px;
   position: relative;
-  border: 1px solid #d8e8f1;
+  border: 1px solid var(--border);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -124,35 +124,35 @@
 }
 
 .ia-tool-icon.blue {
-  background: #e3f3ff;
+  background: var(--primary-soft);
   color: #087dce;
 }
 
 .ia-tool-icon.green {
-  background: #e2f8ed;
-  color: #079b70;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .ia-tool-icon.cyan {
-  background: #e2f7fb;
+  background: var(--primary-soft);
   color: #078fa4;
 }
 
 .ia-tool-icon.purple {
-  background: #eee9ff;
+  background: var(--purple-soft);
   color: #7655d9;
 }
 
 .ia-tool-card strong {
   color: #315773;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .ia-tool-card span {
   margin-top: 2px;
   color: #8298a7;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .ia-tool-arrow {
@@ -181,7 +181,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid #d6e6ef;
+  border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
   color: #7891a1;
@@ -195,7 +195,7 @@
   background: transparent;
   color: #345a73;
   font-family: inherit;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .ia-search input::placeholder {
@@ -211,8 +211,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eef3f6;
-  color: #718896;
+  background: var(--primary-soft);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -221,7 +221,7 @@
   align-items: center;
   gap: 5px;
   color: #7b919f;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .ia-last-update strong {
@@ -248,7 +248,7 @@
 
 .ia-panel {
   overflow: hidden;
-  border: 1px solid #d8e9f2;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: white;
   box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
@@ -261,7 +261,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #e5eef3;
+  border-bottom: 1px solid var(--green-soft);
   box-sizing: border-box;
 }
 
@@ -275,16 +275,16 @@
 .ia-panel-header p {
   margin: 3px 0 0;
   color: #8299a8;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .ia-today {
   margin-left: 5px;
   padding: 3px 5px;
   border-radius: 5px;
-  background: #e7f7f1;
-  color: #07966e;
-  font-size: 6px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 11px;
   font-weight: 700;
   vertical-align: middle;
 }
@@ -296,13 +296,13 @@
   gap: 3px;
   background: transparent;
   color: #087aca;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .ia-view-all:hover {
-  color: #055e9c;
+  color: var(--primary);
 }
 
 /* ============================================================
@@ -318,7 +318,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .ia-suggestion-row:last-child {
@@ -336,22 +336,22 @@
 }
 
 .ia-suggestion-icon.warning {
-  background: #fff0d9;
+  background: var(--warning-soft);
   color: #e99417;
 }
 
 .ia-suggestion-icon.danger {
-  background: #ffe6e8;
-  color: #e13f4e;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .ia-suggestion-icon.success {
-  background: #ddf8eb;
-  color: #079b71;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .ia-suggestion-icon.info {
-  background: #e4f3ff;
+  background: var(--primary-soft);
   color: #087bc9;
 }
 
@@ -364,21 +364,21 @@
 
 .ia-suggestion-content strong {
   color: #365b73;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .ia-suggestion-content span {
   margin-top: 2px;
   color: #8299a6;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .ia-suggestion-view {
   border: none;
   background: transparent;
   color: #087dcc;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -395,7 +395,7 @@
   flex-direction: column;
   gap: 8px;
   color: #91a5b1;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* ============================================================
@@ -413,8 +413,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e4f7ef;
-  color: #079a70;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .ia-chart {
@@ -436,15 +436,15 @@
 
 .ia-chart-y span {
   color: #8ca0ac;
-  font-size: 6px;
+  font-size: 11px;
 }
 
 .ia-chart-body {
   flex: 1;
   height: 130px;
   position: relative;
-  border-left: 1px solid #dce9ef;
-  border-bottom: 1px solid #dce9ef;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .ia-chart-grid-line {
@@ -452,7 +452,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  border-top: 1px dashed #e7eef2;
+  border-top: 1px dashed var(--green-soft);
 }
 
 .line-40 {
@@ -510,7 +510,7 @@
 
 .ia-chart-x span {
   color: #879ba8;
-  font-size: 6px;
+  font-size: 11px;
 }
 
 .ia-chart-legend {
@@ -524,8 +524,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #6f8796;
-  font-size: 7px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .ia-chart-legend i {
@@ -552,12 +552,12 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  border: 1px solid #cde9f6;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: linear-gradient(
     135deg,
-    #f3fbff,
-    #e5f6ff
+    var(--bg),
+    var(--primary-soft)
   );
   box-sizing: border-box;
 }
@@ -572,7 +572,7 @@
   justify-content: center;
   background: linear-gradient(
     135deg,
-    #e0f3ff,
+    var(--primary-soft),
     #ccecff
   );
   color: #087fca;
@@ -592,8 +592,8 @@
 .ia-health-content p {
   max-width: 440px;
   margin: 5px 0 9px;
-  color: #6d8999;
-  font-size: 8px;
+  color: var(--muted);
+  font-size: 12px;
   line-height: 13px;
 }
 
@@ -607,7 +607,7 @@
   gap: 5px;
   background: #087ed0;
   color: white;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -634,7 +634,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .ia-model-row:last-child {
@@ -646,7 +646,7 @@
   align-items: center;
   gap: 7px;
   color: #496b80;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .ia-model-name svg {
@@ -657,8 +657,8 @@
   padding: 3px 7px;
   border-radius: 7px;
   background: #d9f8e8;
-  color: #07956b;
-  font-size: 6px;
+  color: var(--green);
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -672,7 +672,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  border: 1px solid #dbe9f1;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
   box-sizing: border-box;
@@ -686,7 +686,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8f4fb;
+  background: var(--primary-soft);
   color: #087dca;
 }
 
@@ -698,18 +698,18 @@
 
 .ia-information strong {
   color: #41647a;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .ia-information span {
   margin-top: 2px;
   color: #8299a7;
-  font-size: 7px;
+  font-size: 11px;
   line-height: 11px;
 }
 
 .ia-information-check {
-  color: #0a9d74;
+  color: var(--green);
 }
 
 /* ============================================================
@@ -743,7 +743,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e2edf3;
+  border-bottom: 1px solid var(--border);
 }
 
 .ia-modal-title {
@@ -762,22 +762,22 @@
 }
 
 .ia-modal-icon.blue {
-  background: #e3f3ff;
+  background: var(--primary-soft);
   color: #087dce;
 }
 
 .ia-modal-icon.green {
-  background: #e2f8ed;
-  color: #079b70;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .ia-modal-icon.cyan {
-  background: #e2f7fb;
+  background: var(--primary-soft);
   color: #078fa4;
 }
 
 .ia-modal-icon.purple {
-  background: #eee9ff;
+  background: var(--purple-soft);
   color: #7655d9;
 }
 
@@ -790,7 +790,7 @@
 .ia-modal-title p {
   margin: 3px 0 0;
   color: #8298a6;
-  font-size: 8px;
+  font-size: 12px;
 }
 
 .ia-modal-close {
@@ -802,13 +802,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f4f6;
-  color: #6d8493;
+  background: var(--bg);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .ia-modal-close:hover {
-  background: #e6edf1;
+  background: var(--green-soft);
 }
 
 .ia-modal-body {
@@ -825,7 +825,7 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  background: #f8fcfe;
+  background: var(--bg);
 }
 
 .ia-placeholder-icon {
@@ -836,7 +836,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e6f5fd;
+  background: var(--primary-soft);
   color: #087fc9;
 }
 
@@ -850,7 +850,7 @@
   max-width: 400px;
   margin: 6px 0 12px;
   color: #7c94a2;
-  font-size: 8px;
+  font-size: 12px;
   line-height: 13px;
 }
 
@@ -861,9 +861,9 @@
   align-items: center;
   gap: 7px;
   border-radius: 6px;
-  background: #edf8fd;
+  background: var(--primary-soft);
   color: #548097;
-  font-size: 7px;
+  font-size: 11px;
   line-height: 11px;
 }
 
@@ -878,7 +878,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  border-top: 1px solid #e2edf3;
+  border-top: 1px solid var(--border);
 }
 
 .ia-modal-cancel,
@@ -890,15 +890,15 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .ia-modal-cancel {
-  border: 1px solid #d5e2e9;
+  border: 1px solid var(--border);
   background: white;
-  color: #647e8e;
+  color: var(--muted);
 }
 
 .ia-modal-action {
@@ -977,7 +977,7 @@
   }
 
   .ia-title-area p {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .ia-health-card {

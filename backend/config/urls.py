@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/hospitalization/", include("hospitalization.urls")),
     path("api/billing/", include("billing.urls")),
     path("api/dashboard/", include("dashboard.urls")),
+    path("api/forms/", include("formengine.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]

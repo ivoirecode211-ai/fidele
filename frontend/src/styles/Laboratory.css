@@ -5,8 +5,8 @@
 .laboratory-page {
   min-height: 100vh;
   display: flex;
-  background: #f3f8fc;
-  color: #173b55;
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -27,7 +27,7 @@
 
   background: linear-gradient(
     180deg,
-    #063f69 0%,
+    var(--primary-dark) 0%,
     #062d4e 100%
   );
 
@@ -78,7 +78,7 @@
 
 .laboratory-brand p {
   margin: 3px 0 0;
-  color: #d8e9f4;
+  color: var(--border);
   font-size: 10px;
 }
 
@@ -142,7 +142,7 @@
   padding: 0 30px;
 
   background: white;
-  border-bottom: 1px solid #dce8f0;
+  border-bottom: 1px solid var(--border);
 
   display: flex;
   align-items: center;
@@ -151,13 +151,13 @@
 
 .laboratory-header h1 {
   margin: 0 0 6px;
-  color: #0a4773;
+  color: var(--primary-dark);
   font-size: 25px;
 }
 
 .laboratory-header p {
   margin: 0;
-  color: #728694;
+  color: var(--muted);
   font-size: 13px;
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   justify-content: center;
 
-  background: #e1f2fc;
+  background: var(--primary-soft);
   color: #0878c6;
 
   font-size: 12px;
@@ -216,7 +216,7 @@
   padding: 17px;
 
   background: white;
-  border: 1px solid #dce8f1;
+  border: 1px solid var(--border);
   border-radius: 9px;
 
   display: flex;
@@ -242,23 +242,23 @@
 }
 
 .lab-stat-icon.blue {
-  background: #e5f3ff;
+  background: var(--primary-soft);
   color: #0879c9;
 }
 
 .lab-stat-icon.orange {
-  background: #fff1dc;
+  background: var(--warning-soft);
   color: #e38a13;
 }
 
 .lab-stat-icon.purple {
-  background: #eee9ff;
-  color: #7656d7;
+  background: var(--purple-soft);
+  color: var(--purple);
 }
 
 .lab-stat-icon.green {
-  background: #e3f7ed;
-  color: #159d68;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .laboratory-stat-card span,
@@ -268,7 +268,7 @@
 }
 
 .laboratory-stat-card span {
-  color: #708592;
+  color: var(--muted);
   font-size: 10px;
 }
 
@@ -392,7 +392,7 @@
 
 .laboratory-table-card {
   background: white;
-  border: 3px solid #dce8f1;
+  border: 3px solid var(--border);
   border-radius: 9px;
   overflow: hidden;
 
@@ -406,7 +406,7 @@
   justify-content: space-between;
   align-items: center;
 
-  border-bottom: 1px solid #e2edf3;
+  border-bottom: 1px solid var(--border);
 }
 
 .laboratory-card-header h2 {
@@ -447,10 +447,10 @@
 .laboratory-table th {
   padding: 12px;
 
-  background: #f6faff;
-  border-bottom: 1px solid #dce8f0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 
-  color: #69818f;
+  color: var(--muted);
 
   text-align: left;
   font-size: 9px;
@@ -460,7 +460,7 @@
 .laboratory-table td {
   padding: 11px 12px;
 
-  border-bottom: 1px solid #edf3f7;
+  border-bottom: 1px solid var(--primary-soft);
 
   color: #3d5969;
 
@@ -469,7 +469,7 @@
 }
 
 .laboratory-table tbody tr:hover {
-  background: #f9fcff;
+  background: var(--surface);
 }
 
 .lab-analysis-id {
@@ -491,7 +491,7 @@
 
   border-radius: 50%;
 
-  background: #e6f3fc;
+  background: var(--primary-soft);
   color: #0875b7;
 
   display: flex;
@@ -538,27 +538,27 @@
 }
 
 .lab-priority-normal {
-  background: #edf3f7;
+  background: var(--primary-soft);
   color: #607684;
 }
 
 .lab-priority-urgent {
-  background: #ffe4e1;
+  background: var(--warning-soft);
   color: #d84236;
 }
 
 .lab-status-completed {
-  background: #ddf6e9;
+  background: var(--green-soft);
   color: #158b5b;
 }
 
 .lab-status-progress {
-  background: #e0f1ff;
+  background: var(--primary-soft);
   color: #0873ba;
 }
 
 .lab-status-pending {
-  background: #fff0d7;
+  background: var(--warning-soft);
   color: #d6810d;
 }
 
@@ -578,7 +578,7 @@
 }
 
 .lab-action-button:hover {
-  background: #eef8ff;
+  background: var(--primary-soft);
 }
 
 .lab-empty {
@@ -593,7 +593,7 @@
 
 .recent-results-card {
   background: white;
-  border: 1px solid #dce8f1;
+  border: 1px solid var(--border);
   border-radius: 9px;
   overflow: hidden;
 
@@ -607,7 +607,7 @@
   justify-content: space-between;
   align-items: flex-start;
 
-  border-bottom: 1px solid #e2edf3;
+  border-bottom: 1px solid var(--border);
 }
 
 .recent-results-header h2 {
@@ -628,7 +628,7 @@
 
   border-radius: 50%;
 
-  background: #e4f3fd;
+  background: var(--primary-soft);
   color: #0878c6;
 
   display: flex;
@@ -649,7 +649,7 @@
   display: flex;
   gap: 9px;
 
-  border-bottom: 1px solid #edf3f6;
+  border-bottom: 1px solid var(--primary-soft);
 }
 
 .recent-result-item:last-child {
@@ -672,17 +672,17 @@
 }
 
 .recent-result-icon.green {
-  background: #e3f7ed;
-  color: #159a65;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .recent-result-icon.orange {
-  background: #fff0d8;
+  background: var(--warning-soft);
   color: #dc8511;
 }
 
 .recent-result-icon.blue {
-  background: #e3f2ff;
+  background: var(--primary-soft);
   color: #0877c1;
 }
 
@@ -700,7 +700,7 @@
 
 .recent-result-info span {
   margin-top: 3px;
-  color: #189666;
+  color: var(--green);
   font-size: 9px;
 }
 
@@ -763,7 +763,7 @@
 }
 
 .laboratory-quick-actions button:nth-child(2) {
-  background: #6751c7;
+  background: var(--purple);
 }
 
 .laboratory-quick-actions .quick-action-green {
@@ -849,7 +849,7 @@
   align-items: center;
   justify-content: space-between;
 
-  border-bottom: 1px solid #e0ebf1;
+  border-bottom: 1px solid var(--border);
 
   background: white;
 }
@@ -887,9 +887,9 @@
   border: 0;
   border-radius: 7px;
 
-  background: #f1f6f9;
+  background: var(--bg);
 
-  color: #718692;
+  color: var(--muted);
 
   font-size: 25px;
 
@@ -899,7 +899,7 @@
 }
 
 .lab-modal-close:hover {
-  background: #e4eef3;
+  background: var(--green-soft);
   color: #17486a;
 }
 
@@ -913,9 +913,9 @@
 
   padding: 18px 20px;
 
-  background: #f5faff;
+  background: var(--bg);
 
-  border: 1px solid #dcecf5;
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
@@ -933,7 +933,7 @@
 
   border-radius: 50%;
 
-  background: #e0f1fc;
+  background: var(--primary-soft);
 
   color: #0875b9;
 
@@ -1004,7 +1004,7 @@
 
   border-radius: 7px;
 
-  background: #ffffff;
+  background: var(--surface);
 
   resize: vertical;
 
@@ -1066,7 +1066,7 @@
 
   padding-top: 8px;
 
-  border-top: 1px solid #e7eef2;
+  border-top: 1px solid var(--green-soft);
 }
 
 
@@ -1096,7 +1096,7 @@
 }
 
 .lab-cancel-button:hover {
-  background: #f3f7f9;
+  background: var(--bg);
 
   border-color: #b7ccd8;
 }
@@ -1143,7 +1143,7 @@
 }
 
 .laboratory-modal::-webkit-scrollbar-track {
-  background: #f2f6f8;
+  background: var(--bg);
 }
 
 .laboratory-modal::-webkit-scrollbar-thumb {

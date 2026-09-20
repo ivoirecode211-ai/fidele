@@ -1,35 +1,8 @@
-/*
- * ============================================================
- * MA SANTÉ - MODULE HOSPITALISATION
- * ============================================================
- *
- * Fichier : Hospitalization.jsx
- *
- * Fonctionnalités :
- * - Tableau de bord des hospitalisations
- * - Liste des patients hospitalisés
- * - Recherche
- * - Filtrage par statut
- * - Gestion des chambres et des lits
- * - Nouvelle admission
- * - Consultation du dossier d'hospitalisation
- * - Sortie du patient
- *
- * Les données utilisées ici sont actuellement des données
- * de démonstration. Elles pourront ensuite être remplacées
- * par les données provenant de l'API Django.
- * ============================================================
- */
-
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "../styles/Hospitalization.css";
 
 
 const Hospitalization = () => {
-
-  /* ==========================================================
-     ÉTATS
-     ========================================================== */
 
   const [activeTab, setActiveTab] = useState("hospitalisations");
 
@@ -43,10 +16,6 @@ const Hospitalization = () => {
 
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-
-  /* ==========================================================
-     DONNÉES DE DÉMONSTRATION
-     ========================================================== */
 
   const hospitalizations = [
     {
@@ -131,10 +100,6 @@ const Hospitalization = () => {
   ];
 
 
-  /* ==========================================================
-     DONNÉES DES CHAMBRES
-     ========================================================== */
-
   const rooms = [
     {
       id: 1,
@@ -192,10 +157,6 @@ const Hospitalization = () => {
   ];
 
 
-  /* ==========================================================
-     STATISTIQUES
-     ========================================================== */
-
   const totalHospitalized = hospitalizations.filter(
     (item) => item.status !== "Sortie"
   ).length;
@@ -216,10 +177,6 @@ const Hospitalization = () => {
     (item) => item.status === "Sortie prévue"
   ).length;
 
-
-  /* ==========================================================
-     FILTRAGE
-     ========================================================== */
 
   const filteredHospitalizations = useMemo(() => {
 
@@ -243,19 +200,11 @@ const Hospitalization = () => {
   }, [search, statusFilter]);
 
 
-  /* ==========================================================
-     OUVRIR LES DÉTAILS
-     ========================================================== */
-
   const handleDetails = (patient) => {
     setSelectedPatient(patient);
     setShowDetailsModal(true);
   };
 
-
-  /* ==========================================================
-     FERMER LES MODALES
-     ========================================================== */
 
   const closeModals = () => {
     setShowAdmissionModal(false);
@@ -264,16 +213,8 @@ const Hospitalization = () => {
   };
 
 
-  /* ==========================================================
-     RENDU
-     ========================================================== */
-
   return (
     <div className="hospitalization-page">
-
-      {/* ======================================================
-          EN-TÊTE
-      ====================================================== */}
 
       <div className="hospitalization-header">
 
@@ -301,10 +242,6 @@ const Hospitalization = () => {
 
       </div>
 
-
-      {/* ======================================================
-          CARTES STATISTIQUES
-      ====================================================== */}
 
       <div className="hospitalization-stats">
 
@@ -375,10 +312,6 @@ const Hospitalization = () => {
       </div>
 
 
-      {/* ======================================================
-          ONGLETS
-      ====================================================== */}
-
       <div className="hospitalization-tabs">
 
         <button
@@ -405,10 +338,6 @@ const Hospitalization = () => {
 
       </div>
 
-
-      {/* ======================================================
-          ONGLET HOSPITALISATIONS
-      ====================================================== */}
 
       {activeTab === "hospitalisations" && (
 
@@ -442,10 +371,6 @@ const Hospitalization = () => {
 
           </div>
 
-
-          {/* ==================================================
-              TABLEAU
-          ================================================== */}
 
           <div className="hospitalization-table-wrapper">
 
@@ -589,10 +514,6 @@ const Hospitalization = () => {
       )}
 
 
-      {/* ======================================================
-          ONGLET CHAMBRES
-      ====================================================== */}
-
       {activeTab === "chambres" && (
 
         <div className="rooms-section">
@@ -702,10 +623,6 @@ const Hospitalization = () => {
 
       )}
 
-
-      {/* ======================================================
-          MODALE : NOUVELLE ADMISSION
-      ====================================================== */}
 
       {showAdmissionModal && (
 
@@ -909,10 +826,6 @@ const Hospitalization = () => {
 
       )}
 
-
-      {/* ======================================================
-          MODALE : DÉTAILS PATIENT
-      ====================================================== */}
 
       {showDetailsModal && selectedPatient && (
 

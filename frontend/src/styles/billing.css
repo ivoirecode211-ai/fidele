@@ -10,36 +10,7 @@
    VARIABLES
    ============================================================ */
 
-:root {
-
-  --billing-primary: #2563eb;
-  --billing-primary-dark: #1d4ed8;
-  --billing-primary-light: #eff6ff;
-
-  --billing-success: #16a34a;
-  --billing-success-light: #f0fdf4;
-
-  --billing-warning: #d97706;
-  --billing-warning-light: #fffbeb;
-
-  --billing-danger: #dc2626;
-  --billing-danger-light: #fef2f2;
-
-  --billing-text: #172033;
-  --billing-text-secondary: #667085;
-  --billing-text-light: #98a2b3;
-
-  --billing-border: #e7eaf0;
-  --billing-background: #f5f7fb;
-  --billing-white: #ffffff;
-
-  --billing-radius: 14px;
-
-  --billing-shadow:
-    0 4px 16px rgba(16, 24, 40, 0.06);
-
-}
-
+/* Palette du module : voir src/styles/variables.css (source unique). */
 
 /* ============================================================
    PAGE
@@ -51,9 +22,9 @@
 
   padding: 28px;
 
-  background: var(--billing-background);
+  background: var(--bg);
 
-  color: var(--billing-text);
+  color: var(--text);
 
 }
 
@@ -179,7 +150,7 @@
 
   margin: 6px 0 0;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 14px;
 
@@ -232,9 +203,9 @@
 
 .billing-primary-button {
 
-  border: 1px solid var(--billing-primary);
+  border: 1px solid var(--primary);
 
-  background: var(--billing-primary);
+  background: var(--primary);
 
   color: white;
 
@@ -243,9 +214,9 @@
 
 .billing-primary-button:hover {
 
-  background: var(--billing-primary-dark);
+  background: var(--primary-dark);
 
-  border-color: var(--billing-primary-dark);
+  border-color: var(--primary-dark);
 
   transform: translateY(-1px);
 
@@ -254,18 +225,18 @@
 
 .billing-secondary-button {
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   background: white;
 
-  color: var(--billing-text);
+  color: var(--text);
 
 }
 
 
 .billing-secondary-button:hover {
 
-  background: #f8fafc;
+  background: var(--bg);
 
 }
 
@@ -302,11 +273,11 @@
 
   background: white;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
-  border-radius: var(--billing-radius);
+  border-radius: var(--radius);
 
-  box-shadow: var(--billing-shadow);
+  box-shadow: var(--shadow);
 
 }
 
@@ -332,7 +303,7 @@
 
 .billing-stat-blue {
 
-  background: #eff6ff;
+  background: var(--primary-soft);
 
   color: #2563eb;
 
@@ -341,7 +312,7 @@
 
 .billing-stat-green {
 
-  background: #f0fdf4;
+  background: var(--green-soft);
 
   color: #16a34a;
 
@@ -350,7 +321,7 @@
 
 .billing-stat-orange {
 
-  background: #fff7ed;
+  background: var(--danger-soft);
 
   color: #ea580c;
 
@@ -359,7 +330,7 @@
 
 .billing-stat-red {
 
-  background: #fef2f2;
+  background: var(--danger-soft);
 
   color: #dc2626;
 
@@ -379,7 +350,7 @@
 
   margin-bottom: 5px;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 13px;
 
@@ -407,7 +378,7 @@
 
   margin-top: 6px;
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -416,7 +387,7 @@
 
 .billing-stat-positive {
 
-  color: var(--billing-success) !important;
+  color: var(--green) !important;
 
 }
 
@@ -446,11 +417,11 @@
 
   background: white;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
-  border-radius: var(--billing-radius);
+  border-radius: var(--radius);
 
-  box-shadow: var(--billing-shadow);
+  box-shadow: var(--shadow);
 
 }
 
@@ -481,7 +452,7 @@
 
   margin: 5px 0 0;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 12px;
 
@@ -490,7 +461,7 @@
 
 .billing-card-header > svg {
 
-  color: var(--billing-primary);
+  color: var(--primary);
 
 }
 
@@ -520,7 +491,7 @@
 
   padding-bottom: 12px;
 
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--primary-soft);
 
 }
 
@@ -544,7 +515,7 @@
 
   font-size: 13px;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
 }
 
@@ -614,9 +585,9 @@
 
   padding: 13px;
 
-  background: #f8fafc;
+  background: var(--bg);
 
-  border: 1px solid #edf0f5;
+  border: 1px solid var(--primary-soft);
 
   border-radius: 10px;
 
@@ -627,7 +598,7 @@
 
   min-width: 20px;
 
-  color: var(--billing-primary);
+  color: var(--primary);
 
 }
 
@@ -647,7 +618,7 @@
 
   margin-top: 3px;
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -664,11 +635,11 @@
 
   background: white;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
-  border-radius: var(--billing-radius);
+  border-radius: var(--radius);
 
-  box-shadow: var(--billing-shadow);
+  box-shadow: var(--shadow);
 
 }
 
@@ -685,7 +656,7 @@
 
   padding: 20px;
 
-  border-bottom: 1px solid var(--billing-border);
+  border-bottom: 1px solid var(--border);
 
 }
 
@@ -703,7 +674,7 @@
 
   margin: 5px 0 0;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 12px;
 
@@ -755,13 +726,13 @@
     0 35px
     0 38px;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
   outline: none;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   background: white;
 
@@ -813,13 +784,13 @@
 
   padding: 0 30px 0 11px;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
   background: white;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   cursor: pointer;
 
@@ -864,11 +835,11 @@
 
   text-align: left;
 
-  background: #fafbfc;
+  background: var(--bg);
 
   color: #667085;
 
-  border-bottom: 1px solid var(--billing-border);
+  border-bottom: 1px solid var(--border);
 
   font-size: 11px;
 
@@ -887,7 +858,7 @@
 
   padding: 15px 16px;
 
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--primary-soft);
 
   color: #475467;
 
@@ -900,7 +871,7 @@
 
 .billing-table tbody tr:hover {
 
-  background: #fbfcfe;
+  background: var(--surface);
 
 }
 
@@ -943,9 +914,9 @@
 
   border-radius: 8px;
 
-  background: var(--billing-primary-light);
+  background: var(--primary-soft);
 
-  color: var(--billing-primary);
+  color: var(--primary);
 
 }
 
@@ -954,7 +925,7 @@
 
   font-size: 12px;
 
-  color: var(--billing-text);
+  color: var(--text);
 
 }
 
@@ -992,7 +963,7 @@
 
   border-radius: 50%;
 
-  background: #f2f4f7;
+  background: var(--bg);
 
   color: #667085;
 
@@ -1003,7 +974,7 @@
 
   display: block;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   font-size: 12px;
 
@@ -1016,7 +987,7 @@
 
   margin-top: 2px;
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -1053,7 +1024,7 @@
 
 .billing-paid-value {
 
-  color: var(--billing-success);
+  color: var(--green);
 
   font-weight: 650;
 
@@ -1062,14 +1033,14 @@
 
 .billing-remaining {
 
-  color: var(--billing-danger);
+  color: var(--danger);
 
 }
 
 
 .billing-remaining-zero {
 
-  color: var(--billing-success);
+  color: var(--green);
 
 }
 
@@ -1101,7 +1072,7 @@
 
 .billing-status-paid {
 
-  background: var(--billing-success-light);
+  background: var(--green-soft);
 
   color: #15803d;
 
@@ -1110,7 +1081,7 @@
 
 .billing-status-partial {
 
-  background: var(--billing-warning-light);
+  background: var(--warning-soft);
 
   color: #b45309;
 
@@ -1119,7 +1090,7 @@
 
 .billing-status-unpaid {
 
-  background: var(--billing-danger-light);
+  background: var(--danger-soft);
 
   color: #b91c1c;
 
@@ -1149,7 +1120,7 @@
 
   justify-content: center;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 8px;
 
@@ -1164,9 +1135,9 @@
 
 .billing-action-button:hover {
 
-  background: #f8fafc;
+  background: var(--bg);
 
-  color: var(--billing-primary);
+  color: var(--primary);
 
 }
 
@@ -1187,7 +1158,7 @@
 
   background: white;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 10px;
 
@@ -1215,7 +1186,7 @@
 
   background: transparent;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   text-align: left;
 
@@ -1228,7 +1199,7 @@
 
 .billing-action-menu button:hover {
 
-  background: #f2f4f7;
+  background: var(--bg);
 
 }
 
@@ -1261,7 +1232,7 @@
 
   display: block;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   font-size: 14px;
 
@@ -1274,7 +1245,7 @@
 
   margin-top: 5px;
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 12px;
 
@@ -1297,9 +1268,9 @@
 
   padding: 13px 20px;
 
-  border-top: 1px solid var(--billing-border);
+  border-top: 1px solid var(--border);
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -1308,7 +1279,7 @@
 
 .billing-table-footer strong {
 
-  color: var(--billing-danger);
+  color: var(--danger);
 
 }
 
@@ -1371,7 +1342,7 @@
 
   padding: 22px;
 
-  border-bottom: 1px solid var(--billing-border);
+  border-bottom: 1px solid var(--border);
 
 }
 
@@ -1389,7 +1360,7 @@
 
   margin: 5px 0 0;
 
-  color: var(--billing-text-secondary);
+  color: var(--muted);
 
   font-size: 12px;
 
@@ -1412,7 +1383,7 @@
 
   border-radius: 8px;
 
-  background: #f2f4f7;
+  background: var(--bg);
 
   color: #667085;
 
@@ -1423,7 +1394,7 @@
 
 .billing-modal-close:hover {
 
-  background: #e4e7ec;
+  background: var(--border);
 
 }
 
@@ -1454,7 +1425,7 @@
 
 .billing-form-group label {
 
-  color: var(--billing-text);
+  color: var(--text);
 
   font-size: 12px;
 
@@ -1472,13 +1443,13 @@
 
   padding: 0 12px;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
   outline: none;
 
-  color: var(--billing-text);
+  color: var(--text);
 
   background: white;
 
@@ -1542,9 +1513,9 @@
 
   padding: 18px 22px;
 
-  background: #f8fafc;
+  background: var(--bg);
 
-  border-bottom: 1px solid var(--billing-border);
+  border-bottom: 1px solid var(--border);
 
 }
 
@@ -1555,7 +1526,7 @@
 
   background: white;
 
-  border: 1px solid #edf0f5;
+  border: 1px solid var(--primary-soft);
 
   border-radius: 9px;
 
@@ -1568,7 +1539,7 @@
 
   margin-bottom: 5px;
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -1584,7 +1555,7 @@
 
 .billing-payment-rest {
 
-  color: var(--billing-danger) !important;
+  color: var(--danger) !important;
 
 }
 
@@ -1606,11 +1577,11 @@
 
   overflow: hidden;
 
-  border: 1px solid var(--billing-border);
+  border: 1px solid var(--border);
 
   border-radius: 10px;
 
-  background: var(--billing-border);
+  background: var(--border);
 
 }
 
@@ -1632,7 +1603,7 @@
 
 .billing-detail-item span {
 
-  color: var(--billing-text-light);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -1641,7 +1612,7 @@
 
 .billing-detail-item strong {
 
-  color: var(--billing-text);
+  color: var(--text);
 
   font-size: 12px;
 

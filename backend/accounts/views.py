@@ -15,6 +15,12 @@ class MeView(generics.RetrieveAPIView):
         return self.request.user
 
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all().order_by("last_name", "first_name")
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = User.objects.all().order_by("last_name", "first_name")
+        role = self.request.query_params.get("role")
+        if role:
+            qs = qs.filter(role=role)
+        return qs

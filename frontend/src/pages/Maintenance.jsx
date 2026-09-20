@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Wrench,
   CalendarDays,
@@ -16,225 +16,62 @@ import {
   ShieldAlert,
   Droplets,
 } from "lucide-react";
+import StatCard from "../components/StatCard";
+import StatusBadge from "../components/StatusBadge";
 import "../styles/maintenance.css";
 
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
+// Données de démonstration — seront reliées aux API Django/PostgreSQL.
 
 const INTERVENTIONS = [
-  {
-    id: 1,
-    equipment: "Climatiseur Bloc Opératoire",
-    category: "Climatisation",
-    technician: "Jean Kouassi",
-    date: "18/09/2026",
-    time: "08:30",
-    type: "Préventive",
-    status: "Terminée",
-    priority: "Normale",
-    description: "Nettoyage général et contrôle du système de refroidissement.",
-  },
-  {
-    id: 2,
-    equipment: "Générateur principal",
-    category: "Électricité",
-    technician: "Marc Yao",
-    date: "18/09/2026",
-    time: "10:15",
-    type: "Corrective",
-    status: "En cours",
-    priority: "Critique",
-    description: "Vérification du démarrage automatique et contrôle du niveau d'huile.",
-  },
-  {
-    id: 3,
-    equipment: "Stérilisateur Autoclave",
-    category: "Stérilisation",
-    technician: "Paul N'Guessan",
-    date: "17/09/2026",
-    time: "14:00",
-    type: "Préventive",
-    status: "Terminée",
-    priority: "Normale",
-    description: "Maintenance préventive et test de température.",
-  },
-  {
-    id: 4,
-    equipment: "Réfrigérateur pharmacie",
-    category: "Froid médical",
-    technician: "Jean Kouassi",
-    date: "16/09/2026",
-    time: "09:00",
-    type: "Corrective",
-    status: "En attente",
-    priority: "Haute",
-    description: "Température instable détectée dans le compartiment principal.",
-  },
-  {
-    id: 5,
-    equipment: "Système d'oxygène",
-    category: "Gaz médicaux",
-    technician: "Marc Yao",
-    date: "15/09/2026",
-    time: "11:30",
-    type: "Préventive",
-    status: "Terminée",
-    priority: "Haute",
-    description: "Contrôle de pression et recherche de fuite.",
-  },
+  { id: 1, equipment: "Climatiseur Bloc Opératoire", category: "Climatisation", technician: "Jean Kouassi", date: "18/09/2026", time: "08:30", type: "Préventive", status: "Terminée", priority: "Normale", description: "Nettoyage général et contrôle du système de refroidissement." },
+  { id: 2, equipment: "Générateur principal", category: "Électricité", technician: "Marc Yao", date: "18/09/2026", time: "10:15", type: "Corrective", status: "En cours", priority: "Critique", description: "Vérification du démarrage automatique et contrôle du niveau d'huile." },
+  { id: 3, equipment: "Stérilisateur Autoclave", category: "Stérilisation", technician: "Paul N'Guessan", date: "17/09/2026", time: "14:00", type: "Préventive", status: "Terminée", priority: "Normale", description: "Maintenance préventive et test de température." },
+  { id: 4, equipment: "Réfrigérateur pharmacie", category: "Froid médical", technician: "Jean Kouassi", date: "16/09/2026", time: "09:00", type: "Corrective", status: "En attente", priority: "Haute", description: "Température instable détectée dans le compartiment principal." },
+  { id: 5, equipment: "Système d'oxygène", category: "Gaz médicaux", technician: "Marc Yao", date: "15/09/2026", time: "11:30", type: "Préventive", status: "Terminée", priority: "Haute", description: "Contrôle de pression et recherche de fuite." },
 ];
 
 const EQUIPMENTS = [
-  {
-    id: 1,
-    name: "Générateur principal",
-    category: "Électricité",
-    icon: Zap,
-    status: "Critique",
-    location: "Bloc technique",
-    lastMaintenance: "10/09/2026",
-    nextMaintenance: "20/09/2026",
-    uptime: "82%",
-  },
-  {
-    id: 2,
-    name: "Climatisation bloc opératoire",
-    category: "Climatisation",
-    icon: Wind,
-    status: "Opérationnel",
-    location: "Bloc opératoire",
-    lastMaintenance: "18/09/2026",
-    nextMaintenance: "18/10/2026",
-    uptime: "98%",
-  },
-  {
-    id: 3,
-    name: "Autoclave principal",
-    category: "Stérilisation",
-    icon: Settings,
-    status: "Opérationnel",
-    location: "Stérilisation",
-    lastMaintenance: "17/09/2026",
-    nextMaintenance: "17/10/2026",
-    uptime: "96%",
-  },
-  {
-    id: 4,
-    name: "Réfrigérateur pharmacie",
-    category: "Froid médical",
-    icon: Droplets,
-    status: "Attention",
-    location: "Pharmacie",
-    lastMaintenance: "05/09/2026",
-    nextMaintenance: "19/09/2026",
-    uptime: "89%",
-  },
-  {
-    id: 5,
-    name: "Système d'oxygène",
-    category: "Gaz médicaux",
-    icon: Activity,
-    status: "Opérationnel",
-    location: "Service technique",
-    lastMaintenance: "15/09/2026",
-    nextMaintenance: "15/10/2026",
-    uptime: "99%",
-  },
-  {
-    id: 6,
-    name: "Ascenseur principal",
-    category: "Infrastructure",
-    icon: Building2,
-    status: "Opérationnel",
-    location: "Bâtiment principal",
-    lastMaintenance: "01/09/2026",
-    nextMaintenance: "01/10/2026",
-    uptime: "97%",
-  },
+  { id: 1, name: "Générateur principal", category: "Électricité", icon: Zap, status: "Critique", location: "Bloc technique", lastMaintenance: "10/09/2026", nextMaintenance: "20/09/2026", uptime: "82%" },
+  { id: 2, name: "Climatisation bloc opératoire", category: "Climatisation", icon: Wind, status: "Opérationnel", location: "Bloc opératoire", lastMaintenance: "18/09/2026", nextMaintenance: "18/10/2026", uptime: "98%" },
+  { id: 3, name: "Autoclave principal", category: "Stérilisation", icon: Settings, status: "Opérationnel", location: "Stérilisation", lastMaintenance: "17/09/2026", nextMaintenance: "17/10/2026", uptime: "96%" },
+  { id: 4, name: "Réfrigérateur pharmacie", category: "Froid médical", icon: Droplets, status: "Attention", location: "Pharmacie", lastMaintenance: "05/09/2026", nextMaintenance: "19/09/2026", uptime: "89%" },
+  { id: 5, name: "Système d'oxygène", category: "Gaz médicaux", icon: Activity, status: "Opérationnel", location: "Service technique", lastMaintenance: "15/09/2026", nextMaintenance: "15/10/2026", uptime: "99%" },
+  { id: 6, name: "Ascenseur principal", category: "Infrastructure", icon: Building2, status: "Opérationnel", location: "Bâtiment principal", lastMaintenance: "01/09/2026", nextMaintenance: "01/10/2026", uptime: "97%" },
 ];
 
 const CRITICAL_EQUIPMENTS = [
-  {
-    name: "Générateur principal",
-    location: "Bloc technique",
-    issue: "Batterie faible",
-    priority: "Critique",
-  },
-  {
-    name: "Réfrigérateur pharmacie",
-    location: "Pharmacie",
-    issue: "Température instable",
-    priority: "Haute",
-  },
+  { name: "Générateur principal", location: "Bloc technique", issue: "Batterie faible", priority: "Critique" },
+  { name: "Réfrigérateur pharmacie", location: "Pharmacie", issue: "Température instable", priority: "Haute" },
 ];
 
-/* ============================================================
-   COMPOSANTS
-   ============================================================ */
+const STAT_TONES = { warning: "orange", danger: "red", success: "green" };
 
-function StatCard({
-  icon: Icon,
-  title,
-  value,
-  subtitle,
-  className = "",
-}) {
-  return (
-    <div className={`maintenance-stat-card ${className}`}>
-      <div className="maintenance-stat-icon">
-        <Icon size={22} />
-      </div>
+const STATUS_TONES = {
+  "Terminée": "success",
+  "En cours": "info",
+  "En attente": "warning",
+  "Opérationnel": "success",
+  "Attention": "warning",
+  "Critique": "danger",
+};
 
-      <div className="maintenance-stat-content">
-        <span className="maintenance-stat-title">{title}</span>
-        <strong className="maintenance-stat-value">{value}</strong>
-        {subtitle && (
-          <span className="maintenance-stat-subtitle">{subtitle}</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StatusBadge({ status }) {
-  const statusClass = status
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "-");
-
-  return (
-    <span className={`maintenance-status-badge ${statusClass}`}>
-      {status}
-    </span>
-  );
-}
-
-/* ============================================================
-   PAGE MAINTENANCE
-   ============================================================ */
+const EMPTY_INTERVENTION = {
+  equipment: "",
+  category: "",
+  technician: "",
+  date: "",
+  time: "",
+  type: "Préventive",
+  priority: "Normale",
+  description: "",
+};
 
 export default function Maintenance() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [typeFilter, setTypeFilter] = useState("Tous");
   const [showModal, setShowModal] = useState(false);
-
-  const [newIntervention, setNewIntervention] = useState({
-    equipment: "",
-    category: "",
-    technician: "",
-    date: "",
-    time: "",
-    type: "Préventive",
-    priority: "Normale",
-    description: "",
-  });
-
-  /* ============================================================
-     FILTRAGE
-     ============================================================ */
+  const [newIntervention, setNewIntervention] = useState(EMPTY_INTERVENTION);
 
   const filteredInterventions = useMemo(() => {
     return INTERVENTIONS.filter((item) => {
@@ -246,71 +83,35 @@ export default function Maintenance() {
         item.category.toLowerCase().includes(searchValue) ||
         item.technician.toLowerCase().includes(searchValue);
 
-      const matchesStatus =
-        statusFilter === "Tous" || item.status === statusFilter;
-
-      const matchesType =
-        typeFilter === "Tous" || item.type === typeFilter;
+      const matchesStatus = statusFilter === "Tous" || item.status === statusFilter;
+      const matchesType = typeFilter === "Tous" || item.type === typeFilter;
 
       return matchesSearch && matchesStatus && matchesType;
     });
   }, [search, statusFilter, typeFilter]);
 
-  /* ============================================================
-     FORMULAIRE
-     ============================================================ */
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    setNewIntervention((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setNewIntervention((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveIntervention = (e) => {
     e.preventDefault();
-
     console.log("Nouvelle intervention :", newIntervention);
-
     setShowModal(false);
-
-    setNewIntervention({
-      equipment: "",
-      category: "",
-      technician: "",
-      date: "",
-      time: "",
-      type: "Préventive",
-      priority: "Normale",
-      description: "",
-    });
+    setNewIntervention(EMPTY_INTERVENTION);
   };
-
-  /* ============================================================
-     RENDU
-     ============================================================ */
 
   return (
     <div className="maintenance-page">
-
-      {/* ======================================================
-          EN-TÊTE
-          ====================================================== */}
-
       <div className="maintenance-header">
         <div className="maintenance-header-left">
           <div className="maintenance-title-icon">
             <Wrench size={28} />
           </div>
-
           <div>
             <h1>Maintenance</h1>
-            <p>
-              Gestion des équipements, interventions et maintenance
-              technique
-            </p>
+            <p>Gestion des équipements, interventions et maintenance technique</p>
           </div>
         </div>
 
@@ -324,51 +125,16 @@ export default function Maintenance() {
         </button>
       </div>
 
-      {/* ======================================================
-          STATISTIQUES
-          ====================================================== */}
-
       <div className="maintenance-stats-grid">
-        <StatCard
-          icon={Wrench}
-          title="Interventions"
-          value="24"
-          subtitle="Ce mois-ci"
-        />
-
-        <StatCard
-          icon={Clock3}
-          title="En attente"
-          value="05"
-          subtitle="À traiter"
-          className="warning"
-        />
-
-        <StatCard
-          icon={AlertTriangle}
-          title="Équipements critiques"
-          value="02"
-          subtitle="Intervention requise"
-          className="danger"
-        />
-
-        <StatCard
-          icon={CalendarDays}
-          title="Maintenance planifiée"
-          value="08"
-          subtitle="Cette semaine"
-          className="success"
-        />
+        <StatCard icon={<Wrench size={22} />} label="Interventions" value="24" detail="Ce mois-ci" tone="blue" />
+        <StatCard icon={<Clock3 size={22} />} label="En attente" value="05" detail="À traiter" tone={STAT_TONES.warning} />
+        <StatCard icon={<AlertTriangle size={22} />} label="Équipements critiques" value="02" detail="Intervention requise" tone={STAT_TONES.danger} />
+        <StatCard icon={<CalendarDays size={22} />} label="Maintenance planifiée" value="08" detail="Cette semaine" tone={STAT_TONES.success} />
       </div>
-
-      {/* ======================================================
-          BARRE DE RECHERCHE ET FILTRES
-          ====================================================== */}
 
       <div className="maintenance-toolbar">
         <div className="maintenance-search">
           <Search size={18} />
-
           <input
             type="text"
             placeholder="Rechercher une intervention, un équipement..."
@@ -378,20 +144,14 @@ export default function Maintenance() {
         </div>
 
         <div className="maintenance-filters">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="Tous">Tous les statuts</option>
             <option value="Terminée">Terminées</option>
             <option value="En cours">En cours</option>
             <option value="En attente">En attente</option>
           </select>
 
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
             <option value="Tous">Tous les types</option>
             <option value="Préventive">Préventive</option>
             <option value="Corrective">Corrective</option>
@@ -399,25 +159,13 @@ export default function Maintenance() {
         </div>
       </div>
 
-      {/* ======================================================
-          CONTENU PRINCIPAL
-          ====================================================== */}
-
       <div className="maintenance-main-grid">
-
-        {/* ====================================================
-            INTERVENTIONS RÉCENTES
-            ==================================================== */}
-
         <section className="maintenance-panel maintenance-interventions-panel">
           <div className="maintenance-panel-header">
             <div>
               <h2>Interventions récentes</h2>
-              <p>
-                Suivi des dernières opérations de maintenance
-              </p>
+              <p>Suivi des dernières opérations de maintenance</p>
             </div>
-
             <Wrench size={21} />
           </div>
 
@@ -444,30 +192,23 @@ export default function Maintenance() {
                           <span>{item.category}</span>
                         </div>
                       </td>
-
                       <td>{item.technician}</td>
-
                       <td>
                         <div className="maintenance-date-cell">
                           <span>{item.date}</span>
                           <small>{item.time}</small>
                         </div>
                       </td>
-
                       <td>{item.type}</td>
-
                       <td>
                         <span
-                          className={`maintenance-priority ${item.priority
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
+                          className={`maintenance-priority ${item.priority.toLowerCase().replace(/\s+/g, "-")}`}
                         >
                           {item.priority}
                         </span>
                       </td>
-
                       <td>
-                        <StatusBadge status={item.status} />
+                        <StatusBadge status={item.status} tone={STATUS_TONES[item.status]} />
                       </td>
                     </tr>
                   ))
@@ -486,17 +227,12 @@ export default function Maintenance() {
           </div>
         </section>
 
-        {/* ====================================================
-            ÉTAT DU PARC
-            ==================================================== */}
-
         <section className="maintenance-panel maintenance-status-panel">
           <div className="maintenance-panel-header">
             <div>
               <h2>État des équipements</h2>
               <p>Situation actuelle du parc</p>
             </div>
-
             <Activity size={21} />
           </div>
 
@@ -515,13 +251,11 @@ export default function Maintenance() {
               <span>Opérationnels</span>
               <strong>4</strong>
             </div>
-
             <div>
               <span className="legend-dot attention"></span>
               <span>Attention</span>
               <strong>1</strong>
             </div>
-
             <div>
               <span className="legend-dot critical"></span>
               <span>Critiques</span>
@@ -531,21 +265,13 @@ export default function Maintenance() {
         </section>
       </div>
 
-      {/* ======================================================
-          ÉQUIPEMENTS
-          ====================================================== */}
-
       <section className="maintenance-panel maintenance-equipment-panel">
         <div className="maintenance-panel-header">
           <div>
             <h2>Parc des équipements</h2>
             <p>Vue détaillée des équipements de la clinique</p>
           </div>
-
-          <button
-            type="button"
-            className="maintenance-secondary-button"
-          >
+          <button type="button" className="maintenance-secondary-button">
             Voir tous
           </button>
         </div>
@@ -555,40 +281,30 @@ export default function Maintenance() {
             const Icon = equipment.icon;
 
             return (
-              <div
-                className="maintenance-equipment-card"
-                key={equipment.id}
-              >
+              <div className="maintenance-equipment-card" key={equipment.id}>
                 <div className="maintenance-equipment-card-top">
                   <div className="maintenance-equipment-icon">
                     <Icon size={22} />
                   </div>
-
-                  <StatusBadge status={equipment.status} />
+                  <StatusBadge status={equipment.status} tone={STATUS_TONES[equipment.status]} />
                 </div>
 
                 <h3>{equipment.name}</h3>
-
-                <span className="maintenance-equipment-category">
-                  {equipment.category}
-                </span>
+                <span className="maintenance-equipment-category">{equipment.category}</span>
 
                 <div className="maintenance-equipment-info">
                   <div>
                     <span>Localisation</span>
                     <strong>{equipment.location}</strong>
                   </div>
-
                   <div>
                     <span>Disponibilité</span>
                     <strong>{equipment.uptime}</strong>
                   </div>
-
                   <div>
                     <span>Dernière maintenance</span>
                     <strong>{equipment.lastMaintenance}</strong>
                   </div>
-
                   <div>
                     <span>Prochaine maintenance</span>
                     <strong>{equipment.nextMaintenance}</strong>
@@ -600,40 +316,28 @@ export default function Maintenance() {
         </div>
       </section>
 
-      {/* ======================================================
-          ÉQUIPEMENTS CRITIQUES
-          ====================================================== */}
-
       <section className="maintenance-panel maintenance-critical-panel">
         <div className="maintenance-panel-header">
           <div>
             <h2>Alertes de maintenance</h2>
             <p>Équipements nécessitant une attention particulière</p>
           </div>
-
           <ShieldAlert size={21} />
         </div>
 
         <div className="maintenance-critical-list">
           {CRITICAL_EQUIPMENTS.map((equipment, index) => (
-            <div
-              className="maintenance-critical-item"
-              key={index}
-            >
+            <div className="maintenance-critical-item" key={index}>
               <div className="maintenance-critical-icon">
                 <AlertTriangle size={20} />
               </div>
-
               <div className="maintenance-critical-content">
                 <strong>{equipment.name}</strong>
                 <span>{equipment.location}</span>
                 <p>{equipment.issue}</p>
               </div>
-
               <span
-                className={`maintenance-priority ${equipment.priority
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
+                className={`maintenance-priority ${equipment.priority.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 {equipment.priority}
               </span>
@@ -642,29 +346,19 @@ export default function Maintenance() {
         </div>
       </section>
 
-      {/* ======================================================
-          MODALE : NOUVELLE INTERVENTION
-          ====================================================== */}
-
       {showModal && (
         <div
           className="maintenance-modal-overlay"
           onMouseDown={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowModal(false);
-            }
+            if (e.target === e.currentTarget) setShowModal(false);
           }}
         >
           <div className="maintenance-modal">
-
             <div className="maintenance-modal-header">
               <div>
                 <h2>Nouvelle intervention</h2>
-                <p>
-                  Enregistrer une nouvelle opération de maintenance
-                </p>
+                <p>Enregistrer une nouvelle opération de maintenance</p>
               </div>
-
               <button
                 type="button"
                 className="maintenance-modal-close"
@@ -676,12 +370,8 @@ export default function Maintenance() {
 
             <form onSubmit={handleSaveIntervention}>
               <div className="maintenance-form-grid">
-
                 <div className="maintenance-form-group">
-                  <label htmlFor="equipment">
-                    Équipement
-                  </label>
-
+                  <label htmlFor="equipment">Équipement</label>
                   <input
                     id="equipment"
                     name="equipment"
@@ -694,10 +384,7 @@ export default function Maintenance() {
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="category">
-                    Catégorie
-                  </label>
-
+                  <label htmlFor="category">Catégorie</label>
                   <select
                     id="category"
                     name="category"
@@ -705,35 +392,18 @@ export default function Maintenance() {
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="">
-                      Sélectionner
-                    </option>
-                    <option value="Électricité">
-                      Électricité
-                    </option>
-                    <option value="Climatisation">
-                      Climatisation
-                    </option>
-                    <option value="Stérilisation">
-                      Stérilisation
-                    </option>
-                    <option value="Froid médical">
-                      Froid médical
-                    </option>
-                    <option value="Gaz médicaux">
-                      Gaz médicaux
-                    </option>
-                    <option value="Infrastructure">
-                      Infrastructure
-                    </option>
+                    <option value="">Sélectionner</option>
+                    <option value="Électricité">Électricité</option>
+                    <option value="Climatisation">Climatisation</option>
+                    <option value="Stérilisation">Stérilisation</option>
+                    <option value="Froid médical">Froid médical</option>
+                    <option value="Gaz médicaux">Gaz médicaux</option>
+                    <option value="Infrastructure">Infrastructure</option>
                   </select>
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="technician">
-                    Technicien
-                  </label>
-
+                  <label htmlFor="technician">Technicien</label>
                   <input
                     id="technician"
                     name="technician"
@@ -746,30 +416,15 @@ export default function Maintenance() {
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="type">
-                    Type d'intervention
-                  </label>
-
-                  <select
-                    id="type"
-                    name="type"
-                    value={newIntervention.type}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Préventive">
-                      Préventive
-                    </option>
-                    <option value="Corrective">
-                      Corrective
-                    </option>
+                  <label htmlFor="type">Type d'intervention</label>
+                  <select id="type" name="type" value={newIntervention.type} onChange={handleInputChange}>
+                    <option value="Préventive">Préventive</option>
+                    <option value="Corrective">Corrective</option>
                   </select>
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="date">
-                    Date
-                  </label>
-
+                  <label htmlFor="date">Date</label>
                   <input
                     id="date"
                     name="date"
@@ -781,10 +436,7 @@ export default function Maintenance() {
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="time">
-                    Heure
-                  </label>
-
+                  <label htmlFor="time">Heure</label>
                   <input
                     id="time"
                     name="time"
@@ -796,33 +448,16 @@ export default function Maintenance() {
                 </div>
 
                 <div className="maintenance-form-group">
-                  <label htmlFor="priority">
-                    Priorité
-                  </label>
-
-                  <select
-                    id="priority"
-                    name="priority"
-                    value={newIntervention.priority}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Normale">
-                      Normale
-                    </option>
-                    <option value="Haute">
-                      Haute
-                    </option>
-                    <option value="Critique">
-                      Critique
-                    </option>
+                  <label htmlFor="priority">Priorité</label>
+                  <select id="priority" name="priority" value={newIntervention.priority} onChange={handleInputChange}>
+                    <option value="Normale">Normale</option>
+                    <option value="Haute">Haute</option>
+                    <option value="Critique">Critique</option>
                   </select>
                 </div>
 
                 <div className="maintenance-form-group maintenance-form-full">
-                  <label htmlFor="description">
-                    Description
-                  </label>
-
+                  <label htmlFor="description">Description</label>
                   <textarea
                     id="description"
                     name="description"
@@ -842,11 +477,7 @@ export default function Maintenance() {
                 >
                   Annuler
                 </button>
-
-                <button
-                  type="submit"
-                  className="maintenance-primary-button"
-                >
+                <button type="submit" className="maintenance-primary-button">
                   <Save size={18} />
                   Enregistrer
                 </button>

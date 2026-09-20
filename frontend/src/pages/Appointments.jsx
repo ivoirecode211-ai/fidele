@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CalendarDays,
   Clock,
@@ -17,7 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import "../Styles/appointments.css";
+import "../styles/appointments.css";
 
 const initialAppointments = [
   {
@@ -266,9 +266,6 @@ function Appointments() {
   return (
     <div className="appointments-page">
 
-      {/* =====================================================
-          HEADER
-          ===================================================== */}
       <div className="appointments-header">
         <div>
           <div className="appointments-title-wrapper">
@@ -295,9 +292,6 @@ function Appointments() {
         </button>
       </div>
 
-      {/* =====================================================
-          STATISTIQUES
-          ===================================================== */}
       <div className="appointment-statistics">
 
         <div className="appointment-stat-card">
@@ -346,9 +340,6 @@ function Appointments() {
 
       </div>
 
-      {/* =====================================================
-          FILTRES
-          ===================================================== */}
       <div className="appointments-filters">
 
         <div className="appointment-search">
@@ -405,9 +396,6 @@ function Appointments() {
 
       </div>
 
-      {/* =====================================================
-          TABLEAU
-          ===================================================== */}
       <div className="appointments-card">
 
         <div className="appointments-card-header">
@@ -643,9 +631,6 @@ function Appointments() {
         </div>
       </div>
 
-      {/* =====================================================
-          MODAL NOUVEAU / MODIFIER RENDEZ-VOUS
-          ===================================================== */}
       {showModal && (
         <div
           className="appointment-modal-overlay"

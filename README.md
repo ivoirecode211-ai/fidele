@@ -49,12 +49,20 @@ ma-sante-clinique/
 
 ## 2. Installation
 
+Depuis la racine du projet, copier `.env.example` vers `.env`, puis renseigner les paramètres PostgreSQL et la clé Django. Le backend lit ce fichier à la racine.
+
+```bash
+cp .env.example .env
+```
+
 ### Backend
 
 ```bash
 cd backend
 python -m venv venv
-# Windows
+# Linux / macOS
+source venv/bin/activate
+# Windows (à la place de la commande précédente)
 venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
@@ -70,7 +78,7 @@ Créer une base PostgreSQL :
 CREATE DATABASE ma_sante;
 ```
 
-Puis configurer `backend/.env` à partir de `.env.example`.
+Les paramètres de connexion doivent correspondre à ceux du fichier `.env` à la racine du projet.
 
 ### Frontend
 

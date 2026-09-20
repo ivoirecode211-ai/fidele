@@ -31,7 +31,7 @@
 
   display: flex;
 
-  background: #f4f8fc;
+  background: var(--bg);
 
   color: #17345d;
 
@@ -66,8 +66,8 @@
   background:
     linear-gradient(
       180deg,
-      #073c78 0%,
-      #07356c 48%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 48%,
       #062f61 100%
     );
 
@@ -142,7 +142,7 @@
 
   margin-bottom: 5px;
 
-  color: #e5effb;
+  color: var(--primary-soft);
 
   text-decoration: none;
 
@@ -212,7 +212,7 @@
 
   margin-left: 240px;
 
-  background: #f5f9fd;
+  background: var(--bg);
 }
 
 
@@ -232,7 +232,7 @@
   background: white;
 
   border-bottom:
-    1px solid #dbe8f2;
+    1px solid var(--border);
 
   box-shadow:
     0 2px 8px rgba(18, 64, 100, 0.05);
@@ -255,14 +255,14 @@
 
   padding: 0 13px;
 
-  background: #f8fbfe;
+  background: var(--bg);
 
   border:
-    1px solid #d9e6f0;
+    1px solid var(--border);
 
   border-radius: 7px;
 
-  color: #6e8499;
+  color: var(--muted);
 }
 
 
@@ -390,10 +390,10 @@
 
   border-radius: 50%;
 
-  background: #e3edf5;
+  background: var(--border);
 
   border:
-    1px solid #d2e0ea;
+    1px solid var(--border);
 
   font-size: 20px;
 }
@@ -417,7 +417,7 @@
 
 
 .direction-user-info span {
-  color: #71879b;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -496,7 +496,7 @@
   padding: 0 13px;
 
   border:
-    1px solid #d8e5ee;
+    1px solid var(--border);
 
   border-radius: 7px;
 
@@ -563,7 +563,7 @@
   background: white;
 
   border:
-    1px solid #dce8f1;
+    1px solid var(--border);
 
   border-radius: 10px;
 
@@ -609,28 +609,28 @@
    ============================================================ */
 
 .direction-stat-icon.blue {
-  background: #e4f1ff;
+  background: var(--primary-soft);
 
   color: #1877df;
 }
 
 
 .direction-stat-icon.green {
-  background: #e0f7f0;
+  background: var(--green-soft);
 
   color: #10a378;
 }
 
 
 .direction-stat-icon.red {
-  background: #ffe5ea;
+  background: var(--danger-soft);
 
   color: #e84d61;
 }
 
 
 .direction-stat-icon.orange {
-  background: #fff0dc;
+  background: var(--warning-soft);
 
   color: #e99112;
 }
@@ -695,7 +695,7 @@
 
   gap: 3px;
 
-  color: #07996c;
+  color: var(--green);
 
   font-size: 11px;
 
@@ -720,7 +720,7 @@
   background: white;
 
   border:
-    1px solid #d9e5ee;
+    1px solid var(--border);
 
   border-radius: 5px;
 
@@ -758,7 +758,7 @@
   background: white;
 
   border:
-    1px solid #dce8f1;
+    1px solid var(--border);
 
   border-radius: 10px;
 
@@ -783,7 +783,7 @@
   padding: 0 17px;
 
   border-bottom:
-    1px solid #e9f0f5;
+    1px solid var(--primary-soft);
 }
 
 
@@ -838,7 +838,7 @@
 
 
 .legend-green {
-  background: #0da374;
+  background: var(--green);
 }
 
 
@@ -862,7 +862,7 @@
 
 
 .chart-grid {
-  stroke: #e3edf4;
+  stroke: var(--border);
 
   stroke-width: 1;
 }
@@ -898,7 +898,7 @@
 .chart-patients {
   fill: none;
 
-  stroke: #0ca273;
+  stroke: var(--green);
 
   stroke-width: 2.8;
 
@@ -920,7 +920,7 @@
 .chart-point-patients {
   fill: white;
 
-  stroke: #0ca273;
+  stroke: var(--green);
 
   stroke-width: 2.5;
 }
@@ -986,7 +986,7 @@
 
 
 .services-donut-center span {
-  color: #66809a;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -995,7 +995,7 @@
 .services-donut-center strong {
   margin-top: 4px;
 
-  color: #173c69;
+  color: var(--primary-dark);
 
   font-size: 23px;
 
@@ -1094,7 +1094,7 @@
   padding: 8px 0;
 
   border-bottom:
-    1px solid #edf2f6;
+    1px solid var(--primary-soft);
 }
 
 
@@ -1124,30 +1124,30 @@
 
 
 .direction-alert-icon.critical {
-  background: #ffe3e7;
+  background: var(--danger-soft);
 
   color: #eb4259;
 }
 
 
 .direction-alert-icon.warning {
-  background: #fff0db;
+  background: var(--warning-soft);
 
   color: #ee8e13;
 }
 
 
 .direction-alert-icon.info {
-  background: #e3f0ff;
+  background: var(--primary-soft);
 
   color: #1978d9;
 }
 
 
 .direction-alert-icon.success {
-  background: #def6eb;
+  background: var(--green-soft);
 
-  color: #0aa16e;
+  color: var(--green);
 }
 
 
@@ -1198,7 +1198,7 @@
 .direction-alert-content p {
   margin: 4px 0 0;
 
-  color: #6d8296;
+  color: var(--muted);
 
   font-size: 10px;
 

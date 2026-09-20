@@ -5,42 +5,7 @@
  * ============================================================
  */
 
-:root {
-
-  --nursing-primary: #0f766e;
-  --nursing-primary-dark: #115e59;
-  --nursing-primary-light: #ecfdf5;
-
-  --nursing-blue: #2563eb;
-  --nursing-blue-light: #eff6ff;
-
-  --nursing-green: #16a34a;
-  --nursing-green-light: #f0fdf4;
-
-  --nursing-orange: #d97706;
-  --nursing-orange-light: #fffbeb;
-
-  --nursing-red: #dc2626;
-  --nursing-red-light: #fef2f2;
-
-  --nursing-purple: #7c3aed;
-  --nursing-purple-light: #f5f3ff;
-
-  --nursing-text: #172033;
-  --nursing-secondary: #667085;
-  --nursing-muted: #98a2b3;
-
-  --nursing-border: #e7eaf0;
-  --nursing-background: #f5f7fb;
-  --nursing-white: #ffffff;
-
-  --nursing-radius: 14px;
-
-  --nursing-shadow:
-    0 4px 16px rgba(16, 24, 40, 0.06);
-
-}
-
+/* Palette du module : voir src/styles/variables.css (source unique). */
 
 /* ============================================================
    PAGE
@@ -52,9 +17,9 @@
 
   padding: 26px;
 
-  background: var(--nursing-background);
+  background: var(--bg);
 
-  color: var(--nursing-text);
+  color: var(--text);
 
 }
 
@@ -135,7 +100,7 @@
 
   margin: 6px 0 0;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 13px;
 
@@ -165,7 +130,7 @@
 
   background: white;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 10px;
 
@@ -186,9 +151,9 @@
 
   border-radius: 9px;
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
 }
 
@@ -197,7 +162,7 @@
 
   display: block;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -227,13 +192,13 @@
 
   justify-content: center;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 10px;
 
   background: white;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   cursor: pointer;
 
@@ -242,9 +207,9 @@
 
 .nursing-refresh-button:hover {
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
-  background: #f8fafc;
+  background: var(--bg);
 
 }
 
@@ -272,8 +237,8 @@
   background:
     linear-gradient(
       90deg,
-      #fff7ed,
-      #fffbeb
+      var(--danger-soft),
+      var(--warning-soft)
     );
 
 }
@@ -293,9 +258,9 @@
 
   border-radius: 10px;
 
-  color: var(--nursing-orange);
+  color: var(--warning);
 
-  background: #ffedd5;
+  background: var(--warning-soft);
 
 }
 
@@ -313,7 +278,7 @@
 
   margin: 3px 0 0;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -352,11 +317,11 @@
 
   background: white;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
-  border-radius: var(--nursing-radius);
+  border-radius: var(--radius);
 
-  box-shadow: var(--nursing-shadow);
+  box-shadow: var(--shadow);
 
 }
 
@@ -382,36 +347,36 @@
 
 .nursing-stat-blue {
 
-  background: var(--nursing-blue-light);
+  background: var(--primary-soft);
 
-  color: var(--nursing-blue);
+  color: var(--primary);
 
 }
 
 
 .nursing-stat-red {
 
-  background: var(--nursing-red-light);
+  background: var(--danger-soft);
 
-  color: var(--nursing-red);
+  color: var(--danger);
 
 }
 
 
 .nursing-stat-orange {
 
-  background: var(--nursing-orange-light);
+  background: var(--warning-soft);
 
-  color: var(--nursing-orange);
+  color: var(--warning);
 
 }
 
 
 .nursing-stat-green {
 
-  background: var(--nursing-green-light);
+  background: var(--green-soft);
 
-  color: var(--nursing-green);
+  color: var(--green);
 
 }
 
@@ -422,7 +387,7 @@
 
   margin-bottom: 4px;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -444,7 +409,7 @@
 
   margin-top: 4px;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -493,11 +458,11 @@
 
   background: white;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
-  border-radius: var(--nursing-radius);
+  border-radius: var(--radius);
 
-  box-shadow: var(--nursing-shadow);
+  box-shadow: var(--shadow);
 
 }
 
@@ -514,7 +479,7 @@
 
   padding: 18px;
 
-  border-bottom: 1px solid var(--nursing-border);
+  border-bottom: 1px solid var(--border);
 
 }
 
@@ -532,7 +497,7 @@
 
   margin: 5px 0 0;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -553,23 +518,23 @@
 
   border-radius: 9px;
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
 
 .nursing-header-blue-icon {
 
-  color: var(--nursing-blue);
+  color: var(--primary);
 
 }
 
 
 .nursing-header-purple-icon {
 
-  color: var(--nursing-purple);
+  color: var(--purple);
 
 }
 
@@ -588,7 +553,7 @@
 
   padding: 14px 18px;
 
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--primary-soft);
 
 }
 
@@ -612,7 +577,7 @@
 
   left: 11px;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
 }
 
@@ -627,7 +592,7 @@
 
   padding: 0 35px 0 35px;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
@@ -668,7 +633,7 @@
 
   background: transparent;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   cursor: pointer;
 
@@ -681,7 +646,7 @@
 
   padding: 0 29px 0 10px;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
@@ -723,7 +688,7 @@
 
   padding: 14px 18px;
 
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--primary-soft);
 
   transition: 0.18s ease;
 
@@ -732,7 +697,7 @@
 
 .nursing-patient-row:hover {
 
-  background: #fbfefd;
+  background: var(--surface);
 
 }
 
@@ -773,9 +738,9 @@
 
   border-radius: 50%;
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
 }
 
@@ -800,7 +765,7 @@
 
 .nursing-patient-name strong {
 
-  color: var(--nursing-text);
+  color: var(--text);
 
   font-size: 12px;
 
@@ -815,7 +780,7 @@
 
 .nursing-patient-name span {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -845,7 +810,7 @@
 
   gap: 4px;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -854,7 +819,7 @@
 
 .nursing-patient-meta svg {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
 }
 
@@ -886,9 +851,9 @@
 
   border-radius: 6px;
 
-  background: #f8fafc;
+  background: var(--bg);
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -897,7 +862,7 @@
 
 .nursing-vital-mini svg {
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
@@ -946,7 +911,7 @@
 
   color: #b91c1c;
 
-  background: var(--nursing-red-light);
+  background: var(--danger-soft);
 
 }
 
@@ -955,7 +920,7 @@
 
   color: #b45309;
 
-  background: #fffbeb;
+  background: var(--warning-soft);
 
 }
 
@@ -964,14 +929,14 @@
 
   color: #15803d;
 
-  background: var(--nursing-green-light);
+  background: var(--green-soft);
 
 }
 
 
 .nursing-last-care {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 8px;
 
@@ -1005,13 +970,13 @@
 
   justify-content: center;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 8px;
 
   background: white;
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
   cursor: pointer;
 
@@ -1020,7 +985,7 @@
 
 .nursing-small-action:hover {
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
 }
 
@@ -1037,13 +1002,13 @@
 
   padding: 0 9px;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 8px;
 
   background: white;
 
-  color: var(--nursing-text);
+  color: var(--text);
 
   cursor: pointer;
 
@@ -1058,7 +1023,7 @@
 
   border-color: #99f6e4;
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
@@ -1081,14 +1046,14 @@
 
   gap: 6px;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
 }
 
 
 .nursing-empty strong {
 
-  color: var(--nursing-text);
+  color: var(--text);
 
   font-size: 13px;
 
@@ -1123,7 +1088,7 @@
 
   padding: 12px 0;
 
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--primary-soft);
 
 }
 
@@ -1164,9 +1129,9 @@
 
 .nursing-care-done .nursing-care-check {
 
-  background: var(--nursing-green);
+  background: var(--green);
 
-  border-color: var(--nursing-green);
+  border-color: var(--green);
 
 }
 
@@ -1202,7 +1167,7 @@
 
 .nursing-care-top span {
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1226,7 +1191,7 @@
 
 .nursing-care-bottom span {
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1239,9 +1204,9 @@
 
   border-radius: 5px;
 
-  background: #f2f4f7;
+  background: var(--bg);
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 7px;
 
@@ -1282,9 +1247,9 @@
 
   border-radius: 8px;
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
   cursor: pointer;
 
@@ -1323,11 +1288,11 @@
 
   padding: 12px;
 
-  border: 1px solid #edf0f5;
+  border: 1px solid var(--primary-soft);
 
   border-radius: 10px;
 
-  background: #fbfcfe;
+  background: var(--surface);
 
 }
 
@@ -1355,7 +1320,7 @@
 
   color: #dc2626;
 
-  background: #fef2f2;
+  background: var(--danger-soft);
 
 }
 
@@ -1364,7 +1329,7 @@
 
   color: #db2777;
 
-  background: #fdf2f8;
+  background: var(--danger-soft);
 
 }
 
@@ -1373,7 +1338,7 @@
 
   color: #2563eb;
 
-  background: #eff6ff;
+  background: var(--primary-soft);
 
 }
 
@@ -1382,7 +1347,7 @@
 
   color: #7c3aed;
 
-  background: #f5f3ff;
+  background: var(--bg);
 
 }
 
@@ -1391,7 +1356,7 @@
 
   display: block;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1415,7 +1380,7 @@
 
   margin-top: 2px;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 7px;
 
@@ -1456,9 +1421,9 @@
 
 .nursing-primary-button {
 
-  border: 1px solid var(--nursing-primary);
+  border: 1px solid var(--primary);
 
-  background: var(--nursing-primary);
+  background: var(--primary);
 
   color: white;
 
@@ -1467,27 +1432,27 @@
 
 .nursing-primary-button:hover {
 
-  background: var(--nursing-primary-dark);
+  background: var(--primary-dark);
 
-  border-color: var(--nursing-primary-dark);
+  border-color: var(--primary-dark);
 
 }
 
 
 .nursing-secondary-button {
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   background: white;
 
-  color: var(--nursing-text);
+  color: var(--text);
 
 }
 
 
 .nursing-secondary-button:hover {
 
-  background: #f8fafc;
+  background: var(--bg);
 
 }
 
@@ -1537,7 +1502,7 @@
 
   border-radius: 50%;
 
-  background: var(--nursing-purple);
+  background: var(--purple);
 
 }
 
@@ -1571,7 +1536,7 @@
 
 .nursing-transmission-top span {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1582,7 +1547,7 @@
 
   margin: 4px 0;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1593,7 +1558,7 @@
 
 .nursing-transmission-content small {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 8px;
 
@@ -1665,7 +1630,7 @@
 
   padding: 20px;
 
-  border-bottom: 1px solid var(--nursing-border);
+  border-bottom: 1px solid var(--border);
 
 }
 
@@ -1683,7 +1648,7 @@
 
   margin: 5px 0 0;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -1706,9 +1671,9 @@
 
   border-radius: 8px;
 
-  background: #f2f4f7;
+  background: var(--bg);
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   cursor: pointer;
 
@@ -1753,7 +1718,7 @@
 
 .nursing-form-group label {
 
-  color: var(--nursing-text);
+  color: var(--text);
 
   font-size: 10px;
 
@@ -1770,7 +1735,7 @@
 
   width: 100%;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 9px;
 
@@ -1778,7 +1743,7 @@
 
   background: white;
 
-  color: var(--nursing-text);
+  color: var(--text);
 
   font-size: 11px;
 
@@ -1835,7 +1800,7 @@
 
   transform: translateY(-50%);
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
@@ -1880,7 +1845,7 @@
 
   padding: 18px 20px;
 
-  background: #f8fafc;
+  background: var(--bg);
 
 }
 
@@ -1899,9 +1864,9 @@
 
   border-radius: 50%;
 
-  background: var(--nursing-primary-light);
+  background: var(--primary-soft);
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
@@ -1928,7 +1893,7 @@
 
   margin-top: 3px;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -1953,7 +1918,7 @@
 
   padding: 13px;
 
-  border: 1px solid var(--nursing-border);
+  border: 1px solid var(--border);
 
   border-radius: 10px;
 
@@ -1966,7 +1931,7 @@
 
   margin-bottom: 8px;
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 
@@ -1975,7 +1940,7 @@
 
   display: block;
 
-  color: var(--nursing-secondary);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -2007,14 +1972,14 @@
 
   border-radius: 9px;
 
-  background: #f8fafc;
+  background: var(--bg);
 
 }
 
 
 .nursing-detail-section span {
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -2046,7 +2011,7 @@
 
   padding: 12px 4px 3px;
 
-  color: var(--nursing-muted);
+  color: var(--muted);
 
   font-size: 9px;
 
@@ -2066,7 +2031,7 @@
 
 .nursing-footer svg {
 
-  color: var(--nursing-primary);
+  color: var(--primary);
 
 }
 

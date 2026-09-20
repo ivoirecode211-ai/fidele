@@ -1,30 +1,6 @@
 
-/**
- * ============================================================
- * MA SANTÉ — PAGE RAPPORTS DU DIRECTEUR GÉNÉRAL
- * ============================================================
- *
- * Fichier : src/pages/Reports.jsx
- *
- * Cette page permet au Directeur Général de :
- * - consulter les rapports de l'établissement ;
- * - filtrer les rapports ;
- * - visualiser les indicateurs principaux ;
- * - consulter les rapports par service ;
- * - imprimer un rapport ;
- * - télécharger les données au format CSV.
- *
- * Les données présentes ici sont des données de démonstration.
- * Elles pourront ensuite être remplacées par les données Django/API.
- * ============================================================
- */
-
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "../styles/reports.css";
-
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
 
 const reportsData = [
   {
@@ -89,10 +65,6 @@ const reportsData = [
   },
 ];
 
-/* ============================================================
-   STATISTIQUES PAR SERVICE
-   ============================================================ */
-
 const serviceStats = [
   {
     service: "Médecine",
@@ -126,10 +98,6 @@ const serviceStats = [
   },
 ];
 
-/* ============================================================
-   FILTRES
-   ============================================================ */
-
 const reportTypes = [
   "Tous les types",
   "Activité",
@@ -161,10 +129,6 @@ const periods = [
   "Mai 2026",
 ];
 
-/* ============================================================
-   COMPOSANT PRINCIPAL
-   ============================================================ */
-
 function Reports() {
   const [typeFilter, setTypeFilter] = useState("Tous les types");
   const [serviceFilter, setServiceFilter] =
@@ -172,10 +136,6 @@ function Reports() {
   const [periodFilter, setPeriodFilter] =
     useState("Septembre 2026");
   const [search, setSearch] = useState("");
-
-  /* ==========================================================
-     FILTRAGE DES RAPPORTS
-     ========================================================== */
 
   const filteredReports = useMemo(() => {
     return reportsData.filter((report) => {
@@ -212,10 +172,6 @@ function Reports() {
     periodFilter,
     search,
   ]);
-
-  /* ==========================================================
-     EXPORT CSV
-     ========================================================== */
 
   const downloadCSV = () => {
     const headers = [
@@ -263,17 +219,9 @@ function Reports() {
     URL.revokeObjectURL(url);
   };
 
-  /* ==========================================================
-     IMPRESSION
-     ========================================================== */
-
   const handlePrint = () => {
     window.print();
   };
-
-  /* ==========================================================
-     RÉINITIALISATION DES FILTRES
-     ========================================================== */
 
   const resetFilters = () => {
     setTypeFilter("Tous les types");
@@ -282,16 +230,8 @@ function Reports() {
     setSearch("");
   };
 
-  /* ==========================================================
-     AFFICHAGE
-     ========================================================== */
-
   return (
     <div className="reports-page">
-
-      {/* =====================================================
-          EN-TÊTE
-          ===================================================== */}
 
       <div className="reports-header">
 
@@ -329,10 +269,6 @@ function Reports() {
         </div>
 
       </div>
-
-      {/* =====================================================
-          INDICATEURS
-          ===================================================== */}
 
       <div className="reports-stat-grid">
 
@@ -425,10 +361,6 @@ function Reports() {
         </div>
 
       </div>
-
-      {/* =====================================================
-          FILTRES
-          ===================================================== */}
 
       <section className="reports-panel reports-filters-panel">
 
@@ -567,15 +499,7 @@ function Reports() {
 
       </section>
 
-      {/* =====================================================
-          CONTENU PRINCIPAL
-          ===================================================== */}
-
       <div className="reports-content-grid">
-
-        {/* ===================================================
-            TABLEAU DES RAPPORTS
-            =================================================== */}
 
         <section className="reports-panel reports-table-panel">
 
@@ -752,10 +676,6 @@ function Reports() {
 
         </section>
 
-        {/* ===================================================
-            STATISTIQUES PAR SERVICE
-            =================================================== */}
-
         <section className="reports-panel service-panel">
 
           <div className="panel-title">
@@ -819,10 +739,6 @@ function Reports() {
         </section>
 
       </div>
-
-      {/* =====================================================
-          RAPPORTS RAPIDES
-          ===================================================== */}
 
       <section className="reports-panel quick-reports-panel">
 
@@ -952,10 +868,6 @@ function Reports() {
         </div>
 
       </section>
-
-      {/* =====================================================
-          PIED DE PAGE
-          ===================================================== */}
 
       <div className="reports-footer-info">
 
