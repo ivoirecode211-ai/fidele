@@ -54,14 +54,14 @@ const ALL_MODULES = [
 
 const DEFAULT_ROLE_MODULES = {
   ADMIN: ALL_MODULES.map((module) => module.id),
-  DIRECTOR: ["patients", "appointments", "consultations", "hospitalization", "laboratory", "pharmacy", "stocks", "accounting", "hr", "direction", "maintenance", "procurement", "reports", "administration", "reception", "hygiene", "archives", "ia"],
-  DOCTOR: ["patients", "appointments", "consultations", "hospitalization", "laboratory", "pharmacy", "reports", "ia"],
-  NURSE: ["patients", "appointments", "hospitalization", "nursing", "laboratory"],
-  RECEPTION: ["patients", "appointments", "reception"],
-  LAB: ["patients", "laboratory"],
-  PHARMACY: ["patients", "pharmacy", "stocks"],
+  DIRECTOR: ["patients", "appointments", "consultations", "hospitalization", "nursing", "laboratory", "pharmacy", "stocks", "accounting", "hr", "direction", "maintenance", "reports", "hygiene", "archives", "ia"],
+  DOCTOR: ["appointments", "consultations", "hospitalization", "laboratory", "pharmacy", "reports", "ia"],
+  NURSE: ["appointments", "hospitalization", "nursing", "laboratory"],
+  RECEPTION: ["patients", "appointments"],
+  LAB: ["laboratory"],
+  PHARMACY: ["pharmacy", "stocks"],
   ACCOUNTING: ["patients", "accounting", "reports"],
-  STOCK: ["stocks", "pharmacy", "procurement"],
+  STOCK: ["stocks", "pharmacy"],
   HR: ["hr", "reports"],
   MAINTENANCE: ["maintenance"],
 };
@@ -104,7 +104,7 @@ export default function Modules() {
   const authorizedModules = useMemo(() => {
     if (!user) return [];
 
-    if (["ADMIN", "ADMINISTRATOR", "ADMINISTRATEUR"].includes(userRole)) {
+    if (user.is_superuser || ["ADMIN", "ADMINISTRATOR", "ADMINISTRATEUR"].includes(userRole)) {
       return ALL_MODULES;
     }
 
@@ -162,7 +162,11 @@ export default function Modules() {
                 <strong>
                   {user?.first_name || user?.username || "Utilisateur"} {user?.last_name || ""}
                 </strong>
-                <small>{user?.role_label || user?.role || "Utilisateur"}</small>
+                <small>
+                  {user?.is_superuser
+                    ? "Super administrateur"
+                    : user?.role_label || user?.role || "Utilisateur"}
+                </small>
               </div>
 
               <div className="modules-avatar">{initials}</div>

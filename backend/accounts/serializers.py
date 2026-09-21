@@ -8,6 +8,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["role"] = user.role
         token["name"] = user.get_full_name() or user.username
+        token["is_superuser"] = user.is_superuser
         return token
 
     def validate(self, attrs):
@@ -27,4 +28,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "role", "role_label", "phone", "department"]
+        fields = [
+            "id", "username", "email", "first_name", "last_name",
+            "role", "role_label", "is_superuser", "is_staff",
+            "phone", "department",
+        ]
+        read_only_fields = ["is_superuser", "is_staff"]

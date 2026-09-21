@@ -31,6 +31,28 @@ class LoginTests(APITestCase):
         )
         self.assertEqual(response.status_code, 401)
 
+    def test_superuser_is_always_an_administrator(self):
+        superuser = User.objects.create_superuser(
+            username="superviseur", password="pass1234", role="RECEPTION"
+        )
+
+        self.assertTrue(superuser.is_superuser)
+        self.assertTrue(superuser.is_staff)
+        self.assertEqual(superuser.role, "ADMIN")
+
+    def test_me_exposes_superuser_status(self):
+        superuser = User.objects.create_superuser(
+            username="superviseur-api", password="pass1234"
+        )
+        self.client.force_authenticate(superuser)
+
+        response = self.client.get("/api/auth/me/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["is_superuser"])
+        self.assertTrue(response.data["is_staff"])
+        self.assertEqual(response.data["role"], "ADMIN")
+
 
 class UserListTests(APITestCase):
     def setUp(self):

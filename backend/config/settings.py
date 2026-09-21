@@ -5,6 +5,7 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR.parent / ".env")
+load_dotenv(BASE_DIR / ".env")  # Compatibilité avec les installations locales existantes.
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-secret-key")
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "billing",
     "dashboard",
     "formengine",
+    "cashdesk",
 ]
 
 MIDDLEWARE = [
