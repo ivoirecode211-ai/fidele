@@ -19,6 +19,7 @@ import "../styles/Caisse.css";
  * - Application automatique de la réduction assurance
  * - Génération automatique de l'identifiant patient
  * - Calcul dynamique des bilans
+ * - Transmission automatique du patient au médecin
  *
  * IMPORTANT :
  * Les services, médecins et assurances présents ici sont
@@ -33,9 +34,9 @@ import "../styles/Caisse.css";
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Icônes
- * |--------------------------------------------------------------------------
+ * ============================================================
+ * ICÔNES
+ * ============================================================
  */
 
 function Icon({ name, size = 20 }) {
@@ -134,16 +135,14 @@ function Icon({ name, size = 20 }) {
 
 
 /*
- * |--------------------------------------------------------------------------
- * | DONNÉES TEMPORAIRES
- * |--------------------------------------------------------------------------
+ * ============================================================
+ * DONNÉES TEMPORAIRES
+ * ============================================================
  */
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Services médicaux
- * |--------------------------------------------------------------------------
+ * SERVICES MÉDICAUX
  */
 
 const servicesConfiguration = [
@@ -181,9 +180,7 @@ const servicesConfiguration = [
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Médecins
- * |--------------------------------------------------------------------------
+ * MÉDECINS
  */
 
 const doctorsConfiguration = [
@@ -207,11 +204,7 @@ const doctorsConfiguration = [
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Assurances
- * |--------------------------------------------------------------------------
- *
- * reduction = pourcentage de réduction.
+ * ASSURANCES
  */
 
 const insuranceConfiguration = [
@@ -234,13 +227,9 @@ const insuranceConfiguration = [
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Données initiales
- * |--------------------------------------------------------------------------
- *
- * Le bilan commence à 0.
- * Les anciens patients sont conservés dans le tableau,
- * mais leurs montants ne sont PAS ajoutés au nouveau bilan.
+ * ============================================================
+ * PATIENTS INITIAUX
+ * ============================================================
  */
 
 const initialPatients = [
@@ -299,9 +288,9 @@ const initialPatients = [
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Génération de l'identifiant
- * |--------------------------------------------------------------------------
+ * ============================================================
+ * GÉNÉRATION IDENTIFIANT PATIENT
+ * ============================================================
  */
 
 function generatePatientId(patients) {
@@ -318,117 +307,225 @@ function generatePatientId(patients) {
     .filter((number) => !Number.isNaN(number));
 
   const nextNumber =
-    numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+    numbers.length > 0
+      ? Math.max(...numbers) + 1
+      : 1;
 
   return `PAT-${String(nextNumber).padStart(3, "0")}`;
 }
 
 
 /*
- * |--------------------------------------------------------------------------
- * | Page Caisse
- * |--------------------------------------------------------------------------
+ * ============================================================
+ * TRANSMISSION DU PATIENT VERS LE MODULE CONSULTATION
+ * ============================================================
+ */
+
+function savePatientForConsultation(patient) {
+  try {
+    const existingPatients = JSON.parse(
+      localStorage.getItem(
+        "sante_consultation_patients"
+      ) || "[]"
+    );
+
+    const existingIndex = existingPatients.findIndex(
+      (item) => item.id === patient.id
+    );
+
+    const consultationPatient = {
+      id: patient.id,
+
+      numero: String(patient.id).replace(
+        "PAT-",
+        ""
+      ),
+
+      patient: patient.patient,
+
+      sexe:
+        patient.sexe === "Féminin"
+          ? "F"
+          : patient.sexe === "Masculin"
+          ? "M"
+          : "--",
+
+      telephone: patient.telephone,
+
+      quartier: patient.quartier,
+
+      service: patient.service,
+
+      doctor: patient.doctor,
+
+      motif: "Consultation générale",
+
+      heure: new Date().toLocaleTimeString(
+        "fr-FR",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
+
+      statut: "En attente",
+
+      observations: "",
+
+      symptomes: "",
+
+      diagnostic: "",
+
+      traitement: "",
+
+      dateConsultation: null,
+    };
+
+    if (existingIndex >= 0) {
+      existingPatients[existingIndex] =
+        consultationPatient;
+    } else {
+      existingPatients.push(
+        consultationPatient
+      );
+    }
+
+    localStorage.setItem(
+      "sante_consultation_patients",
+      JSON.stringify(existingPatients)
+    );
+
+    /*
+     * Permet de synchroniser immédiatement les deux
+     * modules lorsqu'ils sont ouverts dans la même
+     * application.
+     */
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "sante:patient-added",
+        {
+          detail: consultationPatient,
+        }
+      )
+    );
+
+  } catch (error) {
+    console.error(
+      "Erreur lors de la transmission du patient vers Consultation :",
+      error
+    );
+  }
+}
+
+
+/*
+ * ============================================================
+ * PAGE CAISSE
+ * ============================================================
  */
 
 export default function Caisse() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] =
+    useState("");
 
-  const [patients, setPatients] = useState(initialPatients);
+  const [patients, setPatients] =
+    useState(initialPatients);
 
-  /*
-   * Ouverture / fermeture du formulaire
-   */
-  const [showNewPatientForm, setShowNewPatientForm] =
-    useState(false);
-
-
-  /*
-   * |--------------------------------------------------------------------------
-   * | Formulaire nouveau patient
-   * |--------------------------------------------------------------------------
-   */
-
-  const [formData, setFormData] = useState({
-    nom: "",
-    prenom: "",
-    sexe: "",
-    service: "",
-    doctor: "",
-    telephone: "",
-    assurance: "Non",
-    assuranceId: "",
-    quartier: "",
-  });
+  const [
+    showNewPatientForm,
+    setShowNewPatientForm,
+  ] = useState(false);
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Recherche patient
-   * |--------------------------------------------------------------------------
+   * FORMULAIRE
    */
 
-  const filteredPatients = useMemo(() => {
-    const value = search.trim().toLowerCase();
+  const [formData, setFormData] =
+    useState({
+      nom: "",
+      prenom: "",
+      sexe: "",
+      service: "",
+      doctor: "",
+      telephone: "",
+      assurance: "Non",
+      assuranceId: "",
+      quartier: "",
+    });
 
-    if (!value) {
-      return patients;
-    }
 
-    return patients.filter((item) =>
-      [
-        item.id,
-        item.patient,
-        item.sexe,
-        item.service,
-        item.doctor,
-        item.telephone,
-        item.insurance,
-        item.insuranceName,
-        item.quartier,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(value)
+  /*
+   * RECHERCHE
+   */
+
+  const filteredPatients =
+    useMemo(() => {
+      const value = search
+        .trim()
+        .toLowerCase();
+
+      if (!value) {
+        return patients;
+      }
+
+      return patients.filter(
+        (item) =>
+          [
+            item.id,
+            item.patient,
+            item.sexe,
+            item.service,
+            item.doctor,
+            item.telephone,
+            item.insurance,
+            item.insuranceName,
+            item.quartier,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(value)
+      );
+    }, [search, patients]);
+
+
+  /*
+   * SERVICE SÉLECTIONNÉ
+   */
+
+  const selectedService =
+    servicesConfiguration.find(
+      (service) =>
+        String(service.id) ===
+        String(formData.service)
     );
-  }, [search, patients]);
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Service sélectionné
-   * |--------------------------------------------------------------------------
+   * ASSURANCE SÉLECTIONNÉE
    */
 
-  const selectedService = servicesConfiguration.find(
-    (service) =>
-      String(service.id) === String(formData.service)
-  );
+  const selectedInsurance =
+    insuranceConfiguration.find(
+      (insurance) =>
+        String(insurance.id) ===
+        String(formData.assuranceId)
+    );
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Assurance sélectionnée
-   * |--------------------------------------------------------------------------
+   * CALCUL DU COÛT
    */
 
-  const selectedInsurance = insuranceConfiguration.find(
-    (insurance) =>
-      String(insurance.id) === String(formData.assuranceId)
-  );
-
-
-  /*
-   * |--------------------------------------------------------------------------
-   * | Calcul du coût
-   * |--------------------------------------------------------------------------
-   */
-
-  const basePrice = selectedService
-    ? selectedService.price
-    : 0;
+  const basePrice =
+    selectedService
+      ? selectedService.price
+      : 0;
 
   const reduction =
-    formData.assurance === "Oui" && selectedInsurance
+    formData.assurance === "Oui" &&
+    selectedInsurance
       ? selectedInsurance.reduction
       : 0;
 
@@ -440,85 +537,78 @@ export default function Caisse() {
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | BILANS
-   * |--------------------------------------------------------------------------
-   *
-   * Les bilans commencent à 0.
-   *
-   * Les patients présents initialement dans le tableau
-   * ne sont pas comptabilisés dans le nouveau bilan.
-   *
-   * Seuls les patients ajoutés pendant l'utilisation
-   * de la page sont pris en compte.
+   * BILANS
    */
 
-  const billingTotal = useMemo(() => {
-    return patients
-      .slice(initialPatients.length)
-      .reduce(
-        (total, patient) =>
-          total + Number(patient.cost || 0),
-        0
-      );
-  }, [patients]);
+  const billingTotal =
+    useMemo(() => {
+      return patients
+        .slice(initialPatients.length)
+        .reduce(
+          (total, patient) =>
+            total +
+            Number(
+              patient.cost || 0
+            ),
+          0
+        );
+    }, [patients]);
+
+  const bilanJour =
+    billingTotal;
+
+  const bilanSemaine =
+    billingTotal;
+
+  const bilanMois =
+    billingTotal;
 
 
   /*
-   * Pour le moment, les nouveaux patients sont
-   * comptabilisés dans les trois bilans.
-   *
-   * Plus tard, ces trois valeurs pourront être
-   * calculées selon les dates réelles :
-   *
-   * - jour
-   * - semaine
-   * - mois
+   * MODIFICATION FORMULAIRE
    */
 
-  const bilanJour = billingTotal;
-  const bilanSemaine = billingTotal;
-  const bilanMois = billingTotal;
+  const handleFormChange = (
+    event
+  ) => {
+    const {
+      name,
+      value,
+    } = event.target;
 
-
-  /*
-   * |--------------------------------------------------------------------------
-   * | Modification du formulaire
-   * |--------------------------------------------------------------------------
-   */
-
-  const handleFormChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((currentForm) => ({
-      ...currentForm,
-      [name]: value,
-    }));
+    setFormData(
+      (currentForm) => ({
+        ...currentForm,
+        [name]: value,
+      })
+    );
   };
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Changement assurance
-   * |--------------------------------------------------------------------------
+   * CHANGEMENT ASSURANCE
    */
 
-  const handleInsuranceChange = (value) => {
-    setFormData((currentForm) => ({
-      ...currentForm,
-      assurance: value,
-      assuranceId:
-        value === "Non"
-          ? ""
-          : currentForm.assuranceId,
-    }));
+  const handleInsuranceChange = (
+    value
+  ) => {
+    setFormData(
+      (currentForm) => ({
+        ...currentForm,
+
+        assurance: value,
+
+        assuranceId:
+          value === "Non"
+            ? ""
+            : currentForm.assuranceId,
+      })
+    );
   };
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Ouverture du formulaire
-   * |--------------------------------------------------------------------------
+   * OUVERTURE FORMULAIRE
    */
 
   const handleNewPatient = () => {
@@ -534,33 +624,35 @@ export default function Caisse() {
       quartier: "",
     });
 
-    setShowNewPatientForm(true);
+    setShowNewPatientForm(
+      true
+    );
   };
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Fermeture du formulaire
-   * |--------------------------------------------------------------------------
+   * FERMETURE
    */
 
   const handleCloseForm = () => {
-    setShowNewPatientForm(false);
+    setShowNewPatientForm(
+      false
+    );
   };
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Ajout du patient
-   * |--------------------------------------------------------------------------
+   * AJOUT PATIENT
    */
 
-  const handleAddPatient = (event) => {
+  const handleAddPatient = (
+    event
+  ) => {
     event.preventDefault();
 
 
     /*
-     * Vérification des champs obligatoires
+     * Champs obligatoires
      */
 
     if (
@@ -581,11 +673,12 @@ export default function Caisse() {
 
 
     /*
-     * L'assurance OUI doit avoir une assurance sélectionnée.
+     * Assurance obligatoire si Oui
      */
 
     if (
-      formData.assurance === "Oui" &&
+      formData.assurance ===
+        "Oui" &&
       !formData.assuranceId
     ) {
       alert(
@@ -597,45 +690,69 @@ export default function Caisse() {
 
 
     /*
-     * Recherche des éléments sélectionnés.
+     * SERVICE
      */
 
-    const service = servicesConfiguration.find(
-      (item) =>
-        String(item.id) === String(formData.service)
-    );
+    const service =
+      servicesConfiguration.find(
+        (item) =>
+          String(item.id) ===
+          String(formData.service)
+      );
 
-    const doctor = doctorsConfiguration.find(
-      (item) =>
-        String(item.id) === String(formData.doctor)
-    );
+
+    /*
+     * MÉDECIN
+     */
+
+    const doctor =
+      doctorsConfiguration.find(
+        (item) =>
+          String(item.id) ===
+          String(formData.doctor)
+      );
+
+
+    /*
+     * ASSURANCE
+     */
 
     const insurance =
-      formData.assurance === "Oui"
+      formData.assurance ===
+      "Oui"
         ? insuranceConfiguration.find(
             (item) =>
               String(item.id) ===
-              String(formData.assuranceId)
+              String(
+                formData.assuranceId
+              )
           )
         : null;
 
 
     /*
-     * Génération automatique de l'identifiant.
+     * IDENTIFIANT
      */
 
-    const generatedId = generatePatientId(patients);
+    const generatedId =
+      generatePatientId(
+        patients
+      );
 
 
     /*
-     * Nom complet.
+     * NOM COMPLET
      */
 
-    const fullName = `${formData.nom.trim().toUpperCase()} ${formData.prenom.trim()}`;
+    const fullName =
+      `${formData.nom
+        .trim()
+        .toUpperCase()} ${formData.prenom
+        .trim()}`;
 
 
     /*
-     * Nouveau patient.
+     * NOUVEAU PATIENT
      */
 
     const newPatient = {
@@ -653,54 +770,57 @@ export default function Caisse() {
         ? doctor.name
         : "",
 
-      telephone: formData.telephone.trim(),
+      telephone:
+        formData.telephone.trim(),
 
-      /*
-       * Coût final après réduction éventuelle.
-       */
       cost: finalPrice,
 
-      /*
-       * Assurance OUI / NON.
-       */
-      insurance: formData.assurance,
+      insurance:
+        formData.assurance,
 
-      /*
-       * Nom de l'assurance.
-       */
-      insuranceName: insurance
-        ? insurance.name
-        : "",
+      insuranceName:
+        insurance
+          ? insurance.name
+          : "",
 
-      /*
-       * Quartier / Commune.
-       */
-      quartier: formData.quartier.trim(),
+      quartier:
+        formData.quartier.trim(),
     };
 
 
     /*
-     * Ajout dans la liste.
-     *
-     * Dès que setPatients est exécuté,
-     * le bilan est recalculé automatiquement.
+     * AJOUT DANS LA CAISSE
      */
 
-    setPatients((currentPatients) => [
-      ...currentPatients,
-      newPatient,
-    ]);
+    setPatients(
+      (currentPatients) => [
+        ...currentPatients,
+        newPatient,
+      ]
+    );
 
 
     /*
-     * Fermeture du formulaire.
+     * TRANSMISSION AUTOMATIQUE
+     * AU MODULE CONSULTATION
      */
 
-    setShowNewPatientForm(false);
+    savePatientForConsultation(
+      newPatient
+    );
 
 
     /*
-     * Réinitialisation.
+     * FERMETURE
+     */
+
+    setShowNewPatientForm(
+      false
+    );
+
+
+    /*
+     * RESET
      */
 
     setFormData({
@@ -718,13 +838,15 @@ export default function Caisse() {
 
 
   /*
-   * |--------------------------------------------------------------------------
-   * | Formatage du montant
-   * |--------------------------------------------------------------------------
+   * FORMAT MONNAIE
    */
 
-  const formatMoney = (amount) => {
-    return new Intl.NumberFormat("fr-FR").format(
+  const formatMoney = (
+    amount
+  ) => {
+    return new Intl.NumberFormat(
+      "fr-FR"
+    ).format(
       Number(amount || 0)
     );
   };
@@ -739,8 +861,6 @@ export default function Caisse() {
 
       <aside className="caisse-sidebar">
 
-        {/* Logo */}
-
         <div className="caisse-brand">
 
           <div className="brand-icon">
@@ -754,8 +874,6 @@ export default function Caisse() {
 
         </div>
 
-
-        {/* Menu */}
 
         <nav className="caisse-nav">
 
@@ -853,10 +971,6 @@ export default function Caisse() {
 
       <main className="caisse-content">
 
-        {/* =======================================================
-            HEADER
-        ======================================================= */}
-
         <header className="caisse-header">
 
           <div className="caisse-header-title">
@@ -871,8 +985,6 @@ export default function Caisse() {
 
           </div>
 
-
-          {/* Profil caissière */}
 
           <div className="cashier-profile">
 
@@ -897,16 +1009,9 @@ export default function Caisse() {
         </header>
 
 
-        {/* =======================================================
-            CONTENU
-        ======================================================= */}
-
         <section className="caisse-main">
 
-
-          {/* =====================================================
-              BARRE DE RECHERCHE + NOUVEAU PATIENT
-          ===================================================== */}
+          {/* RECHERCHE */}
 
           <div className="patient-toolbar">
 
@@ -921,7 +1026,9 @@ export default function Caisse() {
                 type="text"
                 value={search}
                 onChange={(event) =>
-                  setSearch(event.target.value)
+                  setSearch(
+                    event.target.value
+                  )
                 }
                 placeholder="Rechercher un patient (nom, téléphone...)"
               />
@@ -932,7 +1039,9 @@ export default function Caisse() {
             <button
               type="button"
               className="new-patient-btn"
-              onClick={handleNewPatient}
+              onClick={
+                handleNewPatient
+              }
             >
 
               <Icon
@@ -949,9 +1058,7 @@ export default function Caisse() {
           </div>
 
 
-          {/* =====================================================
-              TABLEAU PATIENTS
-          ===================================================== */}
+          {/* TABLEAU */}
 
           <div className="patients-card">
 
@@ -1005,89 +1112,108 @@ export default function Caisse() {
 
                 <tbody>
 
-                  {filteredPatients.map((item) => (
+                  {filteredPatients.map(
+                    (item) => (
 
-                    <tr key={item.id}>
+                      <tr
+                        key={
+                          item.id
+                        }
+                      >
 
-                      <td>
-                        {item.id}
-                      </td>
-
-
-                      <td className="patient-name">
-                        {item.patient}
-                      </td>
-
-
-                      <td>
-                        <span
-                          style={{
-                            color:
-                              item.sexe === "Masculin"
-                                ? "#dc2626"
-                                : item.sexe === "Féminin"
-                                ? "#2563eb"
-                                : "#374151",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {item.sexe || "-"}
-                        </span>
-                      </td>
+                        <td>
+                          {item.id}
+                        </td>
 
 
-                      <td>
-                        {item.service}
-                      </td>
+                        <td className="patient-name">
+                          {item.patient}
+                        </td>
 
 
-                      <td>
-                        {item.doctor}
-                      </td>
+                        <td>
+
+                          <span
+                            style={{
+                              color:
+                                item.sexe ===
+                                "Masculin"
+                                  ? "#dc2626"
+                                  : item.sexe ===
+                                    "Féminin"
+                                  ? "#2563eb"
+                                  : "#374151",
+
+                              fontWeight: 600,
+                            }}
+                          >
+                            {item.sexe ||
+                              "-"}
+                          </span>
+
+                        </td>
 
 
-                      <td>
-                        {item.telephone}
-                      </td>
+                        <td>
+                          {item.service}
+                        </td>
 
 
-                      <td>
-                        {formatMoney(item.cost)} FCFA
-                      </td>
+                        <td>
+                          {item.doctor}
+                        </td>
 
 
-                      <td>
-
-                        {item.insurance === "Oui"
-                          ? `${item.insuranceName}`
-                          : "Non"}
-
-                      </td>
+                        <td>
+                          {
+                            item.telephone
+                          }
+                        </td>
 
 
-                      <td>
-
-                        <button
-                          type="button"
-                          className="row-action"
-                          aria-label={`Ouvrir ${item.patient}`}
-                        >
-
-                          <Icon
-                            name="arrow"
-                            size={17}
-                          />
-
-                        </button>
-
-                      </td>
-
-                    </tr>
-
-                  ))}
+                        <td>
+                          {formatMoney(
+                            item.cost
+                          )}{" "}
+                          FCFA
+                        </td>
 
 
-                  {filteredPatients.length === 0 && (
+                        <td>
+
+                          {item.insurance ===
+                          "Oui"
+                            ? item.insuranceName
+                            : "Non"}
+
+                        </td>
+
+
+                        <td>
+
+                          <button
+                            type="button"
+                            className="row-action"
+                            aria-label={`Ouvrir ${item.patient}`}
+                          >
+
+                            <Icon
+                              name="arrow"
+                              size={17}
+                            />
+
+                          </button>
+
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+
+                  {filteredPatients.length ===
+                    0 && (
 
                     <tr>
 
@@ -1111,13 +1237,9 @@ export default function Caisse() {
           </div>
 
 
-          {/* =====================================================
-              BILANS
-          ===================================================== */}
+          {/* BILANS */}
 
           <section className="summary-grid">
-
-            {/* Bilan jour */}
 
             <article className="summary-card">
 
@@ -1126,7 +1248,10 @@ export default function Caisse() {
               </span>
 
               <strong className="summary-value green">
-                {formatMoney(bilanJour)} FCFA
+                {formatMoney(
+                  bilanJour
+                )}{" "}
+                FCFA
               </strong>
 
               <span className="summary-note">
@@ -1136,8 +1261,6 @@ export default function Caisse() {
             </article>
 
 
-            {/* Bilan semaine */}
-
             <article className="summary-card">
 
               <span className="summary-label">
@@ -1145,7 +1268,10 @@ export default function Caisse() {
               </span>
 
               <strong className="summary-value green">
-                {formatMoney(bilanSemaine)} FCFA
+                {formatMoney(
+                  bilanSemaine
+                )}{" "}
+                FCFA
               </strong>
 
               <span className="summary-note">
@@ -1155,8 +1281,6 @@ export default function Caisse() {
             </article>
 
 
-            {/* Bilan mois */}
-
             <article className="summary-card">
 
               <span className="summary-label">
@@ -1164,7 +1288,10 @@ export default function Caisse() {
               </span>
 
               <strong className="summary-value blue">
-                {formatMoney(bilanMois)} FCFA
+                {formatMoney(
+                  bilanMois
+                )}{" "}
+                FCFA
               </strong>
 
               <span className="summary-note">
@@ -1190,7 +1317,8 @@ export default function Caisse() {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
+            background:
+              "rgba(0, 0, 0, 0.45)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1207,22 +1335,23 @@ export default function Caisse() {
               overflowY: "auto",
               background: "#ffffff",
               borderRadius: "14px",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.20)",
+              boxShadow:
+                "0 20px 60px rgba(0, 0, 0, 0.20)",
               padding: "28px",
             }}
           >
 
-            {/* =================================================
-                EN-TÊTE DU FORMULAIRE
-            ================================================= */}
+            {/* EN-TÊTE */}
 
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent:
+                  "space-between",
                 marginBottom: "25px",
-                borderBottom: "1px solid #eeeeee",
+                borderBottom:
+                  "1px solid #eeeeee",
                 paddingBottom: "18px",
               }}
             >
@@ -1241,7 +1370,8 @@ export default function Caisse() {
 
                 <p
                   style={{
-                    margin: "6px 0 0",
+                    margin:
+                      "6px 0 0",
                     color: "#6b7280",
                     fontSize: "14px",
                   }}
@@ -1254,7 +1384,9 @@ export default function Caisse() {
 
               <button
                 type="button"
-                onClick={handleCloseForm}
+                onClick={
+                  handleCloseForm
+                }
                 style={{
                   width: "38px",
                   height: "38px",
@@ -1265,7 +1397,8 @@ export default function Caisse() {
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent:
+                    "center",
                 }}
                 aria-label="Fermer"
               >
@@ -1278,11 +1411,13 @@ export default function Caisse() {
             </div>
 
 
-            {/* =================================================
-                FORMULAIRE
-            ================================================= */}
+            {/* FORMULAIRE */}
 
-            <form onSubmit={handleAddPatient}>
+            <form
+              onSubmit={
+                handleAddPatient
+              }
+            >
 
               <div
                 style={{
@@ -1292,7 +1427,6 @@ export default function Caisse() {
                   gap: "18px",
                 }}
               >
-
 
                 {/* NOM */}
 
@@ -1313,25 +1447,32 @@ export default function Caisse() {
                   <input
                     type="text"
                     name="nom"
-                    value={formData.nom}
-                    onChange={handleFormChange}
+                    value={
+                      formData.nom
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     placeholder="Nom du patient"
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      boxSizing: "border-box",
+                      boxSizing:
+                        "border-box",
                     }}
                   />
 
                 </div>
 
 
-                {/* PRENOM */}
+                {/* PRÉNOM */}
 
                 <div>
 
@@ -1350,18 +1491,25 @@ export default function Caisse() {
                   <input
                     type="text"
                     name="prenom"
-                    value={formData.prenom}
-                    onChange={handleFormChange}
+                    value={
+                      formData.prenom
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     placeholder="Prénom du patient"
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      boxSizing: "border-box",
+                      boxSizing:
+                        "border-box",
                     }}
                   />
 
@@ -1386,22 +1534,32 @@ export default function Caisse() {
 
                   <select
                     name="sexe"
-                    value={formData.sexe}
-                    onChange={handleFormChange}
+                    value={
+                      formData.sexe
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      background: "#ffffff",
-                      boxSizing: "border-box",
+                      background:
+                        "#ffffff",
+                      boxSizing:
+                        "border-box",
                       color:
-                        formData.sexe === "Masculin"
+                        formData.sexe ===
+                        "Masculin"
                           ? "#dc2626"
-                          : formData.sexe === "Féminin"
+                          : formData.sexe ===
+                            "Féminin"
                           ? "#2563eb"
                           : "#374151",
                       fontWeight:
@@ -1418,7 +1576,8 @@ export default function Caisse() {
                     <option
                       value="Masculin"
                       style={{
-                        color: "#dc2626",
+                        color:
+                          "#dc2626",
                         fontWeight: 600,
                       }}
                     >
@@ -1428,7 +1587,8 @@ export default function Caisse() {
                     <option
                       value="Féminin"
                       style={{
-                        color: "#2563eb",
+                        color:
+                          "#2563eb",
                         fontWeight: 600,
                       }}
                     >
@@ -1458,18 +1618,26 @@ export default function Caisse() {
 
                   <select
                     name="service"
-                    value={formData.service}
-                    onChange={handleFormChange}
+                    value={
+                      formData.service
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      background: "#ffffff",
-                      boxSizing: "border-box",
+                      background:
+                        "#ffffff",
+                      boxSizing:
+                        "border-box",
                     }}
                   >
 
@@ -1479,14 +1647,18 @@ export default function Caisse() {
 
                     {servicesConfiguration.map(
                       (service) => (
-
                         <option
-                          key={service.id}
-                          value={service.id}
+                          key={
+                            service.id
+                          }
+                          value={
+                            service.id
+                          }
                         >
-                          {service.name}
+                          {
+                            service.name
+                          }
                         </option>
-
                       )
                     )}
 
@@ -1495,7 +1667,7 @@ export default function Caisse() {
                 </div>
 
 
-                {/* AFFECTÉ À */}
+                {/* MÉDECIN */}
 
                 <div>
 
@@ -1513,18 +1685,26 @@ export default function Caisse() {
 
                   <select
                     name="doctor"
-                    value={formData.doctor}
-                    onChange={handleFormChange}
+                    value={
+                      formData.doctor
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      background: "#ffffff",
-                      boxSizing: "border-box",
+                      background:
+                        "#ffffff",
+                      boxSizing:
+                        "border-box",
                     }}
                   >
 
@@ -1534,14 +1714,18 @@ export default function Caisse() {
 
                     {doctorsConfiguration.map(
                       (doctor) => (
-
                         <option
-                          key={doctor.id}
-                          value={doctor.id}
+                          key={
+                            doctor.id
+                          }
+                          value={
+                            doctor.id
+                          }
                         >
-                          {doctor.name}
+                          {
+                            doctor.name
+                          }
                         </option>
-
                       )
                     )}
 
@@ -1569,25 +1753,32 @@ export default function Caisse() {
                   <input
                     type="tel"
                     name="telephone"
-                    value={formData.telephone}
-                    onChange={handleFormChange}
+                    value={
+                      formData.telephone
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     placeholder="Ex : 0700000000"
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      boxSizing: "border-box",
+                      boxSizing:
+                        "border-box",
                     }}
                   />
 
                 </div>
 
 
-                {/* QUARTIER / COMMUNE */}
+                {/* QUARTIER */}
 
                 <div>
 
@@ -1606,18 +1797,25 @@ export default function Caisse() {
                   <input
                     type="text"
                     name="quartier"
-                    value={formData.quartier}
-                    onChange={handleFormChange}
+                    value={
+                      formData.quartier
+                    }
+                    onChange={
+                      handleFormChange
+                    }
                     placeholder="Ex : Cocody Angré"
                     required
                     style={{
                       width: "100%",
                       height: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
                       outline: "none",
-                      boxSizing: "border-box",
+                      boxSizing:
+                        "border-box",
                     }}
                   />
 
@@ -1639,7 +1837,6 @@ export default function Caisse() {
                   >
                     Assurance
                   </label>
-
 
                   <div
                     style={{
@@ -1665,10 +1862,13 @@ export default function Caisse() {
                         name="assurance"
                         value="Oui"
                         checked={
-                          formData.assurance === "Oui"
+                          formData.assurance ===
+                          "Oui"
                         }
                         onChange={() =>
-                          handleInsuranceChange("Oui")
+                          handleInsuranceChange(
+                            "Oui"
+                          )
                         }
                       />
 
@@ -1692,10 +1892,13 @@ export default function Caisse() {
                         name="assurance"
                         value="Non"
                         checked={
-                          formData.assurance === "Non"
+                          formData.assurance ===
+                          "Non"
                         }
                         onChange={() =>
-                          handleInsuranceChange("Non")
+                          handleInsuranceChange(
+                            "Non"
+                          )
                         }
                       />
 
@@ -1708,9 +1911,10 @@ export default function Caisse() {
                 </div>
 
 
-                {/* CHOIX ASSURANCE */}
+                {/* TYPE ASSURANCE */}
 
-                {formData.assurance === "Oui" && (
+                {formData.assurance ===
+                  "Oui" && (
 
                   <div>
 
@@ -1728,18 +1932,26 @@ export default function Caisse() {
 
                     <select
                       name="assuranceId"
-                      value={formData.assuranceId}
-                      onChange={handleFormChange}
+                      value={
+                        formData.assuranceId
+                      }
+                      onChange={
+                        handleFormChange
+                      }
                       required
                       style={{
                         width: "100%",
                         height: "44px",
-                        padding: "0 13px",
-                        border: "1px solid #d9d9d9",
+                        padding:
+                          "0 13px",
+                        border:
+                          "1px solid #d9d9d9",
                         borderRadius: "8px",
                         outline: "none",
-                        background: "#ffffff",
-                        boxSizing: "border-box",
+                        background:
+                          "#ffffff",
+                        boxSizing:
+                          "border-box",
                       }}
                     >
 
@@ -1749,15 +1961,22 @@ export default function Caisse() {
 
                       {insuranceConfiguration.map(
                         (insurance) => (
-
                           <option
-                            key={insurance.id}
-                            value={insurance.id}
+                            key={
+                              insurance.id
+                            }
+                            value={
+                              insurance.id
+                            }
                           >
-                            {insurance.name} - Réduction{" "}
-                            {insurance.reduction}%
+                            {
+                              insurance.name
+                            }{" "}
+                            - Réduction{" "}
+                            {
+                              insurance.reduction
+                            }%
                           </option>
-
                         )
                       )}
 
@@ -1768,9 +1987,7 @@ export default function Caisse() {
                 )}
 
 
-                {/* =================================================
-                    COÛT
-                ================================================= */}
+                {/* COÛT */}
 
                 <div>
 
@@ -1790,34 +2007,49 @@ export default function Caisse() {
                     style={{
                       width: "100%",
                       minHeight: "44px",
-                      padding: "0 13px",
-                      border: "1px solid #d9d9d9",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
                       borderRadius: "8px",
-                      background: "#f8fafc",
+                      background:
+                        "#f8fafc",
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      boxSizing: "border-box",
+                      alignItems:
+                        "center",
+                      justifyContent:
+                        "space-between",
+                      boxSizing:
+                        "border-box",
                     }}
                   >
 
                     <strong
                       style={{
-                        color: "#1f2937",
-                        fontSize: "15px",
+                        color:
+                          "#1f2937",
+                        fontSize:
+                          "15px",
                       }}
                     >
-                      {formatMoney(finalPrice)} FCFA
+                      {formatMoney(
+                        finalPrice
+                      )}{" "}
+                      FCFA
                     </strong>
 
 
-                    {reduction > 0 && (
+                    {reduction >
+                      0 && (
 
                       <span
                         style={{
-                          fontSize: "12px",
-                          color: "#16a34a",
-                          fontWeight: 600,
+                          fontSize:
+                            "12px",
+                          color:
+                            "#16a34a",
+                          fontWeight:
+                            600,
                         }}
                       >
                         -{reduction}%
@@ -1830,36 +2062,46 @@ export default function Caisse() {
                 </div>
 
 
-                {/* =================================================
-                    INFORMATIONS TARIFAIRES
-                ================================================= */}
+                {/* INFORMATIONS TARIFAIRES */}
 
                 {selectedService && (
 
                   <div
                     style={{
-                      gridColumn: "1 / -1",
-                      padding: "14px 16px",
-                      borderRadius: "8px",
-                      background: "#f8fafc",
-                      border: "1px solid #edf0f2",
+                      gridColumn:
+                        "1 / -1",
+                      padding:
+                        "14px 16px",
+                      borderRadius:
+                        "8px",
+                      background:
+                        "#f8fafc",
+                      border:
+                        "1px solid #edf0f2",
                     }}
                   >
 
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: "20px",
-                        flexWrap: "wrap",
+                        display:
+                          "flex",
+                        justifyContent:
+                          "space-between",
+                        alignItems:
+                          "center",
+                        gap:
+                          "20px",
+                        flexWrap:
+                          "wrap",
                       }}
                     >
 
                       <span
                         style={{
-                          fontSize: "13px",
-                          color: "#6b7280",
+                          fontSize:
+                            "13px",
+                          color:
+                            "#6b7280",
                         }}
                       >
                         Tarif du service
@@ -1867,22 +2109,28 @@ export default function Caisse() {
 
                       <strong
                         style={{
-                          fontSize: "14px",
-                          color: "#374151",
+                          fontSize:
+                            "14px",
+                          color:
+                            "#374151",
                         }}
                       >
-                        {formatMoney(basePrice)} FCFA
+                        {formatMoney(
+                          basePrice
+                        )}{" "}
+                        FCFA
                       </strong>
 
 
-                      {reduction > 0 && (
-
+                      {reduction >
+                        0 && (
                         <>
-
                           <span
                             style={{
-                              fontSize: "13px",
-                              color: "#6b7280",
+                              fontSize:
+                                "13px",
+                              color:
+                                "#6b7280",
                             }}
                           >
                             Réduction assurance
@@ -1890,22 +2138,28 @@ export default function Caisse() {
 
                           <strong
                             style={{
-                              fontSize: "14px",
-                              color: "#16a34a",
+                              fontSize:
+                                "14px",
+                              color:
+                                "#16a34a",
                             }}
                           >
-                            -{formatMoney(insuranceAmount)} FCFA
+                            -
+                            {formatMoney(
+                              insuranceAmount
+                            )}{" "}
+                            FCFA
                           </strong>
-
                         </>
-
                       )}
 
 
                       <span
                         style={{
-                          fontSize: "13px",
-                          color: "#6b7280",
+                          fontSize:
+                            "13px",
+                          color:
+                            "#6b7280",
                         }}
                       >
                         À payer
@@ -1913,11 +2167,16 @@ export default function Caisse() {
 
                       <strong
                         style={{
-                          fontSize: "16px",
-                          color: "#2563eb",
+                          fontSize:
+                            "16px",
+                          color:
+                            "#2563eb",
                         }}
                       >
-                        {formatMoney(finalPrice)} FCFA
+                        {formatMoney(
+                          finalPrice
+                        )}{" "}
+                        FCFA
                       </strong>
 
                     </div>
@@ -1929,33 +2188,44 @@ export default function Caisse() {
               </div>
 
 
-              {/* =================================================
-                  BOUTONS
-              ================================================= */}
+              {/* BOUTONS */}
 
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
+                  display:
+                    "flex",
+                  justifyContent:
+                    "flex-end",
                   gap: "12px",
-                  marginTop: "28px",
-                  paddingTop: "20px",
-                  borderTop: "1px solid #eeeeee",
+                  marginTop:
+                    "28px",
+                  paddingTop:
+                    "20px",
+                  borderTop:
+                    "1px solid #eeeeee",
                 }}
               >
 
                 <button
                   type="button"
-                  onClick={handleCloseForm}
+                  onClick={
+                    handleCloseForm
+                  }
                   style={{
                     height: "44px",
-                    padding: "0 22px",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: "8px",
-                    background: "#ffffff",
+                    padding:
+                      "0 22px",
+                    border:
+                      "1px solid #d9d9d9",
+                    borderRadius:
+                      "8px",
+                    background:
+                      "#ffffff",
                     color: "#555",
-                    cursor: "pointer",
-                    fontWeight: 600,
+                    cursor:
+                      "pointer",
+                    fontWeight:
+                      600,
                   }}
                 >
                   ANNULER
@@ -1966,13 +2236,19 @@ export default function Caisse() {
                   type="submit"
                   style={{
                     height: "44px",
-                    padding: "0 25px",
+                    padding:
+                      "0 25px",
                     border: "none",
-                    borderRadius: "8px",
-                    background: "#2563eb",
-                    color: "#ffffff",
-                    cursor: "pointer",
-                    fontWeight: 600,
+                    borderRadius:
+                      "8px",
+                    background:
+                      "#2563eb",
+                    color:
+                      "#ffffff",
+                    cursor:
+                      "pointer",
+                    fontWeight:
+                      600,
                   }}
                 >
                   AJOUTER

@@ -1,9 +1,26 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
+
 import Logo from "../components/Logo";
+
 import "../styles/Consultations.css";
 
+
+/*
+ * ============================================================
+ * CONSULTATIONS INITIALES
+ * ============================================================
+ */
 
 const consultationsInitiales = [
   {
@@ -15,7 +32,9 @@ const consultationsInitiales = [
     statut: "En cours",
     age: 36,
     sexe: "F",
+    doctor: "Dr. KOUAME",
   },
+
   {
     id: 2,
     numero: "002",
@@ -25,7 +44,9 @@ const consultationsInitiales = [
     statut: "En attente",
     age: 42,
     sexe: "M",
+    doctor: "Dr. BAH",
   },
+
   {
     id: 3,
     numero: "003",
@@ -35,7 +56,9 @@ const consultationsInitiales = [
     statut: "En attente",
     age: 29,
     sexe: "F",
+    doctor: "Dr. KONE",
   },
+
   {
     id: 4,
     numero: "004",
@@ -45,7 +68,9 @@ const consultationsInitiales = [
     statut: "À venir",
     age: 55,
     sexe: "M",
+    doctor: "Dr. KOUAME",
   },
+
   {
     id: 5,
     numero: "005",
@@ -55,224 +80,932 @@ const consultationsInitiales = [
     statut: "À venir",
     age: 31,
     sexe: "F",
+    doctor: "Dr. KOUAME",
   },
 ];
 
 
+/*
+ * ============================================================
+ * RÉCUPÉRATION DES PATIENTS VENANT DE LA CAISSE
+ * ============================================================
+ */
+
+function getPatientsFromCaisse() {
+  try {
+    return JSON.parse(
+      localStorage.getItem(
+        "sante_consultation_patients"
+      ) || "[]"
+    );
+  } catch (error) {
+    console.error(
+      "Erreur de récupération des patients :",
+      error
+    );
+
+    return [];
+  }
+}
+
+
+/*
+ * ============================================================
+ * NORMALISATION DU NOM DU MÉDECIN
+ * ============================================================
+ *
+ * Exemple :
+ *
+ * Dr. KOUAME
+ * Dr. KOUAME Jean
+ *
+ * deviennent :
+ *
+ * kouame
+ *
+ * Cela permet de faire correspondre le médecin
+ * sélectionné à la caisse avec le médecin connecté.
+ */
+
+function normalizeDoctorName(
+  name = ""
+) {
+  return name
+    .toLowerCase()
+    .replace(
+      /^dr\.?\s*/i,
+      ""
+    )
+    .trim()
+    .split(/\s+/)[0];
+}
+
+
+/*
+ * ============================================================
+ * COMPOSANT PRINCIPAL
+ * ============================================================
+ */
+
 export default function Consultations() {
 
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+  const {
+    logout,
+  } = useAuth();
 
-  function handleLogout() {
-    logout();
-    navigate("/login", { replace: true });
-  }
+  const navigate =
+    useNavigate();
 
-  const [consultations, setConsultations] = useState(
-    consultationsInitiales
-  );
 
-  const [recherche, setRecherche] = useState("");
+  /*
+   * ==========================================================
+   * MÉDECIN CONNECTÉ
+   * ==========================================================
+   *
+   * Pour le moment le médecin affiché dans ton interface est
+   * Dr. KOUAME Jean.
+   *
+   * Plus tard cette valeur viendra automatiquement de
+   * AuthContext / Django.
+   */
 
-  const [modal, setModal] = useState(null);
+  const currentDoctor =
+    "Dr. KOUAME Jean";
 
-  const [patientSelectionne, setPatientSelectionne] = useState(null);
 
-  const [nouvelleConsultation, setNouvelleConsultation] = useState({
+  /*
+   * ==========================================================
+   * ÉTATS
+   * ==========================================================
+   */
+
+  const [
+    consultations,
+    setConsultations,
+  ] = useState(() => {
+
+    const patientsCaisse =
+      getPatientsFromCaisse();
+
+    const patientsSansDoublons =
+      patientsCaisse.filter(
+        (patient) =>
+          !consultationsInitiales.some(
+            (consultation) =>
+              consultation.id ===
+              patient.id
+          )
+      );
+
+    return [
+      ...consultationsInitiales,
+      ...patientsSansDoublons,
+    ];
+  });
+
+
+  const [
+    recherche,
+    setRecherche,
+  ] = useState("");
+
+
+  const [
+    modal,
+    setModal,
+  ] = useState(null);
+
+
+  const [
+    patientSelectionne,
+    setPatientSelectionne,
+  ] = useState(null);
+
+
+  const [
+    nouvelleConsultation,
+    setNouvelleConsultation,
+  ] = useState({
     patient: "",
     motif: "",
     heure: "",
   });
 
 
-  const consultationsFiltrees = useMemo(() => {
+  /*
+   * ==========================================================
+   * FORMULAIRE MÉDICAL
+   * ==========================================================
+   */
 
-    const texte = recherche.trim().toLowerCase();
+  const [
+    formulaireMedical,
+    setFormulaireMedical,
+  ] = useState({
+    symptomes: "",
+    diagnostic: "",
+    traitement: "",
+    observations: "",
+  });
 
-    if (!texte) {
-      return consultations;
-    }
 
-    return consultations.filter(
-      (consultation) =>
-        consultation.patient.toLowerCase().includes(texte) ||
-        consultation.motif.toLowerCase().includes(texte) ||
-        consultation.statut.toLowerCase().includes(texte)
+  /*
+   * ==========================================================
+   * SYNCHRONISATION AVEC LA CAISSE
+   * ==========================================================
+   */
+
+  useEffect(() => {
+
+    const synchroniserPatientsCaisse =
+      () => {
+
+        const patientsCaisse =
+          getPatientsFromCaisse();
+
+        setConsultations(
+          (listeActuelle) => {
+
+            const nouvellesConsultations =
+              patientsCaisse.filter(
+                (patient) =>
+                  !listeActuelle.some(
+                    (consultation) =>
+                      consultation.id ===
+                      patient.id
+                  )
+              );
+
+            if (
+              nouvellesConsultations.length ===
+              0
+            ) {
+              return listeActuelle;
+            }
+
+            return [
+              ...listeActuelle,
+              ...nouvellesConsultations,
+            ];
+          }
+        );
+      };
+
+
+    /*
+     * Synchronisation au chargement
+     */
+
+    synchroniserPatientsCaisse();
+
+
+    /*
+     * Événement personnalisé envoyé par Caisse.jsx
+     */
+
+    window.addEventListener(
+      "sante:patient-added",
+      synchroniserPatientsCaisse
     );
 
-  }, [recherche, consultations]);
 
+    /*
+     * Événement storage
+     */
 
-  const ouvrirConsultation = (consultation) => {
-
-    setPatientSelectionne(consultation);
-
-    setConsultations((liste) =>
-      liste.map((item) =>
-        item.id === consultation.id
-          ? { ...item, statut: "En cours" }
-          : item
-      )
+    window.addEventListener(
+      "storage",
+      synchroniserPatientsCaisse
     );
 
-    setModal("consultation");
-  };
 
+    return () => {
 
-  const changerStatut = (id, statut) => {
+      window.removeEventListener(
+        "sante:patient-added",
+        synchroniserPatientsCaisse
+      );
 
-    setConsultations((liste) =>
-      liste.map((item) =>
-        item.id === id
-          ? { ...item, statut }
-          : item
-      )
-    );
-  };
+      window.removeEventListener(
+        "storage",
+        synchroniserPatientsCaisse
+      );
 
-
-  const enregistrerConsultation = (e) => {
-
-    e.preventDefault();
-
-    if (
-      !nouvelleConsultation.patient ||
-      !nouvelleConsultation.motif ||
-      !nouvelleConsultation.heure
-    ) {
-      return;
-    }
-
-    const nouvelle = {
-      id: Date.now(),
-      numero: String(consultations.length + 1).padStart(3, "0"),
-      patient: nouvelleConsultation.patient,
-      motif: nouvelleConsultation.motif,
-      heure: nouvelleConsultation.heure,
-      statut: "À venir",
-      age: "--",
-      sexe: "--",
     };
 
-    setConsultations((liste) => [
-      ...liste,
-      nouvelle,
+  }, []);
+
+
+  /*
+   * ==========================================================
+   * PATIENTS DU MÉDECIN CONNECTÉ
+   * ==========================================================
+   */
+
+  const patientsDuMedecin =
+    useMemo(() => {
+
+      return consultations.filter(
+        (consultation) => {
+
+          /*
+           * Les consultations initiales sont conservées.
+           */
+
+          if (
+            !consultation.doctor
+          ) {
+            return true;
+          }
+
+          return (
+            normalizeDoctorName(
+              consultation.doctor
+            ) ===
+            normalizeDoctorName(
+              currentDoctor
+            )
+          );
+        }
+      );
+
+    }, [consultations]);
+
+
+  /*
+   * ==========================================================
+   * RECHERCHE
+   * ==========================================================
+   */
+
+  const consultationsFiltrees =
+    useMemo(() => {
+
+      const texte =
+        recherche
+          .trim()
+          .toLowerCase();
+
+
+      if (!texte) {
+        return patientsDuMedecin;
+      }
+
+
+      return patientsDuMedecin.filter(
+        (consultation) =>
+          consultation.patient
+            .toLowerCase()
+            .includes(texte) ||
+
+          consultation.motif
+            .toLowerCase()
+            .includes(texte) ||
+
+          consultation.statut
+            .toLowerCase()
+            .includes(texte)
+      );
+
+    }, [
+      recherche,
+      patientsDuMedecin,
     ]);
 
-    setNouvelleConsultation({
-      patient: "",
-      motif: "",
-      heure: "",
-    });
 
-    setModal(null);
+  /*
+   * ==========================================================
+   * DÉCONNEXION
+   * ==========================================================
+   */
+
+  function handleLogout() {
+
+    logout();
+
+    navigate(
+      "/login",
+      {
+        replace: true,
+      }
+    );
+  }
+
+
+  /*
+   * ==========================================================
+   * OUVRIR CONSULTATION
+   * ==========================================================
+   */
+
+  const ouvrirConsultation =
+    (consultation) => {
+
+      setPatientSelectionne(
+        consultation
+      );
+
+
+      /*
+       * Charger les éventuelles données médicales
+       * déjà enregistrées.
+       */
+
+      setFormulaireMedical({
+        symptomes:
+          consultation.symptomes ||
+          "",
+
+        diagnostic:
+          consultation.diagnostic ||
+          "",
+
+        traitement:
+          consultation.traitement ||
+          "",
+
+        observations:
+          consultation.observations ||
+          "",
+      });
+
+
+      /*
+       * Une consultation terminée reste terminée.
+       */
+
+      if (
+        consultation.statut !==
+        "Terminée"
+      ) {
+
+        setConsultations(
+          (liste) =>
+            liste.map(
+              (item) =>
+                item.id ===
+                consultation.id
+                  ? {
+                      ...item,
+                      statut:
+                        "En cours",
+                    }
+                  : item
+            )
+        );
+      }
+
+
+      setModal(
+        "consultation"
+      );
+    };
+
+
+  /*
+   * ==========================================================
+   * CHANGER STATUT
+   * ==========================================================
+   */
+
+  const changerStatut = (
+    id,
+    statut
+  ) => {
+
+    setConsultations(
+      (liste) =>
+        liste.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  statut,
+                }
+              : item
+        )
+    );
   };
+
+
+  /*
+   * ==========================================================
+   * MODIFICATION FORMULAIRE MÉDICAL
+   * ==========================================================
+   */
+
+  const handleMedicalChange =
+    (event) => {
+
+      const {
+        name,
+        value,
+      } = event.target;
+
+      setFormulaireMedical(
+        (current) => ({
+          ...current,
+          [name]: value,
+        })
+      );
+    };
+
+
+  /*
+   * ==========================================================
+   * VALIDER LA CONSULTATION
+   * ==========================================================
+   */
+
+  const validerConsultation =
+    () => {
+
+      if (
+        !patientSelectionne
+      ) {
+        return;
+      }
+
+
+      const dateConsultation =
+        new Date().toISOString();
+
+
+      const patientMisAJour = {
+
+        ...patientSelectionne,
+
+        statut:
+          "Terminée",
+
+        symptomes:
+          formulaireMedical.symptomes,
+
+        diagnostic:
+          formulaireMedical.diagnostic,
+
+        traitement:
+          formulaireMedical.traitement,
+
+        observations:
+          formulaireMedical.observations,
+
+        dateConsultation,
+      };
+
+
+      /*
+       * Mise à jour de la liste affichée
+       */
+
+      setConsultations(
+        (liste) =>
+          liste.map(
+            (item) =>
+              item.id ===
+              patientSelectionne.id
+                ? patientMisAJour
+                : item
+          )
+      );
+
+
+      /*
+       * Mise à jour du localStorage
+       */
+
+      const patientsCaisse =
+        getPatientsFromCaisse();
+
+
+      const patientsMisAJour =
+        patientsCaisse.map(
+          (patient) =>
+            patient.id ===
+            patientSelectionne.id
+              ? patientMisAJour
+              : patient
+        );
+
+
+      localStorage.setItem(
+        "sante_consultation_patients",
+        JSON.stringify(
+          patientsMisAJour
+        )
+      );
+
+
+      /*
+       * Synchronisation entre composants
+       */
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "sante:consultation-updated",
+          {
+            detail:
+              patientMisAJour,
+          }
+        )
+      );
+
+
+      /*
+       * Patient sélectionné mis à jour
+       */
+
+      setPatientSelectionne(
+        patientMisAJour
+      );
+
+
+      /*
+       * Reset formulaire
+       */
+
+      setFormulaireMedical({
+        symptomes: "",
+        diagnostic: "",
+        traitement: "",
+        observations: "",
+      });
+
+
+      /*
+       * Afficher confirmation
+       */
+
+      setModal(
+        "consultation-terminee"
+      );
+    };
+
+
+  /*
+   * ==========================================================
+   * NOUVELLE CONSULTATION
+   * ==========================================================
+   */
+
+  const enregistrerConsultation =
+    (e) => {
+
+      e.preventDefault();
+
+
+      if (
+        !nouvelleConsultation.patient ||
+        !nouvelleConsultation.motif ||
+        !nouvelleConsultation.heure
+      ) {
+        return;
+      }
+
+
+      const nouvelle = {
+
+        id: Date.now(),
+
+        numero:
+          String(
+            consultations.length + 1
+          ).padStart(3, "0"),
+
+        patient:
+          nouvelleConsultation.patient,
+
+        motif:
+          nouvelleConsultation.motif,
+
+        heure:
+          nouvelleConsultation.heure,
+
+        statut:
+          "À venir",
+
+        age:
+          "--",
+
+        sexe:
+          "--",
+
+        doctor:
+          currentDoctor,
+
+        symptomes:
+          "",
+
+        diagnostic:
+          "",
+
+        traitement:
+          "",
+
+        observations:
+          "",
+
+        dateConsultation:
+          null,
+      };
+
+
+      setConsultations(
+        (liste) => [
+          ...liste,
+          nouvelle,
+        ]
+      );
+
+
+      setNouvelleConsultation({
+        patient: "",
+        motif: "",
+        heure: "",
+      });
+
+
+      setModal(null);
+    };
+
+
+  /*
+   * ==========================================================
+   * FERMER MODAL
+   * ==========================================================
+   */
 
   const fermerModal = () => {
+
     setModal(null);
-    setPatientSelectionne(null);
+
+    setPatientSelectionne(
+      null
+    );
   };
 
+
   return (
+
     <div className="consultations-page">
+
+
+      {/* ======================================================
+          SIDEBAR
+      ====================================================== */}
 
       <aside className="medecin-sidebar">
 
-        {/* Logo */}
+
+        {/* LOGO */}
+
         <div className="sidebar-logo">
 
           <div className="sidebar-heart">
-            <Logo size={26} inverted />
+
+            <Logo
+              size={26}
+              inverted
+            />
+
           </div>
 
           <div className="sidebar-brand">
-            <strong>MA SANTE</strong>
-            <span>Gestion de Clinique</span>
+
+            <strong>
+              MA SANTE
+            </strong>
+
+            <span>
+              Gestion de Clinique
+            </span>
+
           </div>
 
         </div>
 
-        {/* Menu */}
+
+        {/* MENU */}
+
         <nav className="medecin-menu">
+
 
           <button
             className="medecin-menu-item active"
-            onClick={() => setModal(null)}
+            onClick={() =>
+              setModal(null)
+            }
           >
-            <span className="menu-icon">⌂</span>
-            <span>Accueil</span>
+
+            <span className="menu-icon">
+              ⌂
+            </span>
+
+            <span>
+              Accueil
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item"
-            onClick={() => setModal("patients")}
+            onClick={() =>
+              setModal(
+                "patients"
+              )
+            }
           >
-            <span className="menu-icon">♟</span>
-            <span>Mes patients</span>
+
+            <span className="menu-icon">
+              ♟
+            </span>
+
+            <span>
+              Mes patients
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item selected"
-            onClick={() => setModal(null)}
+            onClick={() =>
+              setModal(null)
+            }
           >
-            <span className="menu-icon">▣</span>
-            <span>Consultations</span>
+
+            <span className="menu-icon">
+              ▣
+            </span>
+
+            <span>
+              Consultations
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item"
-            onClick={() => setModal("ordonnance")}
+            onClick={() =>
+              setModal(
+                "ordonnance"
+              )
+            }
           >
-            <span className="menu-icon">▤</span>
-            <span>Ordonnances</span>
+
+            <span className="menu-icon">
+              ▤
+            </span>
+
+            <span>
+              Ordonnances
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item"
-            onClick={() => setModal("examens")}
+            onClick={() =>
+              setModal(
+                "examens"
+              )
+            }
           >
-            <span className="menu-icon">▥</span>
-            <span>Examens</span>
+
+            <span className="menu-icon">
+              ▥
+            </span>
+
+            <span>
+              Examens
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item"
-            onClick={() => setModal("rendezvous")}
+            onClick={() =>
+              setModal(
+                "rendezvous"
+              )
+            }
           >
-            <span className="menu-icon">□</span>
-            <span>Rendez-vous</span>
+
+            <span className="menu-icon">
+              □
+            </span>
+
+            <span>
+              Rendez-vous
+            </span>
+
           </button>
+
 
           <button
             className="medecin-menu-item"
-            onClick={() => setModal("messages")}
+            onClick={() =>
+              setModal(
+                "messages"
+              )
+            }
           >
-            <span className="menu-icon">▣</span>
-            <span>Messages</span>
+
+            <span className="menu-icon">
+              ▣
+            </span>
+
+            <span>
+              Messages
+            </span>
+
           </button>
 
         </nav>
 
-        {/* Bas de sidebar */}
+
+        {/* BAS SIDEBAR */}
+
         <div className="sidebar-bottom">
 
           <Link
             to="/modules"
             className="medecin-menu-item"
           >
-            <span className="menu-icon">⌘</span>
-            <span>Retour aux modules</span>
+
+            <span className="menu-icon">
+              ⌘
+            </span>
+
+            <span>
+              Retour aux modules
+            </span>
+
           </Link>
+
 
           <button
             type="button"
             className="medecin-menu-item"
-            onClick={handleLogout}
+            onClick={
+              handleLogout
+            }
           >
-            <span className="menu-icon">⏻</span>
-            <span>Déconnexion</span>
+
+            <span className="menu-icon">
+              ⏻
+            </span>
+
+            <span>
+              Déconnexion
+            </span>
+
           </button>
+
 
           <div className="sidebar-version">
             MA SANTÉ v1.0
@@ -283,7 +1016,14 @@ export default function Consultations() {
       </aside>
 
 
+      {/* ======================================================
+          CONTENU PRINCIPAL
+      ====================================================== */}
+
       <main className="medecin-main">
+
+
+        {/* HEADER */}
 
         <header className="medecin-header">
 
@@ -321,7 +1061,11 @@ export default function Consultations() {
             <button
               className="profile-arrow"
               title="Profil"
-              onClick={() => setModal("profil")}
+              onClick={() =>
+                setModal(
+                  "profil"
+                )
+              }
             >
               ▼
             </button>
@@ -333,6 +1077,8 @@ export default function Consultations() {
 
         <section className="medecin-content">
 
+
+          {/* TITRE */}
 
           <div className="section-heading">
 
@@ -348,18 +1094,25 @@ export default function Consultations() {
 
             </div>
 
+
             <div className="consultation-counter">
+
               <span>
-                {consultations.length}
+                {
+                  consultationsFiltrees.length
+                }
               </span>
 
               <small>
                 consultations
               </small>
+
             </div>
 
           </div>
 
+
+          {/* RECHERCHE */}
 
           <div className="consultation-toolbar">
 
@@ -372,19 +1125,29 @@ export default function Consultations() {
               <input
                 type="text"
                 placeholder="Rechercher un patient..."
-                value={recherche}
+                value={
+                  recherche
+                }
                 onChange={(e) =>
-                  setRecherche(e.target.value)
+                  setRecherche(
+                    e.target.value
+                  )
                 }
               />
 
               {recherche && (
+
                 <button
                   className="clear-search"
-                  onClick={() => setRecherche("")}
+                  onClick={() =>
+                    setRecherche(
+                      ""
+                    )
+                  }
                 >
                   ×
                 </button>
+
               )}
 
             </div>
@@ -392,16 +1155,28 @@ export default function Consultations() {
 
             <button
               className="btn-primary new-consultation-btn"
-              onClick={() => setModal("nouvelle")}
+              onClick={() =>
+                setModal(
+                  "nouvelle"
+                )
+              }
             >
-              <span>＋</span>
+
+              <span>
+                ＋
+              </span>
+
               Nouvelle consultation
+
             </button>
 
           </div>
 
 
+          {/* STATISTIQUES */}
+
           <div className="quick-stats">
+
 
             <div className="quick-stat">
 
@@ -410,13 +1185,17 @@ export default function Consultations() {
               </div>
 
               <div>
+
                 <strong>
-                  {consultations.length}
+                  {
+                    consultationsFiltrees.length
+                  }
                 </strong>
 
                 <span>
                   Total aujourd'hui
                 </span>
+
               </div>
 
             </div>
@@ -429,10 +1208,13 @@ export default function Consultations() {
               </div>
 
               <div>
+
                 <strong>
                   {
-                    consultations.filter(
-                      (c) => c.statut === "En cours"
+                    patientsDuMedecin.filter(
+                      (c) =>
+                        c.statut ===
+                        "En cours"
                     ).length
                   }
                 </strong>
@@ -440,6 +1222,7 @@ export default function Consultations() {
                 <span>
                   En cours
                 </span>
+
               </div>
 
             </div>
@@ -452,10 +1235,13 @@ export default function Consultations() {
               </div>
 
               <div>
+
                 <strong>
                   {
-                    consultations.filter(
-                      (c) => c.statut === "En attente"
+                    patientsDuMedecin.filter(
+                      (c) =>
+                        c.statut ===
+                        "En attente"
                     ).length
                   }
                 </strong>
@@ -463,6 +1249,7 @@ export default function Consultations() {
                 <span>
                   En attente
                 </span>
+
               </div>
 
             </div>
@@ -475,10 +1262,13 @@ export default function Consultations() {
               </div>
 
               <div>
+
                 <strong>
                   {
-                    consultations.filter(
-                      (c) => c.statut === "À venir"
+                    patientsDuMedecin.filter(
+                      (c) =>
+                        c.statut ===
+                        "À venir"
                     ).length
                   }
                 </strong>
@@ -486,6 +1276,7 @@ export default function Consultations() {
                 <span>
                   À venir
                 </span>
+
               </div>
 
             </div>
@@ -493,11 +1284,14 @@ export default function Consultations() {
           </div>
 
 
+          {/* TABLEAU */}
+
           <div className="consultations-card">
 
             <div className="table-header">
 
               <div>
+
                 <h3>
                   Liste des consultations
                 </h3>
@@ -505,7 +1299,9 @@ export default function Consultations() {
                 <span>
                   Planning médical du jour
                 </span>
+
               </div>
+
 
               <div className="table-date">
                 Aujourd'hui
@@ -522,17 +1318,29 @@ export default function Consultations() {
 
                   <tr>
 
-                    <th>#</th>
+                    <th>
+                      #
+                    </th>
 
-                    <th>Patient</th>
+                    <th>
+                      Patient
+                    </th>
 
-                    <th>Motif</th>
+                    <th>
+                      Motif
+                    </th>
 
-                    <th>Heure</th>
+                    <th>
+                      Heure
+                    </th>
 
-                    <th>Statut</th>
+                    <th>
+                      Statut
+                    </th>
 
-                    <th>Action</th>
+                    <th>
+                      Action
+                    </th>
 
                   </tr>
 
@@ -541,13 +1349,18 @@ export default function Consultations() {
 
                 <tbody>
 
-                  {consultationsFiltrees.length > 0 ? (
+                  {consultationsFiltrees.length >
+                  0 ? (
 
                     consultationsFiltrees.map(
-                      (consultation) => (
+                      (
+                        consultation
+                      ) => (
 
                         <tr
-                          key={consultation.id}
+                          key={
+                            consultation.id
+                          }
                           onDoubleClick={() =>
                             ouvrirConsultation(
                               consultation
@@ -556,7 +1369,9 @@ export default function Consultations() {
                         >
 
                           <td className="number-cell">
-                            {consultation.numero}
+                            {
+                              consultation.numero
+                            }
                           </td>
 
 
@@ -566,26 +1381,39 @@ export default function Consultations() {
 
                               <div
                                 className={`patient-avatar ${
-                                  consultation.sexe === "F"
+                                  consultation.sexe ===
+                                  "F"
                                     ? "female"
                                     : "male"
                                 }`}
                               >
-                                {consultation.patient
-                                  .charAt(0)
-                                  .toUpperCase()}
+
+                                {
+                                  consultation.patient
+                                    .charAt(
+                                      0
+                                    )
+                                    .toUpperCase()
+                                }
+
                               </div>
+
 
                               <div>
 
                                 <strong>
-                                  {consultation.patient}
+                                  {
+                                    consultation.patient
+                                  }
                                 </strong>
 
                                 <small>
-                                  {consultation.age !== "--"
-                                    ? `${consultation.age} ans`
-                                    : "Patient"}
+                                  {
+                                    consultation.age !==
+                                    "--"
+                                      ? `${consultation.age} ans`
+                                      : "Patient"
+                                  }
                                 </small>
 
                               </div>
@@ -596,16 +1424,24 @@ export default function Consultations() {
 
 
                           <td>
+
                             <span className="motif-text">
-                              {consultation.motif}
+                              {
+                                consultation.motif
+                              }
                             </span>
+
                           </td>
 
 
                           <td>
+
                             <span className="heure-text">
-                              {consultation.heure}
+                              {
+                                consultation.heure
+                              }
                             </span>
+
                           </td>
 
 
@@ -621,11 +1457,15 @@ export default function Consultations() {
                                 )
                               }
                             >
+
                               <span className="status-dot">
                                 ●
                               </span>
 
-                              {consultation.statut}
+                              {
+                                consultation.statut
+                              }
+
                             </button>
 
                           </td>
@@ -635,17 +1475,43 @@ export default function Consultations() {
 
                             <div className="row-actions">
 
-                              <button
-                                className="row-action view"
-                                title="Ouvrir la consultation"
-                                onClick={() =>
-                                  ouvrirConsultation(
-                                    consultation
-                                  )
-                                }
-                              >
-                                👁
-                              </button>
+
+                              {consultation.statut !==
+                                "Terminée" && (
+
+                                <button
+                                  type="button"
+                                  className="btn-primary"
+                                  onClick={() =>
+                                    ouvrirConsultation(
+                                      consultation
+                                    )
+                                  }
+                                >
+                                  Consulter
+                                </button>
+
+                              )}
+
+
+                              {consultation.statut ===
+                                "Terminée" && (
+
+                                <button
+                                  type="button"
+                                  className="row-action view"
+                                  title="Voir la consultation"
+                                  onClick={() =>
+                                    ouvrirConsultation(
+                                      consultation
+                                    )
+                                  }
+                                >
+                                  👁
+                                </button>
+
+                              )}
+
 
                               <button
                                 className="row-action more"
@@ -702,12 +1568,17 @@ export default function Consultations() {
             </div>
 
 
+            {/* ACTIONS RAPIDES */}
+
             <div className="quick-actions">
+
 
               <button
                 className="quick-action-btn"
                 onClick={() =>
-                  setModal("patient")
+                  setModal(
+                    "patient"
+                  )
                 }
               >
 
@@ -726,13 +1597,21 @@ export default function Consultations() {
                 className="quick-action-btn"
                 onClick={() => {
 
-                  if (consultations.length > 0) {
+                  if (
+                    consultationsFiltrees.length >
+                    0
+                  ) {
+
                     setPatientSelectionne(
-                      consultations[0]
+                      consultationsFiltrees[0]
                     );
+
                   }
 
-                  setModal("dossier");
+                  setModal(
+                    "dossier"
+                  );
+
                 }}
               >
 
@@ -751,13 +1630,21 @@ export default function Consultations() {
                 className="quick-action-btn"
                 onClick={() => {
 
-                  if (consultations.length > 0) {
+                  if (
+                    consultationsFiltrees.length >
+                    0
+                  ) {
+
                     setPatientSelectionne(
-                      consultations[0]
+                      consultationsFiltrees[0]
                     );
+
                   }
 
-                  setModal("ordonnance");
+                  setModal(
+                    "ordonnance"
+                  );
+
                 }}
               >
 
@@ -776,13 +1663,21 @@ export default function Consultations() {
                 className="quick-action-btn"
                 onClick={() => {
 
-                  if (consultations.length > 0) {
+                  if (
+                    consultationsFiltrees.length >
+                    0
+                  ) {
+
                     setPatientSelectionne(
-                      consultations[0]
+                      consultationsFiltrees[0]
                     );
+
                   }
 
-                  setModal("compte-rendu");
+                  setModal(
+                    "compte-rendu"
+                  );
+
                 }}
               >
 
@@ -801,7 +1696,10 @@ export default function Consultations() {
           </div>
 
 
+          {/* INFORMATIONS */}
+
           <div className="bottom-info-grid">
+
 
             <div className="info-card">
 
@@ -812,6 +1710,7 @@ export default function Consultations() {
                 </span>
 
                 <div>
+
                   <h3>
                     Informations du jour
                   </h3>
@@ -819,6 +1718,7 @@ export default function Consultations() {
                   <p>
                     Votre activité médicale
                   </p>
+
                 </div>
 
               </div>
@@ -827,33 +1727,59 @@ export default function Consultations() {
               <div className="info-list">
 
                 <div className="info-row">
+
                   <span>
                     Patients reçus
                   </span>
 
                   <strong>
-                    24
+                    {
+                      patientsDuMedecin.filter(
+                        (c) =>
+                          c.statut ===
+                          "Terminée"
+                      ).length
+                    }
                   </strong>
+
                 </div>
 
+
                 <div className="info-row">
+
                   <span>
                     Consultations terminées
                   </span>
 
                   <strong>
-                    18
+                    {
+                      patientsDuMedecin.filter(
+                        (c) =>
+                          c.statut ===
+                          "Terminée"
+                      ).length
+                    }
                   </strong>
+
                 </div>
 
+
                 <div className="info-row">
+
                   <span>
                     Consultations restantes
                   </span>
 
                   <strong>
-                    {consultations.length}
+                    {
+                      patientsDuMedecin.filter(
+                        (c) =>
+                          c.statut !==
+                          "Terminée"
+                      ).length
+                    }
                   </strong>
+
                 </div>
 
               </div>
@@ -870,6 +1796,7 @@ export default function Consultations() {
                 </span>
 
                 <div>
+
                   <h3>
                     Rappels
                   </h3>
@@ -877,6 +1804,7 @@ export default function Consultations() {
                   <p>
                     À ne pas oublier
                   </p>
+
                 </div>
 
               </div>
@@ -889,6 +1817,7 @@ export default function Consultations() {
                 </span>
 
                 <div>
+
                   <strong>
                     Visite médicale
                   </strong>
@@ -896,6 +1825,7 @@ export default function Consultations() {
                   <span>
                     Service hospitalisation
                   </span>
+
                 </div>
 
               </div>
@@ -908,6 +1838,7 @@ export default function Consultations() {
                 </span>
 
                 <div>
+
                   <strong>
                     Réunion médicale
                   </strong>
@@ -915,6 +1846,7 @@ export default function Consultations() {
                   <span>
                     Salle de réunion
                   </span>
+
                 </div>
 
               </div>
@@ -928,17 +1860,26 @@ export default function Consultations() {
       </main>
 
 
-      {modal === "nouvelle" && (
+      {/* ======================================================
+          NOUVELLE CONSULTATION
+      ====================================================== */}
+
+      {modal ===
+        "nouvelle" && (
 
         <Modal
           title="Nouvelle consultation"
           subtitle="Créer une nouvelle consultation médicale"
-          onClose={fermerModal}
+          onClose={
+            fermerModal
+          }
         >
 
           <form
             className="modal-form"
-            onSubmit={enregistrerConsultation}
+            onSubmit={
+              enregistrerConsultation
+            }
           >
 
             <div className="form-group">
@@ -954,10 +1895,14 @@ export default function Consultations() {
                   nouvelleConsultation.patient
                 }
                 onChange={(e) =>
-                  setNouvelleConsultation({
-                    ...nouvelleConsultation,
-                    patient: e.target.value,
-                  })
+                  setNouvelleConsultation(
+                    {
+                      ...nouvelleConsultation,
+                      patient:
+                        e.target
+                          .value,
+                    }
+                  )
                 }
               />
 
@@ -977,10 +1922,14 @@ export default function Consultations() {
                   nouvelleConsultation.motif
                 }
                 onChange={(e) =>
-                  setNouvelleConsultation({
-                    ...nouvelleConsultation,
-                    motif: e.target.value,
-                  })
+                  setNouvelleConsultation(
+                    {
+                      ...nouvelleConsultation,
+                      motif:
+                        e.target
+                          .value,
+                    }
+                  )
                 }
               />
 
@@ -999,10 +1948,14 @@ export default function Consultations() {
                   nouvelleConsultation.heure
                 }
                 onChange={(e) =>
-                  setNouvelleConsultation({
-                    ...nouvelleConsultation,
-                    heure: e.target.value,
-                  })
+                  setNouvelleConsultation(
+                    {
+                      ...nouvelleConsultation,
+                      heure:
+                        e.target
+                          .value,
+                    }
+                  )
                 }
               />
 
@@ -1014,7 +1967,9 @@ export default function Consultations() {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Annuler
               </button>
@@ -1035,232 +1990,244 @@ export default function Consultations() {
       )}
 
 
-      {modal === "consultation" &&
+      {/* ======================================================
+          CONSULTATION MÉDECINE GÉNÉRALE
+      ====================================================== */}
+
+      {modal ===
+        "consultation" &&
         patientSelectionne && (
 
-          <Modal
-            title="Consultation médicale"
-            subtitle={`Dossier de ${patientSelectionne.patient}`}
-            onClose={fermerModal}
-            large
-          >
+        <Modal
+          title="Consultation de médecine générale"
+          subtitle={`Patient : ${patientSelectionne.patient}`}
+          onClose={
+            fermerModal
+          }
+          large
+        >
 
-            <div className="consultation-detail">
+          <div className="consultation-detail">
 
-              <div className="patient-summary">
 
-                <div className="large-patient-avatar">
-                  {patientSelectionne.patient
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
+            {/* PATIENT */}
 
-                <div>
+            <div className="patient-summary">
 
-                  <h3>
-                    {patientSelectionne.patient}
-                  </h3>
+              <div className="large-patient-avatar">
 
-                  <p>
-                    {patientSelectionne.age !== "--"
-                      ? `${patientSelectionne.age} ans`
-                      : "Âge non renseigné"}
-                    {" • "}
-                    {patientSelectionne.sexe === "F"
+                {patientSelectionne.patient
+                  .charAt(0)
+                  .toUpperCase()}
+
+              </div>
+
+
+              <div>
+
+                <h3>
+                  {
+                    patientSelectionne.patient
+                  }
+                </h3>
+
+                <p>
+
+                  {
+                    patientSelectionne.sexe ===
+                    "F"
                       ? "Femme"
-                      : patientSelectionne.sexe === "M"
+                      : patientSelectionne.sexe ===
+                        "M"
                       ? "Homme"
-                      : "Non renseigné"}
-                  </p>
+                      : "Sexe non renseigné"
+                  }
 
-                </div>
+                  {" • "}
+
+                  {
+                    patientSelectionne.telephone ||
+                    "Téléphone non renseigné"
+                  }
+
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* INFORMATIONS */}
+
+            <div className="detail-grid">
+
+              <div className="detail-box">
+
+                <span>
+                  Heure
+                </span>
+
+                <strong>
+                  {
+                    patientSelectionne.heure ||
+                    "--:--"
+                  }
+                </strong>
 
               </div>
 
 
-              <div className="detail-grid">
+              <div className="detail-box">
 
-                <div className="detail-box">
+                <span>
+                  Service
+                </span>
 
-                  <span>
-                    Heure
-                  </span>
-
-                  <strong>
-                    {patientSelectionne.heure}
-                  </strong>
-
-                </div>
-
-
-                <div className="detail-box">
-
-                  <span>
-                    Motif
-                  </span>
-
-                  <strong>
-                    {patientSelectionne.motif}
-                  </strong>
-
-                </div>
-
-
-                <div className="detail-box">
-
-                  <span>
-                    Statut
-                  </span>
-
-                  <strong>
-                    {patientSelectionne.statut}
-                  </strong>
-
-                </div>
+                <strong>
+                  {
+                    patientSelectionne.service ||
+                    "Médecine générale"
+                  }
+                </strong>
 
               </div>
 
 
-              <div className="medical-section">
+              <div className="detail-box">
 
-                <h4>
-                  Observations médicales
-                </h4>
+                <span>
+                  Statut
+                </span>
+
+                <strong>
+                  {
+                    patientSelectionne.statut
+                  }
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            {/* FORMULAIRE MÉDICAL */}
+
+            <div className="medical-section">
+
+              <h4>
+                Consultation de médecine générale
+              </h4>
+
+
+              <div className="form-group">
+
+                <label>
+                  Symptômes
+                </label>
 
                 <textarea
-                  placeholder="Saisir les observations, symptômes, diagnostic..."
-                  rows="5"
+                  name="symptomes"
+                  rows="4"
+                  placeholder="Décrire les symptômes du patient..."
+                  value={
+                    formulaireMedical.symptomes
+                  }
+                  onChange={
+                    handleMedicalChange
+                  }
                 />
 
               </div>
 
 
-              <div className="modal-actions">
-
-                <button
-                  className="btn-secondary"
-                  onClick={() =>
-                    setModal("ordonnance")
-                  }
-                >
-                  Ordonnance
-                </button>
-
-                <button
-                  className="btn-secondary"
-                  onClick={() =>
-                    setModal("compte-rendu")
-                  }
-                >
-                  Compte rendu
-                </button>
-
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-
-                    changerStatut(
-                      patientSelectionne.id,
-                      "Terminée"
-                    );
-
-                    fermerModal();
-
-                  }}
-                >
-                  Terminer la consultation
-                </button>
-
-              </div>
-
-            </div>
-
-          </Modal>
-
-        )}
-
-
-      {modal === "patient" && (
-
-        <Modal
-          title="Nouveau patient"
-          subtitle="Créer le dossier d'un nouveau patient"
-          onClose={fermerModal}
-        >
-
-          <div className="modal-form">
-
-            <div className="form-group">
-              <label>
-                Nom complet
-              </label>
-
-              <input
-                type="text"
-                placeholder="Nom et prénom"
-              />
-            </div>
-
-
-            <div className="form-row">
-
               <div className="form-group">
+
                 <label>
-                  Date de naissance
+                  Diagnostic
                 </label>
 
-                <input type="date" />
+                <textarea
+                  name="diagnostic"
+                  rows="4"
+                  placeholder="Saisir le diagnostic médical..."
+                  value={
+                    formulaireMedical.diagnostic
+                  }
+                  onChange={
+                    handleMedicalChange
+                  }
+                />
+
               </div>
+
 
               <div className="form-group">
+
                 <label>
-                  Sexe
+                  Traitement / Prescription
                 </label>
 
-                <select>
-                  <option value="">
-                    Sélectionner
-                  </option>
+                <textarea
+                  name="traitement"
+                  rows="4"
+                  placeholder="Indiquer le traitement ou la prescription..."
+                  value={
+                    formulaireMedical.traitement
+                  }
+                  onChange={
+                    handleMedicalChange
+                  }
+                />
 
-                  <option value="F">
-                    Féminin
-                  </option>
+              </div>
 
-                  <option value="M">
-                    Masculin
-                  </option>
-                </select>
+
+              <div className="form-group">
+
+                <label>
+                  Observations médicales
+                </label>
+
+                <textarea
+                  name="observations"
+                  rows="4"
+                  placeholder="Observations complémentaires..."
+                  value={
+                    formulaireMedical.observations
+                  }
+                  onChange={
+                    handleMedicalChange
+                  }
+                />
+
               </div>
 
             </div>
 
 
-            <div className="form-group">
-              <label>
-                Téléphone
-              </label>
-
-              <input
-                type="tel"
-                placeholder="+225 XX XX XX XX XX"
-              />
-            </div>
-
+            {/* ACTIONS */}
 
             <div className="modal-actions">
 
               <button
+                type="button"
                 className="btn-secondary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Annuler
               </button>
 
+
               <button
+                type="button"
                 className="btn-primary"
-                onClick={fermerModal}
+                onClick={
+                  validerConsultation
+                }
               >
-                Créer le patient
+                VALIDER
               </button>
 
             </div>
@@ -1272,107 +2239,421 @@ export default function Consultations() {
       )}
 
 
-      {modal === "dossier" &&
+      {/* ======================================================
+          CONSULTATION TERMINÉE
+      ====================================================== */}
+
+      {modal ===
+        "consultation-terminee" &&
         patientSelectionne && (
 
-          <Modal
-            title="Dossier patient"
-            subtitle={patientSelectionne.patient}
-            onClose={fermerModal}
-            large
-          >
+        <Modal
+          title="Consultation terminée"
+          subtitle={`Dossier de ${patientSelectionne.patient}`}
+          onClose={
+            fermerModal
+          }
+        >
 
-            <div className="patient-file">
+          <div className="placeholder-modal">
 
-              <div className="file-header">
+            <div className="placeholder-modal-icon">
+              ✓
+            </div>
 
-                <div className="large-patient-avatar">
-                  {patientSelectionne.patient
-                    .charAt(0)}
-                </div>
+            <h3>
+              Consultation validée
+            </h3>
 
-                <div>
+            <p>
+              La consultation de médecine générale de{" "}
+              <strong>
+                {
+                  patientSelectionne.patient
+                }
+              </strong>{" "}
+              a été enregistrée avec succès.
+            </p>
 
-                  <h3>
-                    {patientSelectionne.patient}
-                  </h3>
+            <p>
+              Statut :{" "}
+              <strong>
+                Terminée
+              </strong>
+            </p>
 
-                  <span>
-                    Dossier médical
-                  </span>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={
+                fermerModal
+              }
+            >
+              Fermer
+            </button>
 
-                </div>
+          </div>
+
+        </Modal>
+
+      )}
+
+
+      {/* ======================================================
+          MES PATIENTS
+      ====================================================== */}
+
+      {modal ===
+        "patients" && (
+
+        <Modal
+          title="Mes patients"
+          subtitle="Patients pris en charge"
+          onClose={
+            fermerModal
+          }
+          large
+        >
+
+          <div className="consultation-detail">
+
+            {patientsDuMedecin.filter(
+              (patient) =>
+                patient.statut ===
+                "Terminée"
+            ).length > 0 ? (
+
+              <div className="table-wrapper">
+
+                <table className="consultations-table">
+
+                  <thead>
+
+                    <tr>
+
+                      <th>
+                        #
+                      </th>
+
+                      <th>
+                        Patient
+                      </th>
+
+                      <th>
+                        Service
+                      </th>
+
+                      <th>
+                        Diagnostic
+                      </th>
+
+                      <th>
+                        Statut
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+
+                  <tbody>
+
+                    {patientsDuMedecin
+                      .filter(
+                        (patient) =>
+                          patient.statut ===
+                          "Terminée"
+                      )
+                      .map(
+                        (patient) => (
+
+                          <tr
+                            key={
+                              patient.id
+                            }
+                          >
+
+                            <td>
+                              {
+                                patient.numero
+                              }
+                            </td>
+
+
+                            <td>
+
+                              <div className="patient-cell">
+
+                                <div
+                                  className={`patient-avatar ${
+                                    patient.sexe ===
+                                    "F"
+                                      ? "female"
+                                      : "male"
+                                  }`}
+                                >
+
+                                  {
+                                    patient.patient
+                                      .charAt(
+                                        0
+                                      )
+                                      .toUpperCase()
+                                  }
+
+                                </div>
+
+
+                                <div>
+
+                                  <strong>
+                                    {
+                                      patient.patient
+                                    }
+                                  </strong>
+
+                                  <small>
+                                    {
+                                      patient.telephone ||
+                                      "Téléphone non renseigné"
+                                    }
+                                  </small>
+
+                                </div>
+
+                              </div>
+
+                            </td>
+
+
+                            <td>
+                              {
+                                patient.service ||
+                                "Médecine générale"
+                              }
+                            </td>
+
+
+                            <td>
+                              {
+                                patient.diagnostic ||
+                                "Non renseigné"
+                              }
+                            </td>
+
+
+                            <td>
+
+                              <span className="status-badge status-done">
+
+                                <span className="status-dot">
+                                  ●
+                                </span>
+
+                                Terminée
+
+                              </span>
+
+                            </td>
+
+                          </tr>
+
+                        )
+                      )}
+
+                  </tbody>
+
+                </table>
 
               </div>
 
+            ) : (
 
-              <div className="file-sections">
+              <div className="placeholder-modal">
 
-                <div className="file-section">
-
-                  <h4>
-                    Informations personnelles
-                  </h4>
-
-                  <p>
-                    Âge :{" "}
-                    {patientSelectionne.age !== "--"
-                      ? `${patientSelectionne.age} ans`
-                      : "Non renseigné"}
-                  </p>
-
-                  <p>
-                    Sexe :{" "}
-                    {patientSelectionne.sexe === "F"
-                      ? "Féminin"
-                      : patientSelectionne.sexe === "M"
-                      ? "Masculin"
-                      : "Non renseigné"}
-                  </p>
-
+                <div className="placeholder-modal-icon">
+                  ♟
                 </div>
 
+                <h3>
+                  Aucun patient terminé
+                </h3>
 
-                <div className="file-section">
-
-                  <h4>
-                    Dernière consultation
-                  </h4>
-
-                  <p>
-                    Motif :{" "}
-                    {patientSelectionne.motif}
-                  </p>
-
-                  <p>
-                    Heure :{" "}
-                    {patientSelectionne.heure}
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <div className="modal-actions">
+                <p>
+                  Les patients dont les consultations sont validées apparaîtront ici.
+                </p>
 
                 <button
+                  type="button"
                   className="btn-primary"
-                  onClick={fermerModal}
+                  onClick={
+                    fermerModal
+                  }
                 >
-                  Fermer le dossier
+                  Fermer
                 </button>
+
+              </div>
+
+            )}
+
+          </div>
+
+        </Modal>
+
+      )}
+
+
+      {/* ======================================================
+          DOSSIER PATIENT
+      ====================================================== */}
+
+      {modal ===
+        "dossier" &&
+        patientSelectionne && (
+
+        <Modal
+          title="Dossier patient"
+          subtitle={
+            patientSelectionne.patient
+          }
+          onClose={
+            fermerModal
+          }
+          large
+        >
+
+          <div className="patient-file">
+
+            <div className="file-header">
+
+              <div className="large-patient-avatar">
+
+                {
+                  patientSelectionne.patient.charAt(
+                    0
+                  )
+                }
+
+              </div>
+
+
+              <div>
+
+                <h3>
+                  {
+                    patientSelectionne.patient
+                  }
+                </h3>
+
+                <span>
+                  Dossier médical
+                </span>
 
               </div>
 
             </div>
 
-          </Modal>
 
-        )}
+            <div className="file-sections">
+
+              <div className="file-section">
+
+                <h4>
+                  Informations personnelles
+                </h4>
+
+                <p>
+                  Téléphone :{" "}
+                  {
+                    patientSelectionne.telephone ||
+                    "Non renseigné"
+                  }
+                </p>
+
+                <p>
+                  Sexe :{" "}
+                  {
+                    patientSelectionne.sexe ===
+                    "F"
+                      ? "Féminin"
+                      : patientSelectionne.sexe ===
+                        "M"
+                      ? "Masculin"
+                      : "Non renseigné"
+                  }
+                </p>
+
+                <p>
+                  Quartier :{" "}
+                  {
+                    patientSelectionne.quartier ||
+                    "Non renseigné"
+                  }
+                </p>
+
+              </div>
 
 
-      {modal === "ordonnance" && (
+              <div className="file-section">
+
+                <h4>
+                  Dernière consultation
+                </h4>
+
+                <p>
+                  Motif :{" "}
+                  {
+                    patientSelectionne.motif
+                  }
+                </p>
+
+                <p>
+                  Diagnostic :{" "}
+                  {
+                    patientSelectionne.diagnostic ||
+                    "Non renseigné"
+                  }
+                </p>
+
+                <p>
+                  Statut :{" "}
+                  {
+                    patientSelectionne.statut
+                  }
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="modal-actions">
+
+              <button
+                className="btn-primary"
+                onClick={
+                  fermerModal
+                }
+              >
+                Fermer le dossier
+              </button>
+
+            </div>
+
+          </div>
+
+        </Modal>
+
+      )}
+
+
+      {/* ======================================================
+          ORDONNANCE
+      ====================================================== */}
+
+      {modal ===
+        "ordonnance" && (
 
         <Modal
           title="Ordonnance"
@@ -1381,7 +2662,9 @@ export default function Consultations() {
               ? `Patient : ${patientSelectionne.patient}`
               : "Nouvelle ordonnance"
           }
-          onClose={fermerModal}
+          onClose={
+            fermerModal
+          }
         >
 
           <div className="modal-form">
@@ -1450,14 +2733,18 @@ export default function Consultations() {
 
               <button
                 className="btn-secondary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Annuler
               </button>
 
               <button
                 className="btn-primary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Enregistrer l'ordonnance
               </button>
@@ -1471,7 +2758,12 @@ export default function Consultations() {
       )}
 
 
-      {modal === "compte-rendu" && (
+      {/* ======================================================
+          COMPTE RENDU
+      ====================================================== */}
+
+      {modal ===
+        "compte-rendu" && (
 
         <Modal
           title="Compte rendu médical"
@@ -1480,7 +2772,9 @@ export default function Consultations() {
               ? `Patient : ${patientSelectionne.patient}`
               : "Compte rendu"
           }
-          onClose={fermerModal}
+          onClose={
+            fermerModal
+          }
           large
         >
 
@@ -1532,14 +2826,18 @@ export default function Consultations() {
 
               <button
                 className="btn-secondary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Annuler
               </button>
 
               <button
                 className="btn-primary"
-                onClick={fermerModal}
+                onClick={
+                  fermerModal
+                }
               >
                 Enregistrer le compte rendu
               </button>
@@ -1553,8 +2851,125 @@ export default function Consultations() {
       )}
 
 
+      {/* ======================================================
+          NOUVEAU PATIENT
+      ====================================================== */}
+
+      {modal ===
+        "patient" && (
+
+        <Modal
+          title="Nouveau patient"
+          subtitle="Créer le dossier d'un nouveau patient"
+          onClose={
+            fermerModal
+          }
+        >
+
+          <div className="modal-form">
+
+            <div className="form-group">
+
+              <label>
+                Nom complet
+              </label>
+
+              <input
+                type="text"
+                placeholder="Nom et prénom"
+              />
+
+            </div>
+
+
+            <div className="form-row">
+
+              <div className="form-group">
+
+                <label>
+                  Date de naissance
+                </label>
+
+                <input type="date" />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Sexe
+                </label>
+
+                <select>
+
+                  <option value="">
+                    Sélectionner
+                  </option>
+
+                  <option value="F">
+                    Féminin
+                  </option>
+
+                  <option value="M">
+                    Masculin
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <div className="form-group">
+
+              <label>
+                Téléphone
+              </label>
+
+              <input
+                type="tel"
+                placeholder="+225 XX XX XX XX XX"
+              />
+
+            </div>
+
+
+            <div className="modal-actions">
+
+              <button
+                className="btn-secondary"
+                onClick={
+                  fermerModal
+                }
+              >
+                Annuler
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={
+                  fermerModal
+                }
+              >
+                Créer le patient
+              </button>
+
+            </div>
+
+          </div>
+
+        </Modal>
+
+      )}
+
+
+      {/* ======================================================
+          MODULES EN PRÉPARATION
+      ====================================================== */}
+
       {[
-        "patients",
         "examens",
         "rendezvous",
         "messages",
@@ -1562,9 +2977,15 @@ export default function Consultations() {
       ].includes(modal) && (
 
         <Modal
-          title={getModalTitle(modal)}
+          title={
+            getModalTitle(
+              modal
+            )
+          }
           subtitle="Cette fonctionnalité sera connectée au module correspondant."
-          onClose={fermerModal}
+          onClose={
+            fermerModal
+          }
         >
 
           <div className="placeholder-modal">
@@ -1578,13 +2999,14 @@ export default function Consultations() {
             </h3>
 
             <p>
-              Cette partie sera développée lorsque
-              nous créerons le module correspondant.
+              Cette partie sera développée lorsque nous créerons le module correspondant.
             </p>
 
             <button
               className="btn-primary"
-              onClick={fermerModal}
+              onClick={
+                fermerModal
+              }
             >
               Fermer
             </button>
@@ -1600,6 +3022,12 @@ export default function Consultations() {
 }
 
 
+/*
+ * ============================================================
+ * COMPOSANT MODAL
+ * ============================================================
+ */
+
 function Modal({
   title,
   subtitle,
@@ -1614,7 +3042,10 @@ function Modal({
       className="modal-overlay"
       onMouseDown={(e) => {
 
-        if (e.target === e.currentTarget) {
+        if (
+          e.target ===
+          e.currentTarget
+        ) {
           onClose();
         }
 
@@ -1623,7 +3054,9 @@ function Modal({
 
       <div
         className={`modal-container ${
-          large ? "modal-large" : ""
+          large
+            ? "modal-large"
+            : ""
         }`}
       >
 
@@ -1644,7 +3077,9 @@ function Modal({
 
           <button
             className="modal-close"
-            onClick={onClose}
+            onClick={
+              onClose
+            }
             aria-label="Fermer"
           >
             ×
@@ -1667,7 +3102,15 @@ function Modal({
 }
 
 
-function getStatusClass(statut) {
+/*
+ * ============================================================
+ * CLASSE STATUT
+ * ============================================================
+ */
+
+function getStatusClass(
+  statut
+) {
 
   switch (statut) {
 
@@ -1690,22 +3133,34 @@ function getStatusClass(statut) {
 }
 
 
-function getModalTitle(modal) {
+/*
+ * ============================================================
+ * TITRES DES MODALES
+ * ============================================================
+ */
+
+function getModalTitle(
+  modal
+) {
 
   const titres = {
 
-    patients: "Mes patients",
+    examens:
+      "Examens médicaux",
 
-    examens: "Examens médicaux",
+    rendezvous:
+      "Rendez-vous",
 
-    rendezvous: "Rendez-vous",
+    messages:
+      "Messages",
 
-    messages: "Messages",
-
-    profil: "Mon profil",
+    profil:
+      "Mon profil",
 
   };
 
-  return titres[modal] || "Module";
-
+  return (
+    titres[modal] ||
+    "Module"
+  );
 }
