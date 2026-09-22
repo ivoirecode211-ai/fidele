@@ -34,10 +34,10 @@ import "../styles/modules.css";
 // la forme de données ; toutes les tuiles utilisent le même style bleu.
 const ALL_MODULES = [
   { id: "patients", name: "Caisse", description: "Enregistrer les patients, gérer l'accueil et les opérations de caisse", path: "/caisse", icon: Users, color: "blue" },
-  { id: "appointments", name: "Rendez-vous", description: "Planifier et gérer les rendez-vous des patients", path: "/appointments", icon: CalendarDays, color: "green" },
-  { id: "consultations", name: "Consultation Médecine Générale", description: "Gérer les consultations médicales et les prescriptions", path: "/consultations", icon: Stethoscope, color: "purple" },
-  { id: "hospitalization", name: "Hospitalisation", description: "Gérer les admissions, séjours et sorties des patients", path: "/hospitalization", icon: BedDouble, color: "red" },
   { id: "nursing", name: "Soins infirmiers", description: "Saisir les soins, surveillances et traitements", path: "/nursing", icon: HeartPulse, color: "cyan" },
+  { id: "consultations", name: "Consultation Médecine Générale", description: "Gérer les consultations médicales et les prescriptions", path: "/consultations", icon: Stethoscope, color: "purple" },
+  { id: "appointments", name: "Rendez-vous", description: "Planifier et gérer les rendez-vous des patients", path: "/appointments", icon: CalendarDays, color: "green" },
+  { id: "hospitalization", name: "Hospitalisation", description: "Gérer les admissions, séjours et sorties des patients", path: "/hospitalization", icon: BedDouble, color: "red" },
   { id: "laboratory", name: "Laboratoire", description: "Gérer les analyses et résultats de laboratoire", path: "/laboratory", icon: FlaskConical, color: "orange" },
   { id: "pharmacy", name: "Pharmacie", description: "Gérer les médicaments, ordonnances et stocks pharmaceutiques", path: "/pharmacy", icon: Pill, color: "pink" },
   { id: "stocks", name: "Gestion des stocks", description: "Suivre les stocks de médicaments, matériel et consommables", path: "/stocks", icon: Package, color: "blue-dark" },
