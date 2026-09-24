@@ -13,4 +13,6 @@ class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prescription
         fields = "__all__"
-        read_only_fields = ["doctor", "date"]
+        read_only_fields = [
+            "doctor", "date", "consultation", "status", "prepared_by", "prepared_at", "served_by", "served_at",
+        ]

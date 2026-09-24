@@ -18,6 +18,11 @@ class Consultation(models.Model):
     treatment = models.TextField(blank=True)
     recommendations = models.TextField(blank=True)
     next_consultation = models.DateField(null=True, blank=True)
+    # Passage en caisse à l'origine de la consultation (parcours Caisse → Soins → Consultation).
+    admission = models.OneToOneField(
+        "parcours.Admission", null=True, blank=True, on_delete=models.PROTECT, related_name="consultation"
+    )
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-date_time"]

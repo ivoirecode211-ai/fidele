@@ -1,0 +1,311 @@
+from datetime import timedelta
+
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from rest_framework.test import APITestCase
+
+from patients.models import Patient
+
+from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
+
+User = get_user_model()
+URL = "/api/parcours/caisse/patients/"
+
+
+def form(**overrides):
+    data = {
+        "nom": "traore", "prenom": "Awa", "sexe": "Féminin", "age": "32", "dateNaissance": "",
+        "service": MedicalService.objects.get(name="Médecine générale").pk, "telephone": "0700000000",
+        "parentContact": "0500000000", "assurance": "Non", "assuranceId": "", "insuranceNumber": "",
+        "quartier": "Cocody",
+    }
+    data.update(overrides)
+    return data
+
+
+class CatalogueTests(APITestCase):
+    def test_catalogue_matches_frontend_configuration(self):
+        self.client.force_authenticate(User.objects.create_user(username="doc", password="x", role="DOCTOR"))
+        response = self.client.get("/api/parcours/catalogue/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["services"][0], {"id": response.data["services"][0]["id"], "name": "Médecine générale", "price": 10000})
+        self.assertEqual([i["name"] for i in response.data["insurances"]], ["MUGEFCI", "CNPS", "NSIA"])
+
+
+class CaissePatientTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="caisse", password="x", role="RECEPTION")
+        self.client.force_authenticate(self.user)
+
+    def test_create_patient_without_insurance(self):
+        response = self.client.post(URL, form(), format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["id"], "PAT-001")
+        self.assertEqual(response.data["patient"], "TRAORE Awa")
+        self.assertEqual(response.data["sexe"], "Féminin")
+        self.assertEqual(response.data["age"], 32)
+        self.assertEqual(response.data["service"], "Médecine générale")
+        self.assertEqual(response.data["cost"], 10000)
+        self.assertEqual(response.data["insurance"], "Non")
+        self.assertEqual(response.data["quartier"], "Cocody")
+        patient = Patient.objects.get()
+        self.assertEqual((patient.sex, patient.emergency_phone), ("F", "0500000000"))
+
+    def test_insurance_coverage_reduces_cost_server_side(self):
+        cnps = InsuranceCompany.objects.get(name="CNPS")
+        chirurgie = MedicalService.objects.get(name="Chirurgie")
+        response = self.client.post(URL, form(
+            service=chirurgie.pk, assurance="Oui", assuranceId=cnps.pk, insuranceNumber="CNPS-1", cost=1,
+        ), format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["cost"], 20000)
+        self.assertEqual(response.data["insuranceName"], "CNPS")
+        self.assertEqual(response.data["insuranceCoverage"], 20)
+
+    def test_insurance_requires_company_and_number(self):
+        self.assertEqual(self.client.post(URL, form(assurance="Oui"), format="json").status_code, 400)
+        cnps = InsuranceCompany.objects.get(name="CNPS")
+        self.assertEqual(self.client.post(URL, form(assurance="Oui", assuranceId=cnps.pk), format="json").status_code, 400)
+        self.assertFalse(Patient.objects.exists())
+
+    def test_numbers_follow_existing_short_numbers(self):
+        Patient.objects.create(patient_number="PAT-20260922-ABC", last_name="X", first_names="Y", birth_date="1990-01-01", sex="M")
+        self.client.post(URL, form(), format="json")
+        response = self.client.post(URL, form(nom="kone", prenom="Ibrahim", sexe="Masculin"), format="json")
+        self.assertEqual(response.data["id"], "PAT-002")
+
+    def test_future_birth_date_rejected(self):
+        tomorrow = (timezone.localdate() + timedelta(days=1)).isoformat()
+        self.assertEqual(self.client.post(URL, form(dateNaissance=tomorrow), format="json").status_code, 400)
+
+    def test_list_returns_admissions_in_registration_order(self):
+        self.client.post(URL, form(), format="json")
+        self.client.post(URL, form(nom="kone", prenom="Ibrahim", sexe="Masculin"), format="json")
+        response = self.client.get(URL)
+        self.assertEqual([p["patient"] for p in response.data], ["TRAORE Awa", "KONE Ibrahim"])
+
+    def test_roles_outside_caisse_are_refused(self):
+        self.client.force_authenticate(User.objects.create_user(username="lab", password="x", role="LAB"))
+        self.assertEqual(self.client.get(URL).status_code, 403)
+        self.assertEqual(self.client.post(URL, form(), format="json").status_code, 403)
+        self.assertFalse(Admission.objects.exists())
+
+
+class NursingTests(APITestCase):
+    def setUp(self):
+        caissier = User.objects.create_user(username="caisse", password="x", role="RECEPTION")
+        self.client.force_authenticate(caissier)
+        self.admission_id = self.client.post(URL, form(), format="json").data["admissionId"]
+        self.client.force_authenticate(User.objects.create_user(username="inf", password="x", role="NURSE"))
+        self.vitals_url = f"/api/parcours/soins/patients/{self.admission_id}/constantes/"
+
+    def vitals(self, **overrides):
+        data = {
+            "temperature": "38,2", "systolic": "120", "diastolic": "80", "pulse": "", "oxygen": "97",
+            "respiratoryRate": "", "glucose": "0.9", "weight": "", "height": "", "nursingNotes": "Fièvre",
+        }
+        data.update(overrides)
+        return data
+
+    def test_list_exposes_names_expected_by_nursing_page(self):
+        patient = self.client.get("/api/parcours/soins/patients/").data[0]
+        self.assertEqual((patient["id"], patient["numero"]), ("PAT-001", "001"))
+        self.assertEqual((patient["nom"], patient["prenom"], patient["sexe"]), ("TRAORE", "Awa", "F"))
+        self.assertEqual(patient["telephoneParents"], "0500000000")
+        self.assertFalse(patient["sentToConsultation"])
+        self.assertIsNone(patient["lastVitalUpdate"])
+        self.assertNotIn("temperature", patient)
+
+    def test_saving_vitals_sends_patient_to_consultation(self):
+        response = self.client.post(self.vitals_url, self.vitals(), format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["temperature"], 38.2)
+        self.assertEqual(response.data["systolic"], 120)
+        self.assertEqual(response.data["nursingNotes"], "Fièvre")
+        self.assertNotIn("pulse", response.data)
+        self.assertTrue(response.data["sentToConsultation"])
+        self.assertIsNotNone(response.data["lastVitalUpdate"])
+
+    def test_latest_vitals_win_and_history_is_kept(self):
+        self.client.post(self.vitals_url, self.vitals(), format="json")
+        self.client.post(self.vitals_url, self.vitals(temperature="37"), format="json")
+        patient = self.client.get("/api/parcours/soins/patients/").data[0]
+        self.assertEqual(patient["temperature"], 37.0)
+        self.assertEqual(VitalSigns.objects.filter(admission_id=self.admission_id).count(), 2)
+
+    def test_impossible_or_empty_values_are_rejected(self):
+        self.assertEqual(self.client.post(self.vitals_url, self.vitals(temperature="382"), format="json").status_code, 400)
+        self.assertEqual(self.client.post(self.vitals_url, self.vitals(systolic="80", diastolic="90"), format="json").status_code, 400)
+        empty = {key: "" for key in self.vitals()}
+        self.assertEqual(self.client.post(self.vitals_url, empty, format="json").status_code, 400)
+        self.assertFalse(VitalSigns.objects.exists())
+
+    def test_caisse_roles_cannot_take_vitals(self):
+        self.client.force_authenticate(User.objects.get(username="caisse"))
+        self.assertEqual(self.client.post(self.vitals_url, self.vitals(), format="json").status_code, 403)
+        self.assertEqual(self.client.get("/api/parcours/soins/patients/").status_code, 403)
+
+
+class ParcoursBase(APITestCase):
+    """Un patient enregistré à la caisse et les acteurs du parcours."""
+
+    def setUp(self):
+        self.caissier = User.objects.create_user(username="caisse", password="x", role="RECEPTION", first_name="Koffi", last_name="Armel")
+        self.infirmier = User.objects.create_user(username="inf", password="x", role="NURSE")
+        self.medecin = User.objects.create_user(username="med", password="x", role="DOCTOR", first_name="Jean", last_name="Kouame")
+        self.autre_medecin = User.objects.create_user(username="med2", password="x", role="DOCTOR", first_name="Awa", last_name="Bah")
+        self.pharmacien = User.objects.create_user(username="pha", password="x", role="PHARMACY", first_name="Clara", last_name="Ahoue")
+        self.comptable = User.objects.create_user(username="cpt", password="x", role="ACCOUNTING")
+
+        self.client.force_authenticate(self.caissier)
+        cnps = InsuranceCompany.objects.get(name="CNPS")
+        self.pk = self.client.post(URL, form(assurance="Oui", assuranceId=cnps.pk, insuranceNumber="C-1"), format="json").data["admissionId"]
+
+    def as_user(self, user):
+        self.client.force_authenticate(user)
+
+    def envoyer_en_consultation(self):
+        self.as_user(self.infirmier)
+        self.client.post(f"/api/parcours/soins/patients/{self.pk}/constantes/", {"temperature": "38"}, format="json")
+
+    def consulter(self, user=None):
+        self.as_user(user or self.medecin)
+        return self.client.post(f"/api/parcours/consultations/{self.pk}/consulter/")
+
+    def valider(self, traitement="Paracétamol 500 mg\n- Amoxicilline 500 mg\n\n", user=None):
+        self.as_user(user or self.medecin)
+        return self.client.post(f"/api/parcours/consultations/{self.pk}/valider/", {
+            "symptomes": "Fièvre", "diagnostic": "Paludisme", "traitement": traitement, "observations": "",
+        }, format="json")
+
+
+
+class ParcoursCompletTests(ParcoursBase):
+    """Caisse → Soins infirmiers → Consultation → Pharmacie / Comptabilité."""
+
+    def test_patient_waits_for_vitals_before_consultation(self):
+        self.as_user(self.medecin)
+        self.assertEqual(self.client.get("/api/parcours/consultations/").data, [])
+        self.assertEqual(self.consulter().status_code, 400)
+        self.envoyer_en_consultation()
+        self.as_user(self.medecin)
+        patient = self.client.get("/api/parcours/consultations/").data[0]
+        self.assertEqual((patient["statut"], patient["doctor"], patient["temperature"]), ("En attente", "", 38.0))
+        self.assertEqual((patient["insurance"], patient["insuranceName"]), ("Oui", "CNPS"))
+
+    def test_consulter_assigns_doctor_and_locks_patient(self):
+        self.envoyer_en_consultation()
+        response = self.consulter()
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual((response.data["statut"], response.data["doctor"]), ("En cours", "Dr. KOUAME Jean"))
+        self.assertEqual(self.consulter(self.autre_medecin).status_code, 400)
+        self.as_user(self.autre_medecin)
+        self.assertEqual(self.client.get("/api/parcours/consultations/").data, [])
+
+    def test_valider_closes_consultation_and_creates_prescription(self):
+        self.envoyer_en_consultation()
+        self.consulter()
+        response = self.valider()
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["statut"], "Terminée")
+        self.assertEqual(response.data["diagnostic"], "Paludisme")
+        self.assertIsNotNone(response.data["dateConsultation"])
+        self.assertEqual(response.data["prescription"], response.data["traitement"])
+
+        self.as_user(self.pharmacien)
+        ordonnance = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]
+        self.assertEqual(ordonnance["medicines"], ["Paracétamol 500 mg", "Amoxicilline 500 mg"])
+        self.assertEqual((ordonnance["status"], ordonnance["statusClass"]), ("À préparer", "prepare"))
+        self.assertEqual((ordonnance["patient"], ordonnance["doctor"]), ("TRAORE Awa", "Dr. KOUAME Jean"))
+
+    def test_consultation_without_treatment_has_no_prescription(self):
+        self.envoyer_en_consultation()
+        self.valider(traitement="  ")
+        self.as_user(self.pharmacien)
+        self.assertEqual(self.client.get("/api/parcours/pharmacie/ordonnances/").data, [])
+
+    def test_pharmacy_prepares_then_serves_once_and_logs_history(self):
+        self.envoyer_en_consultation()
+        self.valider()
+        self.as_user(self.pharmacien)
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]["id"]
+        base = f"/api/parcours/pharmacie/ordonnances/{code}"
+        self.assertEqual(self.client.post(f"{base}/preparer/").data["status"], "Prête")
+        self.assertEqual(self.client.post(f"{base}/servir/").data["status"], "Servie")
+        self.assertEqual(self.client.post(f"{base}/servir/").status_code, 400)
+        history = self.client.get("/api/parcours/pharmacie/historique/").data
+        self.assertEqual([row["medicine"] for row in history], ["Paracétamol 500 mg", "Amoxicilline 500 mg"])
+        self.assertEqual(history[0]["pharmacist"], "Clara Ahoue")
+
+    def test_served_prescription_cannot_be_rewritten(self):
+        self.envoyer_en_consultation()
+        self.valider()
+        self.as_user(self.pharmacien)
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]["id"]
+        self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/servir/")
+        self.assertEqual(self.valider(traitement="Ibuprofène").status_code, 400)
+        self.assertEqual(self.valider().status_code, 200)
+
+    def test_revalidation_with_new_treatment_replaces_unserved_prescription(self):
+        self.envoyer_en_consultation()
+        self.valider()
+        self.valider(traitement="Ibuprofène 400 mg")
+        self.as_user(self.pharmacien)
+        ordonnances = self.client.get("/api/parcours/pharmacie/ordonnances/").data
+        self.assertEqual(len(ordonnances), 1)
+        self.assertEqual(ordonnances[0]["medicines"], ["Ibuprofène 400 mg"])
+
+    def test_accounting_sees_caisse_payments(self):
+        self.as_user(self.comptable)
+        payment = self.client.get("/api/parcours/comptabilite/paiements/").data[0]
+        self.assertEqual((payment["patient"], payment["patientId"]), ("TRAORE Awa", "PAT-001"))
+        self.assertEqual((payment["totalAmount"], payment["patientAmount"], payment["insuranceAmount"]), (10000, 8000, 2000))
+        self.assertEqual((payment["cashier"], payment["service"], payment["insuranceName"]), ("Koffi Armel", "Médecine générale", "CNPS"))
+
+    def test_roles_are_enforced(self):
+        self.envoyer_en_consultation()
+        self.as_user(self.infirmier)
+        self.assertEqual(self.client.get("/api/parcours/consultations/").status_code, 403)
+        self.assertEqual(self.client.get("/api/parcours/comptabilite/paiements/").status_code, 403)
+        self.valider()
+        self.as_user(self.medecin)
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data and "001"
+        self.assertEqual(self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/servir/").status_code, 403)
+
+
+class NotificationsTests(ParcoursBase):
+    """La pastille reflète ce qui attend une action, selon le rôle."""
+
+    def notifications(self, user):
+        self.as_user(user)
+        return self.client.get("/api/parcours/notifications/").data
+
+    def test_nurse_sees_patients_waiting_for_vitals(self):
+        data = self.notifications(self.infirmier)
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(data["items"][0]["link"], "/nursing")
+        self.envoyer_en_consultation()
+        self.assertEqual(self.notifications(self.infirmier), {"count": 0, "items": []})
+
+    def test_doctor_sees_queue_until_consultation_is_validated(self):
+        self.assertEqual(self.notifications(self.medecin)["count"], 0)
+        self.envoyer_en_consultation()
+        self.assertEqual(self.notifications(self.medecin)["count"], 1)
+        self.consulter()
+        self.assertEqual(self.notifications(self.autre_medecin)["count"], 0)
+        self.assertEqual(self.notifications(self.medecin)["count"], 1)
+        self.valider()
+        self.assertEqual(self.notifications(self.medecin)["count"], 0)
+
+    def test_pharmacist_sees_prescriptions_to_prepare_then_to_serve(self):
+        self.envoyer_en_consultation()
+        self.valider()
+        self.assertEqual([i["id"] for i in self.notifications(self.pharmacien)["items"]], ["to-prepare"])
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]["id"]
+        self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/preparer/")
+        self.assertEqual([i["id"] for i in self.notifications(self.pharmacien)["items"]], ["ready"])
+        self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/servir/")
+        self.assertEqual(self.notifications(self.pharmacien)["count"], 0)
+
+    def test_roles_without_pending_actions_get_nothing(self):
+        self.assertEqual(self.notifications(self.comptable), {"count": 0, "items": []})
