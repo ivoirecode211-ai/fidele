@@ -339,7 +339,6 @@
   flex: 1;
 }
 
-
 /* ============================================================
    HEADER
    ============================================================ */
@@ -351,21 +350,15 @@
     0 42px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
   gap: 24px;
-
   background: var(--primary-soft);
 
   border-bottom:
     1px solid var(--border);
-
   box-sizing: border-box;
 }
-
 
 /* Zone gauche : bascule du menu + titre */
 
@@ -382,21 +375,14 @@
 .sidebar-toggle {
   width: 38px;
   height: 38px;
-
   flex: 0 0 auto;
-
   display: grid;
-
   place-items: center;
-
   border: 0;
-
   border-radius: 10px;
 
   background: var(--bg);
-
   color: var(--primary);
-
   cursor: pointer;
 
   transition: background 0.15s ease;

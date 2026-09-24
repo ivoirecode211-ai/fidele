@@ -805,16 +805,13 @@
     align-items: flex-start;
     flex-direction: column;
   }
-
   .calendar-navigation {
     width: 100%;
     justify-content: space-between;
   }
-
   .form-grid {
     grid-template-columns: 1fr;
   }
-
   .full-width {
     grid-column: auto;
   }
@@ -858,11 +855,9 @@
   .appointment-form-actions {
     flex-direction: column-reverse;
   }
-
   .appointment-form-actions button {
     width: 100%;
   }
-
   .appointment-modal-overlay {
     padding: 10px;
   }

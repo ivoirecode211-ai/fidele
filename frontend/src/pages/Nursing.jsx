@@ -1,20 +1,15 @@
-
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Activity,
   AlertCircle,
   BedDouble,
   Bell,
-  Check,
   CheckCircle2,
   ChevronRight,
-  ClipboardList,
   Clock3,
   Droplets,
   HeartPulse,
-  Plus,
   RefreshCw,
   Search,
   Thermometer,
@@ -24,285 +19,432 @@ import {
   X,
   Stethoscope,
   ShieldCheck,
-  MessageSquareText,
+  Ruler,
+  Wind,
 } from "lucide-react";
 
 import "../styles/nursing.css";
 
+/*
+ * ============================================================
+ * CONFIGURATION
+ * ============================================================
+ */
 
-const INITIAL_PATIENTS = [
-  {
-    id: "PAT-0001",
-    name: "Kouassi Jean",
-    age: 46,
-    sex: "H",
-    room: "Chambre 102",
-    bed: "Lit 2",
-    diagnosis: "Paludisme",
-    priority: "NORMAL",
-    treatment: "Perfusion + traitement antipaludéen",
-    temperature: 37.2,
-    systolic: 120,
-    diastolic: 78,
-    pulse: 82,
-    oxygen: 98,
-    weight: 71,
-    glucose: 0.98,
-    lastCare: "08:20",
-  },
-  {
-    id: "PAT-0002",
-    name: "Yao Marie",
-    age: 32,
-    sex: "F",
-    room: "Chambre 104",
-    bed: "Lit 1",
-    diagnosis: "Infection respiratoire",
-    priority: "URGENT",
-    treatment: "Antibiotique + oxygène",
-    temperature: 38.6,
-    systolic: 135,
-    diastolic: 86,
-    pulse: 96,
-    oxygen: 93,
-    weight: 62,
-    glucose: 1.02,
-    lastCare: "09:05",
-  },
-  {
-    id: "PAT-0003",
-    name: "Adjoua Esther",
-    age: 58,
-    sex: "F",
-    room: "Chambre 201",
-    bed: "Lit 2",
-    diagnosis: "Hypertension",
-    priority: "NORMAL",
-    treatment: "Antihypertenseur",
-    temperature: 36.8,
-    systolic: 148,
-    diastolic: 91,
-    pulse: 79,
-    oxygen: 97,
-    weight: 74,
-    glucose: 1.01,
-    lastCare: "08:45",
-  },
-  {
-    id: "PAT-0004",
-    name: "N'Guessan Paul",
-    age: 67,
-    sex: "H",
-    room: "Chambre 203",
-    bed: "Lit 1",
-    diagnosis: "Diabète",
-    priority: "SURVEILLANCE",
-    treatment: "Insuline + surveillance glycémie",
-    temperature: 36.7,
-    systolic: 129,
-    diastolic: 82,
-    pulse: 76,
-    oxygen: 96,
-    weight: 80,
-    glucose: 1.84,
-    lastCare: "09:15",
-  },
-  {
-    id: "PAT-0005",
-    name: "Aka Bernard",
-    age: 41,
-    sex: "H",
-    room: "Chambre 105",
-    bed: "Lit 1",
-    diagnosis: "Traumatisme",
-    priority: "URGENT",
-    treatment: "Pansement + antalgiques",
-    temperature: 37.6,
-    systolic: 127,
-    diastolic: 80,
-    pulse: 88,
-    oxygen: 98,
-    weight: 77,
-    glucose: 1.05,
-    lastCare: "08:50",
-  },
-  {
-    id: "PAT-0006",
-    name: "Koffi Clarisse",
-    age: 25,
-    sex: "F",
-    room: "Chambre 206",
-    bed: "Lit 2",
-    diagnosis: "Déshydratation",
-    priority: "NORMAL",
-    treatment: "Réhydratation IV",
-    temperature: 37.1,
-    systolic: 114,
-    diastolic: 73,
-    pulse: 84,
-    oxygen: 99,
-    weight: 56,
-    glucose: 0.92,
-    lastCare: "09:00",
-  },
-];
+const PATIENTS_STORAGE_KEY = "sante_consultation_patients";
+const NURSING_VITALS_STORAGE_KEY = "sante_nursing_vitals";
 
+/*
+ * ============================================================
+ * OUTILS DE LECTURE DU STORAGE
+ * ============================================================
+ */
 
-const INITIAL_CARES = [
-  {
-    id: 1,
-    patient: "Yao Marie",
-    patientId: "PAT-0002",
-    care: "Surveillance température",
-    time: "09:30",
-    type: "Surveillance",
-    priority: "URGENT",
-    done: false,
-  },
-  {
-    id: 2,
-    patient: "Aka Bernard",
-    patientId: "PAT-0005",
-    care: "Réfection du pansement",
-    time: "10:00",
-    type: "Pansement",
-    priority: "URGENT",
-    done: false,
-  },
-  {
-    id: 3,
-    patient: "N'Guessan Paul",
-    patientId: "PAT-0004",
-    care: "Contrôle glycémie",
-    time: "10:30",
-    type: "Glycémie",
-    priority: "SURVEILLANCE",
-    done: false,
-  },
-  {
-    id: 4,
-    patient: "Kouassi Jean",
-    patientId: "PAT-0001",
-    care: "Administration traitement",
-    time: "11:00",
-    type: "Traitement",
-    priority: "NORMAL",
-    done: true,
-  },
-  {
-    id: 5,
-    patient: "Koffi Clarisse",
-    patientId: "PAT-0006",
-    care: "Contrôle perfusion",
-    time: "11:30",
-    type: "Perfusion",
-    priority: "NORMAL",
-    done: false,
-  },
-];
+const readStorage = (key, fallback = null) => {
+  try {
+    const raw = localStorage.getItem(key);
 
+    if (!raw) {
+      return fallback;
+    }
 
-const INITIAL_TRANSMISSIONS = [
-  {
-    id: 1,
-    patient: "Yao Marie",
-    time: "09:10",
-    author: "Infirmière de garde",
-    text: "Température élevée. Surveillance renforcée mise en place.",
-  },
-  {
-    id: 2,
-    patient: "N'Guessan Paul",
-    time: "08:55",
-    author: "Infirmier référent",
-    text: "Glycémie supérieure à la normale. Médecin informé.",
-  },
-  {
-    id: 3,
-    patient: "Aka Bernard",
-    time: "08:40",
-    author: "Infirmière de garde",
-    text: "Pansement propre. Douleur signalée modérée.",
-  },
-];
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error(`Erreur lecture localStorage ${key}:`, error);
+    return fallback;
+  }
+};
 
+/*
+ * ============================================================
+ * PATIENTS CAISSE
+ * ============================================================
+ */
 
-function getPatientState(patient) {
-  if (patient.priority === "URGENT") {
-    return "urgent";
+const loadPatientsFromCaisse = () => {
+  const data = readStorage(PATIENTS_STORAGE_KEY, []);
+
+  if (Array.isArray(data)) {
+    return data;
   }
 
-  if (patient.priority === "SURVEILLANCE") {
-    return "surveillance";
+  if (Array.isArray(data?.patients)) {
+    return data.patients;
   }
 
-  return "stable";
-}
-
-
-function PriorityBadge({ priority }) {
-
-  if (priority === "URGENT") {
-    return (
-      <span className="nursing-priority nursing-priority-urgent">
-        <AlertCircle size={14} />
-        Urgent
-      </span>
-    );
+  if (Array.isArray(data?.data)) {
+    return data.data;
   }
 
-  if (priority === "SURVEILLANCE") {
-    return (
-      <span className="nursing-priority nursing-priority-watch">
-        <Clock3 size={14} />
-        Surveillance
-      </span>
-    );
+  return [];
+};
+
+/*
+ * ============================================================
+ * CONSTANTES INFIRMIÈRES
+ * ============================================================
+ */
+
+const loadNursingVitals = () => {
+  const data = readStorage(NURSING_VITALS_STORAGE_KEY, {});
+
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return {};
   }
 
+  return data;
+};
+
+/*
+ * ============================================================
+ * NORMALISATION DES PATIENTS
+ * ============================================================
+ */
+
+const normalizePatient = (patient, nursingVitals = {}) => {
+  const patientId =
+    patient?.id ??
+    patient?.patientId ??
+    patient?.identifiant ??
+    patient?.numero ??
+    patient?.code ??
+    "";
+
+  const savedVitals = nursingVitals?.[patientId] || {};
+
+  return {
+    ...patient,
+
+    id: patientId,
+
+    nom:
+      patient?.nom ||
+      patient?.lastName ||
+      patient?.name ||
+      "Patient",
+
+    prenom:
+      patient?.prenom ||
+      patient?.firstName ||
+      "",
+
+    telephone:
+      patient?.telephone ||
+      patient?.phone ||
+      patient?.tel ||
+      "",
+
+    telephoneParents:
+      patient?.telephoneParents ||
+      patient?.parentsPhone ||
+      patient?.parentPhone ||
+      "",
+
+    sexe:
+      patient?.sexe ||
+      patient?.gender ||
+      "",
+
+    age:
+      patient?.age ??
+      "",
+
+    dateNaissance:
+      patient?.dateNaissance ||
+      patient?.birthDate ||
+      "",
+
+    chambre:
+      patient?.chambre ||
+      patient?.room ||
+      "",
+
+    service:
+      patient?.service ||
+      patient?.department ||
+      "Consultation",
+
+    status:
+      patient?.status ||
+      patient?.statut ||
+      "normal",
+
+    temperature:
+      savedVitals?.temperature ??
+      patient?.temperature ??
+      "",
+
+    systolic:
+      savedVitals?.systolic ??
+      patient?.systolic ??
+      patient?.tensionSystolique ??
+      "",
+
+    diastolic:
+      savedVitals?.diastolic ??
+      patient?.diastolic ??
+      patient?.tensionDiastolique ??
+      "",
+
+    pulse:
+      savedVitals?.pulse ??
+      patient?.pulse ??
+      patient?.frequenceCardiaque ??
+      "",
+
+    oxygen:
+      savedVitals?.oxygen ??
+      patient?.oxygen ??
+      patient?.spo2 ??
+      "",
+
+    respiratoryRate:
+      savedVitals?.respiratoryRate ??
+      patient?.respiratoryRate ??
+      patient?.frequenceRespiratoire ??
+      "",
+
+    glucose:
+      savedVitals?.glucose ??
+      patient?.glucose ??
+      "",
+
+    weight:
+      savedVitals?.weight ??
+      patient?.weight ??
+      patient?.poids ??
+      "",
+
+    height:
+      savedVitals?.height ??
+      patient?.height ??
+      patient?.taille ??
+      "",
+
+    nursingNotes:
+      savedVitals?.nursingNotes ??
+      patient?.nursingNotes ??
+      "",
+
+    lastVitalUpdate:
+      savedVitals?.updatedAt ??
+      patient?.lastVitalUpdate ??
+      null,
+  };
+};
+
+/*
+ * ============================================================
+ * VALIDATION DES VALEURS
+ *
+ * IMPORTANT :
+ * Une donnée vide n'est JAMAIS considérée comme anormale.
+ * Le rouge apparaît uniquement lorsqu'une valeur existe
+ * réellement et se trouve hors de la plage normale.
+ * ============================================================
+ */
+
+const hasValue = (value) => {
   return (
-    <span className="nursing-priority nursing-priority-normal">
-      <CheckCircle2 size={14} />
-      Stable
-    </span>
+    value !== "" &&
+    value !== null &&
+    value !== undefined &&
+    value !== "--" &&
+    Number.isFinite(Number(value))
+  );
+};
+
+/*
+ * ============================================================
+ * PLAGES NORMALES
+ * ============================================================
+ */
+
+const isAbnormalTemperature = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 36.5 || n > 37.5;
+};
+
+const isAbnormalSystolic = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 90 || n >= 140;
+};
+
+const isAbnormalDiastolic = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 60 || n >= 90;
+};
+
+const isAbnormalPulse = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 60 || n > 100;
+};
+
+const isAbnormalOxygen = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 95;
+};
+
+const isAbnormalRespiratoryRate = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 12 || n > 20;
+};
+
+const isAbnormalGlucose = (value) => {
+  if (!hasValue(value)) return false;
+
+  const n = Number(value);
+
+  return n < 0.7 || n > 1.1;
+};
+
+const isAbnormalBloodPressure = (systolic, diastolic) => {
+  return (
+    (hasValue(systolic) && isAbnormalSystolic(systolic)) ||
+    (hasValue(diastolic) && isAbnormalDiastolic(diastolic))
+  );
+};
+
+/*
+ * ============================================================
+ * DÉTECTION GLOBALE D'ANOMALIE
+ * ============================================================
+ */
+
+const hasAbnormalVitals = (patient) => {
+  return (
+    isAbnormalTemperature(patient.temperature) ||
+    isAbnormalBloodPressure(
+      patient.systolic,
+      patient.diastolic
+    ) ||
+    isAbnormalPulse(patient.pulse) ||
+    isAbnormalOxygen(patient.oxygen) ||
+    isAbnormalRespiratoryRate(patient.respiratoryRate) ||
+    isAbnormalGlucose(patient.glucose)
+  );
+};
+
+/*
+ * ============================================================
+ * FORMATAGE
+ * ============================================================
+ */
+
+const displayValue = (value, suffix = "") => {
+  if (!hasValue(value)) {
+    return "--";
+  }
+
+  return `${value}${suffix}`;
+};
+
+const formatDateTime = (date) => {
+  if (!date) {
+    return "Non enregistré";
+  }
+
+  try {
+    return new Date(date).toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "Non enregistré";
+  }
+};
+
+/*
+ * ============================================================
+ * COMPOSANT INPUT CONSTANTE
+ * ============================================================
+ */
+
+function VitalInput({
+  label,
+  value,
+  onChange,
+  unit,
+  type = "number",
+  abnormal = false,
+  placeholder = "",
+}) {
+  return (
+    <div className="nursing-form-group">
+      <label>{label}</label>
+
+      <div className="nursing-input-wrapper">
+        <input
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className={
+            abnormal
+              ? "nursing-input-abnormal"
+              : ""
+          }
+        />
+
+        {unit && (
+          <span className="nursing-input-unit">
+            {unit}
+          </span>
+        )}
+      </div>
+
+      {abnormal && (
+        <small className="nursing-form-warning">
+          Valeur anormale
+        </small>
+      )}
+    </div>
   );
 }
 
+/*
+ * ============================================================
+ * COMPOSANT PRINCIPAL
+ * ============================================================
+ */
 
 export default function Nursing() {
+  const [patients, setPatients] = useState([]);
 
-
-  const [patients, setPatients] =
-    useState(INITIAL_PATIENTS);
-
-
-  const [cares, setCares] =
-    useState(INITIAL_CARES);
-
-
-  const [transmissions, setTransmissions] =
-    useState(INITIAL_TRANSMISSIONS);
-
-
-  const [search, setSearch] =
-    useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [patientFilter, setPatientFilter] =
-    useState("ALL");
-
+    useState("all");
 
   const [selectedPatient, setSelectedPatient] =
     useState(null);
 
-
   const [showVitalsModal, setShowVitalsModal] =
     useState(false);
 
-
-  const [showTransmissionModal, setShowTransmissionModal] =
+  const [showDossierModal, setShowDossierModal] =
     useState(false);
-
 
   const [vitalsForm, setVitalsForm] = useState({
     temperature: "",
@@ -310,1743 +452,1861 @@ export default function Nursing() {
     diastolic: "",
     pulse: "",
     oxygen: "",
-    weight: "",
+    respiratoryRate: "",
     glucose: "",
+    weight: "",
+    height: "",
+    nursingNotes: "",
   });
 
+  const [lastRefresh, setLastRefresh] =
+    useState(new Date());
 
-  const [transmissionForm, setTransmissionForm] =
-    useState({
-      text: "",
-    });
+  /*
+   * ==========================================================
+   * CHARGEMENT
+   * ==========================================================
+   */
 
+  const refreshPatients = () => {
+    const caissePatients = loadPatientsFromCaisse();
+    const nursingVitals = loadNursingVitals();
 
-  const stats = useMemo(() => {
-
-    const urgentPatients =
-      patients.filter(
-        (patient) =>
-          patient.priority === "URGENT"
-      ).length;
-
-    const surveillancePatients =
-      patients.filter(
-        (patient) =>
-          patient.priority === "SURVEILLANCE"
-      ).length;
-
-    const pendingCares =
-      cares.filter(
-        (care) => !care.done
-      ).length;
-
-    const completedCares =
-      cares.filter(
-        (care) => care.done
-      ).length;
-
-    return {
-      patients: patients.length,
-      urgentPatients,
-      surveillancePatients,
-      pendingCares,
-      completedCares,
-    };
-
-  }, [patients, cares]);
-
-
-  const filteredPatients = useMemo(() => {
-
-    const value =
-      search.trim().toLowerCase();
-
-    return patients.filter((patient) => {
-
-      const matchesSearch =
-        !value
-        ||
-        patient.name
-          .toLowerCase()
-          .includes(value)
-        ||
-        patient.id
-          .toLowerCase()
-          .includes(value)
-        ||
-        patient.room
-          .toLowerCase()
-          .includes(value)
-        ||
-        patient.diagnosis
-          .toLowerCase()
-          .includes(value);
-
-      const matchesFilter =
-        patientFilter === "ALL"
-        ||
-        getPatientState(patient) === patientFilter;
-
-      return matchesSearch && matchesFilter;
-
-    });
-
-  }, [patients, search, patientFilter]);
-
-
-  function toggleCare(careId) {
-
-    setCares((currentCares) =>
-      currentCares.map((care) =>
-        care.id === careId
-          ? {
-              ...care,
-              done: !care.done,
-            }
-          : care
-      )
+    const normalized = caissePatients.map(
+      (patient) =>
+        normalizePatient(
+          patient,
+          nursingVitals
+        )
     );
 
-  }
+    setPatients(normalized);
+    setLastRefresh(new Date());
+  };
 
+  useEffect(() => {
+    refreshPatients();
 
-  function openVitalsModal(patient) {
+    const handleStorage = () => {
+      refreshPatients();
+    };
 
+    const handlePatientAdded = () => {
+      refreshPatients();
+    };
+
+    const handleVitalsUpdated = () => {
+      refreshPatients();
+    };
+
+    const handleFocus = () => {
+      refreshPatients();
+    };
+
+    window.addEventListener(
+      "storage",
+      handleStorage
+    );
+
+    window.addEventListener(
+      "sante:patient-added",
+      handlePatientAdded
+    );
+
+    window.addEventListener(
+      "ma-sante-nursing-vitals-updated",
+      handleVitalsUpdated
+    );
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    return () => {
+      window.removeEventListener(
+        "storage",
+        handleStorage
+      );
+
+      window.removeEventListener(
+        "sante:patient-added",
+        handlePatientAdded
+      );
+
+      window.removeEventListener(
+        "ma-sante-nursing-vitals-updated",
+        handleVitalsUpdated
+      );
+
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
+  }, []);
+
+  /*
+   * ==========================================================
+   * STATISTIQUES
+   * ==========================================================
+   */
+
+  const abnormalPatients = useMemo(() => {
+    return patients.filter(hasAbnormalVitals);
+  }, [patients]);
+
+  const urgentPatients = useMemo(() => {
+    return patients.filter(
+      (patient) =>
+        patient.status === "urgent" ||
+        patient.statut === "urgent"
+    );
+  }, [patients]);
+
+  const surveillancePatients = useMemo(() => {
+    return patients.filter((patient) => {
+      const abnormal = hasAbnormalVitals(patient);
+
+      return (
+        abnormal ||
+        patient.status === "surveillance" ||
+        patient.statut === "surveillance"
+      );
+    });
+  }, [patients]);
+
+  /*
+   * ==========================================================
+   * FILTRE DES PATIENTS
+   * ==========================================================
+   */
+
+  const filteredPatients = useMemo(() => {
+    const term =
+      searchTerm.trim().toLowerCase();
+
+    return patients.filter((patient) => {
+      const fullName =
+        `${patient.prenom || ""} ${
+          patient.nom || ""
+        }`.trim();
+
+      const searchableText = [
+        fullName,
+        patient.nom,
+        patient.prenom,
+        patient.id,
+        patient.telephone,
+        patient.telephoneParents,
+        patient.service,
+        patient.chambre,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch =
+        !term ||
+        searchableText.includes(term);
+
+      const state =
+        patient.status ||
+        patient.statut ||
+        "normal";
+
+      const matchesFilter =
+        patientFilter === "all" ||
+        (patientFilter === "urgent" &&
+          state === "urgent") ||
+        (patientFilter === "surveillance" &&
+          state === "surveillance") ||
+        (patientFilter === "abnormal" &&
+          hasAbnormalVitals(patient));
+
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
+    });
+  }, [
+    patients,
+    searchTerm,
+    patientFilter,
+  ]);
+
+  /*
+   * ==========================================================
+   * FORMULAIRE
+   * ==========================================================
+   */
+
+  const openVitalsModal = (patient) => {
     setSelectedPatient(patient);
 
     setVitalsForm({
-      temperature: patient.temperature || "",
-      systolic: patient.systolic || "",
-      diastolic: patient.diastolic || "",
-      pulse: patient.pulse || "",
-      oxygen: patient.oxygen || "",
-      weight: patient.weight || "",
-      glucose: patient.glucose || "",
+      temperature:
+        patient.temperature ?? "",
+
+      systolic:
+        patient.systolic ?? "",
+
+      diastolic:
+        patient.diastolic ?? "",
+
+      pulse:
+        patient.pulse ?? "",
+
+      oxygen:
+        patient.oxygen ?? "",
+
+      respiratoryRate:
+        patient.respiratoryRate ?? "",
+
+      glucose:
+        patient.glucose ?? "",
+
+      weight:
+        patient.weight ?? "",
+
+      height:
+        patient.height ?? "",
+
+      nursingNotes:
+        patient.nursingNotes ?? "",
     });
 
     setShowVitalsModal(true);
+  };
 
-  }
+  const closeVitalsModal = () => {
+    setShowVitalsModal(false);
+    setSelectedPatient(null);
 
+    setVitalsForm({
+      temperature: "",
+      systolic: "",
+      diastolic: "",
+      pulse: "",
+      oxygen: "",
+      respiratoryRate: "",
+      glucose: "",
+      weight: "",
+      height: "",
+      nursingNotes: "",
+    });
+  };
 
-  function handleSaveVitals(event) {
+  const openDossierModal = (patient) => {
+    setSelectedPatient(patient);
+    setShowDossierModal(true);
+  };
 
-    event.preventDefault();
+  const closeDossierModal = () => {
+    setShowDossierModal(false);
+    setSelectedPatient(null);
+  };
 
+  /*
+   * ==========================================================
+   * MODIFICATION DU FORMULAIRE
+   * ==========================================================
+   */
+
+  const updateVitalField = (
+    field,
+    value
+  ) => {
+    setVitalsForm((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
+  };
+
+  /*
+   * ==========================================================
+   * SAUVEGARDE DES CONSTANTES
+   * ==========================================================
+   */
+
+  const saveVitals = () => {
     if (!selectedPatient) {
       return;
     }
 
-    setPatients((currentPatients) =>
-      currentPatients.map((patient) =>
-        patient.id === selectedPatient.id
-          ? {
-              ...patient,
-              temperature:
-                Number(vitalsForm.temperature),
-              systolic:
-                Number(vitalsForm.systolic),
-              diastolic:
-                Number(vitalsForm.diastolic),
-              pulse:
-                Number(vitalsForm.pulse),
-              oxygen:
-                Number(vitalsForm.oxygen),
-              weight:
-                Number(vitalsForm.weight),
-              glucose:
-                Number(vitalsForm.glucose),
-              lastCare:
-                new Date().toLocaleTimeString(
-                  "fr-FR",
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                ),
-            }
-          : patient
-      )
-    );
+    const existingVitals =
+      loadNursingVitals();
 
-    setShowVitalsModal(false);
+    const patientId =
+      selectedPatient.id;
 
-    setSelectedPatient(null);
+    const updatedVitals = {
+      ...existingVitals,
 
-  }
-
-
-  function openTransmissionModal(patient = null) {
-
-    setSelectedPatient(patient);
-
-    setTransmissionForm({
-      text: "",
-    });
-
-    setShowTransmissionModal(true);
-
-  }
-
-
-  function handleSaveTransmission(event) {
-
-    event.preventDefault();
-
-    if (!transmissionForm.text.trim()) {
-      return;
-    }
-
-    const now =
-      new Date().toLocaleTimeString(
-        "fr-FR",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      );
-
-    const newTransmission = {
-      id:
-        Date.now(),
-      patient:
-        selectedPatient?.name ||
-        "Patient",
-      time:
-        now,
-      author:
-        "Utilisateur connecté",
-      text:
-        transmissionForm.text.trim(),
+      [patientId]: {
+        ...vitalsForm,
+        updatedAt:
+          new Date().toISOString(),
+      },
     };
 
-    setTransmissions((current) => [
-      newTransmission,
-      ...current,
-    ]);
+    try {
+      localStorage.setItem(
+        NURSING_VITALS_STORAGE_KEY,
+        JSON.stringify(updatedVitals)
+      );
 
-    setTransmissionForm({
-      text: "",
-    });
+      refreshPatients();
 
-    setSelectedPatient(null);
+      window.dispatchEvent(
+        new CustomEvent(
+          "ma-sante-nursing-vitals-updated"
+        )
+      );
 
-    setShowTransmissionModal(false);
+      closeVitalsModal();
+    } catch (error) {
+      console.error(
+        "Erreur sauvegarde constantes:",
+        error
+      );
+    }
+  };
 
-  }
+  /*
+   * ==========================================================
+   * CLASSES COULEURS
+   * ==========================================================
+   */
 
+  const vitalClass = (abnormal) => {
+    return abnormal
+      ? "nursing-vital-mini nursing-vital-abnormal"
+      : "nursing-vital-mini";
+  };
 
-  function handleRefresh() {
+  const abnormalValueClass = (
+    abnormal
+  ) => {
+    return abnormal
+      ? "nursing-abnormal-value"
+      : "";
+  };
 
-    setSearch("");
+  /*
+   * ==========================================================
+   * NOM PATIENT
+   * ==========================================================
+   */
 
-    setPatientFilter("ALL");
+  const getPatientFullName = (
+    patient
+  ) => {
+    return (
+      `${patient?.prenom || ""} ${
+        patient?.nom || ""
+      }`.trim() ||
+      "Patient sans nom"
+    );
+  };
 
-  }
-
+  /*
+   * ==========================================================
+   * RENDU
+   * ==========================================================
+   */
 
   return (
-
     <div className="nursing-page">
 
+      {/* ======================================================
+          HEADER
+          ====================================================== */}
 
-      <header className="nursing-header">
+      <div className="nursing-header">
 
         <div className="nursing-header-left">
 
           <div className="nursing-header-icon">
-            <HeartPulse size={31} />
+            <HeartPulse size={28} />
           </div>
 
           <div>
-
-            <h1>
-              Espace Infirmiers
-            </h1>
+            <h1>Espace Infirmiers</h1>
 
             <p>
-              Soins, surveillance et suivi quotidien des patients
+              Surveillance et suivi des constantes
+              des patients
             </p>
-
           </div>
 
         </div>
 
-
         <div className="nursing-header-actions">
-
-          <div className="nursing-shift">
-
-            <div className="nursing-shift-icon">
-              <Clock3 size={17} />
-            </div>
-
-            <div>
-
-              <span>
-                Service actuel
-              </span>
-
-              <strong>
-                Garde de jour
-              </strong>
-
-            </div>
-
-          </div>
-
 
           <button
             type="button"
             className="nursing-refresh-button"
-            onClick={handleRefresh}
-            title="Actualiser"
+            onClick={refreshPatients}
           >
-            <RefreshCw size={18} />
+            <RefreshCw size={17} />
+
+            Actualiser
           </button>
 
-        </div>
+          <span className="nursing-last-refresh">
+            <Clock3 size={14} />
 
-      </header>
-
-
-      <div className="nursing-alert-banner">
-
-        <div className="nursing-alert-icon">
-          <Bell size={20} />
-        </div>
-
-        <div>
-
-          <strong>
-            {stats.urgentPatients} patient(s) nécessitent une
-            attention particulière
-          </strong>
-
-          <p>
-            Consultez les patients prioritaires et les soins
-            en attente ci-dessous.
-          </p>
+            Mise à jour{" "}
+            {lastRefresh.toLocaleTimeString(
+              "fr-FR",
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )}
+          </span>
 
         </div>
 
       </div>
 
+      {/* ======================================================
+          ALERTE
+          ====================================================== */}
 
-      <section className="nursing-stats-grid">
+      {abnormalPatients.length > 0 && (
+        <div className="nursing-alert-banner">
 
+          <div className="nursing-alert-icon">
+            <AlertCircle size={22} />
+          </div>
+
+          <div className="nursing-alert-content">
+
+            <strong>
+              Constantes anormales détectées
+            </strong>
+
+            <span>
+              {abnormalPatients.length} patient
+              {abnormalPatients.length > 1
+                ? "s"
+                : ""}{" "}
+              nécessite
+              {abnormalPatients.length > 1
+                ? "nt"
+                : ""}{" "}
+              une surveillance.
+            </span>
+
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setPatientFilter("abnormal")
+            }
+          >
+            Voir les patients
+            <ChevronRight size={17} />
+          </button>
+
+        </div>
+      )}
+
+      {/* ======================================================
+          STATISTIQUES
+          ====================================================== */}
+
+      <div className="nursing-stats-grid">
 
         <div className="nursing-stat-card">
 
           <div className="nursing-stat-icon nursing-stat-blue">
-            <Users size={23} />
+            <Users size={22} />
           </div>
 
           <div>
-
             <span>
-              Patients en charge
+              Patients
             </span>
 
             <strong>
-              {stats.patients}
+              {patients.length}
             </strong>
-
-            <small>
-              Patients suivis aujourd'hui
-            </small>
-
           </div>
 
         </div>
-
 
         <div className="nursing-stat-card">
 
           <div className="nursing-stat-icon nursing-stat-red">
-            <AlertCircle size={23} />
+            <AlertCircle size={22} />
           </div>
 
           <div>
-
             <span>
-              Priorités
+              Constantes anormales
             </span>
 
             <strong>
-              {stats.urgentPatients}
+              {abnormalPatients.length}
             </strong>
-
-            <small>
-              Attention requise
-            </small>
-
           </div>
 
         </div>
-
 
         <div className="nursing-stat-card">
 
           <div className="nursing-stat-icon nursing-stat-orange">
-            <ClipboardList size={23} />
+            <Bell size={22} />
           </div>
 
           <div>
-
             <span>
-              Soins en attente
+              À surveiller
             </span>
 
             <strong>
-              {stats.pendingCares}
+              {surveillancePatients.length}
             </strong>
-
-            <small>
-              À réaliser
-            </small>
-
           </div>
 
         </div>
 
+      </div>
 
-        <div className="nursing-stat-card">
+      {/* ======================================================
+          FILTRES
+          ====================================================== */}
 
-          <div className="nursing-stat-icon nursing-stat-green">
-            <CheckCircle2 size={23} />
-          </div>
+      <div className="nursing-toolbar">
 
-          <div>
+        <div className="nursing-search">
 
-            <span>
-              Soins réalisés
-            </span>
+          <Search size={18} />
 
-            <strong>
-              {stats.completedCares}
-            </strong>
+          <input
+            type="text"
+            placeholder="Rechercher un patient..."
+            value={searchTerm}
+            onChange={(event) =>
+              setSearchTerm(
+                event.target.value
+              )
+            }
+          />
 
-            <small>
-              Aujourd'hui
-            </small>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <div className="nursing-main-grid">
-
-
-        <section className="nursing-panel nursing-patients-panel">
-
-          <div className="nursing-panel-header">
-
-            <div>
-
-              <h2>
-                Patients à prendre en charge
-              </h2>
-
-              <p>
-                Patients actuellement sous surveillance
-              </p>
-
-            </div>
-
-
-            <div className="nursing-panel-header-icon">
-              <Users size={20} />
-            </div>
-
-          </div>
-
-
-          {/* Recherche */}
-
-          <div className="nursing-patient-toolbar">
-
-            <div className="nursing-search">
-
-              <Search size={18} />
-
-              <input
-                type="text"
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                placeholder="Rechercher un patient..."
-              />
-
-              {search && (
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSearch("")
-                  }
-                  className="nursing-clear-search"
-                >
-                  <X size={16} />
-                </button>
-
-              )}
-
-            </div>
-
-
-            <select
-              value={patientFilter}
-              onChange={(event) =>
-                setPatientFilter(event.target.value)
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() =>
+                setSearchTerm("")
               }
-              className="nursing-filter"
+              className="nursing-clear-search"
             >
+              <X size={16} />
+            </button>
+          )}
 
-              <option value="ALL">
-                Tous
-              </option>
+        </div>
 
-              <option value="urgent">
-                Urgents
-              </option>
+        <div className="nursing-filters">
 
-              <option value="surveillance">
-                Surveillance
-              </option>
+          <button
+            type="button"
+            className={
+              patientFilter === "all"
+                ? "nursing-filter active"
+                : "nursing-filter"
+            }
+            onClick={() =>
+              setPatientFilter("all")
+            }
+          >
+            Tous
+          </button>
 
-              <option value="stable">
-                Stables
-              </option>
+          <button
+            type="button"
+            className={
+              patientFilter === "urgent"
+                ? "nursing-filter active"
+                : "nursing-filter"
+            }
+            onClick={() =>
+              setPatientFilter("urgent")
+            }
+          >
+            Urgents
+          </button>
 
-            </select>
+          <button
+            type="button"
+            className={
+              patientFilter === "surveillance"
+                ? "nursing-filter active"
+                : "nursing-filter"
+            }
+            onClick={() =>
+              setPatientFilter("surveillance")
+            }
+          >
+            Surveillance
+          </button>
 
+          <button
+            type="button"
+            className={
+              patientFilter === "abnormal"
+                ? "nursing-filter active"
+                : "nursing-filter"
+            }
+            onClick={() =>
+              setPatientFilter("abnormal")
+            }
+          >
+            Anormaux
+          </button>
+
+        </div>
+
+      </div>
+
+      {/* ======================================================
+          LISTE PATIENTS
+          ====================================================== */}
+
+      <div className="nursing-section">
+
+        <div className="nursing-section-header">
+
+          <div>
+            <h2>
+              Patients
+            </h2>
+
+            <p>
+              {filteredPatients.length} patient
+              {filteredPatients.length > 1
+                ? "s"
+                : ""}{" "}
+              affiché
+              {filteredPatients.length > 1
+                ? "s"
+                : ""}
+            </p>
           </div>
 
+        </div>
 
-          {/* Liste patients */}
+        {patients.length === 0 ? (
+          <div className="nursing-empty-state">
 
+            <div className="nursing-empty-icon">
+              <Users size={34} />
+            </div>
+
+            <h3>
+              Aucun patient disponible
+            </h3>
+
+            <p>
+              Les patients enregistrés dans
+              le module Caisse apparaîtront
+              automatiquement ici.
+            </p>
+
+            <button
+              type="button"
+              onClick={refreshPatients}
+            >
+              <RefreshCw size={17} />
+              Actualiser
+            </button>
+
+          </div>
+        ) : filteredPatients.length === 0 ? (
+          <div className="nursing-empty-state">
+
+            <div className="nursing-empty-icon">
+              <Search size={34} />
+            </div>
+
+            <h3>
+              Aucun résultat
+            </h3>
+
+            <p>
+              Aucun patient ne correspond
+              aux critères sélectionnés.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm("");
+                setPatientFilter("all");
+              }}
+            >
+              Réinitialiser
+            </button>
+
+          </div>
+        ) : (
           <div className="nursing-patients-list">
 
-            {filteredPatients.length > 0 ? (
+            {filteredPatients.map(
+              (patient) => {
+                const abnormal =
+                  hasAbnormalVitals(
+                    patient
+                  );
 
-              filteredPatients.map((patient) => (
+                const temperatureAbnormal =
+                  isAbnormalTemperature(
+                    patient.temperature
+                  );
 
-                <div
-                  className="nursing-patient-row"
-                  key={patient.id}
-                >
+                const bloodPressureAbnormal =
+                  isAbnormalBloodPressure(
+                    patient.systolic,
+                    patient.diastolic
+                  );
 
-                  <div className="nursing-patient-main">
+                const pulseAbnormal =
+                  isAbnormalPulse(
+                    patient.pulse
+                  );
 
-                    <div className="nursing-patient-avatar">
-                      <UserRound size={19} />
-                    </div>
+                const oxygenAbnormal =
+                  isAbnormalOxygen(
+                    patient.oxygen
+                  );
 
+                const respiratoryAbnormal =
+                  isAbnormalRespiratoryRate(
+                    patient.respiratoryRate
+                  );
 
-                    <div className="nursing-patient-info">
+                const glucoseAbnormal =
+                  isAbnormalGlucose(
+                    patient.glucose
+                  );
 
-                      <div className="nursing-patient-name">
+                const fullName =
+                  getPatientFullName(
+                    patient
+                  );
 
-                        <strong>
-                          {patient.name}
-                        </strong>
+                return (
+                  <div
+                    className="nursing-patient-card"
+                    key={patient.id}
+                  >
 
-                        <span>
-                          {patient.age} ans · {patient.sex}
-                        </span>
+                    {/* PATIENT */}
+
+                    <div className="nursing-patient-main">
+
+                      <div className="nursing-patient-avatar">
+                        <UserRound size={23} />
+                      </div>
+
+                      <div className="nursing-patient-info">
+
+                        <div className="nursing-patient-name-row">
+
+                          <h3>
+                            {fullName}
+                          </h3>
+
+                          {abnormal && (
+                            <span className="nursing-status-abnormal">
+                              À surveiller
+                            </span>
+                          )}
+
+                        </div>
+
+                        <div className="nursing-patient-meta">
+
+                          <span>
+                            ID :{" "}
+                            {patient.id ||
+                              "--"}
+                          </span>
+
+                          {patient.age !==
+                            "" && (
+                            <span>
+                              {patient.age} ans
+                            </span>
+                          )}
+
+                          {patient.sexe && (
+                            <span>
+                              {patient.sexe}
+                            </span>
+                          )}
+
+                          {patient.service && (
+                            <span>
+                              {patient.service}
+                            </span>
+                          )}
+
+                          {patient.chambre && (
+                            <span>
+                              Chambre{" "}
+                              {patient.chambre}
+                            </span>
+                          )}
+
+                        </div>
 
                       </div>
 
+                    </div>
 
-                      <div className="nursing-patient-meta">
+                    {/* CONSTANTES */}
 
-                        <span>
-                          <BedDouble size={13} />
-                          {patient.room} · {patient.bed}
-                        </span>
+                    <div className="nursing-vitals-row">
 
-                        <span>
-                          <Stethoscope size={13} />
-                          {patient.diagnosis}
-                        </span>
+                      <div
+                        className={vitalClass(
+                          temperatureAbnormal
+                        )}
+                      >
+                        <Thermometer
+                          size={16}
+                        />
 
+                        <div>
+                          <span>
+                            Température
+                          </span>
+
+                          <strong>
+                            {displayValue(
+                              patient.temperature,
+                              " °C"
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div
+                        className={vitalClass(
+                          bloodPressureAbnormal
+                        )}
+                      >
+                        <Activity
+                          size={16}
+                        />
+
+                        <div>
+                          <span>
+                            Tension
+                          </span>
+
+                          <strong>
+                            {hasValue(
+                              patient.systolic
+                            ) ||
+                            hasValue(
+                              patient.diastolic
+                            )
+                              ? `${hasValue(
+                                  patient.systolic
+                                )
+                                  ? patient.systolic
+                                  : "--"}/${hasValue(
+                                      patient.diastolic
+                                    )
+                                    ? patient.diastolic
+                                    : "--"}`
+                              : "--"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div
+                        className={vitalClass(
+                          pulseAbnormal
+                        )}
+                      >
+                        <HeartPulse
+                          size={16}
+                        />
+
+                        <div>
+                          <span>
+                            Pouls
+                          </span>
+
+                          <strong>
+                            {displayValue(
+                              patient.pulse,
+                              " bpm"
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div
+                        className={vitalClass(
+                          oxygenAbnormal
+                        )}
+                      >
+                        <Droplets
+                          size={16}
+                        />
+
+                        <div>
+                          <span>
+                            SpO₂
+                          </span>
+
+                          <strong>
+                            {displayValue(
+                              patient.oxygen,
+                              " %"
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div
+                        className={vitalClass(
+                          respiratoryAbnormal
+                        )}
+                      >
+                        <Wind size={16} />
+
+                        <div>
+                          <span>
+                            Respiration
+                          </span>
+
+                          <strong>
+                            {displayValue(
+                              patient.respiratoryRate,
+                              " /min"
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div
+                        className={vitalClass(
+                          glucoseAbnormal
+                        )}
+                      >
+                        <Activity
+                          size={16}
+                        />
+
+                        <div>
+                          <span>
+                            Glycémie
+                          </span>
+
+                          <strong>
+                            {displayValue(
+                              patient.glucose,
+                              " g/L"
+                            )}
+                          </strong>
+                        </div>
                       </div>
 
                     </div>
 
-                  </div>
+                    {/* ACTIONS */}
 
+                    <div className="nursing-patient-actions">
 
-                  <div className="nursing-patient-vitals">
+                      <button
+                        type="button"
+                        className="nursing-secondary-button"
+                        onClick={() =>
+                          openDossierModal(
+                            patient
+                          )
+                        }
+                      >
+                        <Stethoscope
+                          size={16}
+                        />
 
+                        Dossier
+                      </button>
 
-                    <div className="nursing-vital-mini">
+                      <button
+                        type="button"
+                        className="nursing-primary-button"
+                        onClick={() =>
+                          openVitalsModal(
+                            patient
+                          )
+                        }
+                      >
+                        <Activity
+                          size={16}
+                        />
 
-                      <Thermometer size={14} />
-
-                      <span>
-                        {patient.temperature} °C
-                      </span>
-
-                    </div>
-
-
-                    <div className="nursing-vital-mini">
-
-                      <HeartPulse size={14} />
-
-                      <span>
-                        {patient.systolic}/{patient.diastolic}
-                      </span>
-
-                    </div>
-
-
-                    <div className="nursing-vital-mini">
-
-                      <Activity size={14} />
-
-                      <span>
-                        {patient.pulse} bpm
-                      </span>
-
-                    </div>
-
-
-                    <div className="nursing-vital-mini">
-
-                      <Droplets size={14} />
-
-                      <span>
-                        {patient.oxygen} %
-                      </span>
+                        Constantes
+                      </button>
 
                     </div>
 
                   </div>
-
-
-                  <div className="nursing-patient-status">
-
-                    <PriorityBadge
-                      priority={patient.priority}
-                    />
-
-                    <span className="nursing-last-care">
-                      Dernier soin : {patient.lastCare}
-                    </span>
-
-                  </div>
-
-
-                  <div className="nursing-patient-actions">
-
-                    <button
-                      type="button"
-                      className="nursing-small-action"
-                      onClick={() =>
-                        openVitalsModal(patient)
-                      }
-                      title="Saisir les constantes"
-                    >
-                      <Activity size={16} />
-                    </button>
-
-
-                    <button
-                      type="button"
-                      className="nursing-view-button"
-                      onClick={() =>
-                        setSelectedPatient(patient)
-                      }
-                    >
-                      Voir
-                      <ChevronRight size={15} />
-                    </button>
-
-                  </div>
-
-                </div>
-
-              ))
-
-            ) : (
-
-              <div className="nursing-empty">
-
-                <Search size={38} />
-
-                <strong>
-                  Aucun patient trouvé
-                </strong>
-
-                <span>
-                  Modifiez votre recherche ou votre filtre.
-                </span>
-
-              </div>
-
+                );
+              }
             )}
 
           </div>
+        )}
 
-        </section>
+      </div>
 
+      {/* ======================================================
+          MODALE CONSTANTES
+          ====================================================== */}
 
-        <section className="nursing-panel">
+      {showVitalsModal &&
+        selectedPatient && (
+          <div
+            className="nursing-modal-overlay"
+            onMouseDown={(event) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeVitalsModal();
+              }
+            }}
+          >
 
-          <div className="nursing-panel-header">
+            <div className="nursing-modal">
 
-            <div>
+              <div className="nursing-modal-header">
 
-              <h2>
-                Soins à réaliser
-              </h2>
+                <div>
 
-              <p>
-                Planning des soins infirmiers
-              </p>
+                  <h2>
+                    Constantes vitales
+                  </h2>
 
-            </div>
+                  <p>
+                    {
+                      getPatientFullName(
+                        selectedPatient
+                      )
+                    }
+                  </p>
 
-
-            <div className="nursing-panel-header-icon">
-              <ClipboardList size={20} />
-            </div>
-
-          </div>
-
-
-          <div className="nursing-care-list">
-
-            {cares.map((care) => (
-
-              <div
-                key={care.id}
-                className={
-                  `nursing-care-item ${
-                    care.done
-                      ? "nursing-care-done"
-                      : ""
-                  }`
-                }
-              >
+                </div>
 
                 <button
                   type="button"
-                  className="nursing-care-check"
-                  onClick={() =>
-                    toggleCare(care.id)
-                  }
-                  title={
-                    care.done
-                      ? "Marquer comme non réalisé"
-                      : "Marquer comme réalisé"
+                  className="nursing-modal-close"
+                  onClick={
+                    closeVitalsModal
                   }
                 >
-
-                  {care.done && (
-                    <Check size={15} />
-                  )}
-
+                  <X size={20} />
                 </button>
 
+              </div>
 
-                <div className="nursing-care-content">
+              <div className="nursing-modal-body">
 
-                  <div className="nursing-care-top">
+                <div className="nursing-patient-summary">
+
+                  <div className="nursing-summary-icon">
+                    <UserRound size={22} />
+                  </div>
+
+                  <div>
 
                     <strong>
-                      {care.care}
+                      {
+                        getPatientFullName(
+                          selectedPatient
+                        )
+                      }
                     </strong>
 
                     <span>
-                      {care.time}
+                      ID :{" "}
+                      {selectedPatient.id ||
+                        "--"}
                     </span>
-
-                  </div>
-
-
-                  <div className="nursing-care-bottom">
-
-                    <span>
-                      {care.patient}
-                    </span>
-
-                    <small>
-                      {care.type}
-                    </small>
 
                   </div>
 
                 </div>
 
-
-                <PriorityBadge
-                  priority={care.priority}
-                />
-
-              </div>
-
-            ))}
-
-          </div>
-
-
-          <button
-            type="button"
-            className="nursing-add-care-button"
-            onClick={() =>
-              alert(
-                "La création des soins sera connectée au backend Django."
-              )
-            }
-          >
-            <Plus size={17} />
-            Ajouter un soin
-          </button>
-
-        </section>
-
-
-      </div>
-
-
-      <div className="nursing-bottom-grid">
-
-
-        <section className="nursing-panel">
-
-          <div className="nursing-panel-header">
-
-            <div>
-
-              <h2>
-                Surveillance des constantes
-              </h2>
-
-              <p>
-                Dernières valeurs enregistrées
-              </p>
-
-            </div>
-
-
-            <Activity size={21} className="nursing-header-blue-icon" />
-
-          </div>
-
-
-          <div className="nursing-vitals-grid">
-
-
-            <div className="nursing-vital-card">
-
-              <div className="nursing-vital-card-icon nursing-vital-temp">
-                <Thermometer size={20} />
-              </div>
-
-              <div>
-
-                <span>
-                  Température moyenne
-                </span>
-
-                <strong>
-                  37,3 °C
-                </strong>
-
-                <small>
-                  Sur les patients affichés
-                </small>
-
-              </div>
-
-            </div>
-
-
-            <div className="nursing-vital-card">
-
-              <div className="nursing-vital-card-icon nursing-vital-heart">
-                <HeartPulse size={20} />
-              </div>
-
-              <div>
-
-                <span>
-                  Pression artérielle
-                </span>
-
-                <strong>
-                  129 / 82
-                </strong>
-
-                <small>
-                  Moyenne actuelle
-                </small>
-
-              </div>
-
-            </div>
-
-
-            <div className="nursing-vital-card">
-
-              <div className="nursing-vital-card-icon nursing-vital-oxygen">
-                <Droplets size={20} />
-              </div>
-
-              <div>
-
-                <span>
-                  Saturation O₂
-                </span>
-
-                <strong>
-                  97 %
-                </strong>
-
-                <small>
-                  Niveau moyen
-                </small>
-
-              </div>
-
-            </div>
-
-
-            <div className="nursing-vital-card">
-
-              <div className="nursing-vital-card-icon nursing-vital-weight">
-                <Weight size={20} />
-              </div>
-
-              <div>
-
-                <span>
-                  Poids
-                </span>
-
-                <strong>
-                  70 kg
-                </strong>
-
-                <small>
-                  Moyenne actuelle
-                </small>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <button
-            type="button"
-            className="nursing-primary-button nursing-full-button"
-            onClick={() => {
-
-              if (patients.length > 0) {
-                openVitalsModal(patients[0]);
-              }
-
-            }}
-          >
-            <Plus size={18} />
-            Saisir des constantes
-          </button>
-
-        </section>
-
-
-        <section className="nursing-panel">
-
-          <div className="nursing-panel-header">
-
-            <div>
-
-              <h2>
-                Transmissions infirmières
-              </h2>
-
-              <p>
-                Dernières observations et informations
-              </p>
-
-            </div>
-
-
-            <MessageSquareText
-              size={21}
-              className="nursing-header-purple-icon"
-            />
-
-          </div>
-
-
-          <div className="nursing-transmission-list">
-
-            {transmissions.map((item) => (
-
-              <div
-                className="nursing-transmission-item"
-                key={item.id}
-              >
-
-                <div className="nursing-transmission-line" />
-
-                <div className="nursing-transmission-content">
-
-                  <div className="nursing-transmission-top">
+                <div className="nursing-form-grid">
+
+                  <VitalInput
+                    label="Température"
+                    value={
+                      vitalsForm.temperature
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "temperature",
+                        value
+                      )
+                    }
+                    unit="°C"
+                    placeholder="36.5"
+                    abnormal={isAbnormalTemperature(
+                      vitalsForm.temperature
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Tension systolique"
+                    value={
+                      vitalsForm.systolic
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "systolic",
+                        value
+                      )
+                    }
+                    unit="mmHg"
+                    placeholder="120"
+                    abnormal={isAbnormalSystolic(
+                      vitalsForm.systolic
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Tension diastolique"
+                    value={
+                      vitalsForm.diastolic
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "diastolic",
+                        value
+                      )
+                    }
+                    unit="mmHg"
+                    placeholder="80"
+                    abnormal={isAbnormalDiastolic(
+                      vitalsForm.diastolic
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Pouls"
+                    value={
+                      vitalsForm.pulse
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "pulse",
+                        value
+                      )
+                    }
+                    unit="bpm"
+                    placeholder="72"
+                    abnormal={isAbnormalPulse(
+                      vitalsForm.pulse
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Saturation SpO₂"
+                    value={
+                      vitalsForm.oxygen
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "oxygen",
+                        value
+                      )
+                    }
+                    unit="%"
+                    placeholder="98"
+                    abnormal={isAbnormalOxygen(
+                      vitalsForm.oxygen
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Fréquence respiratoire"
+                    value={
+                      vitalsForm.respiratoryRate
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "respiratoryRate",
+                        value
+                      )
+                    }
+                    unit="/min"
+                    placeholder="16"
+                    abnormal={isAbnormalRespiratoryRate(
+                      vitalsForm.respiratoryRate
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Glycémie"
+                    value={
+                      vitalsForm.glucose
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "glucose",
+                        value
+                      )
+                    }
+                    unit="g/L"
+                    placeholder="0.90"
+                    abnormal={isAbnormalGlucose(
+                      vitalsForm.glucose
+                    )}
+                  />
+
+                  <VitalInput
+                    label="Poids"
+                    value={
+                      vitalsForm.weight
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "weight",
+                        value
+                      )
+                    }
+                    unit="kg"
+                    placeholder="70"
+                    abnormal={false}
+                  />
+
+                  <VitalInput
+                    label="Taille"
+                    value={
+                      vitalsForm.height
+                    }
+                    onChange={(value) =>
+                      updateVitalField(
+                        "height",
+                        value
+                      )
+                    }
+                    unit="cm"
+                    placeholder="175"
+                    abnormal={false}
+                  />
+
+                </div>
+
+                <div className="nursing-form-group nursing-notes-group">
+
+                  <label>
+                    Observations infirmières
+                  </label>
+
+                  <textarea
+                    value={
+                      vitalsForm.nursingNotes
+                    }
+                    onChange={(event) =>
+                      updateVitalField(
+                        "nursingNotes",
+                        event.target.value
+                      )
+                    }
+                    rows={4}
+                    placeholder="Ajouter une observation, une remarque ou une consigne..."
+                  />
+
+                </div>
+
+                <div className="nursing-normal-range">
+
+                  <ShieldCheck size={18} />
+
+                  <div>
 
                     <strong>
-                      {item.patient}
+                      Plages de référence
                     </strong>
 
                     <span>
-                      {item.time}
+                      Température : 36,5–37,5 °C
+                      · Tension : 90–139 / 60–89
+                      mmHg · Pouls : 60–100 bpm ·
+                      SpO₂ : ≥ 95 % · Respiration :
+                      12–20/min · Glycémie :
+                      0,70–1,10 g/L
                     </span>
 
                   </div>
 
-
-                  <p>
-                    {item.text}
-                  </p>
-
-
-                  <small>
-                    {item.author}
-                  </small>
-
                 </div>
 
               </div>
 
-            ))}
-
-          </div>
-
-
-          <button
-            type="button"
-            className="nursing-secondary-button nursing-full-button"
-            onClick={() =>
-              openTransmissionModal()
-            }
-          >
-            <Plus size={17} />
-            Nouvelle transmission
-          </button>
-
-        </section>
-
-
-      </div>
-
-
-      {showVitalsModal && selectedPatient && (
-
-        <div
-          className="nursing-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget
-            ) {
-              setShowVitalsModal(false);
-            }
-
-          }}
-        >
-
-          <div className="nursing-modal">
-
-
-            <div className="nursing-modal-header">
-
-              <div>
-
-                <h2>
-                  Constantes vitales
-                </h2>
-
-                <p>
-                  {selectedPatient.name} · {selectedPatient.id}
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="nursing-modal-close"
-                onClick={() =>
-                  setShowVitalsModal(false)
-                }
-              >
-                <X size={20} />
-              </button>
-
-            </div>
-
-
-            <form
-              className="nursing-form"
-              onSubmit={handleSaveVitals}
-            >
-
-
-              <div className="nursing-form-grid">
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Température (°C)
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Thermometer size={17} />
-
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={vitalsForm.temperature}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          temperature:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Pouls (bpm)
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <HeartPulse size={17} />
-
-                    <input
-                      type="number"
-                      value={vitalsForm.pulse}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          pulse:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Tension systolique
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Activity size={17} />
-
-                    <input
-                      type="number"
-                      value={vitalsForm.systolic}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          systolic:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Tension diastolique
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Activity size={17} />
-
-                    <input
-                      type="number"
-                      value={vitalsForm.diastolic}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          diastolic:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Saturation O₂ (%)
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Droplets size={17} />
-
-                    <input
-                      type="number"
-                      value={vitalsForm.oxygen}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          oxygen:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Poids (kg)
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Weight size={17} />
-
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={vitalsForm.weight}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          weight:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-                <div className="nursing-form-group">
-
-                  <label>
-                    Glycémie (g/L)
-                  </label>
-
-                  <div className="nursing-input-icon">
-
-                    <Droplets size={17} />
-
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={vitalsForm.glucose}
-                      onChange={(event) =>
-                        setVitalsForm((current) => ({
-                          ...current,
-                          glucose:
-                            event.target.value,
-                        }))
-                      }
-                      required
-                    />
-
-                  </div>
-
-                </div>
-
-
-              </div>
-
-
-              <div className="nursing-modal-actions">
+              <div className="nursing-modal-footer">
 
                 <button
                   type="button"
                   className="nursing-secondary-button"
-                  onClick={() =>
-                    setShowVitalsModal(false)
+                  onClick={
+                    closeVitalsModal
                   }
                 >
                   Annuler
                 </button>
 
-
                 <button
-                  type="submit"
+                  type="button"
                   className="nursing-primary-button"
+                  onClick={saveVitals}
                 >
-                  <CheckCircle2 size={17} />
+                  <CheckCircle2
+                    size={17}
+                  />
+
                   Enregistrer
                 </button>
 
               </div>
 
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      {showTransmissionModal && (
-
-        <div
-          className="nursing-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget
-            ) {
-              setShowTransmissionModal(false);
-            }
-
-          }}
-        >
-
-          <div className="nursing-modal">
-
-
-            <div className="nursing-modal-header">
-
-              <div>
-
-                <h2>
-                  Nouvelle transmission
-                </h2>
-
-                <p>
-                  Ajouter une observation infirmière
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="nursing-modal-close"
-                onClick={() =>
-                  setShowTransmissionModal(false)
-                }
-              >
-                <X size={20} />
-              </button>
-
             </div>
 
+          </div>
+        )}
 
-            <form
-              className="nursing-form"
-              onSubmit={handleSaveTransmission}
-            >
+      {/* ======================================================
+          MODALE DOSSIER PATIENT
+          ====================================================== */}
 
-              <div className="nursing-form-group">
+      {showDossierModal &&
+        selectedPatient && (
+          <div
+            className="nursing-modal-overlay"
+            onMouseDown={(event) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeDossierModal();
+              }
+            }}
+          >
 
-                <label>
-                  Patient
-                </label>
+            <div className="nursing-modal nursing-dossier-modal">
 
-                <select
-                  value={selectedPatient?.id || ""}
-                  onChange={(event) => {
+              <div className="nursing-modal-header">
 
-                    const patient =
-                      patients.find(
-                        (item) =>
-                          item.id === event.target.value
-                      );
+                <div>
 
-                    setSelectedPatient(patient || null);
+                  <h2>
+                    Dossier patient
+                  </h2>
 
-                  }}
-                >
+                  <p>
+                    Informations et constantes
+                  </p>
 
-                  <option value="">
-                    Sélectionner un patient
-                  </option>
+                </div>
 
-                  {patients.map((patient) => (
-
-                    <option
-                      key={patient.id}
-                      value={patient.id}
-                    >
-                      {patient.name} — {patient.id}
-                    </option>
-
-                  ))}
-
-                </select>
-
-              </div>
-
-
-              <div className="nursing-form-group">
-
-                <label>
-                  Observation / transmission
-                </label>
-
-                <textarea
-                  rows="6"
-                  value={transmissionForm.text}
-                  onChange={(event) =>
-                    setTransmissionForm({
-                      text: event.target.value,
-                    })
+                <button
+                  type="button"
+                  className="nursing-modal-close"
+                  onClick={
+                    closeDossierModal
                   }
-                  placeholder="Saisir l'observation, l'évolution du patient ou les informations importantes..."
-                  required
-                />
+                >
+                  <X size={20} />
+                </button>
 
               </div>
 
+              <div className="nursing-modal-body">
 
-              <div className="nursing-modal-actions">
+                {/* IDENTITÉ */}
+
+                <div className="nursing-detail-card">
+
+                  <div className="nursing-detail-card-header">
+
+                    <div className="nursing-detail-icon">
+                      <UserRound size={19} />
+                    </div>
+
+                    <div>
+                      <h3>
+                        Identité
+                      </h3>
+
+                      <span>
+                        Informations du patient
+                      </span>
+                    </div>
+
+                  </div>
+
+                  <div className="nursing-detail-grid">
+
+                    <div>
+                      <span>
+                        Nom complet
+                      </span>
+
+                      <strong>
+                        {
+                          getPatientFullName(
+                            selectedPatient
+                          )
+                        }
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Identifiant
+                      </span>
+
+                      <strong>
+                        {selectedPatient.id ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Téléphone
+                      </span>
+
+                      <strong>
+                        {selectedPatient.telephone ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Téléphone parent
+                      </span>
+
+                      <strong>
+                        {selectedPatient.telephoneParents ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Âge
+                      </span>
+
+                      <strong>
+                        {selectedPatient.age !==
+                        ""
+                          ? `${selectedPatient.age} ans`
+                          : "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Sexe
+                      </span>
+
+                      <strong>
+                        {selectedPatient.sexe ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Service
+                      </span>
+
+                      <strong>
+                        {selectedPatient.service ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Chambre
+                      </span>
+
+                      <strong>
+                        {selectedPatient.chambre ||
+                          "--"}
+                      </strong>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* CONSTANTES */}
+
+                <div className="nursing-detail-card">
+
+                  <div className="nursing-detail-card-header">
+
+                    <div className="nursing-detail-icon">
+                      <HeartPulse size={19} />
+                    </div>
+
+                    <div>
+                      <h3>
+                        Dernières constantes
+                      </h3>
+
+                      <span>
+                        Surveillance infirmière
+                      </span>
+                    </div>
+
+                  </div>
+
+                  <div className="nursing-detail-grid nursing-vitals-detail-grid">
+
+                    <div
+                      className={
+                        isAbnormalTemperature(
+                          selectedPatient.temperature
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        Température
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalTemperature(
+                            selectedPatient.temperature
+                          )
+                        )}
+                      >
+                        {displayValue(
+                          selectedPatient.temperature,
+                          " °C"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={
+                        isAbnormalBloodPressure(
+                          selectedPatient.systolic,
+                          selectedPatient.diastolic
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        Tension
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalBloodPressure(
+                            selectedPatient.systolic,
+                            selectedPatient.diastolic
+                          )
+                        )}
+                      >
+                        {hasValue(
+                          selectedPatient.systolic
+                        ) ||
+                        hasValue(
+                          selectedPatient.diastolic
+                        )
+                          ? `${
+                              hasValue(
+                                selectedPatient.systolic
+                              )
+                                ? selectedPatient.systolic
+                                : "--"
+                            }/${
+                              hasValue(
+                                selectedPatient.diastolic
+                              )
+                                ? selectedPatient.diastolic
+                                : "--"
+                            } mmHg`
+                          : "--"}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={
+                        isAbnormalPulse(
+                          selectedPatient.pulse
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        Pouls
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalPulse(
+                            selectedPatient.pulse
+                          )
+                        )}
+                      >
+                        {displayValue(
+                          selectedPatient.pulse,
+                          " bpm"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={
+                        isAbnormalOxygen(
+                          selectedPatient.oxygen
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        SpO₂
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalOxygen(
+                            selectedPatient.oxygen
+                          )
+                        )}
+                      >
+                        {displayValue(
+                          selectedPatient.oxygen,
+                          " %"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={
+                        isAbnormalRespiratoryRate(
+                          selectedPatient.respiratoryRate
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        Respiration
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalRespiratoryRate(
+                            selectedPatient.respiratoryRate
+                          )
+                        )}
+                      >
+                        {displayValue(
+                          selectedPatient.respiratoryRate,
+                          " /min"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={
+                        isAbnormalGlucose(
+                          selectedPatient.glucose
+                        )
+                          ? "nursing-detail-abnormal"
+                          : ""
+                      }
+                    >
+                      <span>
+                        Glycémie
+                      </span>
+
+                      <strong
+                        className={abnormalValueClass(
+                          isAbnormalGlucose(
+                            selectedPatient.glucose
+                          )
+                        )}
+                      >
+                        {displayValue(
+                          selectedPatient.glucose,
+                          " g/L"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Poids
+                      </span>
+
+                      <strong>
+                        {displayValue(
+                          selectedPatient.weight,
+                          " kg"
+                        )}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Taille
+                      </span>
+
+                      <strong>
+                        {displayValue(
+                          selectedPatient.height,
+                          " cm"
+                        )}
+                      </strong>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* OBSERVATIONS */}
+
+                <div className="nursing-detail-card">
+
+                  <div className="nursing-detail-card-header">
+
+                    <div className="nursing-detail-icon">
+                      <Stethoscope size={19} />
+                    </div>
+
+                    <div>
+                      <h3>
+                        Observations
+                      </h3>
+
+                      <span>
+                        Notes infirmières
+                      </span>
+                    </div>
+
+                  </div>
+
+                  <div className="nursing-notes-display">
+
+                    {selectedPatient.nursingNotes ? (
+                      <p>
+                        {
+                          selectedPatient.nursingNotes
+                        }
+                      </p>
+                    ) : (
+                      <span>
+                        Aucune observation
+                        enregistrée.
+                      </span>
+                    )}
+
+                  </div>
+
+                </div>
+
+                {/* DERNIÈRE MISE À JOUR */}
+
+                <div className="nursing-last-update-card">
+
+                  <Clock3 size={17} />
+
+                  <span>
+                    Dernière mise à jour :{" "}
+                    <strong>
+                      {formatDateTime(
+                        selectedPatient.lastVitalUpdate
+                      )}
+                    </strong>
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div className="nursing-modal-footer">
 
                 <button
                   type="button"
                   className="nursing-secondary-button"
-                  onClick={() =>
-                    setShowTransmissionModal(false)
+                  onClick={
+                    closeDossierModal
                   }
                 >
-                  Annuler
+                  Fermer
                 </button>
-
 
                 <button
-                  type="submit"
+                  type="button"
                   className="nursing-primary-button"
+                  onClick={() => {
+                    closeDossierModal();
+                    openVitalsModal(
+                      selectedPatient
+                    );
+                  }}
                 >
-                  <MessageSquareText size={17} />
-                  Enregistrer la transmission
+                  <Activity size={17} />
+
+                  Modifier les constantes
                 </button>
 
               </div>
 
-            </form>
+            </div>
 
           </div>
+        )}
 
-        </div>
+      {/* ======================================================
+          FOOTER
+          ====================================================== */}
 
-      )}
-
-
-      {selectedPatient &&
-       !showVitalsModal &&
-       !showTransmissionModal && (
-
-        <div
-          className="nursing-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget
-            ) {
-              setSelectedPatient(null);
-            }
-
-          }}
-        >
-
-          <div className="nursing-modal nursing-patient-detail-modal">
-
-
-            <div className="nursing-modal-header">
-
-              <div>
-
-                <h2>
-                  Dossier infirmier
-                </h2>
-
-                <p>
-                  {selectedPatient.name}
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="nursing-modal-close"
-                onClick={() =>
-                  setSelectedPatient(null)
-                }
-              >
-                <X size={20} />
-              </button>
-
-            </div>
-
-
-            <div className="nursing-detail-summary">
-
-              <div className="nursing-detail-avatar">
-                <UserRound size={28} />
-              </div>
-
-              <div>
-
-                <strong>
-                  {selectedPatient.name}
-                </strong>
-
-                <span>
-                  {selectedPatient.age} ans · {selectedPatient.sex} · {selectedPatient.id}
-                </span>
-
-                <span>
-                  {selectedPatient.room} · {selectedPatient.bed}
-                </span>
-
-              </div>
-
-              <PriorityBadge
-                priority={selectedPatient.priority}
-              />
-
-            </div>
-
-
-            <div className="nursing-detail-grid">
-
-
-              <div className="nursing-detail-card">
-
-                <Thermometer size={19} />
-
-                <span>
-                  Température
-                </span>
-
-                <strong>
-                  {selectedPatient.temperature} °C
-                </strong>
-
-              </div>
-
-
-              <div className="nursing-detail-card">
-
-                <HeartPulse size={19} />
-
-                <span>
-                  Tension
-                </span>
-
-                <strong>
-                  {selectedPatient.systolic}/
-                  {selectedPatient.diastolic}
-                </strong>
-
-              </div>
-
-
-              <div className="nursing-detail-card">
-
-                <Activity size={19} />
-
-                <span>
-                  Pouls
-                </span>
-
-                <strong>
-                  {selectedPatient.pulse} bpm
-                </strong>
-
-              </div>
-
-
-              <div className="nursing-detail-card">
-
-                <Droplets size={19} />
-
-                <span>
-                  Saturation
-                </span>
-
-                <strong>
-                  {selectedPatient.oxygen} %
-                </strong>
-
-              </div>
-
-
-              <div className="nursing-detail-card">
-
-                <Weight size={19} />
-
-                <span>
-                  Poids
-                </span>
-
-                <strong>
-                  {selectedPatient.weight} kg
-                </strong>
-
-              </div>
-
-
-              <div className="nursing-detail-card">
-
-                <Droplets size={19} />
-
-                <span>
-                  Glycémie
-                </span>
-
-                <strong>
-                  {selectedPatient.glucose} g/L
-                </strong>
-
-              </div>
-
-
-            </div>
-
-
-            <div className="nursing-detail-section">
-
-              <span>
-                Diagnostic
-              </span>
-
-              <strong>
-                {selectedPatient.diagnosis}
-              </strong>
-
-            </div>
-
-
-            <div className="nursing-detail-section">
-
-              <span>
-                Traitement en cours
-              </span>
-
-              <strong>
-                {selectedPatient.treatment}
-              </strong>
-
-            </div>
-
-
-            <div className="nursing-modal-actions">
-
-              <button
-                type="button"
-                className="nursing-secondary-button"
-                onClick={() =>
-                  openTransmissionModal(
-                    selectedPatient
-                  )
-                }
-              >
-                <MessageSquareText size={17} />
-                Transmission
-              </button>
-
-
-              <button
-                type="button"
-                className="nursing-primary-button"
-                onClick={() =>
-                  openVitalsModal(
-                    selectedPatient
-                  )
-                }
-              >
-                <Activity size={17} />
-                Saisir constantes
-              </button>
-
-            </div>
-
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      <footer className="nursing-footer">
+      <div className="nursing-footer">
 
         <div>
-
           <ShieldCheck size={16} />
 
           <span>
-            Les données affichées sont protégées par le système
-            d'accès de MA SANTÉ.
+            Surveillance infirmière
           </span>
-
         </div>
 
         <span>
-          Dernière actualisation : maintenant
+          MA SANTÉ
         </span>
 
-      </footer>
-
+      </div>
 
     </div>
-
   );
-
 }
-

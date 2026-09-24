@@ -82,24 +82,6 @@
   font-size: 10px;
 }
 
-/*
- * ==========================================================
- * IMPORTANT
- * ==========================================================
- *
- * Le menu de navigation a été supprimé.
- *
- * Il n'existe volontairement plus de :
- *
- * .laboratory-navigation
- * .laboratory-nav-item
- * .laboratory-nav-item span
- * .laboratory-nav-item:hover
- * .laboratory-nav-item.active
- *
- * ==========================================================
- */
-
 /* =========================================================
    FOOTER SIDEBAR
    ========================================================= */
@@ -128,9 +110,11 @@
    ========================================================= */
 
 .laboratory-main {
-  width: calc(100% - 245px);
+  width: calc(100% - 242px);
   margin-left: 0px;
   min-height: 100vh;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -138,8 +122,8 @@
    ========================================================= */
 
 .laboratory-header {
-  height: 88px;
-  padding: 0 30px;
+  min-height: 88px;
+  padding: 0 20px;
 
   background: white;
   border-bottom: 1px solid var(--border);
@@ -147,18 +131,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  box-sizing: border-box;
 }
 
 .laboratory-header h1 {
   margin: 0 0 6px;
+
   color: var(--primary-dark);
-  font-size: 25px;
+
+  font-size: 27px;
+  font-weight: 800;
 }
 
 .laboratory-header p {
   margin: 0;
-  color: var(--muted);
-  font-size: 13px;
+
+  color: #607684;
+
+  font-size: 14px;
 }
 
 .laboratory-user {
@@ -180,7 +171,7 @@
   background: var(--primary-soft);
   color: #0878c6;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -191,13 +182,13 @@
 
 .laboratory-user strong {
   color: #183e58;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .laboratory-user span {
   margin-top: 3px;
-  color: #7c909e;
-  font-size: 10px;
+  color: #657b89;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -205,14 +196,18 @@
    ========================================================= */
 
 .laboratory-statistics {
-  padding: 24px 30px 10px;
+  width: 100%;
+  padding: 24px 10px 10px 12px;
 
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
+
+  box-sizing: border-box;
 }
 
 .laboratory-stat-card {
+  min-height: 82px;
   padding: 17px;
 
   background: white;
@@ -224,6 +219,8 @@
   gap: 13px;
 
   box-shadow: 0 2px 8px rgba(20, 70, 100, 0.04);
+
+  box-sizing: border-box;
 }
 
 .lab-stat-icon {
@@ -268,19 +265,23 @@
 }
 
 .laboratory-stat-card span {
-  color: var(--muted);
-  font-size: 10px;
+  color: #607684;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .laboratory-stat-card strong {
-  margin: 3px 0;
+  margin: 4px 0;
+
   color: #153e59;
-  font-size: 23px;
+
+  font-size: 24px;
+  font-weight: 800;
 }
 
 .laboratory-stat-card small {
-  color: #899aa5;
-  font-size: 9px;
+  color: #718693;
+  font-size: 10px;
 }
 
 /* =========================================================
@@ -288,67 +289,77 @@
    ========================================================= */
 
 .laboratory-toolbar {
-  padding: 18px 30px;
+  width: 100%;
+  padding: 20px 10px 20px 12px;
 
   display: flex;
   align-items: center;
   gap: 11px;
+
+  box-sizing: border-box;
 }
 
 .laboratory-search {
   flex: 1;
-  max-width: 430px;
-  height: 42px;
+  max-width: 500px;
+  height: 46px;
 
-  padding: 0 13px;
+  padding: 0 14px;
 
   background: white;
-  border: 1px solid #cbdde7;
+  border: 1px solid #c5d9e5;
   border-radius: 7px;
 
   display: flex;
   align-items: center;
+
+  box-sizing: border-box;
 }
 
 .laboratory-search span {
-  margin-right: 9px;
-  font-size: 14px;
+  margin-right: 10px;
+  font-size: 17px;
 }
 
 .laboratory-search input {
   width: 100%;
+
   border: 0;
   outline: 0;
 
-  color: #264b63;
-  font-size: 12px;
+  color: #23485f;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .laboratory-search input::placeholder {
-  color: #9aaab4;
+  color: #718692;
 }
 
 .laboratory-filter {
-  height: 42px;
-  min-width: 170px;
+  height: 46px;
+  min-width: 190px;
 
-  padding: 0 11px;
+  padding: 0 12px;
 
   background: white;
-  border: 1px solid #cbdde7;
+  border: 1px solid #c5d9e5;
   border-radius: 7px;
 
   color: #38586c;
-  font-size: 11px;
+
+  font-size: 13px;
+  font-weight: 600;
 
   outline: none;
 }
 
 .new-analysis-button {
-  height: 42px;
+  height: 46px;
   margin-left: auto;
 
-  padding: 0 17px;
+  padding: 0 18px;
 
   border: 0;
   border-radius: 7px;
@@ -358,71 +369,110 @@
 
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
 
   cursor: pointer;
 
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
+
+  transition: all 0.2s ease;
 }
 
 .new-analysis-button:hover {
   background: #0668ae;
+  transform: translateY(-1px);
 }
 
 .new-analysis-button span {
-  font-size: 19px;
+  font-size: 21px;
 }
 
 /* =========================================================
-   GRID
+   CONTENU - PLEINE LARGEUR
    ========================================================= */
 
 .laboratory-content-grid {
-  padding: 0 30px;
+  width: 100%;
 
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  gap: 17px;
+  padding: 0 10px 30px 12px;
+  margin: 0;
+
+  display: block;
+
+  box-sizing: border-box;
+}
+
+.laboratory-content-grid-full {
+  width: 100%;
+  max-width: none;
 }
 
 /* =========================================================
-   TABLE CARD
+   TABLEAU - PLEINE LARGEUR
    ========================================================= */
 
 .laboratory-table-card {
+  width: 100%;
+  max-width: none;
+
+  margin: 0;
+
   background: white;
-  border: 3px solid var(--border);
+
+  border: 1px solid var(--border);
   border-radius: 9px;
+
   overflow: hidden;
 
   box-shadow: 0 2px 8px rgba(20, 70, 100, 0.04);
+
+  box-sizing: border-box;
 }
 
+.laboratory-table-card-full {
+  width: 100%;
+  max-width: none;
+}
+
+/* =========================================================
+   EN-TÊTE DU TABLEAU
+   ========================================================= */
+
 .laboratory-card-header {
-  padding: 17px 19px;
+  width: 100%;
+  min-height: 72px;
+
+  padding: 17px 22px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   border-bottom: 1px solid var(--border);
+
+  box-sizing: border-box;
 }
 
 .laboratory-card-header h2 {
-  margin: 0 0 4px;
+  margin: 0 0 5px;
+
   color: #17486a;
-  font-size: 16px;
+
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .laboratory-card-header p {
   margin: 0;
-  color: #8598a5;
-  font-size: 10px;
+
+  color: #607684;
+
+  font-size: 12px;
 }
 
 .lab-export-button {
-  padding: 8px 12px;
+  padding: 9px 14px;
 
   border: 1px solid #bfd4e1;
   border-radius: 6px;
@@ -431,63 +481,122 @@
   color: #316078;
 
   cursor: pointer;
-  font-size: 10px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  transition: all 0.2s ease;
 }
 
-.laboratory-table-container {
-  overflow-x: auto;
+.lab-export-button:hover {
+  background: var(--primary-soft);
+  border-color: #0878c9;
+  color: #0878c9;
 }
+
+/* =========================================================
+   CONTENEUR TABLEAU
+   ========================================================= */
+
+.laboratory-table-container {
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   TABLEAU
+   ========================================================= */
 
 .laboratory-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1000px;
+
   border-collapse: collapse;
+
+  table-layout: auto;
+
+  box-sizing: border-box;
 }
 
 .laboratory-table th {
-  padding: 12px;
+  padding: 15px 14px;
 
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  background: #f3f7fa;
 
-  color: var(--muted);
+  border-bottom: 1px solid #d8e4eb;
+
+  color: #38596d;
 
   text-align: left;
-  font-size: 9px;
+
+  font-size: 11px;
+  font-weight: 800;
+
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
 }
 
 .laboratory-table td {
-  padding: 11px 12px;
+  padding: 15px 14px;
 
-  border-bottom: 1px solid var(--primary-soft);
+  border-bottom: 1px solid #e1ebf0;
 
-  color: #3d5969;
+  color: #294c61;
 
-  font-size: 10px;
+  font-size: 13px;
+  font-weight: 500;
+
   vertical-align: middle;
 }
 
-.laboratory-table tbody tr:hover {
-  background: var(--surface);
+.laboratory-table tbody tr {
+  transition: background 0.15s ease;
 }
+
+.laboratory-table tbody tr:hover {
+  background: #f7fbfd;
+}
+
+.laboratory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================================
+   IDENTIFIANT ANALYSE
+   ========================================================= */
 
 .lab-analysis-id {
   color: #0879c8;
-  font-size: 10px;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  white-space: nowrap;
 }
 
+/* =========================================================
+   PATIENT
+   ========================================================= */
+
 .lab-patient {
-  min-width: 140px;
+  min-width: 190px;
 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .lab-patient-avatar {
-  width: 29px;
-  height: 29px;
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
 
   border-radius: 50%;
 
@@ -498,53 +607,85 @@
   align-items: center;
   justify-content: center;
 
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
+}
+
+.lab-patient-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .lab-patient strong {
   color: #23485f;
-  font-size: 10px;
+
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .analysis-name {
   color: #1f4f6b;
+
+  font-size: 13px;
   font-weight: 700;
+
+  line-height: 1.4;
 }
+
+/* =========================================================
+   DATES
+   ========================================================= */
 
 .analysis-date {
   display: block;
+
   color: #38576a;
-  font-size: 9px;
+
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .analysis-time {
   display: block;
-  margin-top: 2px;
-  color: #8a9aa4;
-  font-size: 8px;
+
+  margin-top: 3px;
+
+  color: #718692;
+
+  font-size: 11px;
 }
+
+/* =========================================================
+   PRIORITÉ / STATUT
+   ========================================================= */
 
 .lab-priority,
 .lab-status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 5px 8px;
+  min-height: 28px;
+
+  padding: 5px 10px;
 
   border-radius: 20px;
 
-  font-size: 8px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
+
+  white-space: nowrap;
 }
 
 .lab-priority-normal {
   background: var(--primary-soft);
-  color: #607684;
+  color: #526b7a;
 }
 
 .lab-priority-urgent {
   background: var(--warning-soft);
-  color: #d84236;
+  color: #c73e31;
 }
 
 .lab-status-completed {
@@ -559,168 +700,19 @@
 
 .lab-status-pending {
   background: var(--warning-soft);
-  color: #d6810d;
-}
-
-.lab-action-button {
-  padding: 6px 9px;
-
-  border: 1px solid #c9dce7;
-  border-radius: 5px;
-
-  background: white;
-  color: #0876bd;
-
-  cursor: pointer;
-
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.lab-action-button:hover {
-  background: var(--primary-soft);
-}
-
-.lab-empty {
-  padding: 40px !important;
-  text-align: center;
-  color: #8497a4 !important;
+  color: #c8750d;
 }
 
 /* =========================================================
-   RÉSULTATS RÉCENTS
+   ACTIONS TABLEAU
    ========================================================= */
 
-.recent-results-card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  overflow: hidden;
+.lab-action-button {
+  min-height: 34px;
 
-  box-shadow: 0 2px 8px rgba(20, 70, 100, 0.04);
-}
+  padding: 7px 11px;
 
-.recent-results-header {
-  padding: 17px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  border-bottom: 1px solid var(--border);
-}
-
-.recent-results-header h2 {
-  margin: 0 0 4px;
-  color: #17486a;
-  font-size: 15px;
-}
-
-.recent-results-header p {
-  margin: 0;
-  color: #8999a5;
-  font-size: 9px;
-}
-
-.result-count {
-  min-width: 25px;
-  height: 25px;
-
-  border-radius: 50%;
-
-  background: var(--primary-soft);
-  color: #0878c6;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.recent-result-list {
-  padding: 6px 15px;
-}
-
-.recent-result-item {
-  padding: 13px 2px;
-
-  display: flex;
-  gap: 9px;
-
-  border-bottom: 1px solid var(--primary-soft);
-}
-
-.recent-result-item:last-child {
-  border-bottom: 0;
-}
-
-.recent-result-icon {
-  width: 29px;
-  height: 29px;
-  flex-shrink: 0;
-
-  border-radius: 7px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.recent-result-icon.green {
-  background: var(--green-soft);
-  color: var(--green);
-}
-
-.recent-result-icon.orange {
-  background: var(--warning-soft);
-  color: #dc8511;
-}
-
-.recent-result-icon.blue {
-  background: var(--primary-soft);
-  color: #0877c1;
-}
-
-.recent-result-info strong,
-.recent-result-info span,
-.recent-result-info small {
-  display: block;
-}
-
-.recent-result-info strong {
-  color: #254a61;
-  font-size: 10px;
-  line-height: 1.4;
-}
-
-.recent-result-info span {
-  margin-top: 3px;
-  color: var(--green);
-  font-size: 9px;
-}
-
-.recent-result-info .result-warning {
-  color: #dd8110;
-}
-
-.recent-result-info small {
-  margin-top: 3px;
-  color: #93a2ab;
-  font-size: 8px;
-}
-
-.view-all-results {
-  width: calc(100% - 30px);
-
-  margin: 9px 15px 15px;
-  padding: 9px;
-
-  border: 1px solid #cbdde7;
+  border: 1px solid #c9dce7;
   border-radius: 6px;
 
   background: white;
@@ -728,8 +720,76 @@
 
   cursor: pointer;
 
-  font-size: 9px;
+  font-size: 11px;
+  font-weight: 800;
+
+  transition: all 0.2s ease;
+}
+
+.lab-action-button:hover {
+  background: var(--primary-soft);
+  border-color: #0878c9;
+}
+
+/* =========================================================
+   ACTIONS PATIENT
+   ========================================================= */
+
+.lab-patient-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.lab-request-button,
+.lab-print-button {
+  border: none;
+
+  border-radius: 7px;
+
+  padding: 7px 10px;
+
+  font-size: 11px;
   font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.lab-request-button {
+  background: #eaf4ff;
+  color: #1677c8;
+}
+
+.lab-request-button:hover {
+  background: #1677c8;
+  color: white;
+}
+
+.lab-print-button {
+  background: #edf8f1;
+  color: #16834a;
+}
+
+.lab-print-button:hover {
+  background: #16834a;
+  color: white;
+}
+
+/* =========================================================
+   TABLEAU VIDE
+   ========================================================= */
+
+.lab-empty {
+  padding: 60px 30px !important;
+
+  text-align: center;
+
+  color: #657b89 !important;
+
+  font-size: 14px !important;
+  font-weight: 600;
 }
 
 /* =========================================================
@@ -737,14 +797,20 @@
    ========================================================= */
 
 .laboratory-quick-actions {
-  padding: 18px 30px 30px;
+  width: 100%;
+
+  padding: 18px 10px 30px 12px;
 
   display: flex;
   gap: 10px;
+
+  box-sizing: border-box;
 }
 
 .laboratory-quick-actions button {
-  padding: 10px 15px;
+  min-height: 42px;
+
+  padding: 10px 16px;
 
   border: 0;
   border-radius: 6px;
@@ -754,12 +820,18 @@
 
   cursor: pointer;
 
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
+
+  transition: all 0.2s ease;
+}
+
+.laboratory-quick-actions button:hover {
+  transform: translateY(-1px);
 }
 
 .laboratory-quick-actions button span {
-  margin-right: 5px;
+  margin-right: 6px;
 }
 
 .laboratory-quick-actions button:nth-child(2) {
@@ -771,79 +843,127 @@
 }
 
 /* =========================================================
-   MODAL - FORMULAIRE AGRANDI
+   FORMULAIRE - PLEIN ÉCRAN
    ========================================================= */
 
-/*
- * Le formulaire est centré dans la zone principale.
- *
- * La sidebar fait 242px de largeur.
- * On réserve donc 242px à gauche afin que le formulaire
- * ne soit pas centré sous la sidebar.
- */
-
-.laboratory-modal-overlay {
+.laboratory-fullscreen-overlay {
   position: fixed;
+
   inset: 0;
 
-  z-index: 200;
+  z-index: 9999;
 
-  padding-left: 242px;
-  padding-right: 25px;
-  padding-top: 25px;
-  padding-bottom: 25px;
+  width: 100vw;
+  height: 100vh;
 
-  background: rgba(4, 29, 48, 0.58);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-sizing: border-box;
-}
-
-
-/*
- * =========================================================
- * GRANDE FENÊTRE DU FORMULAIRE
- * =========================================================
- *
- * Ancienne largeur :
- * 600px
- *
- * Nouvelle largeur :
- * 850px
- */
-
-.laboratory-modal {
-  width: min(850px, 100%);
-
-  /*
-   * La fenêtre prend presque toute la hauteur disponible.
-   * Cela permet d'avoir les formulaires visibles dès
-   * l'ouverture.
-   */
-  max-height: calc(100vh - 50px);
-
-  background: white;
-
-  border-radius: 12px;
+  background: #f4f8fa;
 
   overflow-y: auto;
   overflow-x: hidden;
 
-  box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.25),
-    0 5px 20px rgba(0, 0, 0, 0.12);
+  padding: 0;
+
+  box-sizing: border-box;
 }
 
+.laboratory-fullscreen-form {
+  width: 100%;
+  min-height: 100vh;
+
+  background: white;
+
+  box-sizing: border-box;
+}
 
 /* =========================================================
-   EN-TÊTE DU FORMULAIRE
+   EN-TÊTE FORMULAIRE PLEIN ÉCRAN
+   ========================================================= */
+
+.laboratory-fullscreen-form .laboratory-modal-header {
+  min-height: 90px;
+
+  padding: 20px 40px;
+
+  background: white;
+
+  border-bottom: 1px solid #dce7ed;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 20;
+}
+
+.laboratory-fullscreen-form .laboratory-modal-header h2 {
+  margin: 0 0 6px;
+
+  color: #123f5c;
+
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.laboratory-fullscreen-form .laboratory-modal-header p {
+  margin: 0;
+
+  color: #607684;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   ANCIEN MODAL
+   ========================================================= */
+
+.laboratory-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  padding: 0;
+
+  background: #f4f8fa;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+
+  box-sizing: border-box;
+}
+
+.laboratory-modal {
+  width: 100%;
+  max-width: none;
+
+  min-height: 100vh;
+  max-height: 100vh;
+
+  margin: 0;
+
+  background: white;
+
+  border-radius: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   EN-TÊTE MODAL
    ========================================================= */
 
 .laboratory-modal-header {
-  padding: 22px 28px;
+  min-height: 90px;
+
+  padding: 20px 40px;
 
   display: flex;
   align-items: center;
@@ -852,46 +972,52 @@
   border-bottom: 1px solid var(--border);
 
   background: white;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 10;
 }
 
 .laboratory-modal-header h2 {
-  margin: 0 0 5px;
+  margin: 0 0 6px;
 
-  color: #17486a;
+  color: #123f5c;
 
-  font-size: 21px;
+  font-size: 25px;
   font-weight: 800;
 }
 
 .laboratory-modal-header p {
   margin: 0;
 
-  color: #8296a2;
+  color: #607684;
 
-  font-size: 11px;
+  font-size: 14px;
 }
-
 
 /* =========================================================
    BOUTON FERMER
    ========================================================= */
 
 .lab-modal-close {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 0;
-  border-radius: 7px;
+  border: 1px solid #d4e1e8;
 
-  background: var(--bg);
+  border-radius: 8px;
 
-  color: var(--muted);
+  background: #f5f8fa;
 
-  font-size: 25px;
+  color: #496575;
+
+  font-size: 27px;
+  font-weight: 500;
 
   cursor: pointer;
 
@@ -899,35 +1025,37 @@
 }
 
 .lab-modal-close:hover {
-  background: var(--green-soft);
-  color: #17486a;
-}
+  background: #eaf4f8;
 
+  color: #123f5c;
+
+  border-color: #b7cbd6;
+}
 
 /* =========================================================
    INFORMATIONS PATIENT
    ========================================================= */
 
 .laboratory-modal-patient {
-  margin: 20px 28px 0;
+  margin: 28px 40px 0;
 
-  padding: 18px 20px;
+  padding: 20px 24px;
 
-  background: var(--bg);
+  background: #f5f9fb;
 
-  border: 1px solid var(--border);
+  border: 1px solid #d8e5eb;
 
-  border-radius: 9px;
+  border-radius: 10px;
 
   display: flex;
   align-items: center;
 
-  gap: 13px;
+  gap: 15px;
 }
 
 .lab-modal-avatar {
-  width: 48px;
-  height: 48px;
+  width: 54px;
+  height: 54px;
 
   flex-shrink: 0;
 
@@ -941,7 +1069,7 @@
   align-items: center;
   justify-content: center;
 
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -952,108 +1080,349 @@
 
 .laboratory-modal-patient strong {
   color: #214960;
-  font-size: 14px;
+
+  font-size: 17px;
+  font-weight: 800;
 }
 
 .laboratory-modal-patient span {
-  margin-top: 5px;
-  color: #7d919e;
-  font-size: 10px;
-}
+  margin-top: 6px;
 
+  color: #607684;
+
+  font-size: 13px;
+}
 
 /* =========================================================
    FORMULAIRE
    ========================================================= */
 
 .laboratory-result-form {
-  padding: 22px 28px 25px;
+  width: 100%;
+
+  padding: 30px 40px 40px;
+
+  box-sizing: border-box;
 }
-
-
-/*
- * Labels des champs
- */
 
 .laboratory-result-form label {
   display: block;
 
-  margin-bottom: 17px;
+  margin-bottom: 24px;
 
-  color: #38576a;
+  color: #294c61;
 
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
+
+  line-height: 1.5;
 }
 
-
-/*
- * Champs textarea
- */
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
 
 .laboratory-result-form textarea {
   width: 100%;
 
+  min-height: 170px;
+
   box-sizing: border-box;
 
-  margin-top: 8px;
+  margin-top: 9px;
 
-  padding: 13px 14px;
+  padding: 15px 16px;
 
-  border: 1px solid #cadde7;
+  border: 1px solid #bfd3de;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
-  background: var(--surface);
+  background: #ffffff;
 
   resize: vertical;
 
   outline: none;
 
-  color: #294c61;
+  color: #172f3e;
 
   font-family: Arial, Helvetica, sans-serif;
 
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: 500;
 
-  line-height: 1.5;
+  line-height: 1.65;
 
   transition: all 0.2s ease;
 }
 
+.laboratory-result-form textarea::placeholder {
+  color: #81939e;
 
-/*
- * Effet focus
- */
+  font-size: 15px;
+}
 
 .laboratory-result-form textarea:focus {
   border-color: #0879c8;
 
   box-shadow:
-    0 0 0 3px rgba(8, 121, 200, 0.08);
+    0 0 0 3px rgba(8, 121, 200, 0.10);
 }
 
-
 /* =========================================================
-   GRANDE ZONE "RÉSULTAT"
+   GRANDE ZONE RÉSULTAT
    ========================================================= */
 
 .laboratory-result-form label:first-child textarea {
-  min-height: 180px;
+  min-height: 230px;
 }
 
-
 /* =========================================================
-   GRANDE ZONE "OBSERVATION"
+   GRANDE ZONE OBSERVATION
    ========================================================= */
 
 .laboratory-result-form label:nth-child(2) textarea {
-  min-height: 120px;
+  min-height: 160px;
 }
 
+/* =========================================================
+   LISTE DES EXAMENS
+   ========================================================= */
+
+.lab-exam-title {
+  margin: 0 0 15px;
+
+  color: #173f59;
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.lab-exam-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  max-height: 520px;
+
+  overflow-y: auto;
+
+  padding: 4px;
+}
+
+.lab-exam-item {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 15px 17px;
+
+  border: 1px solid #d7e3e9;
+
+  border-radius: 9px;
+
+  background: #fff;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.lab-exam-item:hover {
+  border-color: #1677c8;
+
+  background: #f8fbff;
+}
+
+.lab-exam-item.selected {
+  border-color: #1677c8;
+
+  background: #eef7ff;
+
+  box-shadow: 0 2px 8px rgba(22, 119, 200, 0.08);
+}
+
+.lab-exam-item input {
+  width: 20px;
+  height: 20px;
+
+  flex-shrink: 0;
+
+  accent-color: #1677c8;
+}
+
+.lab-exam-information {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  flex: 1;
+}
+
+.lab-exam-information strong {
+  color: #1f2937;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.lab-exam-information span {
+  color: #687b87;
+
+  font-size: 13px;
+}
+
+.lab-exam-price {
+  white-space: nowrap;
+
+  color: #1677c8;
+
+  font-size: 14px;
+  font-weight: 800;
+}
 
 /* =========================================================
-   ACTIONS DU FORMULAIRE
+   TOTAL ANALYSES
+   ========================================================= */
+
+.lab-analysis-total {
+  margin-top: 22px;
+
+  padding: 18px 20px;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  gap: 10px 20px;
+
+  border-radius: 10px;
+
+  background: #f5f8fb;
+
+  border: 1px solid #dce6ec;
+}
+
+.lab-analysis-total span {
+  color: #5e7482;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lab-analysis-total strong {
+  color: #17212b;
+
+  font-size: 15px;
+
+  text-align: right;
+}
+
+.lab-analysis-total strong:last-child {
+  color: #1677c8;
+
+  font-size: 20px;
+}
+
+/* =========================================================
+   RÉSULTATS DES EXAMENS
+   ========================================================= */
+
+.lab-result-exams {
+  margin-bottom: 25px;
+}
+
+.lab-result-exams h3 {
+  margin: 0 0 15px;
+
+  color: #173f59;
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.lab-result-exam-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(220px, 300px)
+    90px;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 14px 10px;
+
+  border-bottom: 1px solid #e1e9ee;
+}
+
+.lab-result-exam-row > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.lab-result-exam-row strong {
+  color: #1f3f52;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.lab-result-exam-row small {
+  color: #718592;
+
+  font-size: 12px;
+}
+
+.lab-result-exam-row input {
+  width: 100%;
+
+  min-height: 45px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbdbe4;
+
+  border-radius: 7px;
+
+  padding: 10px 12px;
+
+  outline: none;
+
+  color: #193747;
+
+  background: white;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lab-result-exam-row input::placeholder {
+  color: #82949f;
+}
+
+.lab-result-exam-row input:focus {
+  border-color: #1677c8;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 119, 200, 0.08);
+}
+
+.lab-result-exam-row > span {
+  color: #607684;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   ACTIONS FORMULAIRE
    ========================================================= */
 
 .laboratory-form-actions {
@@ -1062,24 +1431,25 @@
   justify-content: flex-end;
   align-items: center;
 
-  gap: 11px;
+  gap: 12px;
 
-  padding-top: 8px;
+  padding-top: 22px;
 
-  border-top: 1px solid var(--green-soft);
+  margin-top: 10px;
+
+  border-top: 1px solid #dce7ed;
 }
-
 
 /* =========================================================
    BOUTON ANNULER
    ========================================================= */
 
 .lab-cancel-button {
-  min-height: 44px;
+  min-height: 46px;
 
-  padding: 0 20px;
+  padding: 0 22px;
 
-  border: 1px solid #cbdce5;
+  border: 1px solid #c7d8e1;
 
   border-radius: 7px;
 
@@ -1089,27 +1459,26 @@
 
   cursor: pointer;
 
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 
   transition: all 0.2s ease;
 }
 
 .lab-cancel-button:hover {
-  background: var(--bg);
+  background: #f4f8fa;
 
-  border-color: #b7ccd8;
+  border-color: #b1c7d3;
 }
-
 
 /* =========================================================
    BOUTON ENREGISTRER
    ========================================================= */
 
 .lab-save-button {
-  min-height: 44px;
+  min-height: 46px;
 
-  padding: 0 22px;
+  padding: 0 24px;
 
   border: 0;
 
@@ -1121,8 +1490,8 @@
 
   cursor: pointer;
 
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
 
   transition: all 0.2s ease;
 }
@@ -1133,28 +1502,40 @@
   transform: translateY(-1px);
 }
 
-
 /* =========================================================
-   SCROLLBAR DU FORMULAIRE
+   SCROLLBAR
    ========================================================= */
 
-.laboratory-modal::-webkit-scrollbar {
-  width: 7px;
+.laboratory-modal::-webkit-scrollbar,
+.laboratory-fullscreen-overlay::-webkit-scrollbar,
+.lab-exam-list::-webkit-scrollbar,
+.laboratory-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.laboratory-modal::-webkit-scrollbar-track {
-  background: var(--bg);
+.laboratory-modal::-webkit-scrollbar-track,
+.laboratory-fullscreen-overlay::-webkit-scrollbar-track,
+.lab-exam-list::-webkit-scrollbar-track,
+.laboratory-table-container::-webkit-scrollbar-track {
+  background: #edf3f6;
 }
 
-.laboratory-modal::-webkit-scrollbar-thumb {
-  background: #bfd2dd;
+.laboratory-modal::-webkit-scrollbar-thumb,
+.laboratory-fullscreen-overlay::-webkit-scrollbar-thumb,
+.lab-exam-list::-webkit-scrollbar-thumb,
+.laboratory-table-container::-webkit-scrollbar-thumb {
+  background: #b8ccd7;
+
   border-radius: 10px;
 }
 
-.laboratory-modal::-webkit-scrollbar-thumb:hover {
-  background: #9fb8c5;
+.laboratory-modal::-webkit-scrollbar-thumb:hover,
+.laboratory-fullscreen-overlay::-webkit-scrollbar-thumb:hover,
+.lab-exam-list::-webkit-scrollbar-thumb:hover,
+.laboratory-table-container::-webkit-scrollbar-thumb:hover {
+  background: #96b2c0;
 }
-
 
 /* =========================================================
    RESPONSIVE
@@ -1162,36 +1543,18 @@
 
 @media (max-width: 1200px) {
 
-  .laboratory-content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .recent-results-card {
-    display: block;
-  }
-
   .laboratory-statistics {
     grid-template-columns: repeat(2, 1fr);
   }
-}
 
+  .laboratory-table {
+    min-width: 950px;
+  }
+}
 
 /* =========================================================
    TABLETTE
    ========================================================= */
-
-@media (max-width: 1100px) {
-
-  .laboratory-modal-overlay {
-    padding-left: 210px;
-    padding-right: 20px;
-  }
-
-  .laboratory-modal {
-    width: min(820px, 100%);
-  }
-}
-
 
 @media (max-width: 850px) {
 
@@ -1201,7 +1564,7 @@
 
   .laboratory-main {
     width: calc(100% - 210px);
-    margin-left: 0px;
+    margin-left: 210px;
   }
 
   .laboratory-toolbar {
@@ -1218,55 +1581,48 @@
   }
 
   .laboratory-content-grid {
-    padding: 0 18px;
+    padding: 0 10px 25px 10px;
   }
 
   .laboratory-statistics {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .laboratory-toolbar {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .laboratory-quick-actions {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 10px;
+    padding-right: 10px;
+
     flex-wrap: wrap;
   }
 
-
-  /*
-   * Formulaire
-   */
-
-  .laboratory-modal-overlay {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-
-  .laboratory-modal {
-    width: 100%;
-    max-height: calc(100vh - 30px);
+  .laboratory-result-form {
+    padding-left: 25px;
+    padding-right: 25px;
   }
 
   .laboratory-modal-header {
-    padding: 20px;
+    padding-left: 25px;
+    padding-right: 25px;
   }
 
   .laboratory-modal-patient {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 25px;
+    margin-right: 25px;
   }
 
-  .laboratory-result-form {
-    padding-left: 20px;
-    padding-right: 20px;
+  .lab-result-exam-row {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      minmax(180px, 240px)
+      70px;
   }
 }
-
 
 /* =========================================================
    MOBILE
@@ -1274,18 +1630,13 @@
 
 @media (max-width: 600px) {
 
-  /*
-   * La sidebar reste présente sur mobile,
-   * mais elle ne contient aucun menu.
-   */
-
   .laboratory-sidebar {
     width: 65px;
   }
 
   .laboratory-main {
     width: calc(100% - 65px);
-    margin-left: 0;
+    margin-left: 65px;
   }
 
   .laboratory-brand {
@@ -1306,11 +1657,11 @@
   }
 
   .laboratory-header h1 {
-    font-size: 20px;
+    font-size: 21px;
   }
 
   .laboratory-header p {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .laboratory-user {
@@ -1325,47 +1676,120 @@
     flex: 1;
   }
 
+  .laboratory-content-grid {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
 
-  /*
-   * Formulaire sur mobile
-   */
+  .laboratory-table {
+    min-width: 900px;
+  }
+
+  .laboratory-card-header {
+    padding: 15px;
+  }
+
+  .laboratory-card-header h2 {
+    font-size: 16px;
+  }
+
+  .laboratory-card-header p {
+    font-size: 11px;
+  }
+
+  /* =======================================================
+     FORMULAIRE MOBILE
+     ======================================================= */
 
   .laboratory-modal-overlay {
-    padding: 10px;
+    padding: 0;
   }
 
   .laboratory-modal {
     width: 100%;
+    min-height: 100vh;
+    max-height: 100vh;
 
-    max-height: calc(100vh - 20px);
-
-    border-radius: 9px;
+    border-radius: 0;
   }
 
-  .laboratory-modal-header {
-    padding: 16px;
+  .laboratory-modal-header,
+  .laboratory-fullscreen-form .laboratory-modal-header {
+    min-height: 75px;
+
+    padding: 14px 16px;
   }
 
-  .laboratory-modal-header h2 {
-    font-size: 18px;
+  .laboratory-modal-header h2,
+  .laboratory-fullscreen-form .laboratory-modal-header h2 {
+    font-size: 19px;
+  }
+
+  .laboratory-modal-header p,
+  .laboratory-fullscreen-form .laboratory-modal-header p {
+    font-size: 11px;
   }
 
   .laboratory-modal-patient {
-    margin: 15px 16px 0;
+    margin: 18px 16px 0;
 
-    padding: 14px;
+    padding: 15px;
+  }
+
+  .laboratory-modal-patient strong {
+    font-size: 15px;
+  }
+
+  .laboratory-modal-patient span {
+    font-size: 11px;
   }
 
   .laboratory-result-form {
-    padding: 18px 16px 20px;
+    padding: 20px 16px 25px;
+  }
+
+  .laboratory-result-form label {
+    font-size: 14px;
+  }
+
+  .laboratory-result-form textarea {
+    font-size: 15px;
   }
 
   .laboratory-result-form label:first-child textarea {
-    min-height: 140px;
+    min-height: 180px;
   }
 
   .laboratory-result-form label:nth-child(2) textarea {
-    min-height: 100px;
+    min-height: 130px;
+  }
+
+  .lab-exam-item {
+    padding: 13px;
+  }
+
+  .lab-exam-information strong {
+    font-size: 14px;
+  }
+
+  .lab-exam-information span {
+    font-size: 12px;
+  }
+
+  .lab-result-exam-row {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+
+    padding: 15px 5px;
+  }
+
+  .lab-analysis-total {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-analysis-total strong {
+    text-align: left;
   }
 
   .laboratory-form-actions {
@@ -1380,7 +1804,6 @@
   }
 }
 
-
 /* =========================================================
    TRÈS PETITS ÉCRANS
    ========================================================= */
@@ -1393,14 +1816,28 @@
 
   .laboratory-main {
     width: calc(100% - 58px);
+    margin-left: 58px;
   }
 
   .laboratory-header h1 {
     font-size: 18px;
   }
 
+  .laboratory-toolbar {
+    padding: 15px 8px;
+  }
+
+  .laboratory-statistics {
+    padding: 15px 8px 8px;
+  }
+
+  .laboratory-content-grid {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
   .laboratory-modal-header {
-    padding: 14px;
+    padding: 13px;
   }
 
   .laboratory-modal-patient {
@@ -1413,11 +1850,1610 @@
     padding-right: 12px;
   }
 
+  .laboratory-result-form textarea {
+    font-size: 14px;
+  }
+
   .laboratory-result-form label:first-child textarea {
-    min-height: 125px;
+    min-height: 150px;
   }
 
   .laboratory-result-form label:nth-child(2) textarea {
-    min-height: 90px;
+    min-height: 110px;
   }
 }
+/* ============================================================
+   BOUTONS ACTIONS DU TABLEAU
+   ============================================================ */
+
+.lab-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* Bouton général */
+
+.lab-action-button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* 🔴 DEMANDE D'ANALYSE */
+
+.lab-action-request {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.lab-action-request:hover {
+  background: #b91c1c;
+}
+
+/* 🟢 IMPRIMER */
+
+.lab-action-print {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.lab-action-print:hover {
+  background: #15803d;
+}
+
+/* 🔵 SAISIR / VOIR RÉSULTAT */
+
+.lab-action-result {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.lab-action-result:hover {
+  background: #1d4ed8;
+}
+
+/* Effet clic */
+
+.lab-action-button:active {
+  transform: scale(0.98);
+}
+
+/* =========================================================
+   FORMULAIRE RÉSULTAT - NOUVELLE ORGANISATION
+   ========================================================= */
+
+/* =========================================================
+   CONTENEUR PRINCIPAL DU FORMULAIRE
+   ========================================================= */
+
+.laboratory-result-fullscreen {
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f4f8fa;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   EN-TÊTE DU FORMULAIRE RÉSULTAT
+   ========================================================= */
+
+.laboratory-result-fullscreen .laboratory-modal-header {
+  width: 100%;
+  min-height: 90px;
+
+  padding: 20px 40px;
+
+  background: white;
+
+  border-bottom: 1px solid #dce7ed;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 30;
+
+  box-sizing: border-box;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-header h2 {
+  margin: 0;
+
+  color: #123f5c;
+
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-header p {
+  margin: 0;
+
+  color: #607684;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   LABEL SAISIE DES RÉSULTATS
+   ========================================================= */
+
+.laboratory-form-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #0878c9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+}
+
+/* =========================================================
+   INFORMATIONS PATIENT
+   ========================================================= */
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient {
+  margin: 24px 40px 0;
+
+  padding: 18px 22px;
+
+  background: white;
+
+  border: 1px solid #d8e5eb;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  box-sizing: border-box;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient strong {
+  color: #214960;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient span {
+  margin: 0;
+
+  color: #607684;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   FORMULAIRE COMPLET
+   ========================================================= */
+
+.laboratory-result-form-full {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 28px 40px 40px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   SECTION RÉSULTATS DES EXAMENS
+   ========================================================= */
+
+.lab-result-exams-full {
+  width: 100%;
+
+  margin-bottom: 26px;
+
+  background: white;
+
+  border: 1px solid #d9e5eb;
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   TITRE SECTION
+   ========================================================= */
+
+.lab-result-section-title {
+  padding: 18px 20px;
+
+  background: #f5f9fb;
+
+  border-bottom: 1px solid #dce7ed;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lab-result-section-title h3 {
+  margin: 0 0 5px;
+
+  color: #173f59;
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.lab-result-section-title p {
+  margin: 0;
+
+  color: #6a7e8a;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   LISTE DES RÉSULTATS
+   ========================================================= */
+
+.lab-result-exams-list {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   LIGNE D'UN EXAMEN
+   ========================================================= */
+
+.lab-result-exam-row-full {
+  width: 100%;
+
+  min-height: 90px;
+
+  padding: 16px 20px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px, 1fr)
+    minmax(280px, 420px);
+
+  align-items: center;
+
+  gap: 30px;
+
+  border-bottom: 1px solid #e4edf1;
+
+  box-sizing: border-box;
+}
+
+.lab-result-exam-row-full:last-child {
+  border-bottom: none;
+}
+
+/* =========================================================
+   INFORMATIONS EXAMEN
+   ========================================================= */
+
+.lab-result-exam-name {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.lab-result-exam-name strong {
+  color: #1f4053;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.lab-result-exam-name span {
+  color: #6a7d88;
+
+  font-size: 12px;
+}
+
+.lab-result-exam-name small {
+  margin-top: 3px;
+
+  color: #0878c9;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   CHAMP DE SAISIE DU RÉSULTAT
+   ========================================================= */
+
+.lab-result-input-wrapper {
+  width: 100%;
+
+  min-height: 46px;
+
+  display: flex;
+  align-items: center;
+
+  background: white;
+
+  border: 1px solid #cbdbe4;
+
+  border-radius: 7px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  transition: all 0.2s ease;
+}
+
+.lab-result-input-wrapper:focus-within {
+  border-color: #1677c8;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 119, 200, 0.08);
+}
+
+.lab-result-input-wrapper input {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+
+  padding: 10px 13px;
+
+  border: 0;
+  outline: none;
+
+  background: transparent;
+
+  color: #193747;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  box-sizing: border-box;
+}
+
+.lab-result-input-wrapper input::placeholder {
+  color: #8a9ba5;
+}
+
+.lab-result-input-wrapper span {
+  min-width: 60px;
+
+  padding: 0 12px;
+
+  color: #607684;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: center;
+
+  border-left: 1px solid #dce7ed;
+
+  background: #f7fafb;
+
+  align-self: stretch;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   CHAMPS RÉSULTAT GÉNÉRAL / OBSERVATION
+   ========================================================= */
+
+.laboratory-result-form-full
+.laboratory-form-field {
+  width: 100%;
+
+  margin-bottom: 20px;
+
+  padding: 20px;
+
+  background: white;
+
+  border: 1px solid #d9e5eb;
+
+  border-radius: 10px;
+
+  box-sizing: border-box;
+}
+
+.laboratory-result-form-full
+.laboratory-form-field label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #294c61;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.laboratory-result-form-full
+.laboratory-form-field textarea {
+  width: 100%;
+
+  min-height: 125px;
+
+  padding: 13px 14px;
+
+  border: 1px solid #cbdbe4;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  outline: none;
+
+  resize: vertical;
+
+  color: #193747;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  line-height: 1.55;
+
+  box-sizing: border-box;
+
+  transition: all 0.2s ease;
+}
+
+.laboratory-result-form-full
+.laboratory-form-field textarea:focus {
+  border-color: #0879c8;
+
+  box-shadow:
+    0 0 0 3px rgba(8, 121, 200, 0.08);
+}
+
+.laboratory-result-form-full
+.laboratory-form-field textarea::placeholder {
+  color: #8a9ba5;
+}
+
+/* =========================================================
+   RESULTAT GENERAL
+   ========================================================= */
+
+.laboratory-result-form-full
+.laboratory-form-field:first-of-type textarea {
+  min-height: 130px;
+}
+
+/* =========================================================
+   OBSERVATION MÉDICALE
+   ========================================================= */
+
+.laboratory-result-form-full
+.laboratory-form-field:nth-of-type(2) textarea {
+  min-height: 110px;
+}
+
+/* =========================================================
+   ACTIONS DU FORMULAIRE
+   ========================================================= */
+
+.laboratory-form-actions-full {
+  width: 100%;
+
+  padding: 18px 0 0;
+
+  margin-top: 6px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 10px;
+
+  border-top: 1px solid #dce7ed;
+
+  box-sizing: border-box;
+}
+
+.laboratory-form-actions-full button {
+  min-height: 44px;
+
+  padding: 0 18px;
+
+  border-radius: 7px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* =========================================================
+   BOUTON IMPRIMER PDF
+   ========================================================= */
+
+.laboratory-form-actions-full
+.lab-print-button {
+  min-height: 44px;
+
+  padding: 0 18px;
+
+  border: 0;
+
+  border-radius: 7px;
+
+  background: #16a34a;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.laboratory-form-actions-full
+.lab-print-button:hover {
+  background: #15803d;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   BOUTON ENREGISTRER
+   ========================================================= */
+
+.laboratory-form-actions-full
+.lab-save-button {
+  min-height: 44px;
+
+  padding: 0 20px;
+
+  border: 0;
+
+  border-radius: 7px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.laboratory-form-actions-full
+.lab-save-button:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   BOUTON ANNULER
+   ========================================================= */
+
+.laboratory-form-actions-full
+.lab-cancel-button {
+  min-height: 44px;
+
+  padding: 0 18px;
+
+  border: 1px solid #c7d8e1;
+
+  border-radius: 7px;
+
+  background: white;
+
+  color: #486677;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.laboratory-form-actions-full
+.lab-cancel-button:hover {
+  background: #f4f8fa;
+
+  border-color: #b1c7d3;
+}
+
+/* =========================================================
+   RESPONSIVE FORMULAIRE RÉSULTAT
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-header {
+    padding: 18px 25px;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-patient {
+    margin-left: 25px;
+    margin-right: 25px;
+  }
+
+  .laboratory-result-form-full {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .lab-result-exam-row-full {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .lab-result-input-wrapper {
+    max-width: none;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-header {
+    min-height: 75px;
+
+    padding: 14px 16px;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-header h2 {
+    font-size: 19px;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-header p {
+    font-size: 11px;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-patient {
+    margin: 16px 16px 0;
+
+    padding: 15px;
+  }
+
+  .laboratory-result-form-full {
+    padding: 18px 16px 25px;
+  }
+
+  .lab-result-section-title {
+    padding: 15px;
+  }
+
+  .lab-result-section-title h3 {
+    font-size: 15px;
+  }
+
+  .lab-result-section-title p {
+    font-size: 11px;
+  }
+
+  .lab-result-exam-row-full {
+    padding: 15px;
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .laboratory-result-form-full
+  .laboratory-form-field {
+    padding: 15px;
+  }
+
+  .laboratory-form-actions-full {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .laboratory-form-actions-full button {
+    width: 100%;
+  }
+}
+/* =========================================================
+   FORMULAIRES LABORATOIRE - AFFICHAGE COMPACT
+   DEMANDE D'ANALYSE + SAISIE RÉSULTAT
+   ========================================================= */
+
+/* =========================================================
+   STRUCTURE GÉNÉRALE
+   ========================================================= */
+
+.laboratory-modal-overlay {
+  padding: 14px !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: rgba(8, 39, 59, 0.45) !important;
+
+  overflow-y: auto !important;
+}
+
+/* =========================================================
+   FORMULAIRE DEMANDE D'ANALYSE
+   ========================================================= */
+
+.laboratory-analysis-modal {
+  width: min(1050px, 96vw) !important;
+
+  min-height: auto !important;
+  max-height: 94vh !important;
+
+  margin: auto !important;
+
+  border-radius: 12px !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  box-shadow:
+    0 20px 60px rgba(16, 48, 68, 0.22) !important;
+}
+
+/* En-tête demande */
+
+.laboratory-analysis-modal
+.laboratory-modal-header {
+  min-height: 72px !important;
+
+  padding: 14px 22px !important;
+
+  position: sticky;
+  top: 0;
+
+  background: white;
+
+  z-index: 20;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-header h2 {
+  font-size: 21px !important;
+
+  margin: 0 0 3px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-header p {
+  font-size: 11px !important;
+}
+
+/* Patient */
+
+.laboratory-analysis-modal
+.laboratory-modal-patient {
+  margin: 15px 22px 0 !important;
+
+  padding: 12px 16px !important;
+
+  border-radius: 8px !important;
+
+  gap: 12px !important;
+}
+
+.laboratory-analysis-modal
+.lab-modal-avatar {
+  width: 42px !important;
+  height: 42px !important;
+
+  font-size: 12px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-patient strong {
+  font-size: 14px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-patient span {
+  margin-top: 3px !important;
+
+  font-size: 11px !important;
+}
+
+/* Formulaire */
+
+.laboratory-analysis-modal
+.laboratory-result-form {
+  padding: 18px 22px 20px !important;
+}
+
+/* Titre */
+
+.laboratory-analysis-modal
+.lab-exam-title {
+  margin-bottom: 9px !important;
+
+  font-size: 15px !important;
+}
+
+/* Liste examens */
+
+.laboratory-analysis-modal
+.lab-exam-list {
+  max-height: 45vh !important;
+
+  gap: 6px !important;
+
+  padding: 2px !important;
+
+  overflow-y: auto !important;
+}
+
+/* Ligne examen */
+
+.laboratory-analysis-modal
+.lab-exam-item {
+  min-height: 52px !important;
+
+  padding: 9px 12px !important;
+
+  gap: 10px !important;
+
+  border-radius: 7px !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-item input {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-information {
+  gap: 2px !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-information strong {
+  font-size: 12px !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-information span {
+  font-size: 10px !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-price {
+  font-size: 11px !important;
+}
+
+/* Total */
+
+.laboratory-analysis-modal
+.lab-analysis-total {
+  margin-top: 10px !important;
+
+  padding: 10px 14px !important;
+
+  gap: 5px 15px !important;
+
+  border-radius: 7px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total span {
+  font-size: 11px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total strong {
+  font-size: 12px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total strong:last-child {
+  font-size: 16px !important;
+}
+
+/* Boutons */
+
+.laboratory-analysis-modal
+.laboratory-form-actions {
+  padding-top: 12px !important;
+
+  margin-top: 8px !important;
+
+  gap: 8px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-form-actions button {
+  min-height: 38px !important;
+
+  padding: 0 15px !important;
+
+  font-size: 11px !important;
+}
+
+
+/* =========================================================
+   FORMULAIRE SAISIR / VOIR RÉSULTAT
+   ========================================================= */
+
+.laboratory-result-fullscreen {
+  width: min(1180px, 96vw) !important;
+
+  min-height: auto !important;
+  max-height: 94vh !important;
+
+  margin: auto !important;
+
+  background: #f4f8fa !important;
+
+  border-radius: 12px !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  box-shadow:
+    0 20px 60px rgba(16, 48, 68, 0.22) !important;
+}
+
+/* En-tête résultat */
+
+.laboratory-result-fullscreen
+.laboratory-modal-header {
+  min-height: 72px !important;
+
+  padding: 14px 22px !important;
+
+  position: sticky !important;
+  top: 0 !important;
+
+  background: white !important;
+
+  z-index: 30 !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-header h2 {
+  font-size: 21px !important;
+
+  margin: 0 0 3px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-header p {
+  font-size: 11px !important;
+}
+
+/* Patient résultat */
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient {
+  margin: 14px 22px 0 !important;
+
+  padding: 12px 16px !important;
+
+  border-radius: 8px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-modal-avatar {
+  width: 42px !important;
+  height: 42px !important;
+
+  font-size: 12px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient strong {
+  font-size: 14px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-modal-patient span {
+  margin-top: 2px !important;
+
+  font-size: 11px !important;
+}
+
+/* Formulaire résultat */
+
+.laboratory-result-fullscreen
+.laboratory-result-form-full {
+  max-width: none !important;
+
+  padding: 16px 22px 20px !important;
+}
+
+/* Section examens */
+
+.laboratory-result-fullscreen
+.lab-result-exams-full {
+  margin-bottom: 12px !important;
+
+  border-radius: 8px !important;
+}
+
+/* Titre résultats */
+
+.laboratory-result-fullscreen
+.lab-result-section-title {
+  padding: 11px 15px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-section-title h3 {
+  margin-bottom: 2px !important;
+
+  font-size: 14px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-section-title p {
+  font-size: 10px !important;
+}
+
+/* Liste */
+
+.laboratory-result-fullscreen
+.lab-result-exams-list {
+  max-height: 27vh;
+
+  overflow-y: auto;
+}
+
+/* Ligne examen */
+
+.laboratory-result-fullscreen
+.lab-result-exam-row-full {
+  min-height: 62px !important;
+
+  padding: 9px 15px !important;
+
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(250px, 380px) !important;
+
+  gap: 20px !important;
+}
+
+/* Nom examen */
+
+.laboratory-result-fullscreen
+.lab-result-exam-name {
+  gap: 2px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-exam-name strong {
+  font-size: 12px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-exam-name span {
+  font-size: 10px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-exam-name small {
+  margin-top: 1px !important;
+
+  font-size: 9px !important;
+}
+
+/* Champ résultat */
+
+.laboratory-result-fullscreen
+.lab-result-input-wrapper {
+  min-height: 38px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-input-wrapper input {
+  min-height: 36px !important;
+
+  padding: 7px 10px !important;
+
+  font-size: 12px !important;
+}
+
+.laboratory-result-fullscreen
+.lab-result-input-wrapper span {
+  min-width: 50px !important;
+
+  font-size: 10px !important;
+}
+
+/* =========================================================
+   RÉSULTAT GÉNÉRAL + OBSERVATION
+   ========================================================= */
+
+.laboratory-result-fullscreen
+.laboratory-form-field {
+  margin-bottom: 10px !important;
+
+  padding: 12px 15px !important;
+
+  border-radius: 8px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-form-field label {
+  margin-bottom: 5px !important;
+
+  font-size: 12px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-form-field textarea {
+  min-height: 72px !important;
+
+  padding: 9px 11px !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.4 !important;
+}
+
+/* Résultat général */
+
+.laboratory-result-fullscreen
+.laboratory-form-field:first-of-type textarea {
+  min-height: 75px !important;
+}
+
+/* Observation */
+
+.laboratory-result-fullscreen
+.laboratory-form-field:nth-of-type(2) textarea {
+  min-height: 65px !important;
+}
+
+/* =========================================================
+   BOUTONS DU FORMULAIRE RÉSULTAT
+   ========================================================= */
+
+.laboratory-result-fullscreen
+.laboratory-form-actions-full {
+  padding-top: 10px !important;
+
+  margin-top: 3px !important;
+
+  gap: 8px !important;
+}
+
+.laboratory-result-fullscreen
+.laboratory-form-actions-full button {
+  min-height: 38px !important;
+
+  padding: 0 15px !important;
+
+  font-size: 11px !important;
+}
+
+
+/* =========================================================
+   ÉCRAN MOYEN
+   ========================================================= */
+
+@media (max-height: 800px) and (min-width: 601px) {
+
+  .laboratory-modal-overlay {
+    padding: 8px !important;
+  }
+
+  .laboratory-analysis-modal,
+  .laboratory-result-fullscreen {
+    max-height: 98vh !important;
+  }
+
+  .laboratory-analysis-modal
+  .lab-exam-list {
+    max-height: 38vh !important;
+  }
+
+  .laboratory-result-fullscreen
+  .lab-result-exams-list {
+    max-height: 23vh !important;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-modal-patient {
+    margin-top: 8px !important;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-result-form-full {
+    padding-top: 10px !important;
+  }
+
+  .laboratory-result-fullscreen
+  .laboratory-form-field {
+    margin-bottom: 7px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .laboratory-modal-overlay {
+    padding: 0 !important;
+
+    align-items: stretch !important;
+  }
+
+  .laboratory-analysis-modal,
+  .laboratory-result-fullscreen {
+    width: 100% !important;
+
+    max-width: none !important;
+    max-height: 100vh !important;
+
+    min-height: 100vh !important;
+
+    border-radius: 0 !important;
+  }
+
+  .laboratory-analysis-modal
+  .laboratory-modal-header,
+  .laboratory-result-fullscreen
+  .laboratory-modal-header {
+    padding: 12px 15px !important;
+  }
+
+  .laboratory-analysis-modal
+  .laboratory-modal-patient,
+  .laboratory-result-fullscreen
+  .laboratory-modal-patient {
+    margin-left: 15px !important;
+    margin-right: 15px !important;
+  }
+
+  .laboratory-analysis-modal
+  .laboratory-result-form,
+  .laboratory-result-fullscreen
+  .laboratory-result-form-full {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
+  .laboratory-result-fullscreen
+  .lab-result-exams-list {
+    max-height: none !important;
+  }
+
+  .laboratory-result-fullscreen
+  .lab-result-exam-row-full {
+    grid-template-columns: 1fr !important;
+
+    gap: 8px !important;
+  }
+}
+/* =========================================================
+   DEMANDE D'ANALYSE - TOUT VISIBLE
+   ========================================================= */
+
+.laboratory-analysis-modal {
+  width: min(1100px, 96vw) !important;
+  max-height: 96vh !important;
+
+  overflow-y: auto !important;
+}
+
+/* En-tête plus compact */
+.laboratory-analysis-modal
+.laboratory-modal-header {
+  min-height: 64px !important;
+  padding: 10px 20px !important;
+}
+
+/* Patient plus compact */
+.laboratory-analysis-modal
+.laboratory-modal-patient {
+  margin: 10px 20px 0 !important;
+  padding: 9px 14px !important;
+}
+
+.laboratory-analysis-modal
+.lab-modal-avatar {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-patient strong {
+  font-size: 13px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-modal-patient span {
+  margin-top: 2px !important;
+  font-size: 10px !important;
+}
+
+/* Formulaire */
+.laboratory-analysis-modal
+.laboratory-result-form {
+  padding: 12px 20px 14px !important;
+}
+
+/* Titre */
+.laboratory-analysis-modal
+.lab-exam-title {
+  margin-bottom: 6px !important;
+  font-size: 14px !important;
+}
+
+/* IMPORTANT :
+   on affiche toute la liste sans hauteur bloquée */
+.laboratory-analysis-modal
+.lab-exam-list {
+  max-height: none !important;
+  height: auto !important;
+
+  overflow: visible !important;
+
+  display: grid !important;
+
+  grid-template-columns: 1fr 1fr !important;
+
+  gap: 6px !important;
+
+  padding: 0 !important;
+}
+
+/* Chaque examen */
+.laboratory-analysis-modal
+.lab-exam-item {
+  min-height: 42px !important;
+
+  padding: 7px 10px !important;
+
+  gap: 8px !important;
+
+  border-radius: 6px !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Checkbox */
+.laboratory-analysis-modal
+.lab-exam-item input {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Informations */
+.laboratory-analysis-modal
+.lab-exam-information {
+  gap: 1px !important;
+
+  min-width: 0 !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-information strong {
+  font-size: 11px !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.laboratory-analysis-modal
+.lab-exam-information span {
+  font-size: 9px !important;
+
+  white-space: nowrap !important;
+}
+
+/* PRIX */
+.laboratory-analysis-modal
+.lab-exam-price {
+  margin-left: auto !important;
+
+  flex-shrink: 0 !important;
+
+  color: #1677c8 !important;
+
+  font-size: 10px !important;
+
+  white-space: nowrap !important;
+}
+
+/* Total */
+.laboratory-analysis-modal
+.lab-analysis-total {
+  margin-top: 8px !important;
+
+  padding: 8px 12px !important;
+
+  grid-template-columns: 1fr auto !important;
+
+  gap: 3px 15px !important;
+
+  border-radius: 7px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total span {
+  font-size: 10px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total strong {
+  font-size: 11px !important;
+}
+
+.laboratory-analysis-modal
+.lab-analysis-total strong:last-child {
+  font-size: 15px !important;
+}
+
+/* Boutons */
+.laboratory-analysis-modal
+.laboratory-form-actions {
+  padding-top: 8px !important;
+
+  margin-top: 6px !important;
+
+  gap: 7px !important;
+}
+
+.laboratory-analysis-modal
+.laboratory-form-actions button {
+  min-height: 36px !important;
+
+  padding: 0 14px !important;
+
+  font-size: 10px !important;
+}
+/* =========================================================
+   TABLEAU LABORATOIRE - PLEINE LARGEUR
+   ========================================================= */
+
+.laboratory-table-container {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.laboratory-table-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  overflow-x: auto !important;
+}
+
+.laboratory-table {
+  width: 100% !important;
+  min-width: 1100px !important;
+  table-layout: auto !important;
+}
+
+/* Colonnes plus équilibrées */
+.laboratory-table th,
+.laboratory-table td {
+  padding: 12px 14px !important;
+  white-space: nowrap;
+}
+
+/* Colonne patient */
+.laboratory-table th:nth-child(1),
+.laboratory-table td:nth-child(1) {
+  min-width: 90px;
+}
+
+/* Colonne patient */
+.laboratory-table th:nth-child(2),
+.laboratory-table td:nth-child(2) {
+  min-width: 180px;
+}
+
+/* Colonne examens */
+.laboratory-table th:nth-child(3),
+.laboratory-table td:nth-child(3) {
+  min-width: 220px;
+}
+
+/* Statut */
+.laboratory-table th:nth-child(4),
+.laboratory-table td:nth-child(4) {
+  min-width: 120px;
+}
+
+/* Date */
+.laboratory-table th:nth-child(5),
+.laboratory-table td:nth-child(5) {
+  min-width: 130px;
+}
+
+/* Actions */
+.laboratory-table th:last-child,
+.laboratory-table td:last-child {
+  min-width: 350px;
+}
+
+/* =========================================================
+   CONTENEUR PRINCIPAL DU MODULE
+   ========================================================= */
+
+.laboratory-content,
+.laboratory-main,
+.laboratory-page-content {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Carte contenant le tableau */
+.laboratory-table-card {
+  width: 100% !important;
+  max-width: none !important;
+}
+/* =========================================================
+   FIN DU MODULE LABORATOIRE
+   ========================================================= */

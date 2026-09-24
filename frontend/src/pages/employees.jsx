@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import {
   Users,
@@ -109,6 +110,7 @@ const initialEmployees = [
 ];
 
 const emptyForm = {
+  matricule: "",
   nom: "",
   prenom: "",
   sexe: "Homme",
@@ -203,7 +205,16 @@ function Employees() {
 
   const openAddModal = () => {
     setEditingEmployee(null);
-    setForm(emptyForm);
+
+    const nextMatricule = `EMP-${String(
+      employees.length + 1
+    ).padStart(4, "0")}`;
+
+    setForm({
+      ...emptyForm,
+      matricule: nextMatricule,
+    });
+
     setShowModal(true);
   };
 
@@ -211,6 +222,7 @@ function Employees() {
     setEditingEmployee(employee);
 
     setForm({
+      matricule: employee.matricule,
       nom: employee.nom,
       prenom: employee.prenom,
       sexe: employee.sexe,
@@ -281,9 +293,6 @@ function Employees() {
     } else {
       const newEmployee = {
         id: Date.now(),
-        matricule: `EMP-${String(
-          employees.length + 1
-        ).padStart(4, "0")}`,
         ...form,
       };
 
@@ -839,6 +848,24 @@ function Employees() {
 
                 <div className="employee-form-grid">
 
+                  {/* MATRICULE */}
+
+                  <div className="employee-form-group">
+
+                    <label>
+                      Matricule
+                    </label>
+
+                    <input
+                 type="text"
+                 name="matricule"
+                 value={form.matricule}
+                 onChange={handleChange}
+                 placeholder="Ex : EMP-0007"
+                className="employee-matricule-input"
+                />
+                  </div>
+
                   <div className="employee-form-group">
 
                     <label>
@@ -1315,3 +1342,4 @@ function Employees() {
 }
 
 export default Employees;
+

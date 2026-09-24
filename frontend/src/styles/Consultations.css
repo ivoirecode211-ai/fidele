@@ -11,6 +11,7 @@
 
 /* Palette du module : voir src/styles/variables.css (source unique). */
 
+
 /* ============================================================
    RESET
    ============================================================ */
@@ -20,22 +21,15 @@
 }
 
 .consultations-page {
-
   min-height: 100vh;
-
   width: 100%;
-
   display: flex;
-
   background: var(--bg);
-
   color: var(--text);
-
   font-family:
     "Segoe UI",
     Arial,
     sans-serif;
-
 }
 
 
@@ -44,11 +38,8 @@
    ============================================================ */
 
 .medecin-sidebar {
-
   width: 225px;
-
   min-width: 225px;
-
   min-height: 100vh;
 
   background:
@@ -61,18 +52,14 @@
   color: white;
 
   display: flex;
-
   flex-direction: column;
 
   box-shadow:
     4px 0 14px rgba(4, 35, 61, 0.12);
 
   position: sticky;
-
   top: 0;
-
   z-index: 20;
-
 }
 
 
@@ -81,33 +68,25 @@
    ============================================================ */
 
 .sidebar-logo {
-
   min-height: 74px;
 
   display: flex;
-
   align-items: center;
 
   padding: 14px 15px;
 
   border-bottom:
     1px solid rgba(255, 255, 255, 0.09);
-
 }
 
-
 .sidebar-heart {
-
   width: 42px;
-
   height: 42px;
 
   border-radius: 12px;
 
   display: flex;
-
   justify-content: center;
-
   align-items: center;
 
   background:
@@ -123,38 +102,23 @@
 
   box-shadow:
     0 3px 9px rgba(0, 0, 0, 0.15);
-
 }
-
 
 .sidebar-brand {
-
   display: flex;
-
   flex-direction: column;
-
   line-height: 1.1;
-
 }
-
 
 .sidebar-brand strong {
-
-  font-size: 15px;
-
+  font-size: 17px;
   letter-spacing: 0.3px;
-
 }
 
-
 .sidebar-brand span {
-
-  font-size: 8px;
-
+  font-size: 10px;
   margin-top: 4px;
-
   color: #c4e3f7;
-
 }
 
 
@@ -163,24 +127,18 @@
    ============================================================ */
 
 .medecin-menu {
-
   padding: 14px 9px;
 
   display: flex;
-
   flex-direction: column;
 
   gap: 4px;
-
 }
 
-
 .medecin-menu-item {
-
   width: 100%;
 
   border: none;
-
   background: transparent;
 
   color: var(--border);
@@ -190,7 +148,6 @@
   border-radius: 7px;
 
   display: flex;
-
   align-items: center;
 
   gap: 12px;
@@ -198,33 +155,26 @@
   padding: 0 13px;
 
   cursor: pointer;
-
   text-align: left;
 
-  font-size: 13px;
+  font-size: 15px;
 
   transition:
     background 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease;
-
 }
 
-
 .medecin-menu-item:hover {
-
   background:
     rgba(255, 255, 255, 0.10);
 
   color: white;
 
   transform: translateX(2px);
-
 }
 
-
 .medecin-menu-item.active {
-
   background:
     linear-gradient(
       90deg,
@@ -236,53 +186,37 @@
 
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.12);
-
 }
 
-
 .medecin-menu-item.selected {
-
   background:
     rgba(255, 255, 255, 0.08);
 
   color: white;
-
 }
 
-
 .menu-icon {
-
   width: 20px;
-
   min-width: 20px;
 
   text-align: center;
 
-  font-size: 17px;
-
+  font-size: 19px;
 }
 
-
 .sidebar-bottom {
-
   margin-top: auto;
 
   padding: 15px;
 
   border-top:
     1px solid rgba(255, 255, 255, 0.08);
-
 }
 
-
 .sidebar-version {
-
   color: #82abc4;
-
-  font-size: 9px;
-
+  font-size: 11px;
   text-align: center;
-
 }
 
 
@@ -291,11 +225,8 @@
    ============================================================ */
 
 .medecin-main {
-
   flex: 1;
-
   min-width: 0;
-
 }
 
 
@@ -304,7 +235,6 @@
    ============================================================ */
 
 .medecin-header {
-
   min-height: 82px;
 
   background: white;
@@ -316,36 +246,28 @@
     0 28px;
 
   display: flex;
-
   align-items: center;
 
   justify-content: space-between;
-
 }
 
-
 .header-title h1 {
-
   margin: 0;
 
   color: var(--primary);
 
-  font-size: 22px;
+  font-size: 25px;
 
   font-weight: 700;
-
 }
 
-
 .header-title p {
-
   margin:
-    4px 0 0;
+    5px 0 0;
 
   color: var(--muted);
 
-  font-size: 12px;
-
+  font-size: 14px;
 }
 
 
@@ -354,20 +276,13 @@
    ============================================================ */
 
 .doctor-profile {
-
   display: flex;
-
   align-items: center;
-
   gap: 10px;
-
 }
 
-
 .doctor-avatar {
-
   width: 44px;
-
   height: 44px;
 
   border-radius: 50%;
@@ -382,64 +297,43 @@
   color: white;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   font-weight: 700;
-
-  font-size: 13px;
+  font-size: 15px;
 
   border:
     3px solid var(--primary-soft);
-
 }
-
 
 .doctor-info {
-
   display: flex;
-
   flex-direction: column;
-
 }
-
 
 .doctor-info strong {
-
   color: #174565;
-
-  font-size: 13px;
-
+  font-size: 15px;
 }
-
 
 .doctor-info span {
-
   color: #7a91a4;
-
-  font-size: 10px;
-
+  font-size: 12px;
   margin-top: 2px;
-
 }
 
-
 .profile-arrow {
-
   border: none;
-
   background: transparent;
 
   color: var(--muted);
 
   cursor: pointer;
 
-  font-size: 10px;
+  font-size: 13px;
 
   padding: 5px;
-
 }
 
 
@@ -448,13 +342,11 @@
    ============================================================ */
 
 .medecin-content {
-
   padding: 22px 28px 35px;
 
   max-width: 1500px;
 
   margin: 0 auto;
-
 }
 
 
@@ -463,51 +355,38 @@
    ============================================================ */
 
 .section-heading {
-
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   margin-bottom: 17px;
-
 }
 
-
 .section-heading h2 {
-
   margin: 0;
 
   color: #123f61;
 
-  font-size: 20px;
-
+  font-size: 23px;
 }
 
-
 .section-heading p {
-
   margin:
     5px 0 0;
 
-  font-size: 11px;
+  font-size: 13px;
 
   color: var(--muted);
-
 }
 
-
 .consultation-counter {
-
   display: flex;
-
   align-items: center;
 
   gap: 7px;
 
   padding:
-    7px 13px;
+    9px 15px;
 
   background: white;
 
@@ -515,27 +394,20 @@
     1px solid var(--border);
 
   border-radius: 8px;
-
 }
-
 
 .consultation-counter span {
-
   color: var(--primary);
 
-  font-size: 18px;
+  font-size: 21px;
 
   font-weight: 700;
-
 }
 
-
 .consultation-counter small {
-
   color: var(--muted);
 
-  font-size: 10px;
-
+  font-size: 12px;
 }
 
 
@@ -544,30 +416,22 @@
    ============================================================ */
 
 .consultation-toolbar {
-
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 15px;
 
   margin-bottom: 15px;
-
 }
 
-
 .search-box {
-
   height: 42px;
 
   width: 420px;
-
   max-width: 100%;
 
   display: flex;
-
   align-items: center;
 
   background: white;
@@ -582,78 +446,58 @@
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
-
 }
 
-
 .search-box:focus-within {
-
   border-color:
     #73b9e7;
 
   box-shadow:
     0 0 0 3px rgba(0, 124, 205, 0.08);
-
 }
 
-
 .search-icon {
-
   padding-left: 13px;
 
   color: var(--muted);
 
-  font-size: 21px;
-
+  font-size: 23px;
 }
 
-
 .search-box input {
-
   flex: 1;
 
   height: 100%;
 
   border: none;
-
   outline: none;
 
   padding: 0 10px;
 
-  font-size: 12px;
+  font-size: 14px;
 
   color: var(--text);
-
 }
-
 
 .search-box input::placeholder {
-
   color: #9aafbd;
-
 }
 
-
 .clear-search {
-
   border: none;
-
   background: transparent;
 
   color: #8ca2b1;
 
   cursor: pointer;
 
-  font-size: 18px;
+  font-size: 20px;
 
   padding:
     0 12px;
-
 }
 
-
 .btn-primary {
-
   border: none;
 
   background:
@@ -674,7 +518,7 @@
 
   cursor: pointer;
 
-  font-size: 12px;
+  font-size: 14px;
 
   font-weight: 600;
 
@@ -684,36 +528,26 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
-
 }
 
-
 .btn-primary:hover {
-
   transform: translateY(-1px);
 
   box-shadow:
     0 5px 12px rgba(0, 112, 194, 0.25);
-
 }
 
-
 .new-consultation-btn {
-
   min-height: 42px;
 
   padding:
     0 19px;
-
 }
 
-
 .new-consultation-btn span {
-
-  font-size: 18px;
+  font-size: 20px;
 
   margin-right: 5px;
-
 }
 
 
@@ -722,7 +556,6 @@
    ============================================================ */
 
 .quick-stats {
-
   display: grid;
 
   grid-template-columns:
@@ -731,12 +564,9 @@
   gap: 12px;
 
   margin-bottom: 15px;
-
 }
 
-
 .quick-stat {
-
   min-height: 73px;
 
   background: white;
@@ -747,7 +577,6 @@
   border-radius: 9px;
 
   display: flex;
-
   align-items: center;
 
   padding: 12px 14px;
@@ -755,14 +584,10 @@
   gap: 11px;
 
   box-shadow: var(--shadow);
-
 }
 
-
 .quick-stat-icon {
-
   width: 38px;
-
   height: 38px;
 
   min-width: 38px;
@@ -770,80 +595,48 @@
   border-radius: 9px;
 
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
-  font-size: 17px;
-
-  font-weight: 700;
-
-}
-
-
-.quick-stat-icon.blue {
-
-  background: var(--primary-soft);
-
-  color: var(--primary);
-
-}
-
-
-.quick-stat-icon.green {
-
-  background: var(--green-soft);
-
-  color: var(--green);
-
-}
-
-
-.quick-stat-icon.orange {
-
-  background: var(--warning-soft);
-
-  color: var(--warning);
-
-}
-
-
-.quick-stat-icon.purple {
-
-  background: var(--purple-soft);
-
-  color: var(--purple);
-
-}
-
-
-.quick-stat div:last-child {
-
-  display: flex;
-
-  flex-direction: column;
-
-}
-
-
-.quick-stat strong {
 
   font-size: 19px;
 
-  color: #123f61;
-
+  font-weight: 700;
 }
 
+.quick-stat-icon.blue {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.quick-stat-icon.green {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.quick-stat-icon.orange {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.quick-stat-icon.purple {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.quick-stat div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-stat strong {
+  font-size: 22px;
+  color: #123f61;
+}
 
 .quick-stat span {
-
   color: #8298a9;
-
-  font-size: 9px;
-
+  font-size: 12px;
   margin-top: 2px;
-
 }
 
 
@@ -852,7 +645,6 @@
    ============================================================ */
 
 .consultations-card {
-
   background: white;
 
   border:
@@ -863,55 +655,42 @@
   box-shadow: var(--shadow);
 
   overflow: hidden;
-
 }
 
-
 .table-header {
-
   min-height: 65px;
 
   padding:
     12px 16px;
 
   display: flex;
-
   align-items: center;
 
   justify-content: space-between;
 
   border-bottom:
     1px solid var(--primary-soft);
-
 }
 
-
 .table-header h3 {
-
   margin: 0;
 
   color: #174666;
 
-  font-size: 14px;
-
+  font-size: 17px;
 }
 
-
 .table-header span {
-
   display: block;
 
   color: #8a9eac;
 
-  font-size: 9px;
+  font-size: 12px;
 
   margin-top: 4px;
-
 }
 
-
 .table-date {
-
   background: var(--primary-soft);
 
   color: #1973b7;
@@ -921,10 +700,9 @@
 
   border-radius: 6px;
 
-  font-size: 10px;
+  font-size: 12px;
 
   font-weight: 600;
-
 }
 
 
@@ -933,27 +711,19 @@
    ============================================================ */
 
 .table-wrapper {
-
   width: 100%;
-
   overflow-x: auto;
-
 }
 
-
 .consultations-table {
-
   width: 100%;
 
   border-collapse: collapse;
 
   min-width: 750px;
-
 }
 
-
 .consultations-table th {
-
   height: 40px;
 
   padding:
@@ -968,15 +738,12 @@
 
   text-align: left;
 
-  font-size: 10px;
+  font-size: 13px;
 
   font-weight: 700;
-
 }
 
-
 .consultations-table td {
-
   height: 58px;
 
   padding:
@@ -987,34 +754,24 @@
 
   color: #38566e;
 
-  font-size: 11px;
-
+  font-size: 14px;
 }
 
-
 .consultations-table tbody tr {
-
   transition:
     background 0.15s ease;
 
   cursor: default;
-
 }
-
 
 .consultations-table tbody tr:hover {
-
   background: var(--bg);
-
 }
 
-
 .number-cell {
-
   color: #7890a3 !important;
-
   font-weight: 600;
-
+  font-size: 14px !important;
 }
 
 
@@ -1023,20 +780,14 @@
    ============================================================ */
 
 .patient-cell {
-
   display: flex;
-
   align-items: center;
 
   gap: 9px;
-
 }
 
-
 .patient-avatar {
-
   width: 31px;
-
   height: 31px;
 
   min-width: 31px;
@@ -1044,86 +795,59 @@
   border-radius: 50%;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   color: white;
 
   font-weight: 700;
 
-  font-size: 10px;
-
+  font-size: 12px;
 }
 
-
 .patient-avatar.female {
-
   background:
     linear-gradient(
       135deg,
       #de7b9c,
       #bd5b83
     );
-
 }
 
-
 .patient-avatar.male {
-
   background:
     linear-gradient(
       135deg,
       #3d99d2,
       #176da7
     );
-
 }
-
 
 .patient-cell div:last-child {
-
   display: flex;
-
   flex-direction: column;
-
 }
-
 
 .patient-cell strong {
-
   color: #244e6c;
-
-  font-size: 11px;
-
+  font-size: 14px;
 }
-
 
 .patient-cell small {
-
   color: #9aaebb;
-
-  font-size: 8px;
-
+  font-size: 11px;
   margin-top: 2px;
-
 }
-
 
 .motif-text {
-
   color: #46657c;
-
+  font-size: 14px;
 }
 
-
 .heure-text {
-
   font-weight: 600;
-
   color: #315773;
-
+  font-size: 14px;
 }
 
 
@@ -1132,69 +856,47 @@
    ============================================================ */
 
 .status-badge {
-
   border: none;
 
   padding:
-    5px 9px;
+    6px 11px;
 
   border-radius: 5px;
 
-  font-size: 9px;
+  font-size: 12px;
 
   font-weight: 700;
 
   cursor: pointer;
 
   display: inline-flex;
-
   align-items: center;
 
   gap: 4px;
-
 }
-
 
 .status-dot {
-
-  font-size: 7px;
-
+  font-size: 8px;
 }
-
 
 .status-progress {
-
   color: #07855b;
-
   background: var(--border);
-
 }
-
 
 .status-waiting {
-
   color: #d47a00;
-
   background: #fff0d0;
-
 }
-
 
 .status-coming {
-
   color: #0873ca;
-
   background: var(--primary-soft);
-
 }
 
-
 .status-done {
-
   color: #16825b;
-
   background: var(--green-soft);
-
 }
 
 
@@ -1203,18 +905,12 @@
    ============================================================ */
 
 .row-actions {
-
   display: flex;
-
   gap: 5px;
-
 }
 
-
 .row-action {
-
   width: 29px;
-
   height: 29px;
 
   border: none;
@@ -1224,31 +920,23 @@
   cursor: pointer;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   background: var(--primary-soft);
 
   color: #0875bf;
 
+  font-size: 15px;
 }
-
 
 .row-action:hover {
-
   background: var(--border);
-
 }
 
-
 .row-action.more {
-
   background: var(--bg);
-
   color: var(--muted);
-
 }
 
 
@@ -1257,25 +945,16 @@
    ============================================================ */
 
 .empty-table {
-
   height: 180px !important;
-
   text-align: center !important;
-
 }
-
 
 .empty-table > div {
-
   margin: 0 auto;
-
 }
 
-
 .empty-icon {
-
   width: 42px;
-
   height: 42px;
 
   background: var(--primary-soft);
@@ -1285,37 +964,30 @@
   border-radius: 50%;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   font-size: 21px;
-
 }
 
-
 .empty-table strong {
-
   display: block;
 
   margin-top: 8px;
 
   color: #49687e;
 
+  font-size: 15px;
 }
 
-
 .empty-table span {
-
   display: block;
 
   color: #94a8b5;
 
-  font-size: 10px;
+  font-size: 12px;
 
   margin-top: 3px;
-
 }
 
 
@@ -1324,7 +996,6 @@
    ============================================================ */
 
 .quick-actions {
-
   padding:
     13px 15px;
 
@@ -1336,12 +1007,9 @@
   gap: 10px;
 
   background: var(--surface);
-
 }
 
-
 .quick-action-btn {
-
   min-height: 48px;
 
   border: none;
@@ -1355,58 +1023,42 @@
   cursor: pointer;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   gap: 8px;
 
-  font-size: 10px;
+  font-size: 13px;
 
   font-weight: 600;
 
   transition:
     background 0.2s ease,
     transform 0.2s ease;
-
 }
 
-
 .quick-action-btn:hover {
-
   background: var(--border);
 
   transform: translateY(-1px);
-
 }
 
-
 .action-icon {
-
   width: 27px;
-
   height: 27px;
 
   border-radius: 6px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  font-size: 13px;
-
+  font-size: 15px;
 }
 
-
 .blue-icon {
-
   color: #0876c2;
-
   background: var(--border);
-
 }
 
 
@@ -1415,7 +1067,6 @@
    ============================================================ */
 
 .bottom-info-grid {
-
   display: grid;
 
   grid-template-columns:
@@ -1424,12 +1075,9 @@
   gap: 15px;
 
   margin-top: 15px;
-
 }
 
-
 .info-card {
-
   background: white;
 
   border:
@@ -1440,12 +1088,9 @@
   padding: 16px;
 
   box-shadow: var(--shadow);
-
 }
 
-
 .info-card-title {
-
   display: flex;
 
   gap: 10px;
@@ -1453,14 +1098,10 @@
   align-items: center;
 
   margin-bottom: 13px;
-
 }
 
-
 .info-title-icon {
-
   width: 33px;
-
   height: 33px;
 
   border-radius: 8px;
@@ -1470,63 +1111,43 @@
   color: var(--green);
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   font-weight: 700;
-
 }
-
 
 .info-title-icon.orange-icon {
-
   background: var(--warning-soft);
-
   color: var(--warning);
-
 }
-
 
 .info-card-title h3 {
-
   margin: 0;
 
-  font-size: 12px;
+  font-size: 15px;
 
   color: #244d69;
-
 }
 
-
 .info-card-title p {
-
   margin:
     3px 0 0;
 
-  font-size: 9px;
+  font-size: 11px;
 
   color: #8da0ae;
-
 }
-
 
 .info-list {
-
   display: flex;
-
   flex-direction: column;
-
 }
 
-
 .info-row {
-
   display: flex;
 
   justify-content: space-between;
-
   align-items: center;
 
   padding:
@@ -1534,25 +1155,16 @@
 
   border-top:
     1px solid var(--primary-soft);
-
 }
-
 
 .info-row span {
-
-  font-size: 10px;
-
+  font-size: 12px;
   color: var(--muted);
-
 }
 
-
 .info-row strong {
-
   color: #155a8a;
-
-  font-size: 13px;
-
+  font-size: 15px;
 }
 
 
@@ -1561,7 +1173,6 @@
    ============================================================ */
 
 .reminder {
-
   display: flex;
 
   gap: 12px;
@@ -1573,12 +1184,9 @@
 
   border-top:
     1px solid var(--primary-soft);
-
 }
 
-
 .reminder-time {
-
   color: #0b72ba;
 
   background: var(--primary-soft);
@@ -1588,39 +1196,25 @@
   padding:
     6px 8px;
 
-  font-size: 10px;
+  font-size: 12px;
 
   font-weight: 700;
-
 }
-
 
 .reminder div {
-
   display: flex;
-
   flex-direction: column;
-
 }
-
 
 .reminder strong {
-
   color: #3a5b72;
-
-  font-size: 10px;
-
+  font-size: 13px;
 }
 
-
 .reminder div span {
-
   color: #8ca0ad;
-
-  font-size: 8px;
-
+  font-size: 11px;
   margin-top: 3px;
-
 }
 
 
@@ -1629,9 +1223,7 @@
    ============================================================ */
 
 .modal-overlay {
-
   position: fixed;
-
   inset: 0;
 
   background:
@@ -1640,7 +1232,6 @@
   display: flex;
 
   justify-content: center;
-
   align-items: center;
 
   padding: 20px;
@@ -1648,29 +1239,28 @@
   z-index: 100;
 
   backdrop-filter: blur(2px);
-
 }
 
-
 .modal-container {
-
   width: 100%;
   max-width: 100%;
+
   max-height: 100%;
+
   overflow-y: auto;
+
   background: white;
+
   border-radius: 12px;
+
   box-shadow:
     0 15px 50px rgba(0, 30, 60, 0.25);
 
   animation:
     modalAppear 0.2s ease;
-
 }
 
-
 .modal-container.modal-large {
-
   width: 96%;
 
   max-width: 1200px;
@@ -1680,31 +1270,24 @@
   overflow-y: auto;
 
   border-radius: 14px;
-
 }
 
 @keyframes modalAppear {
-
   from {
-
     opacity: 0;
 
     transform:
       translateY(12px)
       scale(0.98);
-
   }
 
   to {
-
     opacity: 1;
 
     transform:
       translateY(0)
       scale(1);
-
   }
-
 }
 
 
@@ -1713,11 +1296,10 @@
    ============================================================ */
 
 .modal-header {
-
   min-height: 72px;
 
   padding:
-    15px 20px;
+    24px 30px;
 
   display: flex;
 
@@ -1734,60 +1316,51 @@
       var(--bg),
       var(--surface)
     );
-
 }
 
-
 .modal-header h2 {
-
   margin: 0;
 
   color: var(--primary-dark);
 
-  font-size: 17px;
+  font-size: 23px;
 
+  font-weight: 700;
 }
-
 
 .modal-header p {
-
   margin:
-    4px 0 0;
+    7px 0 0;
 
-  color: #8aa0ae;
+  color: #6b7280;
 
-  font-size: 10px;
-
+  font-size: 14px;
 }
 
-
 .modal-close {
+  width: 40px;
+  height: 40px;
 
-  width: 31px;
-
-  height: 31px;
+  min-width: 40px;
 
   border: none;
 
-  border-radius: 6px;
+  border-radius: 10px;
 
-  background: var(--primary-soft);
+  background: #f3f4f6;
 
-  color: var(--muted);
+  color: #4b5563;
 
   cursor: pointer;
 
-  font-size: 20px;
+  font-size: 25px;
 
   line-height: 1;
-
 }
 
-
 .modal-close:hover {
-
-  background: var(--border);
-
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 
@@ -1796,9 +1369,28 @@
    ============================================================ */
 
 .modal-body {
+  padding: 30px;
 
-  padding: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 
@@ -1807,42 +1399,267 @@
    ============================================================ */
 
 .modal-form {
+  width: 100%;
+  max-width: 100%;
 
   display: flex;
 
   flex-direction: column;
 
   gap: 15px;
-
 }
 
-
 .form-group {
+  width: 100%;
+
+  margin-bottom: 22px;
 
   display: flex;
 
   flex-direction: column;
 
   gap: 6px;
-
 }
-
 
 .form-group label {
+  display: block;
 
-  color: #31546c;
+  margin-bottom: 9px;
 
-  font-size: 10px;
+  color: #374151;
 
-  font-weight: 700;
+  font-size: 14px;
 
+  font-weight: 600;
 }
-
 
 .form-group input,
 .form-group select,
 .form-group textarea {
+  width: 100%;
 
+  border:
+    1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  padding:
+    13px 15px;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  color: #111827;
+
+  background: #ffffff;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+  min-height: 48px;
+}
+
+.form-group textarea {
+  min-height: 120px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* ============================================================
+   FORMULAIRES SUR DEUX COLONNES
+   ============================================================ */
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 20px;
+
+  width: 100%;
+}
+
+
+/* ============================================================
+   FORMULAIRE CONSULTATION MÉDICALE
+   ============================================================ */
+
+.consultation-detail {
+  width: 100%;
+}
+
+.medical-section {
+  margin-top: 28px;
+
+  padding: 25px;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  background: #f8fafc;
+}
+
+.medical-section h4 {
+  margin:
+    0 0 24px;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.medical-section .form-group {
+  margin-bottom: 22px;
+}
+
+.medical-section textarea {
+  min-height: 135px;
+}
+
+
+/* ============================================================
+   INFORMATIONS PATIENT
+   ============================================================ */
+
+.patient-summary {
+  width: 100%;
+
+  padding: 20px;
+
+  margin-bottom: 25px;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  background: #f8fafc;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+}
+
+.patient-summary h3 {
+  margin:
+    0 0 6px;
+
+  font-size: 19px;
+
+  color: #111827;
+}
+
+.patient-summary p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.large-patient-avatar {
+  width: 58px;
+  height: 58px;
+
+  min-width: 58px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #dbeafe;
+
+  color: #1d4ed8;
+
+  font-size: 21px;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   DÉTAILS CONSULTATION
+   ============================================================ */
+
+.detail-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 25px;
+}
+
+.detail-box {
+  padding: 18px;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+.detail-box span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.detail-box strong {
+  display: block;
+
+  color: #111827;
+
+  font-size: 15px;
+}
+
+.medical-section h4 {
+  color: #2c536d;
+
+  font-size: 18px;
+
+  margin:
+    0 0 7px;
+}
+
+.medical-section textarea {
   width: 100%;
 
   border:
@@ -1850,55 +1667,64 @@
 
   border-radius: 7px;
 
-  outline: none;
-
-  background: white;
-
-  color: #31546c;
+  padding: 10px;
 
   font-family: inherit;
 
-  font-size: 11px;
-
-  padding:
-    10px 11px;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-
-}
-
-
-.form-group input,
-.form-group select {
-
-  height: 39px;
-
-}
-
-
-.form-group textarea {
+  font-size: 15px;
 
   resize: vertical;
 
+  outline: none;
+}
+
+.medical-section textarea:focus {
+  border-color: #6ab1df;
 }
 
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+/* ============================================================
+   DOSSIER PATIENT
+   ============================================================ */
 
-  border-color: #69b2df;
-
-  box-shadow:
-    0 0 0 3px rgba(0, 126, 202, 0.07);
-
+.patient-file {
+  display: flex;
+  flex-direction: column;
 }
 
+.file-header {
+  display: flex;
 
-.form-row {
+  align-items: center;
 
+  gap: 12px;
+
+  padding: 13px;
+
+  background: var(--bg);
+
+  border-radius: 8px;
+}
+
+.file-header h3 {
+  margin: 0;
+
+  color: #234f6b;
+
+  font-size: 16px;
+}
+
+.file-header span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #8ba0ae;
+
+  font-size: 12px;
+}
+
+.file-sections {
   display: grid;
 
   grid-template-columns:
@@ -1906,6 +1732,143 @@
 
   gap: 12px;
 
+  margin-top: 14px;
+}
+
+.file-section {
+  padding: 13px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 8px;
+}
+
+.file-section h4 {
+  margin:
+    0 0 10px;
+
+  color: #2c536e;
+
+  font-size: 14px;
+}
+
+.file-section p {
+  margin:
+    7px 0;
+
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   PLACEHOLDER
+   ============================================================ */
+
+.placeholder-modal {
+  width: 100%;
+
+  text-align: center;
+
+  padding:
+    35px 25px;
+}
+
+.placeholder-modal-icon {
+  width: 70px;
+  height: 70px;
+
+  margin:
+    0 auto 20px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  background: #dcfce7;
+
+  color: #16a34a;
+
+  font-size: 30px;
+
+  font-weight: 700;
+}
+
+.placeholder-modal h3 {
+  margin:
+    0 0 12px;
+
+  color: #111827;
+
+  font-size: 21px;
+}
+
+.placeholder-modal p {
+  max-width: 650px;
+
+  margin:
+    10px auto;
+
+  color: #6b7280;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+}
+
+.placeholder-modal .btn-primary {
+  margin-top: 20px;
+}
+
+
+/* ============================================================
+   BOUTON RDV
+   ============================================================ */
+
+.btn-rdv {
+  border: none;
+
+  border-radius: 6px;
+
+  padding:
+    8px 14px;
+
+  min-height: 36px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  color: #ffffff;
+
+  background: #dc2626;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    all 0.2s ease;
+}
+
+.btn-rdv:hover {
+  background: #b91c1c;
+
+  transform:
+    translateY(-1px);
+}
+
+.btn-rdv:active {
+  transform:
+    translateY(0);
 }
 
 
@@ -1914,24 +1877,38 @@
    ============================================================ */
 
 .modal-actions {
-
   display: flex;
 
   justify-content: flex-end;
 
   align-items: center;
 
-  gap: 8px;
+  gap: 12px;
 
-  margin-top: 5px;
+  margin-top: 28px;
 
-  padding-top: 10px;
+  padding-top: 22px;
 
+  border-top:
+    1px solid #e5e7eb;
 }
 
+.modal-actions button {
+  min-height: 46px;
+
+  padding:
+    11px 22px;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
 
 .btn-secondary {
-
   min-height: 40px;
 
   padding:
@@ -1948,356 +1925,234 @@
 
   cursor: pointer;
 
-  font-size: 10px;
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: var(--bg);
+}
+
+
+/* ============================================================
+   BOUTONS ANNULER / FERMER
+   ============================================================ */
+
+.btn-cancel {
+  border: none;
+
+  border-radius: 6px;
+
+  padding:
+    8px 14px;
+
+  min-height: 36px;
+
+  font-size: 14px;
 
   font-weight: 600;
 
-}
+  cursor: pointer;
 
+  color: #ffffff;
 
-.btn-secondary:hover {
+  background: #dc2626;
 
-  background: var(--bg);
-
-}
-
-
-/* ============================================================
-   DÉTAIL CONSULTATION
-   ============================================================ */
-
-.patient-summary {
-
-  display: flex;
+  display: inline-flex;
 
   align-items: center;
-
-  gap: 12px;
-
-  padding: 12px;
-
-  background: var(--bg);
-
-  border-radius: 8px;
-
-  margin-bottom: 15px;
-
-}
-
-
-.large-patient-avatar {
-
-  width: 48px;
-
-  height: 48px;
-
-  min-width: 48px;
-
-  border-radius: 50%;
-
-  display: flex;
-
-  align-items: center;
-
   justify-content: center;
 
-  background:
-    linear-gradient(
-      135deg,
-      #1686c9,
-      #54b4df
-    );
-
-  color: white;
-
-  font-size: 15px;
-
-  font-weight: 700;
-
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.btn-cancel:hover {
+  background: #b91c1c;
 
-.patient-summary h3 {
-
-  margin: 0;
-
-  font-size: 14px;
-
-  color: #214c69;
-
+  transform:
+    translateY(-1px);
 }
 
+.btn-cancel:active {
+  background: #991b1b;
 
-.patient-summary p {
-
-  margin:
-    4px 0 0;
-
-  font-size: 9px;
-
-  color: #7d96a6;
-
+  transform:
+    translateY(0);
 }
 
+.btn-cancel:focus-visible {
+  outline:
+    2px solid #ef4444;
 
-.detail-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 10px;
-
-  margin-bottom: 17px;
-
-}
-
-
-.detail-box {
-
-  padding: 11px;
-
-  background: var(--surface);
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 7px;
-
-}
-
-
-.detail-box span {
-
-  display: block;
-
-  color: #8ba0ad;
-
-  font-size: 8px;
-
-  margin-bottom: 5px;
-
-}
-
-
-.detail-box strong {
-
-  color: #315a74;
-
-  font-size: 11px;
-
-}
-
-
-.medical-section h4 {
-
-  color: #2c536d;
-
-  font-size: 11px;
-
-  margin:
-    0 0 7px;
-
-}
-
-
-.medical-section textarea {
-
-  width: 100%;
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 7px;
-
-  padding: 10px;
-
-  font-family: inherit;
-
-  font-size: 11px;
-
-  resize: vertical;
-
-  outline: none;
-
-}
-
-
-.medical-section textarea:focus {
-
-  border-color: #6ab1df;
-
+  outline-offset: 2px;
 }
 
 
 /* ============================================================
-   DOSSIER PATIENT
+   PAGE MES PATIENTS
    ============================================================ */
 
-.patient-file {
-
-  display: flex;
-
-  flex-direction: column;
-
+.mes-patients-card {
+  width: 100%;
+  min-width: 0;
 }
 
+.patients-complete-table {
+  width: 100%;
+  min-width: 1250px;
+}
 
-.file-header {
+.patients-complete-table th,
+.patients-complete-table td {
+  white-space: nowrap;
+}
 
+.patients-complete-table th {
+  font-size: 13px;
+}
+
+.patients-complete-table td {
+  font-size: 14px;
+}
+
+.patients-complete-table td:nth-child(2) {
+  min-width: 220px;
+}
+
+.patients-complete-table td:nth-child(4) {
+  min-width: 170px;
+}
+
+.patients-complete-table td:nth-child(7) {
+  max-width: 240px;
+
+  white-space: normal;
+
+  line-height: 1.45;
+}
+
+.patients-complete-table td:nth-child(8) {
+  min-width: 145px;
+}
+
+.patients-page-footer {
   display: flex;
 
   align-items: center;
 
-  gap: 12px;
+  justify-content: space-between;
 
-  padding: 13px;
-
-  background: var(--bg);
-
-  border-radius: 8px;
-
-}
-
-
-.file-header h3 {
-
-  margin: 0;
-
-  color: #234f6b;
-
-  font-size: 14px;
-
-}
-
-
-.file-header span {
-
-  display: block;
-
-  margin-top: 3px;
-
-  color: #8ba0ae;
-
-  font-size: 9px;
-
-}
-
-
-.file-sections {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 12px;
-
-  margin-top: 14px;
-
-}
-
-
-.file-section {
-
-  padding: 13px;
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 8px;
-
-}
-
-
-.file-section h4 {
-
-  margin:
-    0 0 10px;
-
-  color: #2c536e;
-
-  font-size: 11px;
-
-}
-
-
-.file-section p {
-
-  margin:
-    7px 0;
-
-  color: var(--muted);
-
-  font-size: 10px;
-
-}
-
-
-/* ============================================================
-   PLACEHOLDER
-   ============================================================ */
-
-.placeholder-modal {
-
-  text-align: center;
+  gap: 20px;
 
   padding:
-    15px 20px 10px;
+    18px 22px;
 
+  border-top:
+    1px solid #e5e7eb;
+
+  background: #fafafa;
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+.patients-page-footer strong {
+  color: #1e293b;
+}
+
+.patients-page-footer span:last-child {
+  text-align: right;
 }
 
 
-.placeholder-modal-icon {
+/* ============================================================
+   ORDONNANCES
+   ============================================================ */
 
-  width: 55px;
-
-  height: 55px;
-
-  margin: 0 auto 10px;
-
-  border-radius: 50%;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  background: var(--primary-soft);
-
-  color: #0876bf;
-
-  font-size: 23px;
-
+.ordonnance-page {
+  width: 100%;
 }
 
+.prescription-preview {
+  max-width: 260px;
 
-.placeholder-modal h3 {
+  white-space: nowrap;
 
-  margin: 0;
+  overflow: hidden;
 
-  color: #2b526c;
+  text-overflow: ellipsis;
+
+  color: #334155;
 
   font-size: 14px;
 
+  line-height: 1.5;
 }
 
+.prescription-content {
+  margin-top: 12px;
 
-.placeholder-modal p {
+  padding: 20px;
 
-  max-width: 340px;
+  min-height: 150px;
 
-  margin:
-    7px auto 15px;
+  background: #f8fafc;
 
-  color: #8298a7;
+  border:
+    1px solid #e2e8f0;
 
-  font-size: 10px;
+  border-radius: 12px;
 
-  line-height: 1.6;
+  color: #1e293b;
 
+  font-size: 16px;
+
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+}
+
+.prescription-content strong {
+  color: #0f172a;
+}
+
+.ordonnance-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    5px 10px;
+
+  border-radius: 999px;
+
+  background: #ecfdf5;
+
+  color: #047857;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.ordonnance-status::before {
+  content: "";
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: currentColor;
 }
 
 
@@ -2308,43 +2163,66 @@
 @media (max-width: 1100px) {
 
   .medecin-sidebar {
-
     width: 195px;
-
     min-width: 195px;
-
   }
-
 
   .medecin-content {
-
     padding:
       18px 20px 30px;
-
   }
-
 
   .medecin-header {
-
     padding:
       0 20px;
-
   }
-
 
   .quick-stats {
-
     grid-template-columns:
       repeat(2, 1fr);
-
   }
 
-
   .quick-actions {
-
     grid-template-columns:
       repeat(2, 1fr);
+  }
 
+}
+
+
+/* ============================================================
+   RESPONSIVE TABLEAUX PATIENTS
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+  .patients-complete-table {
+    min-width: 1100px;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE MODALES
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .modal-container {
+    width: 95vw;
+  }
+
+  .modal-container.modal-large {
+    width: 95vw;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
 }
@@ -2357,46 +2235,32 @@
 @media (max-width: 780px) {
 
   .consultations-page {
-
     display: block;
-
   }
 
-
   .medecin-sidebar {
-
     width: 100%;
-
     min-width: 100%;
 
     min-height: auto;
 
     position: relative;
-
   }
-
 
   .sidebar-logo {
-
     min-height: 60px;
-
   }
 
-
   .medecin-menu {
-
     display: grid;
 
     grid-template-columns:
       repeat(4, 1fr);
 
     padding: 8px;
-
   }
 
-
   .medecin-menu-item {
-
     justify-content: center;
 
     flex-direction: column;
@@ -2407,115 +2271,76 @@
 
     min-height: 52px;
 
-    font-size: 8px;
-
+    font-size: 10px;
   }
-
 
   .menu-icon {
-
-    font-size: 15px;
-
+    font-size: 17px;
   }
-
 
   .sidebar-bottom {
-
     display: none;
-
   }
 
-
   .medecin-header {
-
     min-height: 72px;
 
     padding:
       0 15px;
-
   }
-
 
   .header-title h1 {
-
-    font-size: 17px;
-
+    font-size: 20px;
   }
-
 
   .header-title p {
-
     display: none;
-
   }
-
 
   .doctor-info {
-
     display: none;
-
   }
-
 
   .medecin-content {
-
     padding:
       15px;
-
   }
-
 
   .section-heading h2 {
-
-    font-size: 17px;
-
+    font-size: 20px;
   }
 
+  .section-heading p {
+    font-size: 12px;
+  }
 
   .consultation-toolbar {
-
     flex-direction: column;
 
     align-items: stretch;
-
   }
-
 
   .search-box {
-
     width: 100%;
-
   }
-
 
   .new-consultation-btn {
-
     width: 100%;
-
   }
-
 
   .quick-stats {
-
     grid-template-columns:
       1fr 1fr;
-
   }
-
 
   .quick-actions {
-
     grid-template-columns:
       1fr 1fr;
-
   }
 
-
   .bottom-info-grid {
-
     grid-template-columns:
       1fr;
-
   }
 
 }
@@ -2525,81 +2350,1318 @@
    PETIT MOBILE
    ============================================================ */
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
-  .medecin-menu {
-
-    grid-template-columns:
-      repeat(3, 1fr);
-
+  .modal-overlay {
+    padding: 12px;
   }
 
+  .modal-container,
+  .modal-container.modal-large {
+    width: 100%;
 
-  .quick-stats {
+    max-width: 100%;
 
-    grid-template-columns:
-      1fr;
+    max-height: 95vh;
 
+    border-radius: 14px;
   }
 
-
-  .quick-actions {
-
-    grid-template-columns:
-      1fr;
-
+  .modal-header {
+    padding: 18px;
   }
 
-
-  .section-heading {
-
-    align-items: flex-start;
-
+  .modal-body {
+    padding: 18px;
   }
 
-
-  .consultation-counter {
-
-    display: none;
-
+  .modal-header h2 {
+    font-size: 19px;
   }
-
-
-  .form-row {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .detail-grid {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .file-sections {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
 
   .modal-actions {
+    flex-direction: column-reverse;
 
-    flex-wrap: wrap;
-
+    align-items: stretch;
   }
 
-
   .modal-actions button {
+    width: 100%;
+  }
 
-    flex: 1;
-
+  .patient-summary {
+    align-items: flex-start;
   }
 
 }
+
+@media (max-width: 480px) {
+
+  .medecin-menu {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .quick-stats {
+    grid-template-columns:
+      1fr;
+  }
+
+  .quick-actions {
+    grid-template-columns:
+      1fr;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+  }
+
+  .consultation-counter {
+    display: none;
+  }
+
+  .form-row {
+    grid-template-columns:
+      1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .file-sections {
+    grid-template-columns:
+      1fr;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .modal-actions button {
+    flex: 1;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE MES PATIENTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .patients-page-footer {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .patients-page-footer span:last-child {
+    text-align: left;
+  }
+
+}
+
+
+/* ============================================================
+   AGRANDISSEMENT SUPPLÉMENTAIRE DES TEXTES
+   ============================================================ */
+
+@media (min-width: 1101px) {
+
+  .medecin-menu-item {
+    font-size: 15px;
+  }
+
+  .header-title h1 {
+    font-size: 25px;
+  }
+
+  .header-title p {
+    font-size: 14px;
+  }
+
+  .section-heading h2 {
+    font-size: 23px;
+  }
+
+  .consultations-table th {
+    font-size: 13px;
+  }
+
+  .consultations-table td {
+    font-size: 14px;
+  }
+
+}
+
+
+/* ============================================================
+   FIN DU FICHIER
+   ============================================================ */
+
+   /* ============================================================
+   MODALES / FORMULAIRES - VERSION AGRANDIE
+   ============================================================ */
+
+/* Fond de la fenêtre */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  background: rgba(15, 23, 42, 0.55);
+
+  backdrop-filter: blur(3px);
+}
+
+
+/* ============================================================
+   CONTENEUR FORMULAIRE
+   ============================================================ */
+
+.modal-container {
+  width: min(720px, 94vw);
+
+  max-width: 720px;
+
+  max-height: 92vh;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.22);
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+/* ============================================================
+   GRANDE MODALE
+   ============================================================ */
+
+.modal-container.modal-large {
+  width: min(1050px, 94vw);
+
+  max-width: 1050px;
+
+  max-height: 94vh;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   EN-TÊTE DE LA MODALE
+   ============================================================ */
+
+.modal-header {
+  min-height: 85px;
+
+  padding: 24px 30px;
+
+  border-bottom:
+    1px solid #e5e7eb;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  flex-shrink: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc,
+      #ffffff
+    );
+}
+
+
+.modal-header h2 {
+  margin: 0;
+
+  font-size: 23px;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+
+.modal-header p {
+  margin: 7px 0 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   BOUTON FERMER
+   ============================================================ */
+
+.modal-close {
+  width: 40px;
+
+  height: 40px;
+
+  min-width: 40px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #f3f4f6;
+
+  color: #4b5563;
+
+  font-size: 25px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.modal-close:hover {
+  background: #fee2e2;
+
+  color: #dc2626;
+
+  transform: scale(1.03);
+}
+
+
+/* ============================================================
+   CORPS DE LA MODALE
+   ============================================================ */
+
+.modal-body {
+  padding: 30px;
+
+  overflow-y: auto;
+
+  overflow-x: hidden;
+}
+
+
+/* Barre de défilement */
+.modal-body::-webkit-scrollbar {
+  width: 9px;
+}
+
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 10px;
+}
+
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* ============================================================
+   FORMULAIRE
+   ============================================================ */
+
+.modal-form {
+  width: 100%;
+
+  max-width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.form-group {
+  width: 100%;
+
+  margin-bottom: 22px;
+}
+
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+
+  border:
+    1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  padding:
+    13px 15px;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  color: #111827;
+
+  background: #ffffff;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.form-group input,
+.form-group select {
+  min-height: 50px;
+
+  height: 50px;
+}
+
+
+.form-group textarea {
+  min-height: 125px;
+
+  resize: vertical;
+
+  line-height: 1.6;
+}
+
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9ca3af;
+
+  font-size: 14px;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* ============================================================
+   FORMULAIRE 2 COLONNES
+   ============================================================ */
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 20px;
+
+  width: 100%;
+}
+
+
+/* ============================================================
+   INFORMATIONS PATIENT DANS LA MODALE
+   ============================================================ */
+
+.patient-summary {
+  width: 100%;
+
+  padding: 20px;
+
+  margin-bottom: 25px;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  background: #f8fafc;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+.patient-summary h3 {
+  margin:
+    0 0 6px;
+
+  font-size: 20px;
+
+  line-height: 1.4;
+
+  color: #111827;
+}
+
+
+.patient-summary p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+.large-patient-avatar {
+  width: 60px;
+
+  height: 60px;
+
+  min-width: 60px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #dbeafe;
+
+  color: #1d4ed8;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   DÉTAILS CONSULTATION
+   ============================================================ */
+
+.detail-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.detail-box {
+  padding: 18px;
+  border:
+    1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+
+.detail-box span {
+  display: block;
+  margin-bottom: 7px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.detail-box strong {
+  display: block;
+  color: #111827;
+  font-size: 16px;
+}
+
+
+/* ============================================================
+   SECTION MÉDICALE
+   ============================================================ */
+
+.medical-section {
+  width: 100%;
+  margin-top: 28px;
+  padding: 25px;
+  border:
+    1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.medical-section h4 {
+  margin:
+    0 0 24px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.medical-section .form-group {
+  margin-bottom: 22px;
+}
+
+.medical-section textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px;
+  border:
+    1px solid #d1d5db;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+.medical-section textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* ============================================================
+   ACTIONS DE LA MODALE
+   ============================================================ */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top:
+    1px solid #e5e7eb;
+}
+
+
+.modal-actions button {
+  min-height: 48px;
+  padding:
+    11px 24px;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   BOUTON ANNULER
+   ============================================================ */
+
+.btn-cancel {
+  min-height: 46px;
+
+  padding:
+    10px 22px;
+
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #dc2626;
+
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.btn-cancel:hover {
+  background: #b91c1c;
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* ============================================================
+   BOUTON SECONDAIRE
+   ============================================================ */
+
+.btn-secondary {
+  min-height: 46px;
+  padding:
+    10px 22px;
+  border:
+    1px solid #cddfe9;
+  background: #ffffff;
+  color: #537085;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+}
+
+
+/* ============================================================
+   BOUTON PRINCIPAL DANS LA MODALE
+   ============================================================ */
+
+.modal-actions .btn-primary {
+  min-height: 48px;
+  padding:
+    10px 25px;
+  font-size: 15px;
+}
+
+/* ============================================================
+   MODALE DE CONFIRMATION
+   ============================================================ */
+
+.placeholder-modal {
+  width: 100%;
+
+  padding:
+    40px 30px;
+  text-align: center;
+}
+.placeholder-modal-icon {
+  width: 72px;
+
+  height: 72px;
+
+  margin:
+    0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 31px;
+  font-weight: 700;
+}
+
+.placeholder-modal h3 {
+  margin:
+    0 0 12px;
+
+  font-size: 22px;
+
+  color: #111827;
+}
+.placeholder-modal p {
+  max-width: 650px;
+  margin:
+    10px auto 20px;
+
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   RESPONSIVE MODALES
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .modal-container {
+    width: 95vw;
+
+    max-width: 720px;
+  }
+  .modal-container.modal-large {
+    width: 95vw;
+
+    max-width: 1050px;
+  }
+
+  .detail-grid {
+    grid-template-columns:
+      1fr;
+  }
+  .form-row {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal-container,
+  .modal-container.modal-large {
+    width: 100%;
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 14px;
+  }
+  .modal-header {
+    padding: 18px;
+  }
+  .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .modal-header p {
+    font-size: 13px;
+  }
+  .modal-body {
+    padding: 18px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 15px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+  .modal-actions button {
+    width: 100%;
+  }
+  .patient-summary {
+    align-items: flex-start;
+  }
+
+}
+/* ============================================================
+   BOUTON HOSPITALISER
+   ============================================================ */
+
+.btn-hospitaliser {
+  background: #16a34a;
+  color: #ffffff;
+  border: 1px solid #16a34a;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hospitaliser:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.btn-hospitaliser:active {
+  background: #166534;
+  transform: translateY(1px);
+}
+/* ============================================================
+   TABLEAU DES PATIENTS — CONSULTATIONS
+   ============================================================ */
+
+.consultations-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* Tableau */
+.consultations-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  color: #1e293b;
+  min-width: 1100px;
+}
+
+/* En-tête */
+.consultations-table thead th {
+  background: #f1f5f9;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 2px solid #cbd5e1;
+  white-space: nowrap;
+}
+
+/* Première ligne de l'en-tête */
+.consultations-table thead tr:first-child th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.consultations-table thead tr:first-child th:last-child {
+  border-top-right-radius: 12px;
+}
+
+/* Cellules */
+.consultations-table tbody td {
+  padding: 13px 12px;
+  font-size: 13px;
+  color: #334155;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Lignes */
+.consultations-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Une ligne sur deux */
+.consultations-table tbody tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+/* Survol */
+.consultations-table tbody tr:hover td {
+  background: #eef6ff;
+}
+
+/* Dernière ligne */
+.consultations-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Nom du patient */
+.consultations-table .patient-name {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Numéro patient */
+.consultations-table .patient-number {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Statut */
+.consultations-table .status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Zone des actions */
+.consultations-table .actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* Boutons du tableau */
+.consultations-table button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.consultations-table button:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* Bouton Consulter */
+.consultations-table .btn-consulter {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.consultations-table .btn-consulter:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Bouton RDV */
+.consultations-table .btn-rdv {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.consultations-table .btn-rdv:hover {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+/* Bouton Hospitaliser */
+.consultations-table .btn-hospitaliser {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.consultations-table .btn-hospitaliser:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .consultations-table {
+    min-width: 1000px;
+  }
+
+  .consultations-table thead th,
+  .consultations-table tbody td {
+    padding: 11px 9px;
+  }
+}
+
+/* ============================================================
+   MA SANTÉ — CONSULTATIONS
+   AMÉLIORATION DU TABLEAU DES PATIENTS
+   ============================================================ */
+
+/* ============================================================
+   TABLEAU — VISIBILITÉ
+   ============================================================ */
+
+.consultations-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  color: #000000;
+}
+
+.consultations-table thead th {
+  background: #f1f5f9;
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 2px solid #d1d5db;
+  white-space: nowrap;
+}
+
+.consultations-table tbody td {
+  background: #ffffff;
+  color: #000000;
+  padding: 14px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+/* Une ligne sur deux légèrement différenciée */
+.consultations-table tbody tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+/* Survol */
+.consultations-table tbody tr:hover td {
+  background: #eef6ff;
+}
+
+/* ============================================================
+   INFORMATIONS PATIENT — NOIR
+   ============================================================ */
+
+.consultations-table .patient-cell strong {
+  display: block;
+  color: #000000 !important;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.consultations-table .patient-cell small {
+  display: block;
+  color: #000000 !important;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.consultations-table .number-cell {
+  color: #000000 !important;
+  font-weight: 700;
+}
+
+.consultations-table .motif-text {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+.consultations-table .heure-text {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+/* Toutes les informations textuelles du tableau */
+.consultations-table tbody td strong,
+.consultations-table tbody td span,
+.consultations-table tbody td small {
+  color: #000000;
+}
+
+/* ============================================================
+   ACTIONS
+   IMPORTANT :
+   ON CONSERVE LES COULEURS EXISTANTES DES BOUTONS
+   ============================================================ */
+
+.consultations-table .row-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* Bouton Consulter
+   La couleur existante est conservée */
+.consultations-table .row-actions .btn-primary {
+  background: #100ce2;
+  color: #ffffff;
+  border: 1px solid #030518;
+  border-radius: 8px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #ffffff;;
+}
+
+/* Bouton RDV
+   La couleur existante est conservée */
+.consultations-table .row-actions .btn-rdv {
+  color: #ffffff;
+  background: #e90707;
+  color: #ffffff;
+  border: 1px solid #0a1ed3;
+  border-radius: 8px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #ffffff;;
+}
+
+/* Bouton Hospitaliser — VERT */
+.consultations-table .row-actions .btn-hospitaliser {
+  background: #16a34a;
+  color: #ffffff;
+  border: 1px solid #101f15;
+  border-radius: 8px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.consultations-table .row-actions .btn-hospitaliser:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.consultations-table .row-actions .btn-hospitaliser:active {
+  background: #166534;
+}
+
+/* ============================================================
+   CONTENEUR DU TABLEAU
+   ============================================================ */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ============================================================
+   CARTE DU TABLEAU
+   ============================================================ */
+
+.consultations-card {
+  background: #ffffff;
+  border: 1px solid #dbe3ec;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+/* ============================================================
+   EN-TÊTE DU TABLEAU
+   ============================================================ */
+
+.consultations-card .table-header {
+  background: #ffffff;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.consultations-card .table-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.consultations-card .table-header span {
+  color: #475569;
+  font-size: 12px;
+}
+
+/* ============================================================
+   TABLEAU PATIENTS COMPLET
+   ============================================================ */
+
+.patients-complete-table tbody td {
+  color: #000000 !important;
+}
+
+.patients-complete-table .patient-cell strong,
+.patients-complete-table .patient-cell small,
+.patients-complete-table .motif-text,
+.patients-complete-table .heure-text,
+.patients-complete-table .number-cell {
+  color: #000000 !important;
+}
+
+/* ============================================================
+   CELLULE PATIENT
+   ============================================================ */
+
+.patient-cell {
+  display: flex;
+  align-items: center;
+  min-width: 180px;
+}
+
+.patient-cell > div {
+  min-width: 0;
+}
+
+/* ============================================================
+   IDENTIFIANT
+   ============================================================ */
+
+.number-cell {
+  color: #000000 !important;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   INFORMATIONS TEXTUELLES
+   ============================================================ */
+
+.motif-text {
+  display: inline-block;
+  max-width: 220px;
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+.heure-text {
+  color: #000000 !important;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   TABLEAU RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+
+  .consultations-table {
+    min-width: 1050px;
+  }
+
+  .consultations-table thead th,
+  .consultations-table tbody td {
+    padding: 12px 10px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .consultations-table {
+    min-width: 1000px;
+  }
+
+}
+

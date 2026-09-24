@@ -11,24 +11,23 @@ import "../styles/Caisse.css";
  *
  * - Recherche des patients
  * - Enregistrement d'un nouveau patient
+ * - Gestion de l'âge et de la date de naissance
+ * - Gestion du contact du patient
+ * - Gestion du numéro d'un parent
  * - Sélection du sexe
  * - Sélection du service médical
- * - Sélection du médecin
  * - Calcul automatique du coût du service
- * - Gestion temporaire des assurances
- * - Application automatique de la réduction assurance
+ * - Gestion des assurances
+ * - Gestion du numéro d'assurance
+ * - Application automatique du taux de couverture
  * - Génération automatique de l'identifiant patient
- * - Calcul dynamique des bilans
- * - Transmission automatique du patient au médecin
+ * - Bilans jour / semaine / mois
+ * - Page locale des assurances configurées
+ * - Transmission automatique du patient au module Consultation
  *
  * IMPORTANT :
- * Les services, médecins et assurances présents ici sont
- * TEMPORAIRES.
- *
- * Ils seront plus tard récupérés depuis le module
- * Administration / Configuration via l'API Django.
- *
- * La Caisse ne gère PAS le statut médical du patient.
+ * Le médecin / "Affecté à" n'est plus sélectionné depuis
+ * le module Caisse.
  * ============================================================
  */
 
@@ -68,36 +67,21 @@ function Icon({ name, size = 20 }) {
       </>
     ),
 
-    billing: (
-      <>
-        <rect x="4" y="3" width="16" height="18" rx="2" />
-        <path d="M8 7h8" />
-        <path d="M8 11h8" />
-        <path d="M8 15h5" />
-      </>
-    ),
-
-    payment: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 10h18" />
-        <path d="M7 15h3" />
-      </>
-    ),
-
-    history: (
-      <>
-        <path d="M3 12a9 9 0 1 0 3-6.7" />
-        <path d="M3 4v6h6" />
-        <path d="M12 7v5l3 2" />
-      </>
-    ),
-
     report: (
       <>
         <path d="M4 19V5" />
         <path d="M4 19h17" />
         <path d="m7 15 4-4 3 2 5-6" />
+      </>
+    ),
+
+    insurance: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 10h18" />
+        <path d="M8 15h3" />
+        <path d="M15 14v4" />
+        <path d="M13 16h4" />
       </>
     ),
 
@@ -136,13 +120,8 @@ function Icon({ name, size = 20 }) {
 
 /*
  * ============================================================
- * DONNÉES TEMPORAIRES
- * ============================================================
- */
-
-
-/*
  * SERVICES MÉDICAUX
+ * ============================================================
  */
 
 const servicesConfiguration = [
@@ -180,48 +159,28 @@ const servicesConfiguration = [
 
 
 /*
- * MÉDECINS
- */
-
-const doctorsConfiguration = [
-  {
-    id: 1,
-    name: "Dr. KOUAME",
-  },
-  {
-    id: 2,
-    name: "Dr. BAH",
-  },
-  {
-    id: 3,
-    name: "Dr. KONE",
-  },
-  {
-    id: 4,
-    name: "Dr. YAO",
-  },
-];
-
-
-/*
+ * ============================================================
  * ASSURANCES
+ * ============================================================
+ *
+ * coverage = pourcentage pris en charge
  */
 
 const insuranceConfiguration = [
   {
     id: 1,
     name: "MUGEFCI",
-    reduction: 30,
+    coverage: 30,
   },
   {
     id: 2,
     name: "CNPS",
-    reduction: 20,
+    coverage: 20,
   },
   {
     id: 3,
     name: "NSIA",
-    reduction: 40,
+    coverage: 40,
   },
 ];
 
@@ -237,52 +196,68 @@ const initialPatients = [
     id: "PAT-001",
     patient: "TRAORE Awa",
     sexe: "Féminin",
+    age: 32,
+    dateNaissance: "",
     service: "Médecine générale",
-    doctor: "Dr. KOUAME",
     telephone: "0700000000",
+    parentContact: "0500000000",
     cost: 10000,
     insurance: "Non",
     insuranceName: "",
+    insuranceNumber: "",
     quartier: "Cocody",
+    dateEnregistrement: new Date().toISOString(),
   },
 
   {
     id: "PAT-002",
     patient: "KONE Ibrahim",
     sexe: "Masculin",
+    age: 40,
+    dateNaissance: "",
     service: "Chirurgie",
-    doctor: "Dr. BAH",
     telephone: "0500000000",
-    cost: 25000,
+    parentContact: "0700000002",
+    cost: 20000,
     insurance: "Oui",
     insuranceName: "CNPS",
+    insuranceNumber: "CNPS-2026-001245",
     quartier: "Marcory",
+    dateEnregistrement: new Date().toISOString(),
   },
 
   {
     id: "PAT-003",
     patient: "DIALLO Mariam",
     sexe: "Féminin",
+    age: 27,
+    dateNaissance: "",
     service: "Pédiatrie",
-    doctor: "Dr. KONE",
     telephone: "0100000000",
+    parentContact: "0500000003",
     cost: 12000,
     insurance: "Non",
     insuranceName: "",
+    insuranceNumber: "",
     quartier: "Yopougon",
+    dateEnregistrement: new Date().toISOString(),
   },
 
   {
     id: "PAT-004",
     patient: "YAO Claude",
     sexe: "Masculin",
+    age: 35,
+    dateNaissance: "",
     service: "Médecine générale",
-    doctor: "Dr. KOUAME",
     telephone: "0700000001",
-    cost: 10000,
+    parentContact: "0500000004",
+    cost: 7000,
     insurance: "Oui",
     insuranceName: "MUGEFCI",
+    insuranceNumber: "MUG-2026-000123",
     quartier: "Plateau",
+    dateEnregistrement: new Date().toISOString(),
   },
 ];
 
@@ -312,6 +287,55 @@ function generatePatientId(patients) {
       : 1;
 
   return `PAT-${String(nextNumber).padStart(3, "0")}`;
+}
+
+
+/*
+ * ============================================================
+ * CALCUL DATE DE NAISSANCE À PARTIR DE L'ÂGE
+ * ============================================================
+ */
+
+function calculateBirthDate(age) {
+  const numericAge = Number(age);
+
+  if (
+    !Number.isFinite(numericAge) ||
+    numericAge < 0
+  ) {
+    return "";
+  }
+
+  const today = new Date();
+
+  const birthDate = new Date(
+    today.getFullYear() - numericAge,
+    today.getMonth(),
+    today.getDate()
+  );
+
+  return birthDate.toISOString().split("T")[0];
+}
+
+
+/*
+ * ============================================================
+ * FORMAT DATE
+ * ============================================================
+ */
+
+function formatDate(date) {
+  if (!date) {
+    return "--";
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "--";
+  }
+
+  return parsedDate.toLocaleDateString("fr-FR");
 }
 
 
@@ -350,13 +374,30 @@ function savePatientForConsultation(patient) {
           ? "M"
           : "--",
 
+      age: patient.age,
+
+      dateNaissance: patient.dateNaissance,
+
       telephone: patient.telephone,
+
+      parentContact: patient.parentContact,
 
       quartier: patient.quartier,
 
       service: patient.service,
 
-      doctor: patient.doctor,
+      /*
+       * Aucun médecin n'est affecté depuis la Caisse.
+       * Le médecin pourra être déterminé dans le module
+       * Consultation.
+       */
+      doctor: "",
+
+      insurance: patient.insurance,
+
+      insuranceName: patient.insuranceName,
+
+      insuranceNumber: patient.insuranceNumber,
 
       motif: "Consultation générale",
 
@@ -395,12 +436,6 @@ function savePatientForConsultation(patient) {
       JSON.stringify(existingPatients)
     );
 
-    /*
-     * Permet de synchroniser immédiatement les deux
-     * modules lorsqu'ils sont ouverts dans la même
-     * application.
-     */
-
     window.dispatchEvent(
       new CustomEvent(
         "sante:patient-added",
@@ -426,11 +461,42 @@ function savePatientForConsultation(patient) {
  */
 
 export default function Caisse() {
+
+  /*
+   * ==========================================================
+   * ÉTAT DE LA PAGE ACTIVE
+   * ==========================================================
+   */
+
+  const [activePage, setActivePage] =
+    useState("patient");
+
+
+  /*
+   * ==========================================================
+   * RECHERCHE
+   * ==========================================================
+   */
+
   const [search, setSearch] =
     useState("");
 
+
+  /*
+   * ==========================================================
+   * PATIENTS
+   * ==========================================================
+   */
+
   const [patients, setPatients] =
     useState(initialPatients);
+
+
+  /*
+   * ==========================================================
+   * FORMULAIRE
+   * ==========================================================
+   */
 
   const [
     showNewPatientForm,
@@ -439,7 +505,12 @@ export default function Caisse() {
 
 
   /*
-   * FORMULAIRE
+   * ==========================================================
+   * DONNÉES FORMULAIRE
+   * ==========================================================
+   *
+   * IMPORTANT :
+   * Le champ "doctor" a été supprimé.
    */
 
   const [formData, setFormData] =
@@ -447,21 +518,27 @@ export default function Caisse() {
       nom: "",
       prenom: "",
       sexe: "",
+      age: "",
+      dateNaissance: "",
       service: "",
-      doctor: "",
       telephone: "",
+      parentContact: "",
       assurance: "Non",
       assuranceId: "",
+      insuranceNumber: "",
       quartier: "",
     });
 
 
   /*
-   * RECHERCHE
+   * ==========================================================
+   * RECHERCHE PATIENT
+   * ==========================================================
    */
 
   const filteredPatients =
     useMemo(() => {
+
       const value = search
         .trim()
         .toLowerCase();
@@ -476,22 +553,27 @@ export default function Caisse() {
             item.id,
             item.patient,
             item.sexe,
+            item.age,
             item.service,
-            item.doctor,
             item.telephone,
+            item.parentContact,
             item.insurance,
             item.insuranceName,
+            item.insuranceNumber,
             item.quartier,
           ]
             .join(" ")
             .toLowerCase()
             .includes(value)
       );
+
     }, [search, patients]);
 
 
   /*
+   * ==========================================================
    * SERVICE SÉLECTIONNÉ
+   * ==========================================================
    */
 
   const selectedService =
@@ -503,7 +585,9 @@ export default function Caisse() {
 
 
   /*
+   * ==========================================================
    * ASSURANCE SÉLECTIONNÉE
+   * ==========================================================
    */
 
   const selectedInsurance =
@@ -515,7 +599,9 @@ export default function Caisse() {
 
 
   /*
+   * ==========================================================
    * CALCUL DU COÛT
+   * ==========================================================
    */
 
   const basePrice =
@@ -523,27 +609,93 @@ export default function Caisse() {
       ? selectedService.price
       : 0;
 
-  const reduction =
+  const coverage =
     formData.assurance === "Oui" &&
     selectedInsurance
-      ? selectedInsurance.reduction
+      ? selectedInsurance.coverage
       : 0;
 
   const insuranceAmount =
-    basePrice * (reduction / 100);
+    basePrice * (coverage / 100);
 
   const finalPrice =
     basePrice - insuranceAmount;
 
 
   /*
+   * ==========================================================
    * BILANS
+   * ==========================================================
    */
 
-  const billingTotal =
+  const today = new Date();
+
+  const startOfToday =
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+  const startOfWeek =
+    new Date(startOfToday);
+
+  const dayOfWeek =
+    startOfWeek.getDay();
+
+  const differenceToMonday =
+    dayOfWeek === 0
+      ? 6
+      : dayOfWeek - 1;
+
+  startOfWeek.setDate(
+    startOfWeek.getDate() -
+      differenceToMonday
+  );
+
+  const startOfMonth =
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+  const getPatientDate = (patient) => {
+
+    if (!patient.dateEnregistrement) {
+      return null;
+    }
+
+    const date =
+      new Date(
+        patient.dateEnregistrement
+      );
+
+    return Number.isNaN(
+      date.getTime()
+    )
+      ? null
+      : date;
+  };
+
+
+  const bilanJour =
     useMemo(() => {
+
       return patients
-        .slice(initialPatients.length)
+        .filter((patient) => {
+
+          const date =
+            getPatientDate(patient);
+
+          if (!date) {
+            return false;
+          }
+
+          return (
+            date >= startOfToday
+          );
+        })
         .reduce(
           (total, patient) =>
             total +
@@ -552,29 +704,108 @@ export default function Caisse() {
             ),
           0
         );
+
     }, [patients]);
 
-  const bilanJour =
-    billingTotal;
 
   const bilanSemaine =
-    billingTotal;
+    useMemo(() => {
+
+      return patients
+        .filter((patient) => {
+
+          const date =
+            getPatientDate(patient);
+
+          if (!date) {
+            return false;
+          }
+
+          return (
+            date >= startOfWeek
+          );
+        })
+        .reduce(
+          (total, patient) =>
+            total +
+            Number(
+              patient.cost || 0
+            ),
+          0
+        );
+
+    }, [patients]);
+
 
   const bilanMois =
-    billingTotal;
+    useMemo(() => {
+
+      return patients
+        .filter((patient) => {
+
+          const date =
+            getPatientDate(patient);
+
+          if (!date) {
+            return false;
+          }
+
+          return (
+            date >= startOfMonth
+          );
+        })
+        .reduce(
+          (total, patient) =>
+            total +
+            Number(
+              patient.cost || 0
+            ),
+          0
+        );
+
+    }, [patients]);
 
 
   /*
+   * ==========================================================
    * MODIFICATION FORMULAIRE
+   * ==========================================================
    */
 
   const handleFormChange = (
     event
   ) => {
+
     const {
       name,
       value,
     } = event.target;
+
+
+    /*
+     * AGE
+     */
+
+    if (name === "age") {
+
+      const dateNaissance =
+        value !== ""
+          ? calculateBirthDate(value)
+          : "";
+
+      setFormData(
+        (currentForm) => ({
+          ...currentForm,
+
+          age: value,
+
+          dateNaissance,
+        })
+      );
+
+      return;
+    }
+
 
     setFormData(
       (currentForm) => ({
@@ -586,12 +817,15 @@ export default function Caisse() {
 
 
   /*
+   * ==========================================================
    * CHANGEMENT ASSURANCE
+   * ==========================================================
    */
 
   const handleInsuranceChange = (
     value
   ) => {
+
     setFormData(
       (currentForm) => ({
         ...currentForm,
@@ -602,39 +836,57 @@ export default function Caisse() {
           value === "Non"
             ? ""
             : currentForm.assuranceId,
+
+        insuranceNumber:
+          value === "Non"
+            ? ""
+            : currentForm.insuranceNumber,
       })
     );
   };
 
 
   /*
+   * ==========================================================
    * OUVERTURE FORMULAIRE
+   * ==========================================================
    */
 
   const handleNewPatient = () => {
+
     setFormData({
       nom: "",
       prenom: "",
       sexe: "",
+      age: "",
+      dateNaissance: "",
       service: "",
-      doctor: "",
       telephone: "",
+      parentContact: "",
       assurance: "Non",
       assuranceId: "",
+      insuranceNumber: "",
       quartier: "",
     });
 
     setShowNewPatientForm(
       true
     );
+
+    setActivePage(
+      "patient"
+    );
   };
 
 
   /*
+   * ==========================================================
    * FERMETURE
+   * ==========================================================
    */
 
   const handleCloseForm = () => {
+
     setShowNewPatientForm(
       false
     );
@@ -642,28 +894,33 @@ export default function Caisse() {
 
 
   /*
+   * ==========================================================
    * AJOUT PATIENT
+   * ==========================================================
    */
 
   const handleAddPatient = (
     event
   ) => {
+
     event.preventDefault();
 
 
     /*
-     * Champs obligatoires
+     * CHAMPS OBLIGATOIRES
      */
 
     if (
       !formData.nom.trim() ||
       !formData.prenom.trim() ||
       !formData.sexe ||
+      !formData.age ||
       !formData.service ||
-      !formData.doctor ||
       !formData.telephone.trim() ||
+      !formData.parentContact.trim() ||
       !formData.quartier.trim()
     ) {
+
       alert(
         "Veuillez remplir tous les champs obligatoires."
       );
@@ -673,7 +930,7 @@ export default function Caisse() {
 
 
     /*
-     * Assurance obligatoire si Oui
+     * ASSURANCE OBLIGATOIRE SI OUI
      */
 
     if (
@@ -681,8 +938,27 @@ export default function Caisse() {
         "Oui" &&
       !formData.assuranceId
     ) {
+
       alert(
         "Veuillez sélectionner l'assurance du patient."
+      );
+
+      return;
+    }
+
+
+    /*
+     * NUMÉRO ASSURANCE OBLIGATOIRE
+     */
+
+    if (
+      formData.assurance ===
+        "Oui" &&
+      !formData.insuranceNumber.trim()
+    ) {
+
+      alert(
+        "Veuillez renseigner le numéro d'assurance du patient."
       );
 
       return;
@@ -698,18 +974,6 @@ export default function Caisse() {
         (item) =>
           String(item.id) ===
           String(formData.service)
-      );
-
-
-    /*
-     * MÉDECIN
-     */
-
-    const doctor =
-      doctorsConfiguration.find(
-        (item) =>
-          String(item.id) ===
-          String(formData.doctor)
       );
 
 
@@ -756,22 +1020,33 @@ export default function Caisse() {
      */
 
     const newPatient = {
+
       id: generatedId,
 
       patient: fullName,
 
       sexe: formData.sexe,
 
+      age: Number(
+        formData.age
+      ),
+
+      dateNaissance:
+        formData.dateNaissance,
+
       service: service
         ? service.name
         : "",
 
-      doctor: doctor
-        ? doctor.name
-        : "",
+      /*
+       * Aucun médecin affecté depuis la Caisse.
+       */
 
       telephone:
         formData.telephone.trim(),
+
+      parentContact:
+        formData.parentContact.trim(),
 
       cost: finalPrice,
 
@@ -783,8 +1058,21 @@ export default function Caisse() {
           ? insurance.name
           : "",
 
+      insuranceNumber:
+        formData.assurance === "Oui"
+          ? formData.insuranceNumber.trim()
+          : "",
+
+      insuranceCoverage:
+        insurance
+          ? insurance.coverage
+          : 0,
+
       quartier:
         formData.quartier.trim(),
+
+      dateEnregistrement:
+        new Date().toISOString(),
     };
 
 
@@ -827,23 +1115,29 @@ export default function Caisse() {
       nom: "",
       prenom: "",
       sexe: "",
+      age: "",
+      dateNaissance: "",
       service: "",
-      doctor: "",
       telephone: "",
+      parentContact: "",
       assurance: "Non",
       assuranceId: "",
+      insuranceNumber: "",
       quartier: "",
     });
   };
 
 
   /*
+   * ==========================================================
    * FORMAT MONNAIE
+   * ==========================================================
    */
 
   const formatMoney = (
     amount
   ) => {
+
     return new Intl.NumberFormat(
       "fr-FR"
     ).format(
@@ -851,6 +1145,757 @@ export default function Caisse() {
     );
   };
 
+
+  /*
+   * ==========================================================
+   * PAGE BILAN
+   * ==========================================================
+   */
+
+  const renderBilanPage = () => {
+
+    return (
+      <section className="caisse-main">
+
+        <div
+          style={{
+            marginBottom: "25px",
+          }}
+        >
+
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "24px",
+              color: "#1f2937",
+            }}
+          >
+            Bilan
+          </h2>
+
+          <p
+            style={{
+              marginTop: "7px",
+              color: "#6b7280",
+              fontSize: "14px",
+            }}
+          >
+            Consultez les recettes enregistrées
+            du jour, de la semaine et du mois.
+          </p>
+
+        </div>
+
+
+        <section className="summary-grid">
+
+          <article className="summary-card">
+
+            <span className="summary-label">
+              Bilan du jour
+            </span>
+
+            <strong className="summary-value green">
+              {formatMoney(
+                bilanJour
+              )}{" "}
+              FCFA
+            </strong>
+
+            <span className="summary-note">
+              Recettes enregistrées aujourd'hui
+            </span>
+
+          </article>
+
+
+          <article className="summary-card">
+
+            <span className="summary-label">
+              Bilan de la semaine
+            </span>
+
+            <strong className="summary-value green">
+              {formatMoney(
+                bilanSemaine
+              )}{" "}
+              FCFA
+            </strong>
+
+            <span className="summary-note">
+              Total des recettes de la semaine
+            </span>
+
+          </article>
+
+
+          <article className="summary-card">
+
+            <span className="summary-label">
+              Bilan du mois
+            </span>
+
+            <strong className="summary-value blue">
+              {formatMoney(
+                bilanMois
+              )}{" "}
+              FCFA
+            </strong>
+
+            <span className="summary-note">
+              Total des recettes du mois
+            </span>
+
+          </article>
+
+        </section>
+
+
+        <div
+          className="patients-card"
+          style={{
+            marginTop: "25px",
+          }}
+        >
+
+          <div
+            style={{
+              padding: "20px",
+              borderBottom:
+                "1px solid #eeeeee",
+            }}
+          >
+
+            <h3
+              style={{
+                margin: 0,
+                fontSize: "17px",
+                color: "#1f2937",
+              }}
+            >
+              Informations du bilan
+            </h3>
+
+          </div>
+
+
+          <div
+            style={{
+              padding: "20px",
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(3, minmax(0, 1fr))",
+              gap: "18px",
+            }}
+          >
+
+            <div
+              style={{
+                padding: "18px",
+                background: "#f8fafc",
+                borderRadius: "10px",
+                border:
+                  "1px solid #edf0f2",
+              }}
+            >
+
+              <span
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  color: "#6b7280",
+                  marginBottom: "8px",
+                }}
+              >
+                Patients enregistrés aujourd'hui
+              </span>
+
+              <strong
+                style={{
+                  fontSize: "24px",
+                  color: "#1f2937",
+                }}
+              >
+                {
+                  patients.filter(
+                    (patient) => {
+                      const date =
+                        getPatientDate(
+                          patient
+                        );
+
+                      return (
+                        date &&
+                        date >=
+                          startOfToday
+                      );
+                    }
+                  ).length
+                }
+              </strong>
+
+            </div>
+
+
+            <div
+              style={{
+                padding: "18px",
+                background: "#f8fafc",
+                borderRadius: "10px",
+                border:
+                  "1px solid #edf0f2",
+              }}
+            >
+
+              <span
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  color: "#6b7280",
+                  marginBottom: "8px",
+                }}
+              >
+                Patients enregistrés cette semaine
+              </span>
+
+              <strong
+                style={{
+                  fontSize: "24px",
+                  color: "#1f2937",
+                }}
+              >
+                {
+                  patients.filter(
+                    (patient) => {
+                      const date =
+                        getPatientDate(
+                          patient
+                        );
+
+                      return (
+                        date &&
+                        date >=
+                          startOfWeek
+                      );
+                    }
+                  ).length
+                }
+              </strong>
+
+            </div>
+
+
+            <div
+              style={{
+                padding: "18px",
+                background: "#f8fafc",
+                borderRadius: "10px",
+                border:
+                  "1px solid #edf0f2",
+              }}
+            >
+
+              <span
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  color: "#6b7280",
+                  marginBottom: "8px",
+                }}
+              >
+                Patients enregistrés ce mois
+              </span>
+
+              <strong
+                style={{
+                  fontSize: "24px",
+                  color: "#1f2937",
+                }}
+              >
+                {
+                  patients.filter(
+                    (patient) => {
+                      const date =
+                        getPatientDate(
+                          patient
+                        );
+
+                      return (
+                        date &&
+                        date >=
+                          startOfMonth
+                      );
+                    }
+                  ).length
+                }
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+    );
+  };
+
+
+  /*
+   * ==========================================================
+   * PAGE ASSURANCE
+   * ==========================================================
+   */
+
+  const renderInsurancePage = () => {
+
+    return (
+      <section className="caisse-main">
+
+        <div
+          style={{
+            marginBottom: "25px",
+          }}
+        >
+
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "24px",
+              color: "#1f2937",
+            }}
+          >
+            Assurances
+          </h2>
+
+          <p
+            style={{
+              marginTop: "7px",
+              color: "#6b7280",
+              fontSize: "14px",
+            }}
+          >
+            Assurances configurées et pourcentages
+            de couverture.
+          </p>
+
+        </div>
+
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(3, minmax(0, 1fr))",
+            gap: "20px",
+          }}
+        >
+
+          {insuranceConfiguration.map(
+            (insurance) => (
+
+              <article
+                key={insurance.id}
+                style={{
+                  background: "#ffffff",
+                  border:
+                    "1px solid #e5e7eb",
+                  borderRadius: "12px",
+                  padding: "22px",
+                  boxShadow:
+                    "0 4px 14px rgba(0,0,0,0.04)",
+                }}
+              >
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent:
+                      "space-between",
+                    marginBottom: "20px",
+                  }}
+                >
+
+                  <div
+                    style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "10px",
+                      background: "#eff6ff",
+                      color: "#2563eb",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:
+                        "center",
+                    }}
+                  >
+                    <Icon
+                      name="insurance"
+                      size={22}
+                    />
+                  </div>
+
+                  <span
+                    style={{
+                      padding:
+                        "6px 10px",
+                      borderRadius:
+                        "20px",
+                      background:
+                        "#ecfdf5",
+                      color:
+                        "#16a34a",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    ACTIVE
+                  </span>
+
+                </div>
+
+
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "18px",
+                    color: "#1f2937",
+                  }}
+                >
+                  {insurance.name}
+                </h3>
+
+
+                <div
+                  style={{
+                    marginTop: "18px",
+                    padding: "15px",
+                    background:
+                      "#f8fafc",
+                    borderRadius: "9px",
+                  }}
+                >
+
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: "13px",
+                      color: "#6b7280",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    Taux de couverture
+                  </span>
+
+                  <strong
+                    style={{
+                      fontSize: "28px",
+                      color: "#2563eb",
+                    }}
+                  >
+                    {insurance.coverage}%
+                  </strong>
+
+                </div>
+
+              </article>
+
+            )
+          )}
+
+        </div>
+
+
+        <div
+          style={{
+            marginTop: "25px",
+            padding: "18px 20px",
+            background: "#f8fafc",
+            border:
+              "1px solid #edf0f2",
+            borderRadius: "10px",
+          }}
+        >
+
+          <strong
+            style={{
+              display: "block",
+              color: "#374151",
+              marginBottom: "6px",
+            }}
+          >
+            Fonctionnement
+          </strong>
+
+          <span
+            style={{
+              fontSize: "13px",
+              color: "#6b7280",
+              lineHeight: 1.6,
+            }}
+          >
+            Le taux de couverture est appliqué
+            automatiquement au tarif du service
+            lorsqu'un patient possède une assurance.
+            Le montant restant correspond au montant
+            à payer par le patient.
+          </span>
+
+        </div>
+
+      </section>
+    );
+  };
+
+
+  /*
+   * ==========================================================
+   * PAGE PATIENT
+   * ==========================================================
+   */
+
+  const renderPatientPage = () => {
+
+    return (
+      <section className="caisse-main">
+
+        {/* RECHERCHE */}
+
+        <div className="patient-toolbar">
+
+          <div className="search-box">
+
+            <Icon
+              name="search"
+              size={21}
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Rechercher un patient (nom, téléphone...)"
+            />
+
+          </div>
+          <button
+            type="button"
+            className="new-patient-btn"
+            onClick={
+              handleNewPatient
+            }
+          >
+
+            <Icon
+              name="plus"
+              size={20}
+            />
+
+            <span>
+              Nouveau patient
+            </span>
+
+          </button>
+
+        </div>
+
+
+        {/* TABLEAU */}
+
+        <div className="patients-card">
+
+          <div className="table-wrapper">
+
+            <table className="patients-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Identifiant
+                  </th>
+
+                  <th>
+                    Patient
+                  </th>
+                  <th>
+                    Sexe
+                  </th>
+
+                  <th>
+                    Service
+                  </th>
+
+                  <th>
+                    Téléphone
+                  </th>
+
+                  <th>
+                    N° parent
+                  </th>
+
+                  <th>
+                    Coût
+                  </th>
+
+                  <th>
+                    Assurance
+                  </th>
+
+                  <th>
+                    N° assurance
+                  </th>
+
+                  <th>
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {filteredPatients.map(
+                  (item) => (
+
+                    <tr
+                      key={
+                        item.id
+                      }
+                    >
+
+                      <td>
+                        {item.id}
+                      </td>
+                      <td className="patient-name">
+                        {item.patient}
+                      </td>
+                      <td>
+
+                        <span
+                          style={{
+                            color:
+                              item.sexe ===
+                              "Masculin"
+                                ? "#dc2626"
+                                : item.sexe ===
+                                  "Féminin"
+                                ? "#2563eb"
+                                : "#374151",
+
+                            fontWeight: 600,
+                          }}
+                        >
+                          {item.sexe ||
+                            "-"}
+                        </span>
+
+                      </td>
+
+
+                      <td>
+                        {item.service ||
+                          "--"}
+                      </td>
+
+
+                      <td>
+                        {item.telephone ||
+                          "--"}
+                      </td>
+
+                      <td>
+                        {item.parentContact ||
+                          "--"}
+                      </td>
+                      <td>
+                        {formatMoney(
+                          item.cost
+                        )}{" "}
+                        FCFA
+                      </td>
+
+                      <td>
+
+                        {item.insurance ===
+                        "Oui"
+                          ? item.insuranceName
+                          : "Non"}
+
+                      </td>
+
+
+                      <td>
+                        {item.insurance ===
+                          "Oui" &&
+                        item.insuranceNumber
+                          ? item.insuranceNumber
+                          : "--"}
+                      </td>
+
+
+                      <td>
+
+                        <button
+                          type="button"
+                          className="row-action"
+                          aria-label={`Ouvrir ${item.patient}`}
+                        >
+
+                          <Icon
+                            name="arrow"
+                            size={17}
+                          />
+
+                        </button>
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )}
+                {filteredPatients.length ===
+                  0 && (
+
+                  <tr>
+
+                    <td
+                      colSpan="10"
+                      className="empty-row"
+                    >
+                      Aucun patient trouvé.
+                    </td>
+
+                  </tr>
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+    );
+  };
+
+
+  /*
+   * ==========================================================
+   * RENDU
+   * ==========================================================
+   */
 
   return (
     <div className="caisse-page">
@@ -877,88 +1922,95 @@ export default function Caisse() {
 
         <nav className="caisse-nav">
 
+          {/* ACCUEIL */}
+
           <Link
             to="/modules"
             className="caisse-nav-item"
           >
+
             <Icon name="home" />
 
             <span>
               Accueil
             </span>
+
           </Link>
 
 
+          {/* ENREGISTRER PATIENT */}
+
           <button
             type="button"
-            className="caisse-nav-item active"
+            className={`caisse-nav-item ${
+              activePage === "patient"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActivePage(
+                "patient"
+              )
+            }
           >
+
             <Icon name="patient" />
 
             <span>
               Enregistrer un patient
             </span>
+
           </button>
 
 
-          <Link
-            to="/billing"
-            className="caisse-nav-item"
-          >
-            <Icon name="billing" />
-
-            <span>
-              Facturation
-            </span>
-          </Link>
-
+          {/* BILAN */}
 
           <button
             type="button"
-            className="caisse-nav-item"
+            className={`caisse-nav-item ${
+              activePage === "bilan"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActivePage(
+                "bilan"
+              )
+            }
           >
-            <Icon name="payment" />
 
-            <span>
-              Paiements
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            className="caisse-nav-item"
-          >
-            <Icon name="history" />
-
-            <span>
-              Historique
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            className="caisse-nav-item"
-          >
             <Icon name="report" />
 
             <span>
               Bilan
             </span>
+
           </button>
 
 
-          <Link
-            to="/reports"
-            className="caisse-nav-item"
+          {/* ASSURANCE */}
+
+          <button
+            type="button"
+            className={`caisse-nav-item ${
+              activePage === "assurance"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActivePage(
+                "assurance"
+              )
+            }
           >
-            <Icon name="report" />
+
+            <Icon name="insurance" />
 
             <span>
-              Rapports
+              Assurance
             </span>
-          </Link>
+
+          </button>
 
         </nav>
 
@@ -980,7 +2032,11 @@ export default function Caisse() {
             </h1>
 
             <p>
-              Enregistrement / Accueil patient
+              {activePage === "patient"
+                ? "Enregistrement / Accueil patient"
+                : activePage === "bilan"
+                ? "Bilan des recettes"
+                : "Gestion des assurances"}
             </p>
 
           </div>
@@ -1009,300 +2065,18 @@ export default function Caisse() {
         </header>
 
 
-        <section className="caisse-main">
+        {/* =====================================================
+            PAGE ACTIVE
+        ===================================================== */}
 
-          {/* RECHERCHE */}
+        {activePage === "patient" &&
+          renderPatientPage()}
 
-          <div className="patient-toolbar">
+        {activePage === "bilan" &&
+          renderBilanPage()}
 
-            <div className="search-box">
-
-              <Icon
-                name="search"
-                size={21}
-              />
-
-              <input
-                type="text"
-                value={search}
-                onChange={(event) =>
-                  setSearch(
-                    event.target.value
-                  )
-                }
-                placeholder="Rechercher un patient (nom, téléphone...)"
-              />
-
-            </div>
-
-
-            <button
-              type="button"
-              className="new-patient-btn"
-              onClick={
-                handleNewPatient
-              }
-            >
-
-              <Icon
-                name="plus"
-                size={20}
-              />
-
-              <span>
-                Nouveau patient
-              </span>
-
-            </button>
-
-          </div>
-
-
-          {/* TABLEAU */}
-
-          <div className="patients-card">
-
-            <div className="table-wrapper">
-
-              <table className="patients-table">
-
-                <thead>
-
-                  <tr>
-
-                    <th>
-                      #
-                    </th>
-
-                    <th>
-                      Patient
-                    </th>
-
-                    <th>
-                      Sexe
-                    </th>
-
-                    <th>
-                      Service
-                    </th>
-
-                    <th>
-                      Affecté à
-                    </th>
-
-                    <th>
-                      Téléphone
-                    </th>
-
-                    <th>
-                      Coût
-                    </th>
-
-                    <th>
-                      Assurance
-                    </th>
-
-                    <th>
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {filteredPatients.map(
-                    (item) => (
-
-                      <tr
-                        key={
-                          item.id
-                        }
-                      >
-
-                        <td>
-                          {item.id}
-                        </td>
-
-
-                        <td className="patient-name">
-                          {item.patient}
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            style={{
-                              color:
-                                item.sexe ===
-                                "Masculin"
-                                  ? "#dc2626"
-                                  : item.sexe ===
-                                    "Féminin"
-                                  ? "#2563eb"
-                                  : "#374151",
-
-                              fontWeight: 600,
-                            }}
-                          >
-                            {item.sexe ||
-                              "-"}
-                          </span>
-
-                        </td>
-
-
-                        <td>
-                          {item.service}
-                        </td>
-
-
-                        <td>
-                          {item.doctor}
-                        </td>
-
-
-                        <td>
-                          {
-                            item.telephone
-                          }
-                        </td>
-
-
-                        <td>
-                          {formatMoney(
-                            item.cost
-                          )}{" "}
-                          FCFA
-                        </td>
-
-
-                        <td>
-
-                          {item.insurance ===
-                          "Oui"
-                            ? item.insuranceName
-                            : "Non"}
-
-                        </td>
-
-
-                        <td>
-
-                          <button
-                            type="button"
-                            className="row-action"
-                            aria-label={`Ouvrir ${item.patient}`}
-                          >
-
-                            <Icon
-                              name="arrow"
-                              size={17}
-                            />
-
-                          </button>
-
-                        </td>
-
-                      </tr>
-
-                    )
-                  )}
-
-
-                  {filteredPatients.length ===
-                    0 && (
-
-                    <tr>
-
-                      <td
-                        colSpan="9"
-                        className="empty-row"
-                      >
-                        Aucun patient trouvé.
-                      </td>
-
-                    </tr>
-
-                  )}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          </div>
-
-
-          {/* BILANS */}
-
-          <section className="summary-grid">
-
-            <article className="summary-card">
-
-              <span className="summary-label">
-                Bilan du jour
-              </span>
-
-              <strong className="summary-value green">
-                {formatMoney(
-                  bilanJour
-                )}{" "}
-                FCFA
-              </strong>
-
-              <span className="summary-note">
-                Recettes enregistrées aujourd'hui
-              </span>
-
-            </article>
-
-
-            <article className="summary-card">
-
-              <span className="summary-label">
-                Bilan semaine
-              </span>
-
-              <strong className="summary-value green">
-                {formatMoney(
-                  bilanSemaine
-                )}{" "}
-                FCFA
-              </strong>
-
-              <span className="summary-note">
-                Total des recettes de la semaine
-              </span>
-
-            </article>
-
-
-            <article className="summary-card">
-
-              <span className="summary-label">
-                Bilan mois
-              </span>
-
-              <strong className="summary-value blue">
-                {formatMoney(
-                  bilanMois
-                )}{" "}
-                FCFA
-              </strong>
-
-              <span className="summary-note">
-                Total des recettes du mois
-              </span>
-
-            </article>
-
-          </section>
-
-        </section>
+        {activePage === "assurance" &&
+          renderInsurancePage()}
 
       </main>
 
@@ -1402,10 +2176,12 @@ export default function Caisse() {
                 }}
                 aria-label="Fermer"
               >
+
                 <Icon
                   name="close"
                   size={19}
                 />
+
               </button>
 
             </div>
@@ -1600,6 +2376,100 @@ export default function Caisse() {
                 </div>
 
 
+                {/* ÂGE */}
+
+                <div>
+
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "7px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      color: "#374151",
+                    }}
+                  >
+                    Âge
+                  </label>
+
+                  <input
+                    type="number"
+                    name="age"
+                    value={
+                      formData.age
+                    }
+                    onChange={
+                      handleFormChange
+                    }
+                    placeholder="Ex : 35"
+                    min="0"
+                    max="120"
+                    required
+                    style={{
+                      width: "100%",
+                      height: "44px",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
+                      borderRadius: "8px",
+                      outline: "none",
+                      boxSizing:
+                        "border-box",
+                    }}
+                  />
+
+                </div>
+
+
+                {/* DATE DE NAISSANCE */}
+
+                {formData.age !== "" && (
+
+                  <div>
+
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "7px",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        color: "#374151",
+                      }}
+                    >
+                      Date de naissance
+                    </label>
+
+                    <input
+                      type="date"
+                      name="dateNaissance"
+                      value={
+                        formData.dateNaissance
+                      }
+                      readOnly
+                      style={{
+                        width: "100%",
+                        height: "44px",
+                        padding:
+                          "0 13px",
+                        border:
+                          "1px solid #d9d9d9",
+                        borderRadius: "8px",
+                        outline: "none",
+                        background:
+                          "#f8fafc",
+                        boxSizing:
+                          "border-box",
+                        color:
+                          "#374151",
+                      }}
+                    />
+
+                  </div>
+
+                )}
+
+
                 {/* SERVICE */}
 
                 <div>
@@ -1647,6 +2517,7 @@ export default function Caisse() {
 
                     {servicesConfiguration.map(
                       (service) => (
+
                         <option
                           key={
                             service.id
@@ -1659,6 +2530,7 @@ export default function Caisse() {
                             service.name
                           }
                         </option>
+
                       )
                     )}
 
@@ -1667,7 +2539,7 @@ export default function Caisse() {
                 </div>
 
 
-                {/* MÉDECIN */}
+                {/* CONTACT PATIENT */}
 
                 <div>
 
@@ -1680,74 +2552,7 @@ export default function Caisse() {
                       color: "#374151",
                     }}
                   >
-                    Affecté à
-                  </label>
-
-                  <select
-                    name="doctor"
-                    value={
-                      formData.doctor
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    required
-                    style={{
-                      width: "100%",
-                      height: "44px",
-                      padding:
-                        "0 13px",
-                      border:
-                        "1px solid #d9d9d9",
-                      borderRadius: "8px",
-                      outline: "none",
-                      background:
-                        "#ffffff",
-                      boxSizing:
-                        "border-box",
-                    }}
-                  >
-
-                    <option value="">
-                      Sélectionner un médecin
-                    </option>
-
-                    {doctorsConfiguration.map(
-                      (doctor) => (
-                        <option
-                          key={
-                            doctor.id
-                          }
-                          value={
-                            doctor.id
-                          }
-                        >
-                          {
-                            doctor.name
-                          }
-                        </option>
-                      )
-                    )}
-
-                  </select>
-
-                </div>
-
-
-                {/* TELEPHONE */}
-
-                <div>
-
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "7px",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      color: "#374151",
-                    }}
-                  >
-                    Numéro de téléphone
+                    Contact du patient
                   </label>
 
                   <input
@@ -1760,6 +2565,50 @@ export default function Caisse() {
                       handleFormChange
                     }
                     placeholder="Ex : 0700000000"
+                    required
+                    style={{
+                      width: "100%",
+                      height: "44px",
+                      padding:
+                        "0 13px",
+                      border:
+                        "1px solid #d9d9d9",
+                      borderRadius: "8px",
+                      outline: "none",
+                      boxSizing:
+                        "border-box",
+                    }}
+                  />
+
+                </div>
+
+
+                {/* NUMÉRO PARENT */}
+
+                <div>
+
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "7px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      color: "#374151",
+                    }}
+                  >
+                    Numéro d'un parent
+                  </label>
+
+                  <input
+                    type="tel"
+                    name="parentContact"
+                    value={
+                      formData.parentContact
+                    }
+                    onChange={
+                      handleFormChange
+                    }
+                    placeholder="Ex : 0500000000"
                     required
                     style={{
                       width: "100%",
@@ -1961,6 +2810,7 @@ export default function Caisse() {
 
                       {insuranceConfiguration.map(
                         (insurance) => (
+
                           <option
                             key={
                               insurance.id
@@ -1972,15 +2822,65 @@ export default function Caisse() {
                             {
                               insurance.name
                             }{" "}
-                            - Réduction{" "}
+                            - Couverture{" "}
                             {
-                              insurance.reduction
+                              insurance.coverage
                             }%
                           </option>
+
                         )
                       )}
 
                     </select>
+
+                  </div>
+
+                )}
+
+
+                {/* NUMÉRO ASSURANCE */}
+
+                {formData.assurance ===
+                  "Oui" && (
+
+                  <div>
+
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "7px",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        color: "#374151",
+                      }}
+                    >
+                      Numéro d'assurance
+                    </label>
+
+                    <input
+                      type="text"
+                      name="insuranceNumber"
+                      value={
+                        formData.insuranceNumber
+                      }
+                      onChange={
+                        handleFormChange
+                      }
+                      placeholder="Ex : MUG-2026-000123"
+                      required
+                      style={{
+                        width: "100%",
+                        height: "44px",
+                        padding:
+                          "0 13px",
+                        border:
+                          "1px solid #d9d9d9",
+                        borderRadius: "8px",
+                        outline: "none",
+                        boxSizing:
+                          "border-box",
+                      }}
+                    />
 
                   </div>
 
@@ -2039,7 +2939,7 @@ export default function Caisse() {
                     </strong>
 
 
-                    {reduction >
+                    {coverage >
                       0 && (
 
                       <span
@@ -2052,7 +2952,7 @@ export default function Caisse() {
                             600,
                         }}
                       >
-                        -{reduction}%
+                        -{coverage}%
                       </span>
 
                     )}
@@ -2122,9 +3022,10 @@ export default function Caisse() {
                       </strong>
 
 
-                      {reduction >
+                      {coverage >
                         0 && (
                         <>
+
                           <span
                             style={{
                               fontSize:
@@ -2133,7 +3034,7 @@ export default function Caisse() {
                                 "#6b7280",
                             }}
                           >
-                            Réduction assurance
+                            Couverture assurance
                           </span>
 
                           <strong
@@ -2150,6 +3051,7 @@ export default function Caisse() {
                             )}{" "}
                             FCFA
                           </strong>
+
                         </>
                       )}
 

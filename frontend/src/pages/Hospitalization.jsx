@@ -1,249 +1,823 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../styles/Hospitalization.css";
 
 
+// ============================================================
+// DONNÉES INITIALES DES HOSPITALISATIONS
+// ============================================================
+
+const initialHospitalizations = [
+  {
+    id: 1,
+    patient: "KOFFI Jean",
+    dossier: "PAT-000125",
+    age: 42,
+    sexe: "Homme",
+    service: "Médecine générale",
+    chambre: "A-102",
+    lit: "Lit 01",
+    admission: "15/09/2026",
+    sortiePrevue: "20/09/2026",
+    medecin: "Dr. DJE",
+    motif: "Paludisme",
+    status: "En cours",
+  },
+
+  {
+    id: 2,
+    patient: "KOUASSI Marie",
+    dossier: "PAT-000126",
+    age: 34,
+    sexe: "Femme",
+    service: "Maternité",
+    chambre: "B-204",
+    lit: "Lit 02",
+    admission: "16/09/2026",
+    sortiePrevue: "19/09/2026",
+    medecin: "Dr. YAO",
+    motif: "Surveillance",
+    status: "En cours",
+  },
+
+  {
+    id: 3,
+    patient: "YAO Ibrahim",
+    dossier: "PAT-000127",
+    age: 58,
+    sexe: "Homme",
+    service: "Cardiologie",
+    chambre: "C-301",
+    lit: "Lit 01",
+    admission: "14/09/2026",
+    sortiePrevue: "18/09/2026",
+    medecin: "Dr. KOFFI",
+    motif: "Hypertension",
+    status: "Sortie prévue",
+  },
+
+  {
+    id: 4,
+    patient: "ADJE Fatou",
+    dossier: "PAT-000128",
+    age: 27,
+    sexe: "Femme",
+    service: "Chirurgie",
+    chambre: "D-105",
+    lit: "Lit 01",
+    admission: "12/09/2026",
+    sortiePrevue: "17/09/2026",
+    medecin: "Dr. N'GUESSAN",
+    motif: "Intervention chirurgicale",
+    status: "En cours",
+  },
+
+  {
+    id: 5,
+    patient: "KOUAME Paul",
+    dossier: "PAT-000129",
+    age: 63,
+    sexe: "Homme",
+    service: "Médecine générale",
+    chambre: "A-103",
+    lit: "Lit 02",
+    admission: "10/09/2026",
+    sortiePrevue: "16/09/2026",
+    medecin: "Dr. DJE",
+    motif: "Diabète",
+    status: "Sortie",
+  },
+];
+
+
+// ============================================================
+// DONNÉES INITIALES DES CHAMBRES
+// ============================================================
+
+const initialRooms = [
+  {
+    id: 1,
+    number: "A-101",
+    service: "Médecine générale",
+    type: "Standard",
+    totalBeds: 2,
+    occupiedBeds: 1,
+    beds: ["Lit 01", "Lit 02"],
+  },
+
+  {
+    id: 2,
+    number: "A-102",
+    service: "Médecine générale",
+    type: "Standard",
+    totalBeds: 2,
+    occupiedBeds: 2,
+    beds: ["Lit 01", "Lit 02"],
+  },
+
+  {
+    id: 3,
+    number: "B-201",
+    service: "Maternité",
+    type: "Standard",
+    totalBeds: 3,
+    occupiedBeds: 2,
+    beds: ["Lit 01", "Lit 02", "Lit 03"],
+  },
+
+  {
+    id: 4,
+    number: "B-204",
+    service: "Maternité",
+    type: "VIP",
+    totalBeds: 2,
+    occupiedBeds: 1,
+    beds: ["Lit 01", "Lit 02"],
+  },
+
+  {
+    id: 5,
+    number: "C-301",
+    service: "Cardiologie",
+    type: "VIP",
+    totalBeds: 1,
+    occupiedBeds: 1,
+    beds: ["Lit 01"],
+  },
+
+  {
+    id: 6,
+    number: "D-105",
+    service: "Chirurgie",
+    type: "Standard",
+    totalBeds: 2,
+    occupiedBeds: 1,
+    beds: ["Lit 01", "Lit 02"],
+  },
+];
+
+
+// ============================================================
+// COMPOSANT
+// ============================================================
+
 const Hospitalization = () => {
 
-  const [activeTab, setActiveTab] = useState("hospitalisations");
+  // ==========================================================
+  // ÉTATS PRINCIPAUX
+  // ==========================================================
+
+  const [activeTab, setActiveTab] = useState(
+    "hospitalisations"
+  );
 
   const [search, setSearch] = useState("");
 
-  const [statusFilter, setStatusFilter] = useState("Tous");
-
-  const [showAdmissionModal, setShowAdmissionModal] = useState(false);
-
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-
-  const [selectedPatient, setSelectedPatient] = useState(null);
-
-
-  const hospitalizations = [
-    {
-      id: 1,
-      patient: "KOFFI Jean",
-      dossier: "PAT-000125",
-      age: 42,
-      sexe: "Homme",
-      service: "Médecine générale",
-      chambre: "A-102",
-      lit: "Lit 01",
-      admission: "15/09/2026",
-      sortiePrevue: "20/09/2026",
-      medecin: "Dr. DJE",
-      motif: "Paludisme",
-      status: "En cours",
-    },
-
-    {
-      id: 2,
-      patient: "KOUASSI Marie",
-      dossier: "PAT-000126",
-      age: 34,
-      sexe: "Femme",
-      service: "Maternité",
-      chambre: "B-204",
-      lit: "Lit 02",
-      admission: "16/09/2026",
-      sortiePrevue: "19/09/2026",
-      medecin: "Dr. YAO",
-      motif: "Surveillance",
-      status: "En cours",
-    },
-
-    {
-      id: 3,
-      patient: "YAO Ibrahim",
-      dossier: "PAT-000127",
-      age: 58,
-      sexe: "Homme",
-      service: "Cardiologie",
-      chambre: "C-301",
-      lit: "Lit 01",
-      admission: "14/09/2026",
-      sortiePrevue: "18/09/2026",
-      medecin: "Dr. KOFFI",
-      motif: "Hypertension",
-      status: "Sortie prévue",
-    },
-
-    {
-      id: 4,
-      patient: "ADJE Fatou",
-      dossier: "PAT-000128",
-      age: 27,
-      sexe: "Femme",
-      service: "Chirurgie",
-      chambre: "D-105",
-      lit: "Lit 01",
-      admission: "12/09/2026",
-      sortiePrevue: "17/09/2026",
-      medecin: "Dr. N'GUESSAN",
-      motif: "Intervention chirurgicale",
-      status: "En cours",
-    },
-
-    {
-      id: 5,
-      patient: "KOUAME Paul",
-      dossier: "PAT-000129",
-      age: 63,
-      sexe: "Homme",
-      service: "Médecine générale",
-      chambre: "A-103",
-      lit: "Lit 02",
-      admission: "10/09/2026",
-      sortiePrevue: "16/09/2026",
-      medecin: "Dr. DJE",
-      motif: "Diabète",
-      status: "Sortie",
-    },
-  ];
-
-
-  const rooms = [
-    {
-      id: 1,
-      number: "A-101",
-      service: "Médecine générale",
-      type: "Standard",
-      totalBeds: 2,
-      occupiedBeds: 1,
-    },
-
-    {
-      id: 2,
-      number: "A-102",
-      service: "Médecine générale",
-      type: "Standard",
-      totalBeds: 2,
-      occupiedBeds: 2,
-    },
-
-    {
-      id: 3,
-      number: "B-201",
-      service: "Maternité",
-      type: "Standard",
-      totalBeds: 3,
-      occupiedBeds: 2,
-    },
-
-    {
-      id: 4,
-      number: "B-204",
-      service: "Maternité",
-      type: "VIP",
-      totalBeds: 2,
-      occupiedBeds: 1,
-    },
-
-    {
-      id: 5,
-      number: "C-301",
-      service: "Cardiologie",
-      type: "VIP",
-      totalBeds: 1,
-      occupiedBeds: 1,
-    },
-
-    {
-      id: 6,
-      number: "D-105",
-      service: "Chirurgie",
-      type: "Standard",
-      totalBeds: 2,
-      occupiedBeds: 1,
-    },
-  ];
-
-
-  const totalHospitalized = hospitalizations.filter(
-    (item) => item.status !== "Sortie"
-  ).length;
-
-  const totalBeds = rooms.reduce(
-    (total, room) => total + room.totalBeds,
-    0
+  const [statusFilter, setStatusFilter] = useState(
+    "Tous"
   );
 
-  const occupiedBeds = rooms.reduce(
-    (total, room) => total + room.occupiedBeds,
-    0
-  );
+  const [showAdmissionModal, setShowAdmissionModal] =
+    useState(false);
 
-  const availableBeds = totalBeds - occupiedBeds;
+  const [showDetailsModal, setShowDetailsModal] =
+    useState(false);
 
-  const plannedDischarges = hospitalizations.filter(
-    (item) => item.status === "Sortie prévue"
-  ).length;
+  const [selectedPatient, setSelectedPatient] =
+    useState(null);
 
 
-  const filteredHospitalizations = useMemo(() => {
+  // ==========================================================
+  // FORMULAIRE AJOUT DE LIT
+  // ==========================================================
 
-    return hospitalizations.filter((item) => {
+  const [newBedRoom, setNewBedRoom] = useState("");
 
-      const searchValue = search.toLowerCase();
+  const [newBedNumber, setNewBedNumber] =
+    useState("");
 
-      const matchesSearch =
-        item.patient.toLowerCase().includes(searchValue) ||
-        item.dossier.toLowerCase().includes(searchValue) ||
-        item.chambre.toLowerCase().includes(searchValue) ||
-        item.service.toLowerCase().includes(searchValue);
 
-      const matchesStatus =
-        statusFilter === "Tous" ||
-        item.status === statusFilter;
+  // ==========================================================
+  // HOSPITALISATIONS
+  // ==========================================================
 
-      return matchesSearch && matchesStatus;
+  const [hospitalizations, setHospitalizations] =
+    useState(() => {
+
+      const saved =
+        localStorage.getItem(
+          "hospitalizations"
+        );
+
+      if (saved) {
+
+        try {
+
+          return JSON.parse(saved);
+
+        } catch (error) {
+
+          console.error(
+            "Erreur lors de la lecture des hospitalisations :",
+            error
+          );
+
+        }
+      }
+
+      return initialHospitalizations;
     });
 
-  }, [search, statusFilter]);
 
+  // ==========================================================
+  // CHAMBRES
+  // ==========================================================
+
+  const [rooms, setRooms] = useState(() => {
+
+    const savedRooms =
+      localStorage.getItem(
+        "hospitalization_rooms"
+      );
+
+    if (savedRooms) {
+
+      try {
+
+        const parsedRooms =
+          JSON.parse(savedRooms);
+
+        return parsedRooms.map((room) => {
+
+          if (!room.beds) {
+
+            return {
+              ...room,
+              beds: Array.from(
+                { length: room.totalBeds },
+                (_, index) =>
+                  `Lit ${String(index + 1).padStart(
+                    2,
+                    "0"
+                  )}`
+              ),
+            };
+
+          }
+
+          return room;
+
+        });
+
+      } catch (error) {
+
+        console.error(
+          "Erreur lors de la lecture des chambres :",
+          error
+        );
+
+      }
+    }
+
+    return initialRooms;
+  });
+
+
+  // ==========================================================
+  // SAUVEGARDE DES HOSPITALISATIONS
+  // ==========================================================
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "hospitalizations",
+      JSON.stringify(hospitalizations)
+    );
+
+  }, [hospitalizations]);
+
+
+  // ==========================================================
+  // SAUVEGARDE DES CHAMBRES
+  // ==========================================================
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "hospitalization_rooms",
+      JSON.stringify(rooms)
+    );
+
+  }, [rooms]);
+
+
+  // ==========================================================
+  // SYNCHRONISATION AVEC CONSULTATIONS
+  // ==========================================================
+
+  useEffect(() => {
+
+    const handleStorageChange = (event) => {
+
+      if (
+        event.key === "hospitalizations" &&
+        event.newValue
+      ) {
+
+        try {
+
+          const updated =
+            JSON.parse(event.newValue);
+
+          setHospitalizations(updated);
+
+        } catch (error) {
+
+          console.error(
+            "Erreur de synchronisation des hospitalisations :",
+            error
+          );
+
+        }
+
+      }
+
+
+      if (
+        event.key === "hospitalization_rooms" &&
+        event.newValue
+      ) {
+
+        try {
+
+          const updatedRooms =
+            JSON.parse(event.newValue);
+
+          setRooms(updatedRooms);
+
+        } catch (error) {
+
+          console.error(
+            "Erreur de synchronisation des chambres :",
+            error
+          );
+
+        }
+
+      }
+
+    };
+
+
+    window.addEventListener(
+      "storage",
+      handleStorageChange
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "storage",
+        handleStorageChange
+      );
+
+    };
+
+  }, []);
+
+
+  // ==========================================================
+  // STATISTIQUES
+  // ==========================================================
+
+  const totalHospitalized =
+    hospitalizations.filter(
+      (item) =>
+        item.status !== "Sortie"
+    ).length;
+
+
+  const totalBeds =
+    rooms.reduce(
+      (total, room) =>
+        total + room.totalBeds,
+      0
+    );
+
+
+  const occupiedBeds =
+    rooms.reduce(
+      (total, room) =>
+        total + room.occupiedBeds,
+      0
+    );
+
+
+  const availableBeds =
+    Math.max(
+      0,
+      totalBeds - occupiedBeds
+    );
+
+
+  const plannedDischarges =
+    hospitalizations.filter(
+      (item) =>
+        item.status === "Sortie prévue"
+    ).length;
+
+
+  // ==========================================================
+  // RECHERCHE ET FILTRE
+  // ==========================================================
+
+  const filteredHospitalizations =
+    useMemo(() => {
+
+      return hospitalizations.filter(
+        (item) => {
+
+          const searchValue =
+            search
+              .toLowerCase()
+              .trim();
+
+
+          const matchesSearch =
+            item.patient
+              ?.toLowerCase()
+              .includes(searchValue) ||
+
+            item.dossier
+              ?.toLowerCase()
+              .includes(searchValue) ||
+
+            item.chambre
+              ?.toLowerCase()
+              .includes(searchValue) ||
+
+            item.service
+              ?.toLowerCase()
+              .includes(searchValue);
+
+
+          const matchesStatus =
+            statusFilter === "Tous" ||
+            item.status === statusFilter;
+
+
+          return (
+            matchesSearch &&
+            matchesStatus
+          );
+
+        }
+      );
+
+    }, [
+      hospitalizations,
+      search,
+      statusFilter,
+    ]);
+
+
+  // ==========================================================
+  // OUVRIR LES DÉTAILS
+  // ==========================================================
 
   const handleDetails = (patient) => {
+
     setSelectedPatient(patient);
+
     setShowDetailsModal(true);
+
   };
 
+
+  // ==========================================================
+  // AJOUTER UN LIT
+  // ==========================================================
+
+  const handleAddBed = () => {
+
+    const roomNumber =
+      newBedRoom.trim();
+
+    const bedNumber =
+      newBedNumber.trim();
+
+
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
+
+    if (!roomNumber || !bedNumber) {
+
+      alert(
+        "Veuillez renseigner la chambre et le numéro du lit."
+      );
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // RECHERCHE DE LA CHAMBRE
+    // --------------------------------------------------------
+
+    const room =
+      rooms.find(
+        (item) =>
+          item.number === roomNumber
+      );
+
+
+    if (!room) {
+
+      alert(
+        "La chambre sélectionnée n'existe pas."
+      );
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // LISTE DES LITS EXISTANTS
+    // --------------------------------------------------------
+
+    const existingBeds =
+      room.beds || [];
+
+
+    // --------------------------------------------------------
+    // VÉRIFICATION DU DOUBLON
+    // --------------------------------------------------------
+
+    const bedAlreadyExists =
+      existingBeds.some(
+        (bed) =>
+          bed.toLowerCase() ===
+          bedNumber.toLowerCase()
+      );
+
+
+    if (bedAlreadyExists) {
+
+      alert(
+        `Le lit ${bedNumber} existe déjà dans la chambre ${roomNumber}.`
+      );
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // AJOUT DU LIT
+    // --------------------------------------------------------
+
+    const updatedRooms =
+      rooms.map((item) => {
+
+        if (
+          item.number !== roomNumber
+        ) {
+
+          return item;
+
+        }
+
+
+        return {
+
+          ...item,
+
+          totalBeds:
+            item.totalBeds + 1,
+
+          beds: [
+            ...existingBeds,
+            bedNumber,
+          ],
+
+        };
+
+      });
+
+
+    setRooms(updatedRooms);
+
+
+    // --------------------------------------------------------
+    // RÉINITIALISATION DU FORMULAIRE
+    // --------------------------------------------------------
+
+    setNewBedRoom("");
+
+    setNewBedNumber("");
+
+
+    // --------------------------------------------------------
+    // FERMETURE DE LA MODALE
+    // --------------------------------------------------------
+
+    setShowAdmissionModal(false);
+
+  };
+
+
+  // ==========================================================
+  // TERMINER UNE HOSPITALISATION
+  // ==========================================================
+
+  const handleTerminateHospitalization =
+    (patientId) => {
+
+      const hospitalization =
+        hospitalizations.find(
+          (item) =>
+            item.id === patientId
+        );
+
+
+      if (!hospitalization) {
+
+        return;
+
+      }
+
+
+      if (
+        hospitalization.status ===
+        "Sortie"
+      ) {
+
+        return;
+
+      }
+
+
+      // ------------------------------------------------------
+      // MISE À JOUR DU STATUT
+      // ------------------------------------------------------
+
+      const updatedHospitalizations =
+        hospitalizations.map(
+          (item) =>
+            item.id === patientId
+              ? {
+                  ...item,
+                  status: "Sortie",
+                }
+              : item
+        );
+
+
+      setHospitalizations(
+        updatedHospitalizations
+      );
+
+
+      // ------------------------------------------------------
+      // LIBÉRATION DU LIT
+      // ------------------------------------------------------
+
+      const updatedRooms =
+        rooms.map((room) => {
+
+          if (
+            room.number ===
+            hospitalization.chambre
+          ) {
+
+            return {
+
+              ...room,
+
+              occupiedBeds:
+                Math.max(
+                  0,
+                  room.occupiedBeds - 1
+                ),
+
+            };
+
+          }
+
+
+          return room;
+
+        });
+
+
+      setRooms(updatedRooms);
+
+
+      // ------------------------------------------------------
+      // MISE À JOUR DU PATIENT DANS LE MODAL
+      // ------------------------------------------------------
+
+      setSelectedPatient(
+        (previous) =>
+          previous
+            ? {
+                ...previous,
+                status: "Sortie",
+              }
+            : null
+      );
+
+    };
+
+
+  // ==========================================================
+  // FERMER LES MODALES
+  // ==========================================================
 
   const closeModals = () => {
+
     setShowAdmissionModal(false);
+
     setShowDetailsModal(false);
+
     setSelectedPatient(null);
+
+    setNewBedRoom("");
+
+    setNewBedNumber("");
+
   };
 
 
+  // ==========================================================
+  // RENDU
+  // ==========================================================
+
   return (
+
     <div className="hospitalization-page">
+
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
 
       <div className="hospitalization-header">
 
         <div>
+
           <div className="hospitalization-breadcrumb">
+
             Tableau de bord
-            <span>/</span>
+
+            <span>
+              /
+            </span>
+
             Hospitalisation
+
           </div>
 
-          <h1>Hospitalisation</h1>
+
+          <h1>
+            Hospitalisation
+          </h1>
+
 
           <p>
-            Gestion des admissions, des chambres et des patients hospitalisés.
+            Gestion des admissions, des chambres et des
+            patients hospitalisés.
           </p>
+
         </div>
+
 
         <button
           className="hospitalization-primary-btn"
-          onClick={() => setShowAdmissionModal(true)}
+          onClick={() =>
+            setShowAdmissionModal(true)
+          }
         >
-          <span>+</span>
-          Nouvelle admission
+
+          <span>
+            +
+          </span>
+
+          Ajout de lits
+
         </button>
 
       </div>
 
 
+      {/* ======================================================
+          STATISTIQUES
+      ====================================================== */}
+
       <div className="hospitalization-stats">
+
+
+        {/* PATIENTS HOSPITALISÉS */}
 
         <div className="hospitalization-stat-card">
 
@@ -251,14 +825,27 @@ const Hospitalization = () => {
             🛏
           </div>
 
+
           <div className="stat-content">
-            <span>Patients hospitalisés</span>
-            <strong>{totalHospitalized}</strong>
-            <small>Patients actuellement admis</small>
+
+            <span>
+              Patients hospitalisés
+            </span>
+
+            <strong>
+              {totalHospitalized}
+            </strong>
+
+            <small>
+              Patients actuellement admis
+            </small>
+
           </div>
 
         </div>
 
+
+        {/* LITS DISPONIBLES */}
 
         <div className="hospitalization-stat-card">
 
@@ -266,14 +853,27 @@ const Hospitalization = () => {
             ✓
           </div>
 
+
           <div className="stat-content">
-            <span>Lits disponibles</span>
-            <strong>{availableBeds}</strong>
-            <small>Sur {totalBeds} lits</small>
+
+            <span>
+              Lits disponibles
+            </span>
+
+            <strong>
+              {availableBeds}
+            </strong>
+
+            <small>
+              Sur {totalBeds} lits
+            </small>
+
           </div>
 
         </div>
 
+
+        {/* SORTIES PRÉVUES */}
 
         <div className="hospitalization-stat-card">
 
@@ -281,14 +881,27 @@ const Hospitalization = () => {
             ↗
           </div>
 
+
           <div className="stat-content">
-            <span>Sorties prévues</span>
-            <strong>{plannedDischarges}</strong>
-            <small>À surveiller</small>
+
+            <span>
+              Sorties prévues
+            </span>
+
+            <strong>
+              {plannedDischarges}
+            </strong>
+
+            <small>
+              À surveiller
+            </small>
+
           </div>
 
         </div>
 
+
+        {/* LITS OCCUPÉS */}
 
         <div className="hospitalization-stat-card">
 
@@ -296,15 +909,31 @@ const Hospitalization = () => {
             ▣
           </div>
 
+
           <div className="stat-content">
-            <span>Lits occupés</span>
-            <strong>{occupiedBeds}</strong>
+
+            <span>
+              Lits occupés
+            </span>
+
+            <strong>
+              {occupiedBeds}
+            </strong>
+
             <small>
+
               {totalBeds > 0
-                ? Math.round((occupiedBeds / totalBeds) * 100)
+                ? Math.round(
+                    (occupiedBeds /
+                      totalBeds) *
+                      100
+                  )
                 : 0}
+
               % d'occupation
+
             </small>
+
           </div>
 
         </div>
@@ -312,26 +941,41 @@ const Hospitalization = () => {
       </div>
 
 
+      {/* ======================================================
+          ONGLETS
+      ====================================================== */}
+
       <div className="hospitalization-tabs">
 
         <button
           className={
-            activeTab === "hospitalisations"
+            activeTab ===
+            "hospitalisations"
               ? "active"
               : ""
           }
-          onClick={() => setActiveTab("hospitalisations")}
+          onClick={() =>
+            setActiveTab(
+              "hospitalisations"
+            )
+          }
         >
           Hospitalisations
         </button>
 
+
         <button
           className={
-            activeTab === "chambres"
+            activeTab ===
+            "chambres"
               ? "active"
               : ""
           }
-          onClick={() => setActiveTab("chambres")}
+          onClick={() =>
+            setActiveTab(
+              "chambres"
+            )
+          }
         >
           Chambres & lits
         </button>
@@ -339,21 +983,37 @@ const Hospitalization = () => {
       </div>
 
 
-      {activeTab === "hospitalisations" && (
+      {/* ======================================================
+          HOSPITALISATIONS
+      ====================================================== */}
+
+      {activeTab ===
+        "hospitalisations" && (
 
         <div className="hospitalization-content">
 
+
+          {/* BARRE DE RECHERCHE */}
+
           <div className="hospitalization-toolbar">
+
 
             <div className="hospitalization-search">
 
-              <span>⌕</span>
+              <span>
+                ⌕
+              </span>
+
 
               <input
                 type="text"
                 placeholder="Rechercher un patient, dossier, chambre..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) =>
+                  setSearch(
+                    e.target.value
+                  )
+                }
               />
 
             </div>
@@ -361,16 +1021,35 @@ const Hospitalization = () => {
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) =>
+                setStatusFilter(
+                  e.target.value
+                )
+              }
             >
-              <option value="Tous">Tous les statuts</option>
-              <option value="En cours">En cours</option>
-              <option value="Sortie prévue">Sortie prévue</option>
-              <option value="Sortie">Sortie</option>
+
+              <option value="Tous">
+                Tous les statuts
+              </option>
+
+              <option value="En cours">
+                En cours
+              </option>
+
+              <option value="Sortie prévue">
+                Sortie prévue
+              </option>
+
+              <option value="Sortie">
+                Sortie
+              </option>
+
             </select>
 
           </div>
 
+
+          {/* TABLEAU */}
 
           <div className="hospitalization-table-wrapper">
 
@@ -379,14 +1058,39 @@ const Hospitalization = () => {
               <thead>
 
                 <tr>
-                  <th>Patient</th>
-                  <th>Service</th>
-                  <th>Chambre / Lit</th>
-                  <th>Admission</th>
-                  <th>Sortie prévue</th>
-                  <th>Médecin</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
+
+                  <th>
+                    Patient
+                  </th>
+
+                  <th>
+                    Service
+                  </th>
+
+                  <th>
+                    Chambre / Lit
+                  </th>
+
+                  <th>
+                    Admission
+                  </th>
+
+                  <th>
+                    Sortie prévue
+                  </th>
+
+                  <th>
+                    Médecin
+                  </th>
+
+                  <th>
+                    Statut
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
                 </tr>
 
               </thead>
@@ -394,99 +1098,158 @@ const Hospitalization = () => {
 
               <tbody>
 
-                {filteredHospitalizations.length > 0 ? (
+                {filteredHospitalizations.length >
+                0 ? (
 
-                  filteredHospitalizations.map((item) => (
+                  filteredHospitalizations.map(
+                    (item) => (
 
-                    <tr key={item.id}>
+                      <tr key={item.id}>
 
-                      <td>
 
-                        <div className="patient-cell">
+                        {/* PATIENT */}
 
-                          <div className="patient-avatar">
-                            {item.patient
-                              .split(" ")
-                              .map((word) => word[0])
-                              .join("")
-                              .substring(0, 2)}
+                        <td>
+
+                          <div className="patient-cell">
+
+                            <div className="patient-avatar">
+
+                              {item.patient
+                                ?.split(" ")
+                                .map(
+                                  (word) =>
+                                    word[0]
+                                )
+                                .join("")
+                                .substring(
+                                  0,
+                                  2
+                                )}
+
+                            </div>
+
+
+                            <div>
+
+                              <strong>
+                                {item.patient}
+                              </strong>
+
+                              <span>
+                                {item.dossier}{" "}
+                                ·{" "}
+                                {item.age}{" "}
+                                ans
+                              </span>
+
+                            </div>
+
                           </div>
 
-                          <div>
-                            <strong>{item.patient}</strong>
+                        </td>
+
+
+                        {/* SERVICE */}
+
+                        <td>
+
+                          <span className="service-name">
+                            {item.service}
+                          </span>
+
+                          <small className="motif">
+                            {item.motif}
+                          </small>
+
+                        </td>
+
+
+                        {/* CHAMBRE / LIT */}
+
+                        <td>
+
+                          <div className="room-cell">
+
+                            <strong>
+                              {item.chambre}
+                            </strong>
+
                             <span>
-                              {item.dossier} · {item.age} ans
+                              {item.lit}
                             </span>
+
                           </div>
 
-                        </div>
-
-                      </td>
+                        </td>
 
 
-                      <td>
-                        <span className="service-name">
-                          {item.service}
-                        </span>
+                        {/* ADMISSION */}
 
-                        <small className="motif">
-                          {item.motif}
-                        </small>
-                      </td>
+                        <td>
+                          {item.admission}
+                        </td>
 
 
-                      <td>
-                        <div className="room-cell">
-                          <strong>{item.chambre}</strong>
-                          <span>{item.lit}</span>
-                        </div>
-                      </td>
+                        {/* SORTIE PRÉVUE */}
+
+                        <td>
+                          {item.sortiePrevue ||
+                            "—"}
+                        </td>
 
 
-                      <td>
-                        {item.admission}
-                      </td>
+                        {/* MÉDECIN */}
+
+                        <td>
+                          {item.medecin}
+                        </td>
 
 
-                      <td>
-                        {item.sortiePrevue}
-                      </td>
+                        {/* STATUT */}
+
+                        <td>
+
+                          <span
+                            className={`status-badge ${item.status
+                              ?.toLowerCase()
+                              .replaceAll(
+                                " ",
+                                "-"
+                              )}`}
+                          >
+
+                            <span className="status-dot"></span>
+
+                            {item.status}
+
+                          </span>
+
+                        </td>
 
 
-                      <td>
-                        {item.medecin}
-                      </td>
+                        {/* ACTION */}
 
+                        <td>
 
-                      <td>
+                          <button
+                            className="action-button"
+                            title="Voir les détails"
+                            onClick={() =>
+                              handleDetails(
+                                item
+                              )
+                            }
+                          >
+                            👁
+                          </button>
 
-                        <span
-                          className={`status-badge ${item.status
-                            .toLowerCase()
-                            .replace(" ", "-")}`}
-                        >
-                          <span className="status-dot"></span>
-                          {item.status}
-                        </span>
+                        </td>
 
-                      </td>
+                      </tr>
 
-
-                      <td>
-
-                        <button
-                          className="action-button"
-                          title="Voir les détails"
-                          onClick={() => handleDetails(item)}
-                        >
-                          👁
-                        </button>
-
-                      </td>
-
-                    </tr>
-
-                  ))
+                    )
+                  )
 
                 ) : (
 
@@ -514,18 +1277,28 @@ const Hospitalization = () => {
       )}
 
 
-      {activeTab === "chambres" && (
+      {/* ======================================================
+          CHAMBRES ET LITS
+      ====================================================== */}
+
+      {activeTab ===
+        "chambres" && (
 
         <div className="rooms-section">
+
 
           <div className="rooms-header">
 
             <div>
-              <h2>Chambres et lits</h2>
+
+              <h2>
+                Chambres et lits
+              </h2>
 
               <p>
                 Visualisez l'occupation actuelle des chambres.
               </p>
+
             </div>
 
           </div>
@@ -536,10 +1309,20 @@ const Hospitalization = () => {
             {rooms.map((room) => {
 
               const available =
-                room.totalBeds - room.occupiedBeds;
+                Math.max(
+                  0,
+                  room.totalBeds -
+                    room.occupiedBeds
+                );
+
 
               const occupation =
-                (room.occupiedBeds / room.totalBeds) * 100;
+                room.totalBeds > 0
+                  ? (room.occupiedBeds /
+                      room.totalBeds) *
+                    100
+                  : 0;
+
 
               return (
 
@@ -547,6 +1330,9 @@ const Hospitalization = () => {
                   className="room-card"
                   key={room.id}
                 >
+
+
+                  {/* EN-TÊTE CHAMBRE */}
 
                   <div className="room-card-header">
 
@@ -556,30 +1342,47 @@ const Hospitalization = () => {
                         Chambre
                       </span>
 
-                      <h3>{room.number}</h3>
+                      <h3>
+                        {room.number}
+                      </h3>
 
                     </div>
 
-                    <span className={`room-type ${room.type === "VIP" ? "vip" : ""}`}>
+
+                    <span
+                      className={`room-type ${
+                        room.type ===
+                        "VIP"
+                          ? "vip"
+                          : ""
+                      }`}
+                    >
                       {room.type}
                     </span>
 
                   </div>
 
 
+                  {/* SERVICE */}
+
                   <div className="room-service">
                     {room.service}
                   </div>
 
 
+                  {/* OCCUPATION */}
+
                   <div className="room-occupancy">
 
                     <div className="occupancy-header">
 
-                      <span>Occupation</span>
+                      <span>
+                        Occupation
+                      </span>
 
                       <strong>
-                        {room.occupiedBeds}/{room.totalBeds}
+                        {room.occupiedBeds}/
+                        {room.totalBeds}
                       </strong>
 
                     </div>
@@ -590,7 +1393,10 @@ const Hospitalization = () => {
                       <div
                         className="occupancy-progress"
                         style={{
-                          width: `${occupation}%`,
+                          width: `${Math.min(
+                            occupation,
+                            100
+                          )}%`,
                         }}
                       ></div>
 
@@ -599,15 +1405,77 @@ const Hospitalization = () => {
                   </div>
 
 
+                  {/* PIED DE CARTE */}
+
                   <div className="room-footer">
 
                     <span className="occupied">
-                      {room.occupiedBeds} occupé(s)
+                      {room.occupiedBeds}{" "}
+                      occupé(s)
                     </span>
 
                     <span className="available">
-                      {available} disponible(s)
+                      {available}{" "}
+                      disponible(s)
                     </span>
+
+                  </div>
+
+
+                  {/* LISTE DES LITS */}
+
+                  <div className="room-beds-list">
+
+                    <span className="room-beds-title">
+                      Lits
+                    </span>
+
+
+                    <div className="beds-container">
+
+                      {(room.beds ||
+                        []).map(
+                        (bed) => {
+
+                          const occupied =
+                            hospitalizations.some(
+                              (item) =>
+                                item.chambre ===
+                                  room.number &&
+                                item.lit ===
+                                  bed &&
+                                item.status !==
+                                  "Sortie"
+                            );
+
+
+                          return (
+
+                            <span
+                              key={bed}
+                              className={
+                                occupied
+                                  ? "bed-item occupied"
+                                  : "bed-item available"
+                              }
+                            >
+
+                              {bed}
+
+                              <small>
+                                {occupied
+                                  ? "Occupé"
+                                  : "Disponible"}
+                              </small>
+
+                            </span>
+
+                          );
+
+                        }
+                      )}
+
+                    </div>
 
                   </div>
 
@@ -624,6 +1492,10 @@ const Hospitalization = () => {
       )}
 
 
+      {/* ======================================================
+          MODALE AJOUT DE LIT
+      ====================================================== */}
+
       {showAdmissionModal && (
 
         <div
@@ -633,17 +1505,28 @@ const Hospitalization = () => {
 
           <div
             className="hospitalization-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
+
+
+            {/* EN-TÊTE */}
 
             <div className="modal-header">
 
               <div>
-                <h2>Nouvelle admission</h2>
+
+                <h2>
+                  Ajouter un lit
+                </h2>
+
                 <p>
-                  Enregistrer l'admission d'un patient.
+                  Ajouter un nouveau lit dans une chambre existante.
                 </p>
+
               </div>
+
 
               <button
                 className="modal-close"
@@ -655,152 +1538,137 @@ const Hospitalization = () => {
             </div>
 
 
+            {/* FORMULAIRE */}
+
             <div className="modal-body">
+
+
+              {/* CHAMBRE */}
 
               <div className="form-group">
 
                 <label>
-                  Patient
+                  Numéro de la chambre
                 </label>
 
-                <select>
+
+                <select
+                  value={newBedRoom}
+                  onChange={(e) =>
+                    setNewBedRoom(
+                      e.target.value
+                    )
+                  }
+                >
+
                   <option value="">
-                    Sélectionner un patient
+                    Sélectionner une chambre
                   </option>
 
-                  <option>
-                    KOFFI Jean
-                  </option>
 
-                  <option>
-                    KOUASSI Marie
-                  </option>
+                  {rooms.map((room) => (
 
-                  <option>
-                    YAO Ibrahim
-                  </option>
+                    <option
+                      key={room.id}
+                      value={room.number}
+                    >
+                      {room.number} —{" "}
+                      {room.service}
+                    </option>
 
-                  <option>
-                    ADJE Fatou
-                  </option>
+                  ))}
 
                 </select>
 
               </div>
 
 
-              <div className="form-row">
-
-                <div className="form-group">
-
-                  <label>
-                    Service
-                  </label>
-
-                  <select>
-
-                    <option>
-                      Médecine générale
-                    </option>
-
-                    <option>
-                      Chirurgie
-                    </option>
-
-                    <option>
-                      Maternité
-                    </option>
-
-                    <option>
-                      Cardiologie
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <div className="form-group">
-
-                  <label>
-                    Chambre
-                  </label>
-
-                  <select>
-
-                    <option>
-                      A-101
-                    </option>
-
-                    <option>
-                      A-102
-                    </option>
-
-                    <option>
-                      B-201
-                    </option>
-
-                    <option>
-                      B-204
-                    </option>
-
-                    <option>
-                      D-105
-                    </option>
-
-                  </select>
-
-                </div>
-
-              </div>
-
-
-              <div className="form-row">
-
-                <div className="form-group">
-
-                  <label>
-                    Date d'admission
-                  </label>
-
-                  <input
-                    type="date"
-                    defaultValue="2026-09-17"
-                  />
-
-                </div>
-
-
-                <div className="form-group">
-
-                  <label>
-                    Sortie prévue
-                  </label>
-
-                  <input
-                    type="date"
-                  />
-
-                </div>
-
-              </div>
-
+              {/* NUMÉRO DU LIT */}
 
               <div className="form-group">
 
                 <label>
-                  Motif d'hospitalisation
+                  Numéro du lit
                 </label>
 
-                <textarea
-                  placeholder="Décrire le motif de l'hospitalisation..."
-                  rows="4"
-                ></textarea>
+
+                <input
+                  type="text"
+                  placeholder="Ex. Lit 03"
+                  value={newBedNumber}
+                  onChange={(e) =>
+                    setNewBedNumber(
+                      e.target.value
+                    )
+                  }
+                />
 
               </div>
 
+
+              {/* INFORMATIONS CHAMBRE */}
+
+              {newBedRoom && (
+
+                <div className="bed-add-info">
+
+                  {(() => {
+
+                    const room =
+                      rooms.find(
+                        (item) =>
+                          item.number ===
+                          newBedRoom
+                      );
+
+
+                    if (!room) {
+                      return null;
+                    }
+
+
+                    const available =
+                      Math.max(
+                        0,
+                        room.totalBeds -
+                          room.occupiedBeds
+                      );
+
+
+                    return (
+
+                      <>
+
+                        <strong>
+                          Chambre{" "}
+                          {room.number}
+                        </strong>
+
+                        <span>
+
+                          {room.totalBeds}{" "}
+                          lit(s)
+                          actuellement ·{" "}
+
+                          {available}{" "}
+                          disponible(s)
+
+                        </span>
+
+                      </>
+
+                    );
+
+                  })()}
+
+                </div>
+
+              )}
+
             </div>
 
+
+            {/* FOOTER */}
 
             <div className="modal-footer">
 
@@ -811,11 +1679,12 @@ const Hospitalization = () => {
                 Annuler
               </button>
 
+
               <button
                 className="hospitalization-primary-btn"
-                onClick={closeModals}
+                onClick={handleAddBed}
               >
-                Enregistrer l'admission
+                Ajouter le lit
               </button>
 
             </div>
@@ -827,7 +1696,12 @@ const Hospitalization = () => {
       )}
 
 
-      {showDetailsModal && selectedPatient && (
+      {/* ======================================================
+          MODALE DÉTAILS PATIENT
+      ====================================================== */}
+
+      {showDetailsModal &&
+        selectedPatient && (
 
         <div
           className="hospitalization-modal-overlay"
@@ -836,8 +1710,13 @@ const Hospitalization = () => {
 
           <div
             className="hospitalization-modal details-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
+
+
+            {/* EN-TÊTE */}
 
             <div className="modal-header">
 
@@ -853,6 +1732,7 @@ const Hospitalization = () => {
 
               </div>
 
+
               <button
                 className="modal-close"
                 onClick={closeModals}
@@ -863,19 +1743,31 @@ const Hospitalization = () => {
             </div>
 
 
+            {/* DÉTAILS */}
+
             <div className="patient-details">
+
+
+              {/* PROFIL */}
 
               <div className="details-profile">
 
                 <div className="large-avatar">
 
                   {selectedPatient.patient
-                    .split(" ")
-                    .map((word) => word[0])
+                    ?.split(" ")
+                    .map(
+                      (word) =>
+                        word[0]
+                    )
                     .join("")
-                    .substring(0, 2)}
+                    .substring(
+                      0,
+                      2
+                    )}
 
                 </div>
+
 
                 <div>
 
@@ -892,70 +1784,126 @@ const Hospitalization = () => {
               </div>
 
 
+              {/* GRILLE INFORMATIONS */}
+
               <div className="details-grid">
 
-                <div>
-                  <span>Âge</span>
-                  <strong>
-                    {selectedPatient.age} ans
-                  </strong>
-                </div>
 
                 <div>
-                  <span>Sexe</span>
+
+                  <span>
+                    Âge
+                  </span>
+
+                  <strong>
+                    {selectedPatient.age}{" "}
+                    ans
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Sexe
+                  </span>
+
                   <strong>
                     {selectedPatient.sexe}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Service</span>
+
+                  <span>
+                    Service
+                  </span>
+
                   <strong>
                     {selectedPatient.service}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Chambre</span>
+
+                  <span>
+                    Chambre
+                  </span>
+
                   <strong>
                     {selectedPatient.chambre}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Lit</span>
+
+                  <span>
+                    Lit
+                  </span>
+
                   <strong>
                     {selectedPatient.lit}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Médecin</span>
+
+                  <span>
+                    Médecin
+                  </span>
+
                   <strong>
                     {selectedPatient.medecin}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Date d'admission</span>
+
+                  <span>
+                    Date d'admission
+                  </span>
+
                   <strong>
                     {selectedPatient.admission}
                   </strong>
+
                 </div>
 
+
                 <div>
-                  <span>Sortie prévue</span>
+
+                  <span>
+                    Sortie prévue
+                  </span>
+
                   <strong>
-                    {selectedPatient.sortiePrevue}
+                    {selectedPatient.sortiePrevue ||
+                      "—"}
                   </strong>
+
                 </div>
 
               </div>
 
 
+              {/* MOTIF */}
+
               <div className="details-motif">
 
-                <span>Motif d'hospitalisation</span>
+                <span>
+                  Motif d'hospitalisation
+                </span>
 
                 <p>
                   {selectedPatient.motif}
@@ -963,10 +1911,28 @@ const Hospitalization = () => {
 
               </div>
 
+
+              {/* STATUT */}
+
+              <div className="details-status">
+
+                <span>
+                  Statut
+                </span>
+
+                <strong>
+                  {selectedPatient.status}
+                </strong>
+
+              </div>
+
             </div>
 
 
+            {/* FOOTER */}
+
             <div className="modal-footer">
+
 
               <button
                 className="secondary-button"
@@ -975,12 +1941,24 @@ const Hospitalization = () => {
                 Fermer
               </button>
 
-              <button
-                className="hospitalization-primary-btn"
-                onClick={closeModals}
-              >
-                Modifier le dossier
-              </button>
+
+              {/* BOUTON TERMINER */}
+
+              {selectedPatient.status !==
+                "Sortie" && (
+
+                <button
+                  className="hospitalization-danger-btn"
+                  onClick={() =>
+                    handleTerminateHospitalization(
+                      selectedPatient.id
+                    )
+                  }
+                >
+                  Terminer l'hospitalisation
+                </button>
+
+              )}
 
             </div>
 
@@ -991,7 +1969,10 @@ const Hospitalization = () => {
       )}
 
     </div>
+
   );
+
 };
+
 
 export default Hospitalization;
