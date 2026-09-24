@@ -1,114 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  Search,
-  Wallet,
-  CreditCard,
   Banknote,
-  TrendingUp,
-  ShieldCheck,
-  Users,
+  Building2,
   CalendarDays,
-  UserRound,
+  CircleAlert,
+  CreditCard,
   Download,
   Eye,
-  X,
-  RefreshCw,
   Filter,
   Receipt,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  TrendingUp,
   UserCheck,
-  Building2,
+  UserRound,
+  Users,
+  Wallet,
+  X,
 } from "lucide-react";
 
+import api from "../services/api";
+
 import "../styles/billing.css";
-
-
-/* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ------------------------------------------------------------
-   Ces données servent uniquement si l'API de la Caisse
-   n'est pas encore disponible.
-   ============================================================ */
-
-const INITIAL_PAYMENTS = [
-  {
-    id: "CAISSE-2026-001",
-    patient: "Kouassi Jean",
-    patientId: "PAT-0001",
-    date: "2026-09-24",
-    totalAmount: 45000,
-    patientAmount: 45000,
-    insuranceAmount: 0,
-    method: "Espèces",
-    cashier: "Administrateur",
-    service: "Consultation + Analyses",
-  },
-
-  {
-    id: "CAISSE-2026-002",
-    patient: "Yao Marie",
-    patientId: "PAT-0002",
-    date: "2026-09-24",
-    totalAmount: 78000,
-    patientAmount: 30000,
-    insuranceAmount: 48000,
-    method: "Mobile Money",
-    cashier: "Koffi Armel",
-    service: "Consultation + Pharmacie",
-  },
-
-  {
-    id: "CAISSE-2026-003",
-    patient: "Adjoua Esther",
-    patientId: "PAT-0003",
-    date: "2026-09-23",
-    totalAmount: 125000,
-    patientAmount: 50000,
-    insuranceAmount: 75000,
-    method: "Carte bancaire",
-    cashier: "N'Guessan Marie",
-    service: "Hospitalisation",
-  },
-
-  {
-    id: "CAISSE-2026-004",
-    patient: "N'Guessan Paul",
-    patientId: "PAT-0004",
-    date: "2026-09-23",
-    totalAmount: 32500,
-    patientAmount: 32500,
-    insuranceAmount: 0,
-    method: "Espèces",
-    cashier: "Administrateur",
-    service: "Consultation",
-  },
-
-  {
-    id: "CAISSE-2026-005",
-    patient: "Aka Bernard",
-    patientId: "PAT-0005",
-    date: "2026-09-22",
-    totalAmount: 96000,
-    patientAmount: 50000,
-    insuranceAmount: 46000,
-    method: "Mobile Money",
-    cashier: "Koffi Armel",
-    service: "Laboratoire + Consultation",
-  },
-
-  {
-    id: "CAISSE-2026-006",
-    patient: "Koffi Clarisse",
-    patientId: "PAT-0006",
-    date: "2026-09-21",
-    totalAmount: 18000,
-    patientAmount: 18000,
-    insuranceAmount: 0,
-    method: "Espèces",
-    cashier: "N'Guessan Marie",
-    service: "Pharmacie",
-  },
-];
 
 
 /* ============================================================
@@ -305,105 +220,24 @@ export default function Billing() {
 
     try {
 
-      const response = await fetch(
-        "/api/caisse/payments/",
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
+      const response = await api.get(
+        "/parcours/comptabilite/paiements/"
       );
 
 
-      if (!response.ok) {
-        throw new Error(
-          `Erreur serveur : ${response.status}`
-        );
-      }
-
-
-      const data = await response.json();
-
-
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data.results)
-          ? data.results
-          : Array.isArray(data.payments)
-            ? data.payments
-            : Array.isArray(data.data)
-              ? data.data
-              : [];
-
-
       setPayments(
-        list.map(normalizePayment)
+        response.data.map(normalizePayment)
       );
 
     } catch (apiError) {
 
-      console.warn(
-        "API Caisse indisponible. Tentative avec localStorage.",
-        apiError
+      console.error(apiError);
+
+      setPayments([]);
+
+      setError(
+        "Impossible de récupérer les paiements de la Caisse."
       );
-
-
-      try {
-
-        const localData =
-          localStorage.getItem("caissePayments");
-
-
-        if (localData) {
-
-          const parsed =
-            JSON.parse(localData);
-
-
-          const list =
-            Array.isArray(parsed)
-              ? parsed
-              : Array.isArray(parsed?.payments)
-                ? parsed.payments
-                : [];
-
-
-          setPayments(
-            list.map(normalizePayment)
-          );
-
-          setError("");
-
-        } else {
-
-          /*
-           * Mode démonstration.
-           * À supprimer lorsque Caisse sera connectée
-           * définitivement à l'API.
-           */
-
-          setPayments(
-            INITIAL_PAYMENTS.map(normalizePayment)
-          );
-
-          setError(
-            "Les données réelles de la Caisse ne sont pas encore disponibles. Affichage des données de démonstration."
-          );
-        }
-
-      } catch (localError) {
-
-        console.error(localError);
-
-        setPayments(
-          INITIAL_PAYMENTS.map(normalizePayment)
-        );
-
-        setError(
-          "Impossible de récupérer les paiements de la Caisse."
-        );
-      }
 
     } finally {
 
@@ -844,25 +678,6 @@ export default function Billing() {
 
       <div className="billing-header">
 
-        <div className="billing-header-left">
-
-          <div className="billing-header-icon">
-            <Receipt size={26} />
-          </div>
-
-          <div>
-
-            <h1>
-              Encaissements
-            </h1>
-
-            <p>
-              Suivi des paiements enregistrés à la caisse
-            </p>
-
-          </div>
-
-        </div>
 
 
         <div className="billing-header-actions">
@@ -913,7 +728,7 @@ export default function Billing() {
 
         <div className="billing-info-message">
 
-          <AlertCircleIcon />
+          <CircleAlert size={20} strokeWidth={2} aria-hidden="true" />
 
           <span>
             {error}
@@ -2065,51 +1880,6 @@ export default function Billing() {
       )}
 
     </div>
-
-  );
-}
-
-
-/* ============================================================
-   ICÔNE ERREUR
-   ============================================================ */
-
-function AlertCircleIcon() {
-
-  return (
-
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-
-      <line
-        x1="12"
-        y1="8"
-        x2="12"
-        y2="12"
-      />
-
-      <line
-        x1="12"
-        y1="16"
-        x2="12.01"
-        y2="16"
-      />
-
-    </svg>
 
   );
 }

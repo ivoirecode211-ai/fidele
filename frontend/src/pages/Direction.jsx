@@ -1,5 +1,8 @@
 import "../styles/direction.css";
 import Logo from "../components/Logo";
+import SidebarFooter from "../components/SidebarFooter";
+import UserBadge from "../components/UserBadge";
+import NotificationBell from "../components/NotificationBell";
 import {
   LayoutDashboard,
   Users,
@@ -14,14 +17,13 @@ import {
   Siren,
   FileText,
   Search,
-  Bell,
-  ChevronDown,
   CalendarDays,
   TrendingUp,
   Database,
   Box,
   AlertTriangle,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 
 const menuItems = [
@@ -61,12 +63,13 @@ const consultationData = [
 ];
 
 const services = [
-  { name: "Médecine générale", percentage: 36, color: "#2d7ff9" },
-  { name: "Pédiatrie", percentage: 18, color: "#4f8df7" },
-  { name: "Gynécologie", percentage: 15, color: "#697cf4" },
-  { name: "Chirurgie", percentage: 12, color: "#f39a13" },
-  { name: "Laboratoire", percentage: 10, color: "#f2c21b" },
-  { name: "Autres", percentage: 9, color: "#806df1" },
+  // Rampe du bleu de la charte : plus la part est grande, plus le bleu est profond.
+  { name: "Médecine générale", percentage: 36, color: "#0a4979" },
+  { name: "Pédiatrie", percentage: 18, color: "#1671b7" },
+  { name: "Gynécologie", percentage: 15, color: "#368ad1" },
+  { name: "Chirurgie", percentage: 12, color: "#67aae9" },
+  { name: "Laboratoire", percentage: 10, color: "#98caf9" },
+  { name: "Autres", percentage: 9, color: "#c2e0ff" },
 ];
 
 const alerts = [
@@ -213,7 +216,7 @@ export default function Direction() {
           <div className="direction-brand-icon">
             <Logo size={32} inverted />
           </div>
-          <span>MA SANTE</span>
+          <span>MA SANTÉ</span>
         </div>
 
         <nav className="direction-sidebar-nav">
@@ -228,42 +231,36 @@ export default function Direction() {
               >
                 <Icon size={16} strokeWidth={2} />
                 <span>{item.label}</span>
-                {item.active && <span className="direction-menu-arrow">›</span>}
+                {item.active && <ChevronRight size={15} className="direction-menu-arrow" aria-hidden="true" />}
               </a>
             );
           })}
         </nav>
+
+        <SidebarFooter />
       </aside>
 
       <main className="direction-content">
         <header className="direction-topbar">
+          <div className="topbar-title">
+            <h1>Tableau de bord - Direction</h1>
+            <p>Vue globale des activités de la clinique</p>
+          </div>
+
           <div className="direction-search">
             <Search size={16} />
             <input type="text" placeholder="Rechercher un patient, une consultation, un utilisateur..." />
           </div>
 
           <div className="direction-topbar-right">
-            <button className="direction-notification">
-              <Bell size={19} />
-              <span>5</span>
-            </button>
+            <NotificationBell />
 
-            <div className="direction-user">
-              <div className="direction-user-avatar">👨🏾‍💼</div>
-              <div className="direction-user-info">
-                <strong>Directeur</strong>
-              </div>
-              <ChevronDown size={15} className="direction-user-chevron" />
-            </div>
+            <UserBadge />
           </div>
         </header>
 
         <div className="direction-page-content">
           <div className="direction-page-heading">
-            <div>
-              <h1>Tableau de bord - Direction</h1>
-              <p>Vue globale des activités de la clinique</p>
-            </div>
 
             <button className="direction-date-button">
               <span>Aujourd'hui</span>

@@ -105,15 +105,6 @@ export default function Maintenance() {
   return (
     <div className="maintenance-page">
       <div className="maintenance-header">
-        <div className="maintenance-header-left">
-          <div className="maintenance-title-icon">
-            <Wrench size={28} />
-          </div>
-          <div>
-            <h1>Maintenance</h1>
-            <p>Gestion des équipements, interventions et maintenance technique</p>
-          </div>
-        </div>
 
         <button
           type="button"

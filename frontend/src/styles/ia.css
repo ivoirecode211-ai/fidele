@@ -37,14 +37,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #394aa8, #302e8f);
+  background: linear-gradient(135deg, #0b5d98, #0c3557);
   color: white;
-  box-shadow: 0 4px 13px rgba(57, 74, 168, 0.2);
+  box-shadow: 0 4px 13px rgba(11, 93, 152, 0.2);
 }
 
 .ia-title-area h1 {
   margin: 0;
-  color: #164b72;
+  color: #0a4979;
   font-size: 22px;
   font-weight: 700;
 }
@@ -73,8 +73,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #08ad7b;
-  box-shadow: 0 0 0 3px rgba(8, 173, 123, 0.1);
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
 /* ============================================================
@@ -109,8 +109,8 @@
 
 .ia-tool-card:hover {
   transform: translateY(-2px);
-  border-color: #bcdce9;
-  box-shadow: 0 7px 18px rgba(25, 90, 126, 0.1);
+  border-color: #c2e0ff;
+  box-shadow: 0 7px 18px rgba(11, 93, 152, 0.1);
 }
 
 .ia-tool-icon {
@@ -125,7 +125,7 @@
 
 .ia-tool-icon.blue {
   background: var(--primary-soft);
-  color: #087dce;
+  color: #1671b7;
 }
 
 .ia-tool-icon.green {
@@ -135,16 +135,16 @@
 
 .ia-tool-icon.cyan {
   background: var(--primary-soft);
-  color: #078fa4;
+  color: #368ad1;
 }
 
 .ia-tool-icon.purple {
   background: var(--purple-soft);
-  color: #7655d9;
+  color: #1671b7;
 }
 
 .ia-tool-card strong {
-  color: #315773;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 700;
 }
@@ -184,7 +184,7 @@
   border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
-  color: #7891a1;
+  color: #64748b;
   box-sizing: border-box;
 }
 
@@ -193,7 +193,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #345a73;
+  color: #0b5d98;
   font-family: inherit;
   font-size: 12px;
 }
@@ -225,7 +225,7 @@
 }
 
 .ia-last-update strong {
-  color: #46677b;
+  color: #0b5d98;
 }
 
 /* ============================================================
@@ -251,7 +251,7 @@
   border: 1px solid var(--border);
   border-radius: 9px;
   background: white;
-  box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
+  box-shadow: 0 2px 9px rgba(11, 93, 152, 0.05);
 }
 
 .ia-panel-header {
@@ -267,7 +267,7 @@
 
 .ia-panel-header h2 {
   margin: 0;
-  color: #174b71;
+  color: #0a4979;
   font-size: 11px;
   font-weight: 700;
 }
@@ -295,7 +295,7 @@
   align-items: center;
   gap: 3px;
   background: transparent;
-  color: #087aca;
+  color: #1671b7;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -337,7 +337,7 @@
 
 .ia-suggestion-icon.warning {
   background: var(--warning-soft);
-  color: #e99417;
+  color: #f59e0b;
 }
 
 .ia-suggestion-icon.danger {
@@ -352,7 +352,7 @@
 
 .ia-suggestion-icon.info {
   background: var(--primary-soft);
-  color: #087bc9;
+  color: #1671b7;
 }
 
 .ia-suggestion-content {
@@ -363,7 +363,7 @@
 }
 
 .ia-suggestion-content strong {
-  color: #365b73;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 600;
 }
@@ -377,7 +377,7 @@
 .ia-suggestion-view {
   border: none;
   background: transparent;
-  color: #087dcc;
+  color: #1671b7;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -481,22 +481,22 @@
   left: 0;
   width: 100%;
   height: 105px;
-  color: #0aaf8a;
+  color: #67aae9;
   overflow: visible;
 }
 
 .ia-chart-svg circle {
-  fill: #0aaf8a;
+  fill: #67aae9;
   stroke: white;
   stroke-width: 2;
 }
 
 .ia-chart-svg .prediction-line {
-  color: #3a9cde;
+  color: #368ad1;
 }
 
 .ia-chart-svg .prediction-line + circle {
-  fill: #3a9cde;
+  fill: #368ad1;
 }
 
 .ia-chart-x {
@@ -535,11 +535,11 @@
 }
 
 .legend-real {
-  background: #0aaf8a;
+  background: #67aae9;
 }
 
 .legend-prediction {
-  border-top: 2px dashed #3a9cde;
+  border-top: 2px dashed #368ad1;
 }
 
 /* ============================================================
@@ -573,9 +573,9 @@
   background: linear-gradient(
     135deg,
     var(--primary-soft),
-    #ccecff
+    #e0effe
   );
-  color: #087fca;
+  color: #368ad1;
   box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.45);
 }
 
@@ -585,7 +585,7 @@
 
 .ia-health-content h2 {
   margin: 0;
-  color: #17567b;
+  color: #0b5d98;
   font-size: 12px;
 }
 
@@ -605,7 +605,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #087ed0;
+  background: #368ad1;
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -613,7 +613,7 @@
 }
 
 .ia-health-content button:hover {
-  background: #066db5;
+  background: #1671b7;
 }
 
 /* ============================================================
@@ -621,7 +621,7 @@
    ============================================================ */
 
 .models-sparkle {
-  color: #7755dc;
+  color: #1671b7;
 }
 
 .ia-models-list {
@@ -645,12 +645,12 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #496b80;
+  color: #1671b7;
   font-size: 12px;
 }
 
 .ia-model-name svg {
-  color: #3c8bc2;
+  color: #368ad1;
 }
 
 .ia-model-status {
@@ -687,7 +687,7 @@
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  color: #087dca;
+  color: #1671b7;
 }
 
 .ia-information > div:nth-child(2) {
@@ -697,7 +697,7 @@
 }
 
 .ia-information strong {
-  color: #41647a;
+  color: #0b5d98;
   font-size: 12px;
 }
 
@@ -724,7 +724,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(5, 35, 55, 0.5);
+  background: rgba(8, 35, 58, 0.5);
   backdrop-filter: blur(2px);
   box-sizing: border-box;
 }
@@ -735,7 +735,7 @@
   overflow-y: auto;
   border-radius: 11px;
   background: white;
-  box-shadow: 0 20px 60px rgba(4, 35, 59, 0.27);
+  box-shadow: 0 20px 60px rgba(8, 35, 58, 0.27);
 }
 
 .ia-modal-header {
@@ -763,7 +763,7 @@
 
 .ia-modal-icon.blue {
   background: var(--primary-soft);
-  color: #087dce;
+  color: #1671b7;
 }
 
 .ia-modal-icon.green {
@@ -773,17 +773,17 @@
 
 .ia-modal-icon.cyan {
   background: var(--primary-soft);
-  color: #078fa4;
+  color: #368ad1;
 }
 
 .ia-modal-icon.purple {
   background: var(--purple-soft);
-  color: #7655d9;
+  color: #1671b7;
 }
 
 .ia-modal-title h2 {
   margin: 0;
-  color: #174b70;
+  color: #0a4979;
   font-size: 15px;
 }
 
@@ -837,12 +837,12 @@
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  color: #087fc9;
+  color: #368ad1;
 }
 
 .ia-modal-placeholder h3 {
   margin: 0;
-  color: #245673;
+  color: #0b5d98;
   font-size: 13px;
 }
 
@@ -862,14 +862,14 @@
   gap: 7px;
   border-radius: 6px;
   background: var(--primary-soft);
-  color: #548097;
+  color: #368ad1;
   font-size: 11px;
   line-height: 11px;
 }
 
 .ia-development-info svg {
   flex-shrink: 0;
-  color: #087dc8;
+  color: #1671b7;
 }
 
 .ia-modal-footer {
@@ -905,8 +905,8 @@
   border: none;
   background: linear-gradient(
     135deg,
-    #4b50c8,
-    #35349c
+    #0b5d98,
+    #0a4979
   );
   color: white;
 }
@@ -914,8 +914,8 @@
 .ia-modal-action:hover {
   background: linear-gradient(
     135deg,
-    #4146b6,
-    #2e2e8b
+    #0b5d98,
+    #0c3557
   );
 }
 

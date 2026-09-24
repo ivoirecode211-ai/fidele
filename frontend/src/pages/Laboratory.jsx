@@ -3,6 +3,19 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../styles/Laboratory.css";
 
+import {
+  Check,
+  CircleCheck,
+  Download,
+  FlaskConical,
+  Hourglass,
+  Printer,
+  Search,
+  TestTube,
+  X,
+} from "lucide-react";
+import Logo from "../components/Logo";
+import SidebarFooter from "../components/SidebarFooter";
 /* ============================================================
    TARIFS DES EXAMENS
    ============================================================ */
@@ -986,12 +999,12 @@ function Laboratory() {
         <div className="laboratory-brand">
 
           <div className="lab-brand-icon">
-            ♥
+            <Logo size={30} inverted />
           </div>
 
           <div>
             <h2>
-              MA<span>SANTE</span>
+              MA <span>SANTÉ</span>
             </h2>
 
             <p>
@@ -1001,17 +1014,7 @@ function Laboratory() {
 
         </div>
 
-        <div className="laboratory-sidebar-footer">
-
-          <strong>
-            MA SANTE
-          </strong>
-
-          <span>
-            Gestion de Clinique
-          </span>
-
-        </div>
+        <SidebarFooter />
 
       </aside>
 
@@ -1021,42 +1024,6 @@ function Laboratory() {
 
         {/* HEADER */}
 
-        <header className="laboratory-header">
-
-          <div>
-
-            <h1>
-              Laboratoire
-            </h1>
-
-            <p>
-              Gérez les demandes d'analyses et
-              les résultats biologiques des patients.
-            </p>
-
-          </div>
-
-          <div className="laboratory-user">
-
-            <div className="lab-user-avatar">
-              KE
-            </div>
-
-            <div>
-
-              <strong>
-                KOFFI Emmanuel
-              </strong>
-
-              <span>
-                Laborantin
-              </span>
-
-            </div>
-
-          </div>
-
-        </header>
 
         {/* STATISTIQUES */}
 
@@ -1065,7 +1032,7 @@ function Laboratory() {
           <div className="laboratory-stat-card">
 
             <div className="lab-stat-icon blue">
-              🧪
+              <TestTube size={22} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -1089,7 +1056,7 @@ function Laboratory() {
           <div className="laboratory-stat-card">
 
             <div className="lab-stat-icon orange">
-              ⏳
+              <Hourglass size={22} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -1119,7 +1086,7 @@ function Laboratory() {
           <div className="laboratory-stat-card">
 
             <div className="lab-stat-icon purple">
-              ⚗
+              <FlaskConical size={22} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -1149,7 +1116,7 @@ function Laboratory() {
           <div className="laboratory-stat-card">
 
             <div className="lab-stat-icon green">
-              ✓
+              <CircleCheck size={22} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -1185,7 +1152,7 @@ function Laboratory() {
           <div className="laboratory-search">
 
             <span>
-              🔎
+              <Search size={17} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <input
@@ -1254,7 +1221,7 @@ function Laboratory() {
               </div>
 
               <button className="lab-export-button">
-                ↓ Exporter
+                <Download size={16} className="ms-inline-icon" aria-hidden="true" /> Exporter
               </button>
 
             </div>
@@ -1486,7 +1453,7 @@ function Laboratory() {
                     }
                     type="button"
                   >
-                    ×
+                    <X size={18} strokeWidth={2} aria-hidden="true" />
                   </button>
 
                 </div>
@@ -1618,7 +1585,7 @@ function Laboratory() {
                       type="submit"
                       className="lab-save-button"
                     >
-                      ✓ Enregistrer la demande
+                      <Check size={16} className="ms-inline-icon" aria-hidden="true" /> Enregistrer la demande
                     </button>
 
                   </div>
@@ -1675,7 +1642,7 @@ function Laboratory() {
                     onClick={closeResultForm}
                     type="button"
                   >
-                    ×
+                    <X size={18} strokeWidth={2} aria-hidden="true" />
                   </button>
 
                 </div>
@@ -1887,14 +1854,14 @@ function Laboratory() {
                         )
                       }
                     >
-                      🖨 Imprimer PDF
+                      <Printer size={16} className="ms-inline-icon" aria-hidden="true" /> Imprimer PDF
                     </button>
 
                     <button
                       type="submit"
                       className="lab-save-button"
                     >
-                      ✓ Enregistrer le résultat
+                      <Check size={16} className="ms-inline-icon" aria-hidden="true" /> Enregistrer le résultat
                     </button>
 
                   </div>

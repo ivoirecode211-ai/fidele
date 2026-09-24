@@ -1,5 +1,19 @@
-import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  ChartLine,
+  Home,
+  Plus,
+  Search,
+  ShieldCheck,
+  UserRound,
+  X,
+} from "lucide-react";
+import api from "../services/api";
+import Logo from "../components/Logo";
+import SidebarFooter from "../components/SidebarFooter";
+import UserBadge from "../components/UserBadge";
+import NotificationBell from "../components/NotificationBell";
 import "../styles/Caisse.css";
 
 /*
@@ -23,7 +37,8 @@ import "../styles/Caisse.css";
  * - Génération automatique de l'identifiant patient
  * - Bilans jour / semaine / mois
  * - Page locale des assurances configurées
- * - Transmission automatique du patient au module Consultation
+ * - Transmission automatique du patient aux Soins infirmiers
+ *   et à la Comptabilité (via l'API)
  *
  * IMPORTANT :
  * Le médecin / "Affecté à" n'est plus sélectionné depuis
@@ -38,256 +53,34 @@ import "../styles/Caisse.css";
  * ============================================================
  */
 
+const ICONS = {
+  home: Home,
+  patient: UserRound,
+  report: ChartLine,
+  insurance: ShieldCheck,
+  search: Search,
+  plus: Plus,
+  arrow: ArrowRight,
+  close: X,
+};
+
 function Icon({ name, size = 20 }) {
-  const commonProps = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": true,
-  };
+  const LucideIcon = ICONS[name];
 
-  const icons = {
-    home: (
-      <>
-        <path d="m3 10 9-7 9 7" />
-        <path d="M5 9v11h14V9" />
-        <path d="M9 20v-6h6v6" />
-      </>
-    ),
-
-    patient: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-
-    report: (
-      <>
-        <path d="M4 19V5" />
-        <path d="M4 19h17" />
-        <path d="m7 15 4-4 3 2 5-6" />
-      </>
-    ),
-
-    insurance: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 10h18" />
-        <path d="M8 15h3" />
-        <path d="M15 14v4" />
-        <path d="M13 16h4" />
-      </>
-    ),
-
-    search: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </>
-    ),
-
-    plus: (
-      <>
-        <path d="M12 5v14" />
-        <path d="M5 12h14" />
-      </>
-    ),
-
-    arrow: (
-      <>
-        <path d="M5 12h14" />
-        <path d="m13 6 6 6-6 6" />
-      </>
-    ),
-
-    close: (
-      <>
-        <path d="M6 6l12 12" />
-        <path d="M18 6 6 18" />
-      </>
-    ),
-  };
-
-  return <svg {...commonProps}>{icons[name]}</svg>;
+  return LucideIcon ? (
+    <LucideIcon size={size} strokeWidth={2} aria-hidden="true" />
+  ) : null;
 }
 
 
 /*
  * ============================================================
- * SERVICES MÉDICAUX
- * ============================================================
- */
-
-const servicesConfiguration = [
-  {
-    id: 1,
-    name: "Médecine générale",
-    price: 10000,
-  },
-  {
-    id: 2,
-    name: "Pédiatrie",
-    price: 12000,
-  },
-  {
-    id: 3,
-    name: "Chirurgie",
-    price: 25000,
-  },
-  {
-    id: 4,
-    name: "Gynécologie",
-    price: 15000,
-  },
-  {
-    id: 5,
-    name: "Cardiologie",
-    price: 20000,
-  },
-  {
-    id: 6,
-    name: "Dermatologie",
-    price: 12000,
-  },
-];
-
-
-/*
- * ============================================================
- * ASSURANCES
+ * SERVICES, ASSURANCES ET PATIENTS
  * ============================================================
  *
- * coverage = pourcentage pris en charge
+ * Servis par l'API (/api/parcours/) : le catalogue, l'identifiant
+ * patient et le coût sont déterminés par le backend.
  */
-
-const insuranceConfiguration = [
-  {
-    id: 1,
-    name: "MUGEFCI",
-    coverage: 30,
-  },
-  {
-    id: 2,
-    name: "CNPS",
-    coverage: 20,
-  },
-  {
-    id: 3,
-    name: "NSIA",
-    coverage: 40,
-  },
-];
-
-
-/*
- * ============================================================
- * PATIENTS INITIAUX
- * ============================================================
- */
-
-const initialPatients = [
-  {
-    id: "PAT-001",
-    patient: "TRAORE Awa",
-    sexe: "Féminin",
-    age: 32,
-    dateNaissance: "",
-    service: "Médecine générale",
-    telephone: "0700000000",
-    parentContact: "0500000000",
-    cost: 10000,
-    insurance: "Non",
-    insuranceName: "",
-    insuranceNumber: "",
-    quartier: "Cocody",
-    dateEnregistrement: new Date().toISOString(),
-  },
-
-  {
-    id: "PAT-002",
-    patient: "KONE Ibrahim",
-    sexe: "Masculin",
-    age: 40,
-    dateNaissance: "",
-    service: "Chirurgie",
-    telephone: "0500000000",
-    parentContact: "0700000002",
-    cost: 20000,
-    insurance: "Oui",
-    insuranceName: "CNPS",
-    insuranceNumber: "CNPS-2026-001245",
-    quartier: "Marcory",
-    dateEnregistrement: new Date().toISOString(),
-  },
-
-  {
-    id: "PAT-003",
-    patient: "DIALLO Mariam",
-    sexe: "Féminin",
-    age: 27,
-    dateNaissance: "",
-    service: "Pédiatrie",
-    telephone: "0100000000",
-    parentContact: "0500000003",
-    cost: 12000,
-    insurance: "Non",
-    insuranceName: "",
-    insuranceNumber: "",
-    quartier: "Yopougon",
-    dateEnregistrement: new Date().toISOString(),
-  },
-
-  {
-    id: "PAT-004",
-    patient: "YAO Claude",
-    sexe: "Masculin",
-    age: 35,
-    dateNaissance: "",
-    service: "Médecine générale",
-    telephone: "0700000001",
-    parentContact: "0500000004",
-    cost: 7000,
-    insurance: "Oui",
-    insuranceName: "MUGEFCI",
-    insuranceNumber: "MUG-2026-000123",
-    quartier: "Plateau",
-    dateEnregistrement: new Date().toISOString(),
-  },
-];
-
-
-/*
- * ============================================================
- * GÉNÉRATION IDENTIFIANT PATIENT
- * ============================================================
- */
-
-function generatePatientId(patients) {
-  const numbers = patients
-    .map((patient) => {
-      const match = String(patient.id).match(/PAT-(\d+)/);
-
-      if (!match) {
-        return 0;
-      }
-
-      return Number(match[1]);
-    })
-    .filter((number) => !Number.isNaN(number));
-
-  const nextNumber =
-    numbers.length > 0
-      ? Math.max(...numbers) + 1
-      : 1;
-
-  return `PAT-${String(nextNumber).padStart(3, "0")}`;
-}
 
 
 /*
@@ -341,121 +134,6 @@ function formatDate(date) {
 
 /*
  * ============================================================
- * TRANSMISSION DU PATIENT VERS LE MODULE CONSULTATION
- * ============================================================
- */
-
-function savePatientForConsultation(patient) {
-  try {
-    const existingPatients = JSON.parse(
-      localStorage.getItem(
-        "sante_consultation_patients"
-      ) || "[]"
-    );
-
-    const existingIndex = existingPatients.findIndex(
-      (item) => item.id === patient.id
-    );
-
-    const consultationPatient = {
-      id: patient.id,
-
-      numero: String(patient.id).replace(
-        "PAT-",
-        ""
-      ),
-
-      patient: patient.patient,
-
-      sexe:
-        patient.sexe === "Féminin"
-          ? "F"
-          : patient.sexe === "Masculin"
-          ? "M"
-          : "--",
-
-      age: patient.age,
-
-      dateNaissance: patient.dateNaissance,
-
-      telephone: patient.telephone,
-
-      parentContact: patient.parentContact,
-
-      quartier: patient.quartier,
-
-      service: patient.service,
-
-      /*
-       * Aucun médecin n'est affecté depuis la Caisse.
-       * Le médecin pourra être déterminé dans le module
-       * Consultation.
-       */
-      doctor: "",
-
-      insurance: patient.insurance,
-
-      insuranceName: patient.insuranceName,
-
-      insuranceNumber: patient.insuranceNumber,
-
-      motif: "Consultation générale",
-
-      heure: new Date().toLocaleTimeString(
-        "fr-FR",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      ),
-
-      statut: "En attente",
-
-      observations: "",
-
-      symptomes: "",
-
-      diagnostic: "",
-
-      traitement: "",
-
-      dateConsultation: null,
-    };
-
-    if (existingIndex >= 0) {
-      existingPatients[existingIndex] =
-        consultationPatient;
-    } else {
-      existingPatients.push(
-        consultationPatient
-      );
-    }
-
-    localStorage.setItem(
-      "sante_consultation_patients",
-      JSON.stringify(existingPatients)
-    );
-
-    window.dispatchEvent(
-      new CustomEvent(
-        "sante:patient-added",
-        {
-          detail: consultationPatient,
-        }
-      )
-    );
-
-  } catch (error) {
-    console.error(
-      "Erreur lors de la transmission du patient vers Consultation :",
-      error
-    );
-  }
-}
-
-
-/*
- * ============================================================
  * PAGE CAISSE
  * ============================================================
  */
@@ -489,7 +167,31 @@ export default function Caisse() {
    */
 
   const [patients, setPatients] =
-    useState(initialPatients);
+    useState([]);
+
+  const [servicesConfiguration, setServicesConfiguration] =
+    useState([]);
+
+  const [insuranceConfiguration, setInsuranceConfiguration] =
+    useState([]);
+
+  useEffect(() => {
+    Promise.all([
+      api.get("/parcours/catalogue/"),
+      api.get("/parcours/caisse/patients/"),
+    ])
+      .then(([catalogue, caissePatients]) => {
+        setServicesConfiguration(catalogue.data.services);
+        setInsuranceConfiguration(catalogue.data.insurances);
+        setPatients(caissePatients.data);
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur de chargement de la caisse :",
+          error
+        );
+      });
+  }, []);
 
 
   /*
@@ -899,7 +601,7 @@ export default function Caisse() {
    * ==========================================================
    */
 
-  const handleAddPatient = (
+  const handleAddPatient = async (
     event
   ) => {
 
@@ -966,114 +668,32 @@ export default function Caisse() {
 
 
     /*
-     * SERVICE
+     * ENREGISTREMENT
+     *
+     * Le backend attribue l'identifiant et calcule le coût
+     * à partir du catalogue.
      */
 
-    const service =
-      servicesConfiguration.find(
-        (item) =>
-          String(item.id) ===
-          String(formData.service)
+    let newPatient;
+
+    try {
+      const response = await api.post(
+        "/parcours/caisse/patients/",
+        formData
       );
 
+      newPatient = response.data;
+    } catch (error) {
+      const errors = error.response?.data;
 
-    /*
-     * ASSURANCE
-     */
-
-    const insurance =
-      formData.assurance ===
-      "Oui"
-        ? insuranceConfiguration.find(
-            (item) =>
-              String(item.id) ===
-              String(
-                formData.assuranceId
-              )
-          )
-        : null;
-
-
-    /*
-     * IDENTIFIANT
-     */
-
-    const generatedId =
-      generatePatientId(
-        patients
+      alert(
+        errors && typeof errors === "object"
+          ? Object.values(errors).flat().join("\n")
+          : "Impossible d'enregistrer le patient. Veuillez réessayer."
       );
 
-
-    /*
-     * NOM COMPLET
-     */
-
-    const fullName =
-      `${formData.nom
-        .trim()
-        .toUpperCase()} ${formData.prenom
-        .trim()}`;
-
-
-    /*
-     * NOUVEAU PATIENT
-     */
-
-    const newPatient = {
-
-      id: generatedId,
-
-      patient: fullName,
-
-      sexe: formData.sexe,
-
-      age: Number(
-        formData.age
-      ),
-
-      dateNaissance:
-        formData.dateNaissance,
-
-      service: service
-        ? service.name
-        : "",
-
-      /*
-       * Aucun médecin affecté depuis la Caisse.
-       */
-
-      telephone:
-        formData.telephone.trim(),
-
-      parentContact:
-        formData.parentContact.trim(),
-
-      cost: finalPrice,
-
-      insurance:
-        formData.assurance,
-
-      insuranceName:
-        insurance
-          ? insurance.name
-          : "",
-
-      insuranceNumber:
-        formData.assurance === "Oui"
-          ? formData.insuranceNumber.trim()
-          : "",
-
-      insuranceCoverage:
-        insurance
-          ? insurance.coverage
-          : 0,
-
-      quartier:
-        formData.quartier.trim(),
-
-      dateEnregistrement:
-        new Date().toISOString(),
-    };
+      return;
+    }
 
 
     /*
@@ -1085,16 +705,6 @@ export default function Caisse() {
         ...currentPatients,
         newPatient,
       ]
-    );
-
-
-    /*
-     * TRANSMISSION AUTOMATIQUE
-     * AU MODULE CONSULTATION
-     */
-
-    savePatientForConsultation(
-      newPatient
     );
 
 
@@ -1523,7 +1133,7 @@ export default function Caisse() {
                       height: "44px",
                       borderRadius: "10px",
                       background: "#eff6ff",
-                      color: "#2563eb",
+                      color: "#1671b7",
                       display: "flex",
                       alignItems: "center",
                       justifyContent:
@@ -1591,7 +1201,7 @@ export default function Caisse() {
                   <strong
                     style={{
                       fontSize: "28px",
-                      color: "#2563eb",
+                      color: "#1671b7",
                     }}
                   >
                     {insurance.coverage}%
@@ -1784,10 +1394,10 @@ export default function Caisse() {
                             color:
                               item.sexe ===
                               "Masculin"
-                                ? "#dc2626"
+                                ? "#c94f4f"
                                 : item.sexe ===
                                   "Féminin"
-                                ? "#2563eb"
+                                ? "#1671b7"
                                 : "#374151",
 
                             fontWeight: 600,
@@ -1909,11 +1519,11 @@ export default function Caisse() {
         <div className="caisse-brand">
 
           <div className="brand-icon">
-            ♥
+            <Logo size={30} inverted />
           </div>
 
           <div className="brand-text">
-            <span>MA</span>
+            <span>MA</span>{" "}
             <strong>SANTÉ</strong>
           </div>
 
@@ -1921,22 +1531,6 @@ export default function Caisse() {
 
 
         <nav className="caisse-nav">
-
-          {/* ACCUEIL */}
-
-          <Link
-            to="/modules"
-            className="caisse-nav-item"
-          >
-
-            <Icon name="home" />
-
-            <span>
-              Accueil
-            </span>
-
-          </Link>
-
 
           {/* ENREGISTRER PATIENT */}
 
@@ -2014,6 +1608,8 @@ export default function Caisse() {
 
         </nav>
 
+        <SidebarFooter />
+
       </aside>
 
 
@@ -2042,24 +1638,9 @@ export default function Caisse() {
           </div>
 
 
-          <div className="cashier-profile">
-
-            <div className="cashier-avatar">
-              CF
-            </div>
-
-            <div className="cashier-info">
-
-              <strong>
-                COULIBALY Fatou
-              </strong>
-
-              <span>
-                Caissière
-              </span>
-
-            </div>
-
+          <div className="ms-header-tools">
+            <NotificationBell />
+            <UserBadge />
           </div>
 
         </header>
@@ -2333,10 +1914,10 @@ export default function Caisse() {
                       color:
                         formData.sexe ===
                         "Masculin"
-                          ? "#dc2626"
+                          ? "#c94f4f"
                           : formData.sexe ===
                             "Féminin"
-                          ? "#2563eb"
+                          ? "#1671b7"
                           : "#374151",
                       fontWeight:
                         formData.sexe
@@ -2353,7 +1934,7 @@ export default function Caisse() {
                       value="Masculin"
                       style={{
                         color:
-                          "#dc2626",
+                          "#c94f4f",
                         fontWeight: 600,
                       }}
                     >
@@ -2364,7 +1945,7 @@ export default function Caisse() {
                       value="Féminin"
                       style={{
                         color:
-                          "#2563eb",
+                          "#1671b7",
                         fontWeight: 600,
                       }}
                     >
@@ -3072,7 +2653,7 @@ export default function Caisse() {
                           fontSize:
                             "16px",
                           color:
-                            "#2563eb",
+                            "#1671b7",
                         }}
                       >
                         {formatMoney(
@@ -3144,7 +2725,7 @@ export default function Caisse() {
                     borderRadius:
                       "8px",
                     background:
-                      "#2563eb",
+                      "#1671b7",
                     color:
                       "#ffffff",
                     cursor:

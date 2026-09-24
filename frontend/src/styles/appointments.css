@@ -34,7 +34,7 @@
   height: 52px;
   border-radius: 14px;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +60,7 @@
 .btn-primary {
   border: none;
   border-radius: 9px;
-  background: #2563eb;
+  background: #1671b7;
   color: white;
   padding: 11px 17px;
   display: inline-flex;
@@ -74,7 +74,7 @@
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
   transform: translateY(-1px);
 }
 
@@ -125,7 +125,7 @@
 
 .stat-blue {
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .stat-green {
@@ -135,12 +135,12 @@
 
 .stat-orange {
   background: var(--warning-soft);
-  color: #ea8a00;
+  color: #f59e0b;
 }
 
 .stat-red {
   background: var(--danger-soft);
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .appointment-stat-card span {
@@ -356,7 +356,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -393,7 +393,7 @@
   height: 34px;
   border-radius: 8px;
   background: var(--bg);
-  color: #0f9f78;
+  color: #16a34a;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -438,7 +438,7 @@
 }
 
 .time-cell svg {
-  color: #2563eb;
+  color: #1671b7;
 }
 
 /* ============================================================
@@ -473,12 +473,12 @@
 
 .status-pending {
   background: var(--warning-soft);
-  color: #b76a00;
+  color: #b45309;
 }
 
 .status-cancelled {
   background: var(--danger-soft);
-  color: #c62828;
+  color: #b34242;
 }
 
 /* ============================================================
@@ -510,34 +510,34 @@
 
 .action-confirm:hover {
   background: var(--green-soft);
-  border-color: #bde8ca;
+  border-color: #86efac;
 }
 
 .action-edit {
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .action-edit:hover {
   background: var(--primary-soft);
-  border-color: #c9dcff;
+  border-color: #c2e0ff;
 }
 
 .action-cancel {
-  color: #ea8a00;
+  color: #f59e0b;
 }
 
 .action-cancel:hover {
   background: var(--warning-soft);
-  border-color: #f4d9aa;
+  border-color: #fcd34d;
 }
 
 .action-delete {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .action-delete:hover {
   background: var(--danger-soft);
-  border-color: #f1c2c2;
+  border-color: #efcfcf;
 }
 
 /* ============================================================
@@ -612,7 +612,7 @@
   height: 42px;
   border-radius: 10px;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -691,7 +691,7 @@
 }
 
 .form-group label span {
-  color: #dc2626;
+  color: #c94f4f;
   margin-left: 3px;
 }
 
@@ -724,8 +724,8 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #6695ef;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #67aae9;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .input-icon-wrapper {
@@ -740,8 +740,8 @@
 }
 
 .input-icon-wrapper:focus-within {
-  border-color: #6695ef;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #67aae9;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .input-icon-wrapper input,
@@ -872,8 +872,8 @@
    ============================================================ */
 
 .patient-appointment-btn {
-  border: 1px solid #2563eb;
-  background: #2563eb;
+  border: 1px solid #1671b7;
+  background: #1671b7;
   color: white;
   min-height: 32px;
   padding: 7px 11px;
@@ -890,10 +890,10 @@
 }
 
 .patient-appointment-btn:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #0b5d98;
+  border-color: #0b5d98;
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 3px 8px rgba(22, 113, 183, 0.18);
 }
 
 .patient-appointment-btn:active {
@@ -922,10 +922,10 @@
 
 .status-pending {
   background: var(--warning-soft);
-  color: #b76a00;
+  color: #b45309;
 }
 
 .status-cancelled {
   background: var(--danger-soft);
-  color: #c62828;
+  color: #b34242;
 }

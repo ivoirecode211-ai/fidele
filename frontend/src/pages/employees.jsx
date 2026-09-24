@@ -370,22 +370,6 @@ function Employees() {
 
       <div className="employees-header">
 
-        <div className="employees-title-wrapper">
-
-          <div className="employees-main-icon">
-            <Users size={27} />
-          </div>
-
-          <div>
-            <h1>Ressources humaines</h1>
-
-            <p>
-              Gérez les employés, leurs postes,
-              contrats et informations professionnelles.
-            </p>
-          </div>
-
-        </div>
 
         <button
           className="employees-primary-btn"

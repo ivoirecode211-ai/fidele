@@ -34,7 +34,7 @@
   height: 52px;
   border-radius: 14px;
   background: var(--purple-soft);
-  color: #6d4aff;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +60,7 @@
 .employees-primary-btn {
   border: none;
   border-radius: 9px;
-  background: #2563eb;
+  background: #1671b7;
   color: white;
   padding: 11px 17px;
   display: inline-flex;
@@ -74,7 +74,7 @@
 }
 
 .employees-primary-btn:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
   transform: translateY(-1px);
 }
 
@@ -111,7 +111,7 @@
 
 .employee-blue {
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .employee-green {
@@ -121,12 +121,12 @@
 
 .employee-orange {
   background: var(--warning-soft);
-  color: #ea8a00;
+  color: #f59e0b;
 }
 
 .employee-purple {
   background: var(--purple-soft);
-  color: #6d4aff;
+  color: #1671b7;
 }
 
 .employee-stat-card span {
@@ -240,7 +240,7 @@
   padding: 7px 11px;
   border-radius: 20px;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   font-size: 12px;
   font-weight: 700;
 }
@@ -305,7 +305,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,7 +343,7 @@
 }
 
 .employee-job svg {
-  color: #667eea;
+  color: #368ad1;
 }
 
 .employee-job span {
@@ -362,7 +362,7 @@
 }
 
 .employee-department svg {
-  color: #0f9f78;
+  color: #16a34a;
 }
 
 .employee-department span {
@@ -423,12 +423,12 @@
 
 .employee-status-leave {
   background: var(--warning-soft);
-  color: #b76a00;
+  color: #b45309;
 }
 
 .employee-status-suspended {
   background: var(--danger-soft);
-  color: #c62828;
+  color: #b34242;
 }
 
 .employee-status-inactive {
@@ -467,7 +467,7 @@
 }
 
 .employee-action-edit {
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .employee-action-edit:hover {
@@ -475,7 +475,7 @@
 }
 
 .employee-action-delete {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .employee-action-delete:hover {
@@ -563,7 +563,7 @@
   height: 42px;
   border-radius: 10px;
   background: var(--primary-soft);
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -641,7 +641,7 @@
 }
 
 .employee-form-group label span {
-  color: #dc2626;
+  color: #c94f4f;
   margin-left: 3px;
 }
 
@@ -662,8 +662,8 @@
 
 .employee-form-group input:focus,
 .employee-form-group select:focus {
-  border-color: #6695ef;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #67aae9;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .employee-input-icon {
@@ -678,8 +678,8 @@
 }
 
 .employee-input-icon:focus-within {
-  border-color: #6695ef;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #67aae9;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .employee-input-icon input {
@@ -727,9 +727,9 @@
 }
 
 .employee-leave-btn {
-  border: 1px solid #f3d7a4;
+  border: 1px solid #fcd34d;
   background: var(--warning-soft);
-  color: #b76a00;
+  color: #b45309;
   padding: 11px 15px;
   border-radius: 9px;
   font-weight: 600;

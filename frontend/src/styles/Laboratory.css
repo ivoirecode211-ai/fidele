@@ -28,7 +28,7 @@
   background: linear-gradient(
     180deg,
     var(--primary-dark) 0%,
-    #062d4e 100%
+    #0c3557 100%
   );
 
   color: white;
@@ -56,7 +56,7 @@
 
   border-radius: 50%;
 
-  background: #0a82c9;
+  background: #368ad1;
 
   display: flex;
   align-items: center;
@@ -73,7 +73,7 @@
 }
 
 .laboratory-brand h2 span {
-  color: #1ba46c;
+  color: #16a34a;
 }
 
 .laboratory-brand p {
@@ -101,7 +101,7 @@
 .laboratory-sidebar-footer span {
   display: block;
   margin-top: 3px;
-  color: #afd0e4;
+  color: #98caf9;
   font-size: 10px;
 }
 
@@ -169,7 +169,7 @@
   justify-content: center;
 
   background: var(--primary-soft);
-  color: #0878c6;
+  color: #1671b7;
 
   font-size: 13px;
   font-weight: 800;
@@ -181,7 +181,7 @@
 }
 
 .laboratory-user strong {
-  color: #183e58;
+  color: #0c3557;
   font-size: 13px;
 }
 
@@ -218,7 +218,7 @@
   align-items: center;
   gap: 13px;
 
-  box-shadow: 0 2px 8px rgba(20, 70, 100, 0.04);
+  box-shadow: 0 2px 8px rgba(10, 73, 121, 0.04);
 
   box-sizing: border-box;
 }
@@ -240,12 +240,12 @@
 
 .lab-stat-icon.blue {
   background: var(--primary-soft);
-  color: #0879c9;
+  color: #1671b7;
 }
 
 .lab-stat-icon.orange {
   background: var(--warning-soft);
-  color: #e38a13;
+  color: #d97706;
 }
 
 .lab-stat-icon.purple {
@@ -273,7 +273,7 @@
 .laboratory-stat-card strong {
   margin: 4px 0;
 
-  color: #153e59;
+  color: #0c3557;
 
   font-size: 24px;
   font-weight: 800;
@@ -327,7 +327,7 @@
   border: 0;
   outline: 0;
 
-  color: #23485f;
+  color: #0a4979;
 
   font-size: 14px;
   font-weight: 500;
@@ -347,7 +347,7 @@
   border: 1px solid #c5d9e5;
   border-radius: 7px;
 
-  color: #38586c;
+  color: #0b5d98;
 
   font-size: 13px;
   font-weight: 600;
@@ -364,7 +364,7 @@
   border: 0;
   border-radius: 7px;
 
-  background: #0878ca;
+  background: #1671b7;
   color: white;
 
   display: flex;
@@ -380,7 +380,7 @@
 }
 
 .new-analysis-button:hover {
-  background: #0668ae;
+  background: #1671b7;
   transform: translateY(-1px);
 }
 
@@ -425,7 +425,7 @@
 
   overflow: hidden;
 
-  box-shadow: 0 2px 8px rgba(20, 70, 100, 0.04);
+  box-shadow: 0 2px 8px rgba(10, 73, 121, 0.04);
 
   box-sizing: border-box;
 }
@@ -457,7 +457,7 @@
 .laboratory-card-header h2 {
   margin: 0 0 5px;
 
-  color: #17486a;
+  color: #0a4979;
 
   font-size: 18px;
   font-weight: 800;
@@ -478,7 +478,7 @@
   border-radius: 6px;
 
   background: white;
-  color: #316078;
+  color: #0b5d98;
 
   cursor: pointer;
 
@@ -490,8 +490,8 @@
 
 .lab-export-button:hover {
   background: var(--primary-soft);
-  border-color: #0878c9;
-  color: #0878c9;
+  border-color: #1671b7;
+  color: #1671b7;
 }
 
 /* =========================================================
@@ -529,7 +529,7 @@
 
   border-bottom: 1px solid #d8e4eb;
 
-  color: #38596d;
+  color: #0b5d98;
 
   text-align: left;
 
@@ -547,7 +547,7 @@
 
   border-bottom: 1px solid #e1ebf0;
 
-  color: #294c61;
+  color: #0a4979;
 
   font-size: 13px;
   font-weight: 500;
@@ -572,7 +572,7 @@
    ========================================================= */
 
 .lab-analysis-id {
-  color: #0879c8;
+  color: #1671b7;
 
   font-size: 13px;
   font-weight: 800;
@@ -601,7 +601,7 @@
   border-radius: 50%;
 
   background: var(--primary-soft);
-  color: #0875b7;
+  color: #1671b7;
 
   display: flex;
   align-items: center;
@@ -618,14 +618,14 @@
 }
 
 .lab-patient strong {
-  color: #23485f;
+  color: #0a4979;
 
   font-size: 13px;
   font-weight: 800;
 }
 
 .analysis-name {
-  color: #1f4f6b;
+  color: #0a4979;
 
   font-size: 13px;
   font-weight: 700;
@@ -640,7 +640,7 @@
 .analysis-date {
   display: block;
 
-  color: #38576a;
+  color: #0b5d98;
 
   font-size: 12px;
   font-weight: 600;
@@ -685,22 +685,22 @@
 
 .lab-priority-urgent {
   background: var(--warning-soft);
-  color: #c73e31;
+  color: #b34242;
 }
 
 .lab-status-completed {
   background: var(--green-soft);
-  color: #158b5b;
+  color: #15803d;
 }
 
 .lab-status-progress {
   background: var(--primary-soft);
-  color: #0873ba;
+  color: #1671b7;
 }
 
 .lab-status-pending {
   background: var(--warning-soft);
-  color: #c8750d;
+  color: #d97706;
 }
 
 /* =========================================================
@@ -716,7 +716,7 @@
   border-radius: 6px;
 
   background: white;
-  color: #0876bd;
+  color: #1671b7;
 
   cursor: pointer;
 
@@ -728,7 +728,7 @@
 
 .lab-action-button:hover {
   background: var(--primary-soft);
-  border-color: #0878c9;
+  border-color: #1671b7;
 }
 
 /* =========================================================
@@ -759,21 +759,21 @@
 
 .lab-request-button {
   background: #eaf4ff;
-  color: #1677c8;
+  color: #1671b7;
 }
 
 .lab-request-button:hover {
-  background: #1677c8;
+  background: #1671b7;
   color: white;
 }
 
 .lab-print-button {
   background: #edf8f1;
-  color: #16834a;
+  color: #15803d;
 }
 
 .lab-print-button:hover {
-  background: #16834a;
+  background: #15803d;
   color: white;
 }
 
@@ -815,7 +815,7 @@
   border: 0;
   border-radius: 6px;
 
-  background: #0878c9;
+  background: #1671b7;
   color: white;
 
   cursor: pointer;
@@ -839,7 +839,7 @@
 }
 
 .laboratory-quick-actions .quick-action-green {
-  background: #17a36c;
+  background: #16a34a;
 }
 
 /* =========================================================
@@ -901,7 +901,7 @@
 .laboratory-fullscreen-form .laboratory-modal-header h2 {
   margin: 0 0 6px;
 
-  color: #123f5c;
+  color: #0c3557;
 
   font-size: 25px;
   font-weight: 800;
@@ -982,7 +982,7 @@
 .laboratory-modal-header h2 {
   margin: 0 0 6px;
 
-  color: #123f5c;
+  color: #0c3557;
 
   font-size: 25px;
   font-weight: 800;
@@ -1014,7 +1014,7 @@
 
   background: #f5f8fa;
 
-  color: #496575;
+  color: #0b5d98;
 
   font-size: 27px;
   font-weight: 500;
@@ -1027,7 +1027,7 @@
 .lab-modal-close:hover {
   background: #eaf4f8;
 
-  color: #123f5c;
+  color: #0c3557;
 
   border-color: #b7cbd6;
 }
@@ -1063,7 +1063,7 @@
 
   background: var(--primary-soft);
 
-  color: #0875b9;
+  color: #1671b7;
 
   display: flex;
   align-items: center;
@@ -1079,7 +1079,7 @@
 }
 
 .laboratory-modal-patient strong {
-  color: #214960;
+  color: #0a4979;
 
   font-size: 17px;
   font-weight: 800;
@@ -1110,7 +1110,7 @@
 
   margin-bottom: 24px;
 
-  color: #294c61;
+  color: #0a4979;
 
   font-size: 15px;
   font-weight: 800;
@@ -1162,10 +1162,10 @@
 }
 
 .laboratory-result-form textarea:focus {
-  border-color: #0879c8;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(8, 121, 200, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 /* =========================================================
@@ -1191,7 +1191,7 @@
 .lab-exam-title {
   margin: 0 0 15px;
 
-  color: #173f59;
+  color: #0c3557;
 
   font-size: 19px;
   font-weight: 800;
@@ -1230,17 +1230,17 @@
 }
 
 .lab-exam-item:hover {
-  border-color: #1677c8;
+  border-color: #1671b7;
 
   background: #f8fbff;
 }
 
 .lab-exam-item.selected {
-  border-color: #1677c8;
+  border-color: #1671b7;
 
   background: #eef7ff;
 
-  box-shadow: 0 2px 8px rgba(22, 119, 200, 0.08);
+  box-shadow: 0 2px 8px rgba(22, 113, 183, 0.08);
 }
 
 .lab-exam-item input {
@@ -1249,7 +1249,7 @@
 
   flex-shrink: 0;
 
-  accent-color: #1677c8;
+  accent-color: #1671b7;
 }
 
 .lab-exam-information {
@@ -1277,7 +1277,7 @@
 .lab-exam-price {
   white-space: nowrap;
 
-  color: #1677c8;
+  color: #1671b7;
 
   font-size: 14px;
   font-weight: 800;
@@ -1321,7 +1321,7 @@
 }
 
 .lab-analysis-total strong:last-child {
-  color: #1677c8;
+  color: #1671b7;
 
   font-size: 20px;
 }
@@ -1337,7 +1337,7 @@
 .lab-result-exams h3 {
   margin: 0 0 15px;
 
-  color: #173f59;
+  color: #0c3557;
 
   font-size: 19px;
   font-weight: 800;
@@ -1368,7 +1368,7 @@
 }
 
 .lab-result-exam-row strong {
-  color: #1f3f52;
+  color: #0c3557;
 
   font-size: 14px;
   font-weight: 800;
@@ -1395,7 +1395,7 @@
 
   outline: none;
 
-  color: #193747;
+  color: #0c3557;
 
   background: white;
 
@@ -1408,10 +1408,10 @@
 }
 
 .lab-result-exam-row input:focus {
-  border-color: #1677c8;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(22, 119, 200, 0.08);
+    0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .lab-result-exam-row > span {
@@ -1455,7 +1455,7 @@
 
   background: white;
 
-  color: #486677;
+  color: #0b5d98;
 
   cursor: pointer;
 
@@ -1484,7 +1484,7 @@
 
   border-radius: 7px;
 
-  background: #17a36c;
+  background: #16a34a;
 
   color: white;
 
@@ -1497,7 +1497,7 @@
 }
 
 .lab-save-button:hover {
-  background: #128957;
+  background: #15803d;
 
   transform: translateY(-1px);
 }
@@ -1534,7 +1534,7 @@
 .laboratory-fullscreen-overlay::-webkit-scrollbar-thumb:hover,
 .lab-exam-list::-webkit-scrollbar-thumb:hover,
 .laboratory-table-container::-webkit-scrollbar-thumb:hover {
-  background: #96b2c0;
+  background: #67aae9;
 }
 
 /* =========================================================
@@ -1890,12 +1890,12 @@
 /* 🔴 DEMANDE D'ANALYSE */
 
 .lab-action-request {
-  background: #dc2626;
+  background: #c94f4f;
   color: #ffffff;
 }
 
 .lab-action-request:hover {
-  background: #b91c1c;
+  background: #b34242;
 }
 
 /* 🟢 IMPRIMER */
@@ -1912,12 +1912,12 @@
 /* 🔵 SAISIR / VOIR RÉSULTAT */
 
 .lab-action-result {
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
 }
 
 .lab-action-result:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
 }
 
 /* Effet clic */
@@ -1983,7 +1983,7 @@
 .laboratory-modal-header h2 {
   margin: 0;
 
-  color: #123f5c;
+  color: #0c3557;
 
   font-size: 25px;
   font-weight: 800;
@@ -2007,7 +2007,7 @@
 
   margin-bottom: 3px;
 
-  color: #0878c9;
+  color: #1671b7;
 
   font-size: 10px;
   font-weight: 800;
@@ -2048,7 +2048,7 @@
 
 .laboratory-result-fullscreen
 .laboratory-modal-patient strong {
-  color: #214960;
+  color: #0a4979;
 
   font-size: 16px;
   font-weight: 800;
@@ -2116,7 +2116,7 @@
 .lab-result-section-title h3 {
   margin: 0 0 5px;
 
-  color: #173f59;
+  color: #0c3557;
 
   font-size: 17px;
   font-weight: 800;
@@ -2185,7 +2185,7 @@
 }
 
 .lab-result-exam-name strong {
-  color: #1f4053;
+  color: #0c3557;
 
   font-size: 14px;
   font-weight: 800;
@@ -2200,7 +2200,7 @@
 .lab-result-exam-name small {
   margin-top: 3px;
 
-  color: #0878c9;
+  color: #1671b7;
 
   font-size: 11px;
   font-weight: 600;
@@ -2232,10 +2232,10 @@
 }
 
 .lab-result-input-wrapper:focus-within {
-  border-color: #1677c8;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(22, 119, 200, 0.08);
+    0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .lab-result-input-wrapper input {
@@ -2252,7 +2252,7 @@
 
   background: transparent;
 
-  color: #193747;
+  color: #0c3557;
 
   font-size: 14px;
   font-weight: 500;
@@ -2314,7 +2314,7 @@
 
   margin-bottom: 9px;
 
-  color: #294c61;
+  color: #0a4979;
 
   font-size: 14px;
   font-weight: 800;
@@ -2338,7 +2338,7 @@
 
   resize: vertical;
 
-  color: #193747;
+  color: #0c3557;
 
   font-family: Arial, Helvetica, sans-serif;
 
@@ -2354,10 +2354,10 @@
 
 .laboratory-result-form-full
 .laboratory-form-field textarea:focus {
-  border-color: #0879c8;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(8, 121, 200, 0.08);
+    0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .laboratory-result-form-full
@@ -2465,7 +2465,7 @@
 
   border-radius: 7px;
 
-  background: #2563eb;
+  background: #1671b7;
 
   color: white;
 
@@ -2477,7 +2477,7 @@
 
 .laboratory-form-actions-full
 .lab-save-button:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
 
   transform: translateY(-1px);
 }
@@ -2498,7 +2498,7 @@
 
   background: white;
 
-  color: #486677;
+  color: #0b5d98;
 
   font-size: 12px;
   font-weight: 700;
@@ -2630,7 +2630,7 @@
   align-items: center !important;
   justify-content: center !important;
 
-  background: rgba(8, 39, 59, 0.45) !important;
+  background: rgba(8, 35, 58, 0.45) !important;
 
   overflow-y: auto !important;
 }
@@ -2653,7 +2653,7 @@
   overflow-x: hidden !important;
 
   box-shadow:
-    0 20px 60px rgba(16, 48, 68, 0.22) !important;
+    0 20px 60px rgba(12, 53, 87, 0.22) !important;
 }
 
 /* En-tête demande */
@@ -2854,7 +2854,7 @@
   overflow-x: hidden !important;
 
   box-shadow:
-    0 20px 60px rgba(16, 48, 68, 0.22) !important;
+    0 20px 60px rgba(12, 53, 87, 0.22) !important;
 }
 
 /* En-tête résultat */
@@ -3318,7 +3318,7 @@
 
   flex-shrink: 0 !important;
 
-  color: #1677c8 !important;
+  color: #1671b7 !important;
 
   font-size: 10px !important;
 

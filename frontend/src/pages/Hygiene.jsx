@@ -106,15 +106,6 @@ export default function Hygiene() {
   return (
     <div className="hygiene-page">
       <header className="hygiene-header">
-        <div className="hygiene-title-area">
-          <div className="hygiene-title-icon">
-            <ShieldCheck size={25} />
-          </div>
-          <div>
-            <h1>Hygiène</h1>
-            <p>Suivi de la propreté, de la désinfection et de la gestion des déchets médicaux</p>
-          </div>
-        </div>
 
         <button type="button" className="hygiene-primary-button" onClick={openNewTask}>
           <Plus size={16} />

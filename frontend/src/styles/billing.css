@@ -75,7 +75,7 @@
   border-radius: 12px;
 
   background: #eaf2ff;
-  color: #155eef;
+  color: #1671b7;
 }
 
 .billing-header-left h1 {
@@ -146,17 +146,17 @@
 }
 
 .billing-primary-button {
-  border: 1px solid #155eef;
-  background: #155eef;
+  border: 1px solid #1671b7;
+  background: #1671b7;
   color: #ffffff;
 
-  box-shadow: 0 3px 8px rgba(21, 94, 239, 0.18);
+  box-shadow: 0 3px 8px rgba(22, 113, 183, 0.18);
 }
 
 .billing-primary-button:hover {
-  background: #0f4dcc;
-  border-color: #0f4dcc;
-  box-shadow: 0 5px 12px rgba(21, 94, 239, 0.22);
+  background: #0b5d98;
+  border-color: #0b5d98;
+  box-shadow: 0 5px 12px rgba(22, 113, 183, 0.22);
 }
 
 .billing-secondary-button {
@@ -195,12 +195,12 @@
   padding: 14px 17px;
 
   background: #fff8e6;
-  border: 1px solid #f2d58a;
-  border-left: 5px solid #d99a00;
+  border: 1px solid #fcd34d;
+  border-left: 5px solid #f59e0b;
 
   border-radius: 9px;
 
-  color: #664d03;
+  color: #92400e;
 
   font-size: 14px;
   font-weight: 600;
@@ -258,22 +258,22 @@
 
 .billing-stat-blue {
   background: #e8f1ff;
-  color: #155eef;
+  color: #1671b7;
 }
 
 .billing-stat-green {
   background: #eaf8ef;
-  color: #16834a;
+  color: #15803d;
 }
 
 .billing-stat-orange {
   background: #fff3df;
-  color: #b35a00;
+  color: #b45309;
 }
 
 .billing-stat-red {
   background: #ffecec;
-  color: #c62828;
+  color: #b34242;
 }
 
 .billing-stat-content {
@@ -376,7 +376,7 @@
 
 .billing-card-header > svg {
   flex-shrink: 0;
-  color: #155eef;
+  color: #1671b7;
 }
 
 
@@ -435,15 +435,15 @@
 }
 
 .billing-dot-green {
-  background: #16a05d;
+  background: #16a34a;
 }
 
 .billing-dot-orange {
-  background: #e88900;
+  background: #d97706;
 }
 
 .billing-dot-blue {
-  background: #155eef;
+  background: #1671b7;
 }
 
 
@@ -472,7 +472,7 @@
   background: #edf4ff;
   border-radius: 12px;
 
-  color: #155eef;
+  color: #1671b7;
 }
 
 .billing-big-number strong {
@@ -639,10 +639,10 @@
 
 .billing-search:focus-within,
 .billing-date-input:focus-within {
-  border-color: #155eef;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(21, 94, 239, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 .billing-search input,
@@ -716,10 +716,10 @@
 }
 
 .billing-filter-select:focus {
-  border-color: #155eef;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(21, 94, 239, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 .billing-reset-button {
@@ -860,7 +860,7 @@
   border-radius: 7px;
 
   background: #edf4ff;
-  color: #155eef;
+  color: #1671b7;
 }
 
 .billing-invoice-id strong {
@@ -896,7 +896,7 @@
   border-radius: 50%;
 
   background: #edf4ff;
-  color: #155eef;
+  color: #1671b7;
 }
 
 .billing-patient-cell > div:last-child {
@@ -986,7 +986,7 @@
 .billing-patient-paid {
   display: inline-block;
 
-  color: #087443;
+  color: #15803d;
 
   font-size: 14px;
   font-weight: 800;
@@ -999,7 +999,7 @@
   align-items: center;
   gap: 5px;
 
-  color: #a65300;
+  color: #b45309;
 
   font-size: 14px;
   font-weight: 800;
@@ -1035,7 +1035,7 @@
 }
 
 .billing-method-cell svg {
-  color: #155eef;
+  color: #1671b7;
 }
 
 
@@ -1069,9 +1069,9 @@
 }
 
 .billing-action-button:hover {
-  border-color: #155eef;
+  border-color: #1671b7;
   background: #edf4ff;
-  color: #155eef;
+  color: #1671b7;
 }
 
 
@@ -1279,11 +1279,11 @@
 }
 
 .billing-patient-paid-detail {
-  color: #087443 !important;
+  color: #15803d !important;
 }
 
 .billing-insurance-detail {
-  color: #a65300 !important;
+  color: #b45309 !important;
 }
 
 
@@ -1302,7 +1302,7 @@
 
   background: #edf4ff;
 
-  border: 1px solid #c9dcff;
+  border: 1px solid #c2e0ff;
   border-radius: 10px;
 }
 
@@ -1314,7 +1314,7 @@
 }
 
 .billing-detail-total strong {
-  color: #155eef;
+  color: #1671b7;
 
   font-size: 21px;
   font-weight: 900;

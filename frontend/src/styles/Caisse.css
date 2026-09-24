@@ -61,7 +61,7 @@
 
   box-shadow:
     5px 0 18px
-    rgba(13, 66, 101, 0.08);
+    rgba(10, 73, 121, 0.08);
 
   overflow: hidden;
 
@@ -104,31 +104,11 @@
 /* Icône du logo */
 
 .brand-icon {
-  width: 45px;
-  height: 45px;
-
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  border:
-    3px solid var(--primary-300);
-
-  border-radius: 13px;
-
-  color: var(--primary-100);
-
-  font-size: 24px;
-
-  background:
-    rgba(255, 255, 255, 0.08);
-
-  box-shadow:
-    0 0 0 3px
-    rgba(255, 255, 255, 0.06);
+  display: grid;
+  place-items: center;
 }
 
 
@@ -519,7 +499,7 @@
 
   box-shadow:
     0 2px 8px
-    rgba(34, 92, 130, 0.04);
+    rgba(11, 93, 152, 0.04);
 
   box-sizing: border-box;
 }
@@ -547,7 +527,7 @@
 
   background: transparent;
 
-  color: #294b65;
+  color: #0a4979;
 
   font-size: 16px;
 }
@@ -636,7 +616,7 @@
 
   box-shadow:
     0 3px 12px
-    rgba(28, 81, 113, 0.04);
+    rgba(10, 73, 121, 0.04);
 }
 
 
@@ -696,7 +676,7 @@
 /* Corps */
 
 .patients-table td {
-  color: #49657b;
+  color: #0b5d98;
 
   font-size: 15px;
 
@@ -714,7 +694,7 @@
 /* Nom patient */
 
 .patient-name {
-  color: #284b65 !important;
+  color: #0a4979 !important;
 
   font-weight: 750 !important;
 }
@@ -733,13 +713,13 @@
 */
 
 .sexe-masculin {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
 
   font-weight: 800 !important;
 }
 
 .sexe-femme {
-  color: #2563eb !important;
+  color: #1671b7 !important;
 
   font-weight: 800 !important;
 }
@@ -770,7 +750,7 @@
 /* Badge Masculin */
 
 .sexe-badge-masculin {
-  color: #dc2626;
+  color: #c94f4f;
 
   background: #fee2e2;
 }
@@ -779,7 +759,7 @@
 /* Badge Femme */
 
 .sexe-badge-femme {
-  color: #2563eb;
+  color: #1671b7;
 
   background: #dbeafe;
 }
@@ -788,7 +768,7 @@
 /* Select Masculin */
 
 .sexe-select-masculin {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
 
   font-weight: 700 !important;
 }
@@ -797,7 +777,7 @@
 /* Select Femme */
 
 .sexe-select-femme {
-  color: #2563eb !important;
+  color: #1671b7 !important;
 
   font-weight: 700 !important;
 }
@@ -817,7 +797,7 @@
 
   background: var(--bg);
 
-  color: #1682d7;
+  color: #368ad1;
 
   cursor: pointer;
 
@@ -839,7 +819,7 @@
    ============================================================ */
 
 .row-action.delete {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .row-action.delete:hover {
@@ -895,7 +875,7 @@
 
   box-shadow:
     0 2px 10px
-    rgba(28, 81, 113, 0.035);
+    rgba(10, 73, 121, 0.035);
 }
 
 
@@ -906,7 +886,7 @@
 
   margin-bottom: 8px;
 
-  color: #37556e;
+  color: #0b5d98;
 
   font-size: 16px;
 
@@ -940,14 +920,14 @@
 /* Montant bleu */
 
 .summary-value.blue {
-  color: #0757bd;
+  color: #0b5d98;
 }
 
 
 /* Montant rouge */
 
 .summary-value.red {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 
@@ -980,9 +960,9 @@
 */
 
 .patient-form select[name="sexe"].sexe-select-masculin {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
 
-  border-color: #fca5a5;
+  border-color: #e3aaaa;
 }
 
 
@@ -991,9 +971,9 @@
 */
 
 .patient-form select[name="sexe"].sexe-select-femme {
-  color: #2563eb !important;
+  color: #1671b7 !important;
 
-  border-color: #93c5fd;
+  border-color: #98caf9;
 }
 
 

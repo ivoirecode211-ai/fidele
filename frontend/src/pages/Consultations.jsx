@@ -5,133 +5,59 @@ import {
 } from "react";
 
 import {
-  Link,
   useNavigate,
 } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
+import api from "../services/api";
+
 import Logo from "../components/Logo";
+
+import SidebarFooter from "../components/SidebarFooter";
+
+import UserBadge from "../components/UserBadge";
+
+import NotificationBell from "../components/NotificationBell";
 
 import "../styles/Consultations.css";
 
 
+import {
+  Activity,
+  ArrowLeft,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  CircleCheck,
+  ClipboardList,
+  ClipboardX,
+  Clock3,
+  FileCheck2,
+  FileText,
+  FlaskConical,
+  FolderOpen,
+  Home,
+  Hourglass,
+  Info,
+  MessageSquare,
+  Search,
+  Stethoscope,
+  UserCheck,
+  UserPlus,
+  UserRound,
+  Users,
+  Wrench,
+  X,
+} from "lucide-react";
 /*
  * ============================================================
- * CONSULTATIONS INITIALES
+ * PATIENTS
  * ============================================================
+ *
+ * Servis par l'API (/api/parcours/consultations/) : seuls les
+ * patients envoyés par Soins infirmiers apparaissent.
  */
-
-const consultationsInitiales = [
-  {
-    id: 1,
-    numero: "001",
-    patient: "TRAORE Awa",
-    motif: "Fièvre",
-    heure: "08:30",
-    statut: "En cours",
-    age: 36,
-    sexe: "F",
-    doctor: "Dr. KOUAME",
-    telephone: "0700000000",
-    parentContact: "0500000000",
-    service: "Médecine générale",
-    insurance: "Non",
-    insuranceName: "",
-  },
-
-  {
-    id: 2,
-    numero: "002",
-    patient: "KONE Ibrahim",
-    motif: "Contrôle",
-    heure: "09:00",
-    statut: "En attente",
-    age: 42,
-    sexe: "M",
-    doctor: "Dr. BAH",
-    telephone: "0500000000",
-    parentContact: "0700000002",
-    service: "Chirurgie",
-    insurance: "CNPS",
-    insuranceName: "CNPS",
-  },
-
-  {
-    id: 3,
-    numero: "003",
-    patient: "DIALLO Mariam",
-    motif: "Douleur abdominale",
-    heure: "09:30",
-    statut: "En attente",
-    age: 29,
-    sexe: "F",
-    doctor: "Dr. KONE",
-    telephone: "0100000000",
-    parentContact: "0500000003",
-    service: "Pédiatrie",
-    insurance: "Non",
-    insuranceName: "",
-  },
-
-  {
-    id: 4,
-    numero: "004",
-    patient: "YAO Claude",
-    motif: "Hypertension",
-    heure: "10:00",
-    statut: "À venir",
-    age: 55,
-    sexe: "M",
-    doctor: "Dr. KOUAME",
-    telephone: "0700000001",
-    parentContact: "0500000004",
-    service: "Médecine générale",
-    insurance: "MUGEFCI",
-    insuranceName: "MUGEFCI",
-  },
-
-  {
-    id: 5,
-    numero: "005",
-    patient: "N'GUESSAN Marie",
-    motif: "Suivi grossesse",
-    heure: "10:30",
-    statut: "À venir",
-    age: 31,
-    sexe: "F",
-    doctor: "Dr. KOUAME",
-    telephone: "0500000005",
-    parentContact: "0700000005",
-    service: "Gynécologie",
-    insurance: "Non",
-    insuranceName: "",
-  },
-];
-
-
-/*
- * ============================================================
- * RÉCUPÉRATION DES PATIENTS VENANT DE LA CAISSE
- * ============================================================
- */
-
-function getPatientsFromCaisse() {
-  try {
-    return JSON.parse(
-      localStorage.getItem(
-        "sante_consultation_patients"
-      ) || "[]"
-    );
-  } catch (error) {
-    console.error(
-      "Erreur de récupération des patients :",
-      error
-    );
-
-    return [];
-  }
-}
 
 
 /*
@@ -163,7 +89,7 @@ function normalizeDoctorName(
 export default function Consultations() {
 
   const {
-    logout,
+    user,
   } = useAuth();
 
   const navigate =
@@ -177,7 +103,7 @@ export default function Consultations() {
    */
 
   const currentDoctor =
-    "Dr. KOUAME Jean";
+    `Dr. ${(user?.last_name || "").toUpperCase()} ${user?.first_name || ""}`.trim();
 
 
   /*
@@ -205,26 +131,7 @@ export default function Consultations() {
   const [
     consultations,
     setConsultations,
-  ] = useState(() => {
-
-    const patientsCaisse =
-      getPatientsFromCaisse();
-
-    const patientsSansDoublons =
-      patientsCaisse.filter(
-        (patient) =>
-          !consultationsInitiales.some(
-            (consultation) =>
-              consultation.id ===
-              patient.id
-          )
-      );
-
-    return [
-      ...consultationsInitiales,
-      ...patientsSansDoublons,
-    ];
-  });
+  ] = useState([]);
 
 
   const [
@@ -319,66 +226,37 @@ export default function Consultations() {
 
   useEffect(() => {
 
-    const synchroniserPatientsCaisse =
+    const synchroniserPatients =
       () => {
 
-        const patientsCaisse =
-          getPatientsFromCaisse();
-
-        setConsultations(
-          (listeActuelle) => {
-
-            const nouvellesConsultations =
-              patientsCaisse.filter(
-                (patient) =>
-                  !listeActuelle.some(
-                    (consultation) =>
-                      consultation.id ===
-                      patient.id
-                  )
-              );
-
-            if (
-              nouvellesConsultations.length ===
-              0
-            ) {
-              return listeActuelle;
-            }
-
-            return [
-              ...listeActuelle,
-              ...nouvellesConsultations,
-            ];
-          }
-        );
+        api
+          .get("/parcours/consultations/")
+          .then((response) =>
+            setConsultations(response.data)
+          )
+          .catch((error) =>
+            console.error(
+              "Erreur de récupération des patients :",
+              error
+            )
+          );
       };
 
 
-    synchroniserPatientsCaisse();
+    synchroniserPatients();
 
 
     window.addEventListener(
-      "sante:patient-added",
-      synchroniserPatientsCaisse
-    );
-
-
-    window.addEventListener(
-      "storage",
-      synchroniserPatientsCaisse
+      "focus",
+      synchroniserPatients
     );
 
 
     return () => {
 
       window.removeEventListener(
-        "sante:patient-added",
-        synchroniserPatientsCaisse
-      );
-
-      window.removeEventListener(
-        "storage",
-        synchroniserPatientsCaisse
+        "focus",
+        synchroniserPatients
       );
 
     };
@@ -603,23 +481,7 @@ export default function Consultations() {
     ]);
 
 
-  /*
-   * ==========================================================
-   * DÉCONNEXION
-   * ==========================================================
-   */
 
-  function handleLogout() {
-
-    logout();
-
-    navigate(
-      "/login",
-      {
-        replace: true,
-      }
-    );
-  }
 
 
   /*
@@ -658,8 +520,14 @@ export default function Consultations() {
 
       if (
         consultation.statut !==
-        "Terminée"
+          "Terminée" &&
+        !consultation.admissionId
       ) {
+
+        /*
+         * Consultation créée depuis « Nouvelle consultation » :
+         * elle n'est rattachée à aucun passage en caisse.
+         */
 
         setConsultations(
           (liste) =>
@@ -675,6 +543,37 @@ export default function Consultations() {
                   : item
             )
         );
+
+      } else if (
+        consultation.statut !==
+        "Terminée"
+      ) {
+
+        api
+          .post(
+            `/parcours/consultations/${consultation.admissionId}/consulter/`
+          )
+          .then((response) =>
+            setConsultations(
+              (liste) =>
+                liste.map(
+                  (item) =>
+                    item.admissionId ===
+                    consultation.admissionId
+                      ? response.data
+                      : item
+                )
+            )
+          )
+          .catch((error) => {
+
+            alert(
+              error.response?.data?.detail ||
+                "Impossible de démarrer la consultation."
+            );
+
+            setModal(null);
+          });
       }
 
 
@@ -1063,38 +962,6 @@ export default function Consultations() {
       );
 
 
-      const patientsCaisse =
-        getPatientsFromCaisse();
-
-
-      const patientsCaisseMisAJour =
-        patientsCaisse.map(
-          (patient) =>
-            patient.id ===
-            patientSelectionne.id
-              ? patientHospitalise
-              : patient
-        );
-
-
-      if (
-        patientsCaisse.some(
-          (patient) =>
-            patient.id ===
-            patientSelectionne.id
-        )
-      ) {
-
-        localStorage.setItem(
-          "sante_consultation_patients",
-          JSON.stringify(
-            patientsCaisseMisAJour
-          )
-        );
-
-      }
-
-
       window.dispatchEvent(
         new CustomEvent(
           "sante:hospitalisation-added",
@@ -1187,7 +1054,7 @@ export default function Consultations() {
    */
 
   const validerConsultation =
-    () => {
+    async () => {
 
       if (
         !patientSelectionne
@@ -1196,104 +1063,57 @@ export default function Consultations() {
       }
 
 
-      const dateConsultation =
-        new Date().toISOString();
+      if (
+        !patientSelectionne.admissionId
+      ) {
+
+        alert(
+          "Cette consultation n'est rattachée à aucun patient enregistré à la Caisse : elle ne peut pas être validée."
+        );
+
+        return;
+      }
 
 
       /*
-       * IMPORTANT :
-       * Le champ traitement reste conservé pour compatibilité
-       * avec les anciennes données.
-       *
-       * Le champ prescription devient maintenant la source
-       * officielle de l'ordonnance.
+       * Le backend clôture la consultation et transmet
+       * l'ordonnance (champ Traitement / Prescription,
+       * un médicament par ligne) à la Pharmacie.
        */
 
-      const patientMisAJour = {
+      let patientMisAJour;
 
-        ...patientSelectionne,
+      try {
 
-        statut:
-          "Terminée",
+        const response =
+          await api.post(
+            `/parcours/consultations/${patientSelectionne.admissionId}/valider/`,
+            formulaireMedical
+          );
 
-        symptomes:
-          formulaireMedical.symptomes,
+        patientMisAJour =
+          response.data;
 
-        diagnostic:
-          formulaireMedical.diagnostic,
+      } catch (error) {
 
-        traitement:
-          formulaireMedical.traitement,
+        alert(
+          error.response?.data?.detail ||
+            "Impossible de valider la consultation. Veuillez réessayer."
+        );
 
-        prescription:
-          formulaireMedical.traitement,
-
-        observations:
-          formulaireMedical.observations,
-
-        dateConsultation,
-
-        doctor:
-          patientSelectionne.doctor ||
-          currentDoctor,
-      };
+        return;
+      }
 
 
       setConsultations(
         (liste) =>
           liste.map(
             (item) =>
-              item.id ===
-              patientSelectionne.id
+              item.admissionId ===
+              patientMisAJour.admissionId
                 ? patientMisAJour
                 : item
           )
-      );
-
-
-      const patientsCaisse =
-        getPatientsFromCaisse();
-
-
-      const patientExisteDansCaisse =
-        patientsCaisse.some(
-          (patient) =>
-            patient.id ===
-            patientSelectionne.id
-        );
-
-
-      let patientsMisAJour;
-
-
-      if (
-        patientExisteDansCaisse
-      ) {
-
-        patientsMisAJour =
-          patientsCaisse.map(
-            (patient) =>
-              patient.id ===
-              patientSelectionne.id
-                ? patientMisAJour
-                : patient
-          );
-
-      } else {
-
-        patientsMisAJour = [
-          ...patientsCaisse,
-          patientMisAJour,
-        ];
-
-      }
-
-
-      localStorage.setItem(
-        "sante_consultation_patients",
-        JSON.stringify(
-          patientsMisAJour
-        )
       );
 
 
@@ -1508,7 +1328,7 @@ export default function Consultations() {
           <div className="sidebar-brand">
 
             <strong>
-              MA SANTE
+              MA SANTÉ
             </strong>
 
             <span>
@@ -1548,7 +1368,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ⌂
+              <Home size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1582,7 +1402,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ♟
+              <Users size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1614,7 +1434,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ▣
+              <Stethoscope size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1650,7 +1470,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ▤
+              <ClipboardList size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1670,7 +1490,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ▥
+              <FlaskConical size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1689,7 +1509,7 @@ export default function Consultations() {
           >
 
             <span className="menu-icon">
-              ▣
+              <MessageSquare size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1701,50 +1521,7 @@ export default function Consultations() {
         </nav>
 
 
-        {/* BAS SIDEBAR */}
-
-        <div className="sidebar-bottom">
-
-          <Link
-            to="/modules"
-            className="medecin-menu-item"
-          >
-
-            <span className="menu-icon">
-              ⌘
-            </span>
-
-            <span>
-              Retour aux modules
-            </span>
-
-          </Link>
-
-
-          <button
-            type="button"
-            className="medecin-menu-item"
-            onClick={
-              handleLogout
-            }
-          >
-
-            <span className="menu-icon">
-              ⏻
-            </span>
-
-            <span>
-              Déconnexion
-            </span>
-
-          </button>
-
-
-          <div className="sidebar-version">
-            MA SANTÉ v1.0
-          </div>
-
-        </div>
+        <SidebarFooter />
 
       </aside>
 
@@ -1773,36 +1550,26 @@ export default function Consultations() {
           </div>
 
 
-          <div className="doctor-profile">
+          <div className="ms-header-tools">
+            <NotificationBell />
 
-            <div className="doctor-avatar">
-              DJ
+            <div className="doctor-profile">
+
+              <UserBadge />
+
+              <button
+                className="profile-arrow"
+                title="Profil"
+                onClick={() =>
+                  setModal(
+                    "profil"
+                  )
+                }
+              >
+                <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
+              </button>
+
             </div>
-
-            <div className="doctor-info">
-
-              <strong>
-                Dr. KOUAME Jean
-              </strong>
-
-              <span>
-                Médecin
-              </span>
-
-            </div>
-
-            <button
-              className="profile-arrow"
-              title="Profil"
-              onClick={() =>
-                setModal(
-                  "profil"
-                )
-              }
-            >
-              ▼
-            </button>
-
           </div>
 
         </header>
@@ -1858,7 +1625,7 @@ export default function Consultations() {
               <div className="search-box">
 
                 <span className="search-icon">
-                  ⌕
+                  <Search size={18} strokeWidth={2} aria-hidden="true" />
                 </span>
 
                 <input
@@ -1885,7 +1652,7 @@ export default function Consultations() {
                       )
                     }
                   >
-                    ×
+                    <X size={16} strokeWidth={2} aria-hidden="true" />
                   </button>
 
                 )}
@@ -1902,7 +1669,7 @@ export default function Consultations() {
                 }
               >
 
-                ←
+                <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
 
                 <span>
                   Retour aux consultations
@@ -1921,7 +1688,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon blue">
-                  ♟
+                  <Users size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1944,7 +1711,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon green">
-                  ✓
+                  <UserRound size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1971,7 +1738,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon orange">
-                  ✓
+                  <UserRound size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1998,7 +1765,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon purple">
-                  ✓
+                  <FileCheck2 size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2309,7 +2076,7 @@ export default function Consultations() {
                         >
 
                           <div className="empty-icon">
-                            ♟
+                            <Users size={28} strokeWidth={2} aria-hidden="true" />
                           </div>
 
                           <strong>
@@ -2422,7 +2189,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon blue">
-                  ▤
+                  <ClipboardList size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2445,7 +2212,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon green">
-                  ✓
+                  <UserCheck size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2468,7 +2235,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon orange">
-                  !
+                  <ClipboardX size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2498,7 +2265,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon purple">
-                  ✓
+                  <CircleCheck size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2828,7 +2595,7 @@ export default function Consultations() {
                         >
 
                           <div className="empty-icon">
-                            ▤
+                            <ClipboardList size={28} strokeWidth={2} aria-hidden="true" />
                           </div>
 
                           <strong>
@@ -2937,7 +2704,7 @@ export default function Consultations() {
               <div className="search-box">
 
                 <span className="search-icon">
-                  ⌕
+                  <Search size={18} strokeWidth={2} aria-hidden="true" />
                 </span>
 
                 <input
@@ -2963,7 +2730,7 @@ export default function Consultations() {
                       )
                     }
                   >
-                    ×
+                    <X size={16} strokeWidth={2} aria-hidden="true" />
                   </button>
 
                 )}
@@ -2980,7 +2747,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon blue">
-                  ◷
+                  <CalendarDays size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -3003,7 +2770,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon green">
-                  ✓
+                  <Activity size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -3030,7 +2797,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon orange">
-                  !
+                  <Hourglass size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -3057,7 +2824,7 @@ export default function Consultations() {
               <div className="quick-stat">
 
                 <div className="quick-stat-icon purple">
-                  →
+                  <Clock3 size={20} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -3370,7 +3137,7 @@ export default function Consultations() {
                         >
 
                           <div className="empty-icon">
-                            ⌕
+                            <Search size={28} strokeWidth={2} aria-hidden="true" />
                           </div>
 
                           <strong>
@@ -3409,7 +3176,7 @@ export default function Consultations() {
                 >
 
                   <span className="action-icon blue-icon">
-                    ♟
+                    <UserPlus size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <span>
@@ -3442,7 +3209,7 @@ export default function Consultations() {
                 >
 
                   <span className="action-icon blue-icon">
-                    ▣
+                    <FolderOpen size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <span>
@@ -3474,7 +3241,7 @@ export default function Consultations() {
                 >
 
                   <span className="action-icon blue-icon">
-                    ▤
+                    <ClipboardList size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <span>
@@ -3507,7 +3274,7 @@ export default function Consultations() {
                 >
 
                   <span className="action-icon blue-icon">
-                    ▤
+                    <FileText size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <span>
@@ -3531,7 +3298,7 @@ export default function Consultations() {
                 <div className="info-card-title">
 
                   <span className="info-title-icon">
-                    ✓
+                    <Info size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
                   <div>
                     <h3>
@@ -3976,7 +3743,7 @@ export default function Consultations() {
           <div className="placeholder-modal">
 
             <div className="placeholder-modal-icon">
-              ✓
+              <Check size={30} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <h3>
@@ -4524,7 +4291,7 @@ export default function Consultations() {
           <div className="placeholder-modal">
 
             <div className="placeholder-modal-icon">
-              ✓
+              <Check size={30} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <h3>
@@ -5163,7 +4930,7 @@ export default function Consultations() {
           <div className="placeholder-modal">
 
             <div className="placeholder-modal-icon">
-              ◈
+              <Wrench size={28} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <h3>
@@ -5254,7 +5021,7 @@ function Modal({
             }
             aria-label="Fermer"
           >
-            ×
+            <X size={18} strokeWidth={2} aria-hidden="true" />
           </button>
 
         </div>

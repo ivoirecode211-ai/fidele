@@ -38,9 +38,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: linear-gradient(135deg, #087fd5, var(--primary));
+  background: linear-gradient(135deg, #368ad1, var(--primary));
   color: var(--surface);
-  box-shadow: 0 4px 12px rgba(8, 127, 213, 0.18);
+  box-shadow: 0 4px 12px rgba(54, 138, 209, 0.18);
 }
 
 .maintenance-header-left h1 {
@@ -70,18 +70,18 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background: linear-gradient(135deg, #087fd5, #0567b3);
+  background: linear-gradient(135deg, #368ad1, #1671b7);
   color: var(--surface);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(8, 127, 213, 0.18);
+  box-shadow: 0 4px 12px rgba(54, 138, 209, 0.18);
   transition: all 0.2s ease;
 }
 
 .maintenance-primary-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 7px 17px rgba(8, 127, 213, 0.25);
+  box-shadow: 0 7px 17px rgba(54, 138, 209, 0.25);
 }
 
 /* ============================================================
@@ -117,13 +117,13 @@
   border: 1px solid var(--border);
   border-radius: 7px;
   background: var(--surface);
-  color: #7892a5;
+  color: #368ad1;
   box-sizing: border-box;
 }
 
 .maintenance-search:focus-within {
-  border-color: #1384d2;
-  box-shadow: 0 0 0 3px rgba(19, 132, 210, 0.07);
+  border-color: #368ad1;
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.07);
 }
 
 .maintenance-search input {
@@ -131,7 +131,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #294e69;
+  color: #0a4979;
   font-size: 11px;
 }
 
@@ -153,14 +153,14 @@
   border-radius: 7px;
   outline: none;
   background: var(--surface);
-  color: #4f6e84;
+  color: #1671b7;
   font-family: inherit;
   font-size: 10px;
   cursor: pointer;
 }
 
 .maintenance-filters select:focus {
-  border-color: #1384d2;
+  border-color: #368ad1;
 }
 
 /* ============================================================
@@ -182,7 +182,7 @@
   border: 1px solid var(--border);
   border-radius: 9px;
   background: var(--surface);
-  box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
+  box-shadow: 0 2px 9px rgba(11, 93, 152, 0.05);
   overflow: hidden;
 }
 
@@ -199,21 +199,21 @@
 
 .maintenance-panel-header h2 {
   margin: 0;
-  color: #164a76;
+  color: #0a4979;
   font-size: 13px;
   font-weight: 700;
 }
 
 .maintenance-panel-header p {
   margin: 3px 0 0;
-  color: #7b94a6;
+  color: #368ad1;
   font-size: 9px;
   line-height: 13px;
 }
 
 .maintenance-panel-header > svg {
   flex-shrink: 0;
-  color: #087fd5;
+  color: #368ad1;
 }
 
 /* ============================================================
@@ -239,7 +239,7 @@
 .maintenance-table th {
   padding: 10px 9px;
   text-align: left;
-  color: #58758a;
+  color: #1671b7;
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
@@ -248,7 +248,7 @@
 
 .maintenance-table td {
   padding: 10px 9px;
-  color: #4c687d;
+  color: #1671b7;
   border-bottom: 1px solid var(--primary-soft);
   white-space: nowrap;
   vertical-align: middle;
@@ -270,7 +270,7 @@
 }
 
 .maintenance-equipment-cell strong {
-  color: #244f6f;
+  color: #0a4979;
   font-size: 10px;
   font-weight: 600;
 }
@@ -287,7 +287,7 @@
 }
 
 .maintenance-date-cell span {
-  color: #4c687d;
+  color: #1671b7;
   font-size: 9px;
 }
 
@@ -318,12 +318,12 @@
 
 .maintenance-priority.haute {
   background: var(--warning-soft);
-  color: #d9850b;
+  color: #d97706;
 }
 
 .maintenance-priority.critique {
   background: var(--danger-soft);
-  color: #d93243;
+  color: #c94f4f;
 }
 
 /* ============================================================
@@ -369,10 +369,10 @@
   border-radius: 50%;
   background:
     conic-gradient(
-      #08ad80 0deg 240deg,
-      #f2a52b 240deg 300deg,
-      #f24750 300deg 330deg,
-      #1789dc 330deg 360deg
+      #16a34a 0deg 240deg,
+      #f59e0b 240deg 300deg,
+      #d26868 300deg 330deg,
+      #368ad1 330deg 360deg
     );
 }
 
@@ -393,14 +393,14 @@
 }
 
 .maintenance-donut-inner strong {
-  color: #164b70;
+  color: #0a4979;
   font-size: 22px;
   line-height: 24px;
 }
 
 .maintenance-donut-inner span {
   margin-top: 2px;
-  color: #7b94a4;
+  color: #368ad1;
   font-size: 8px;
 }
 
@@ -416,12 +416,12 @@
   grid-template-columns: 9px 1fr auto;
   align-items: center;
   gap: 7px;
-  color: #5b7588;
+  color: #1671b7;
   font-size: 9px;
 }
 
 .maintenance-status-legend strong {
-  color: #244f6c;
+  color: #0a4979;
   font-size: 10px;
 }
 
@@ -432,15 +432,15 @@
 }
 
 .legend-dot.operational {
-  background: #08ad80;
+  background: #16a34a;
 }
 
 .legend-dot.attention {
-  background: #f2a52b;
+  background: #f59e0b;
 }
 
 .legend-dot.critical {
-  background: #f24750;
+  background: #d26868;
 }
 
 /* ============================================================
@@ -456,7 +456,7 @@
   border-radius: 6px;
   padding: 7px 11px;
   background: var(--surface);
-  color: #0877c5;
+  color: #1671b7;
   font-size: 9px;
   font-weight: 600;
   cursor: pointer;
@@ -485,7 +485,7 @@
 .maintenance-equipment-card:hover {
   transform: translateY(-2px);
   border-color: #c9e1ef;
-  box-shadow: 0 6px 15px rgba(23, 100, 145, 0.08);
+  box-shadow: 0 6px 15px rgba(11, 93, 152, 0.08);
 }
 
 .maintenance-equipment-card-top {
@@ -505,13 +505,13 @@
   justify-content: center;
   border-radius: 8px;
   background: var(--primary-soft);
-  color: #0879cf;
+  color: #1671b7;
 }
 
 .maintenance-equipment-card h3 {
   margin: 0;
   overflow: hidden;
-  color: #28516f;
+  color: #0a4979;
   font-size: 10px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -546,7 +546,7 @@
 
 .maintenance-equipment-info strong {
   overflow: hidden;
-  color: #45677d;
+  color: #0b5d98;
   font-size: 8px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -564,7 +564,7 @@
 .maintenance-critical-panel
   .maintenance-panel-header
   > svg {
-  color: #ed4855;
+  color: #d26868;
 }
 
 .maintenance-critical-list {
@@ -587,7 +587,7 @@
 }
 
 .maintenance-critical-item:nth-child(2) {
-  border-color: #ffe5bd;
+  border-color: #fde68a;
   background: var(--danger-soft);
 }
 
@@ -600,13 +600,13 @@
   justify-content: center;
   border-radius: 50%;
   background: var(--danger-soft);
-  color: #ef414c;
+  color: #d26868;
 }
 
 .maintenance-critical-item:nth-child(2)
   .maintenance-critical-icon {
   background: var(--warning-soft);
-  color: #ed9419;
+  color: #f59e0b;
 }
 
 .maintenance-critical-content {
@@ -617,14 +617,14 @@
 }
 
 .maintenance-critical-content strong {
-  color: #2a506d;
+  color: #0a4979;
   font-size: 9px;
   font-weight: 700;
 }
 
 .maintenance-critical-content span {
   margin-top: 2px;
-  color: #7891a2;
+  color: #368ad1;
   font-size: 8px;
 }
 
@@ -651,7 +651,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(7, 36, 59, 0.48);
+  background: rgba(8, 35, 58, 0.48);
   backdrop-filter: blur(2px);
   box-sizing: border-box;
 }
@@ -662,7 +662,7 @@
   overflow-y: auto;
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 20px 60px rgba(5, 38, 65, 0.25);
+  box-shadow: 0 20px 60px rgba(8, 35, 58, 0.25);
 }
 
 .maintenance-modal-header {
@@ -676,13 +676,13 @@
 
 .maintenance-modal-header h2 {
   margin: 0;
-  color: #164b70;
+  color: #0a4979;
   font-size: 17px;
 }
 
 .maintenance-modal-header p {
   margin: 3px 0 0;
-  color: #7a94a6;
+  color: #368ad1;
   font-size: 10px;
 }
 
@@ -702,7 +702,7 @@
 
 .maintenance-modal-close:hover {
   background: var(--green-soft);
-  color: #244e6d;
+  color: #0a4979;
 }
 
 /* ============================================================
@@ -728,7 +728,7 @@
 }
 
 .maintenance-form-group label {
-  color: #385d76;
+  color: #0b5d98;
   font-size: 11px;
   font-weight: 600;
 }
@@ -742,7 +742,7 @@
   border-radius: 6px;
   outline: none;
   background: var(--surface);
-  color: #294f69;
+  color: #0a4979;
   font-family: inherit;
   font-size: 11px;
   box-sizing: border-box;
@@ -752,8 +752,8 @@
 .maintenance-form-group input:focus,
 .maintenance-form-group select:focus,
 .maintenance-form-group textarea:focus {
-  border-color: #1384d2;
-  box-shadow: 0 0 0 3px rgba(19, 132, 210, 0.08);
+  border-color: #368ad1;
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.08);
 }
 
 .maintenance-form-group textarea {
@@ -787,7 +787,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
-  color: #5f7a8d;
+  color: #1671b7;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;

@@ -36,14 +36,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #08a985, #078668);
+  background: linear-gradient(135deg, #67aae9, #1671b7);
   color: white;
-  box-shadow: 0 4px 12px rgba(8, 169, 133, 0.18);
+  box-shadow: 0 4px 12px rgba(103, 170, 233, 0.18);
 }
 
 .hygiene-title-area h1 {
   margin: 0;
-  color: #164b72;
+  color: #0a4979;
   font-size: 22px;
   font-weight: 700;
 }
@@ -63,18 +63,18 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: linear-gradient(135deg, #087fd4, #0568b4);
+  background: linear-gradient(135deg, #368ad1, #1671b7);
   color: white;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(8, 127, 212, 0.18);
+  box-shadow: 0 4px 12px rgba(54, 138, 209, 0.18);
   transition: all 0.2s ease;
 }
 
 .hygiene-primary-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 7px 18px rgba(8, 127, 212, 0.24);
+  box-shadow: 0 7px 18px rgba(54, 138, 209, 0.24);
 }
 
 /* ============================================================
@@ -119,7 +119,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #315670;
+  color: #0b5d98;
   font-family: inherit;
   font-size: 13px;
 }
@@ -151,7 +151,7 @@
 }
 
 .hygiene-date-info strong {
-  color: #3d6178;
+  color: #0b5d98;
 }
 
 /* ============================================================
@@ -181,7 +181,7 @@
   border: 1px solid var(--border);
   border-radius: 9px;
   background: white;
-  box-shadow: 0 2px 9px rgba(27, 87, 125, 0.05);
+  box-shadow: 0 2px 9px rgba(11, 93, 152, 0.05);
 }
 
 .hygiene-panel-header {
@@ -197,7 +197,7 @@
 
 .hygiene-panel-header h2 {
   margin: 0;
-  color: #174b71;
+  color: #0a4979;
   font-size: 12px;
   font-weight: 700;
 }
@@ -219,7 +219,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #087fd4;
+  background: #368ad1;
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -227,7 +227,7 @@
 }
 
 .hygiene-small-button:hover {
-  background: #066cb5;
+  background: #1671b7;
 }
 
 .hygiene-link-button {
@@ -236,7 +236,7 @@
   align-items: center;
   gap: 3px;
   background: transparent;
-  color: #087aca;
+  color: #1671b7;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -265,7 +265,7 @@
 .hygiene-table th {
   padding: 8px 7px;
   text-align: left;
-  color: #5b788e;
+  color: #1671b7;
   font-size: 11px;
   font-weight: 700;
   border-bottom: 1px solid var(--border);
@@ -274,7 +274,7 @@
 
 .hygiene-table td {
   padding: 8px 7px;
-  color: #58768b;
+  color: #1671b7;
   border-bottom: 1px solid var(--primary-soft);
   white-space: nowrap;
 }
@@ -284,7 +284,7 @@
 }
 
 .hygiene-table td strong {
-  color: #315872;
+  color: #0b5d98;
   font-weight: 600;
 }
 
@@ -304,7 +304,7 @@
 
 .hygiene-edit-button:hover {
   background: var(--primary-soft);
-  color: #0879c9;
+  color: #1671b7;
 }
 
 .hygiene-empty {
@@ -345,7 +345,7 @@
 
 .hygiene-product-icon.blue {
   background: var(--primary-soft);
-  color: #087bc9;
+  color: #1671b7;
 }
 
 .hygiene-product-icon.green {
@@ -355,12 +355,12 @@
 
 .hygiene-product-icon.cyan {
   background: var(--primary-soft);
-  color: #079ca5;
+  color: #368ad1;
 }
 
 .hygiene-product-icon.purple {
   background: var(--purple-soft);
-  color: #7552d8;
+  color: #1671b7;
 }
 
 .hygiene-product-info {
@@ -371,7 +371,7 @@
 }
 
 .hygiene-product-info strong {
-  color: #315873;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 600;
 }
@@ -393,7 +393,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0bab79;
+  color: #16a34a;
 }
 
 /* ============================================================
@@ -436,7 +436,7 @@
 
 .waste-icon.orange {
   background: var(--warning-soft);
-  color: #e78b17;
+  color: #f59e0b;
 }
 
 .waste-icon.gray {
@@ -445,7 +445,7 @@
 }
 
 .waste-card strong {
-  color: #365a72;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 600;
 }
@@ -487,7 +487,7 @@
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  color: #087dca;
+  color: #1671b7;
 }
 
 .audit-icon.next {
@@ -502,7 +502,7 @@
 }
 
 .audit-info strong {
-  color: #365a72;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 600;
 }
@@ -567,8 +567,8 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    #08b484,
-    #17c497
+    #22c55e,
+    #22c55e
   );
 }
 
@@ -611,7 +611,7 @@
 }
 
 .summary-content strong {
-  color: #28614e;
+  color: #166534;
   font-size: 13px;
 }
 
@@ -651,7 +651,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(5, 37, 57, 0.48);
+  background: rgba(8, 35, 58, 0.48);
   backdrop-filter: blur(2px);
   box-sizing: border-box;
 }
@@ -662,7 +662,7 @@
   overflow-y: auto;
   border-radius: 11px;
   background: white;
-  box-shadow: 0 20px 60px rgba(4, 35, 59, 0.25);
+  box-shadow: 0 20px 60px rgba(8, 35, 58, 0.25);
 }
 
 .hygiene-modal-header {
@@ -692,7 +692,7 @@
 
 .modal-title h2 {
   margin: 0;
-  color: #174b70;
+  color: #0a4979;
   font-size: 16px;
 }
 
@@ -742,7 +742,7 @@
 }
 
 .hygiene-form-group label {
-  color: #42647a;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 600;
 }
@@ -756,7 +756,7 @@
   border-radius: 6px;
   outline: none;
   background: white;
-  color: #345770;
+  color: #0b5d98;
   font-family: inherit;
   font-size: 12px;
   box-sizing: border-box;
@@ -764,8 +764,8 @@
 
 .hygiene-form-group input:focus,
 .hygiene-form-group select:focus {
-  border-color: #0a83d1;
-  box-shadow: 0 0 0 3px rgba(10, 131, 209, 0.08);
+  border-color: #368ad1;
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.08);
 }
 
 .hygiene-form-group input::placeholder {
@@ -781,7 +781,7 @@
   gap: 7px;
   border-radius: 6px;
   background: var(--bg);
-  color: #4f8070;
+  color: #15803d;
   font-size: 12px;
 }
 
@@ -824,8 +824,8 @@
   border: none;
   background: linear-gradient(
     135deg,
-    #08a67f,
-    #078663
+    #368ad1,
+    #15803d
   );
   color: white;
 }
@@ -834,7 +834,7 @@
   background: linear-gradient(
     135deg,
     var(--green),
-    #067655
+    #15803d
   );
 }
 

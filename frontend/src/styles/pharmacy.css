@@ -28,10 +28,10 @@
   background: linear-gradient(
     180deg,
     var(--primary-dark) 0%,
-    #052d52 100%
+    #0c3557 100%
   );
   color: var(--surface);
-  box-shadow: 4px 0 18px rgba(5, 50, 86, 0.12);
+  box-shadow: 4px 0 18px rgba(12, 53, 87, 0.12);
 }
 
 .pharmacy-sidebar-brand {
@@ -52,10 +52,10 @@
   flex-shrink: 0;
   background: linear-gradient(
     135deg,
-    #16a6ed,
-    #13bd98
+    #67aae9,
+    #67aae9
   );
-  box-shadow: 0 4px 12px rgba(0, 180, 220, 0.25);
+  box-shadow: 0 4px 12px rgba(103, 170, 233, 0.25);
 }
 
 .mini-heart-logo span {
@@ -70,13 +70,13 @@
 }
 
 .pharmacy-sidebar-brand strong span {
-  color: #19bd83;
+  color: #22c55e;
 }
 
 .pharmacy-sidebar-brand small {
   display: block;
   margin-top: 2px;
-  color: #b7d4e8;
+  color: #98caf9;
   font-size: 8px;
 }
 
@@ -116,11 +116,11 @@
 .pharmacy-nav-item.active {
   background: linear-gradient(
     90deg,
-    #087ee0,
-    #0d6fc0
+    #368ad1,
+    #1671b7
   );
   color: var(--surface);
-  box-shadow: inset 3px 0 0 #4ed8ff;
+  box-shadow: inset 3px 0 0 #98caf9;
 }
 
 .sidebar-footer {
@@ -129,7 +129,7 @@
   align-items: center;
   gap: 7px;
   padding: 16px 15px;
-  color: #a9c7db;
+  color: #98caf9;
   font-size: 9px;
   border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -139,8 +139,8 @@
   height: 8px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #17c989;
-  box-shadow: 0 0 0 4px rgba(23, 201, 137, 0.13);
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.13);
 }
 
 /* ============================================================
@@ -165,7 +165,7 @@
     var(--bg) 55%,
     var(--primary-soft) 100%
   );
-  border-bottom: 1px solid #c8e3f3;
+  border-bottom: 1px solid #c2e0ff;
 }
 
 .header-left {
@@ -196,7 +196,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #174d77;
+  color: #0a4979;
 }
 
 .pharmacist-profile .avatar {
@@ -209,13 +209,13 @@
   background: linear-gradient(
     135deg,
     var(--border),
-    #86b7d4
+    #67aae9
   );
   color: var(--primary);
   font-weight: 800;
   font-size: 12px;
   border: 2px solid var(--surface);
-  box-shadow: 0 2px 7px rgba(0, 70, 120, 0.16);
+  box-shadow: 0 2px 7px rgba(10, 73, 121, 0.16);
 }
 
 .pharmacist-profile strong,
@@ -279,8 +279,8 @@
   flex-shrink: 0;
   border-radius: 11px;
   background: var(--primary-soft);
-  color: #0877cc;
-  border: 1px solid #cce9fa;
+  color: #1671b7;
+  border: 1px solid #c2e0ff;
 }
 
 .toolbar-title h2 {
@@ -292,7 +292,7 @@
 
 .toolbar-title p {
   margin: 4px 0 0;
-  color: #7894aa;
+  color: #368ad1;
   font-size: 11px;
 }
 
@@ -325,8 +325,8 @@
 }
 
 .search-box:focus-within {
-  border-color: #8fc9eb;
-  box-shadow: 0 0 0 3px rgba(8, 127, 220, 0.08);
+  border-color: #98caf9;
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.08);
 }
 
 .search-box input {
@@ -334,7 +334,7 @@
   flex: 1;
   border: 0;
   outline: 0;
-  color: #234e6e;
+  color: #0a4979;
   font: inherit;
   font-size: 13px;
   background: transparent;
@@ -352,7 +352,7 @@
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #7898ad;
+  color: #368ad1;
   cursor: pointer;
 }
 
@@ -393,37 +393,37 @@
 .purple-btn:hover,
 .blue-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 13px rgba(24, 111, 178, 0.15);
+  box-shadow: 0 6px 13px rgba(22, 113, 183, 0.15);
 }
 
 .primary-btn,
 .blue-btn {
   background: linear-gradient(
     135deg,
-    #087fdc,
-    #0871c8
+    #368ad1,
+    #1671b7
   );
 }
 
 .green-btn {
   background: linear-gradient(
     135deg,
-    #13bf9b,
-    #0cae89
+    #67aae9,
+    #67aae9
   );
 }
 
 .purple-btn {
   background: linear-gradient(
     135deg,
-    #7658dc,
+    #1671b7,
     var(--purple)
   );
 }
 
 .secondary-btn {
   background: var(--primary-soft);
-  color: #55748a;
+  color: #1671b7;
 }
 
 .secondary-btn:hover {
@@ -452,7 +452,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 6px 20px rgba(45, 105, 143, 0.07);
+  box-shadow: 0 6px 20px rgba(22, 113, 183, 0.07);
   overflow: hidden;
 }
 
@@ -489,7 +489,7 @@
 
 .card-header h3 {
   margin: 0;
-  color: #124e78;
+  color: #0a4979;
   font-size: 20px;
   font-weight: 800;
 }
@@ -497,7 +497,7 @@
 .card-header span {
   display: block;
   margin-top: 5px;
-  color: #8199ab;
+  color: #67aae9;
   font-size: 12px;
   font-weight: 500;
 }
@@ -528,14 +528,14 @@
 }
 
 .filter-tabs button:hover {
-  border-color: #a7d3ef;
-  color: #0875c9;
+  border-color: #98caf9;
+  color: #1671b7;
 }
 
 .filter-tabs button.selected {
   background: var(--primary-soft);
-  border-color: #b9dcf3;
-  color: #0875c9;
+  border-color: #c2e0ff;
+  color: #1671b7;
   font-weight: 800;
 }
 
@@ -569,7 +569,7 @@
 .orders-table td {
   padding: 18px 20px;
   border-bottom: 1px solid var(--primary-soft);
-  color: #365c76;
+  color: #0b5d98;
   font-size: 14px;
   font-weight: 500;
   vertical-align: middle;
@@ -588,7 +588,7 @@
 }
 
 .number-cell {
-  color: #7993a6 !important;
+  color: #368ad1 !important;
   font-size: 13px !important;
   font-weight: 800 !important;
 }
@@ -605,7 +605,7 @@
 }
 
 .patient-cell strong {
-  color: #1a4c6d;
+  color: #0a4979;
   font-size: 15px;
   font-weight: 800;
 }
@@ -618,7 +618,7 @@
   flex: 0 0 36px;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #1377b8;
+  color: #1671b7;
 }
 
 /* ============================================================
@@ -626,14 +626,14 @@
    ============================================================ */
 
 .doctor-cell {
-  color: #557a92;
+  color: #1671b7;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .doctor-cell svg {
-  color: #5ba2cf;
+  color: #67aae9;
   flex-shrink: 0;
 }
 
@@ -649,7 +649,7 @@
 }
 
 .medicine-list span {
-  color: #4f7187;
+  color: #1671b7;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -675,7 +675,7 @@
 
 .status-badge.prepare {
   background: var(--warning-soft);
-  color: #d88b0c;
+  color: #d97706;
 }
 
 .status-badge.ready {
@@ -685,7 +685,7 @@
 
 .status-badge.served {
   background: var(--primary-soft);
-  color: #1976c8;
+  color: #1671b7;
 }
 
 /* ============================================================
@@ -700,14 +700,14 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  color: #1474b7;
+  color: #1671b7;
   cursor: pointer;
   transition: 0.18s ease;
 }
 
 .icon-action:hover {
   background: var(--primary-soft);
-  border-color: #a8d5ef;
+  border-color: #98caf9;
   transform: translateY(-1px);
 }
 
@@ -718,7 +718,7 @@
 .empty-state {
   height: 250px;
   text-align: center !important;
-  color: #88a0b1 !important;
+  color: #67aae9 !important;
 }
 
 .empty-state svg,
@@ -729,11 +729,11 @@
 }
 
 .empty-state svg {
-  color: #9ab6c9;
+  color: #67aae9;
 }
 
 .empty-state strong {
-  color: #55778f;
+  color: #1671b7;
   font-size: 15px;
   font-weight: 700;
 }
@@ -782,7 +782,7 @@
   border: 1px solid var(--border);
   border-radius: 11px;
   background: var(--surface);
-  box-shadow: 0 4px 12px rgba(45, 105, 143, 0.04);
+  box-shadow: 0 4px 12px rgba(22, 113, 183, 0.04);
 }
 
 .stat-icon {
@@ -796,7 +796,7 @@
 
 .stat-icon.blue {
   background: var(--primary-soft);
-  color: #0879cf;
+  color: #1671b7;
 }
 
 .stat-icon.orange {
@@ -806,7 +806,7 @@
 
 .stat-icon.green {
   background: var(--green-soft);
-  color: #0bad79;
+  color: #16a34a;
 }
 
 .stat-icon.red {
@@ -816,7 +816,7 @@
 
 .stat-card strong {
   display: block;
-  color: #174f72;
+  color: #0a4979;
   font-size: 21px;
   line-height: 1;
   font-weight: 800;
@@ -841,7 +841,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(4, 38, 65, 0.42);
+  background: rgba(8, 35, 58, 0.42);
   backdrop-filter: blur(3px);
 }
 
@@ -852,7 +852,7 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 20px 60px rgba(5, 50, 85, 0.25);
+  box-shadow: 0 20px 60px rgba(12, 53, 87, 0.25);
   overflow: hidden;
 }
 
@@ -867,7 +867,7 @@
 }
 
 .modal-kicker {
-  color: #0c86ce;
+  color: #368ad1;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.6px;
@@ -875,7 +875,7 @@
 
 .modal-header h3 {
   margin: 5px 0 0;
-  color: #154f73;
+  color: #0a4979;
   font-size: 21px;
   font-weight: 800;
 }
@@ -932,7 +932,7 @@
 
 .modal-section h4 {
   margin: 0 0 9px;
-  color: #315e79;
+  color: #0b5d98;
   font-size: 12px;
   font-weight: 800;
 }
@@ -954,19 +954,19 @@
   flex-shrink: 0;
   border-radius: 6px;
   background: var(--primary-soft);
-  color: #1578b5;
+  color: #1671b7;
   font-size: 10px;
   font-weight: 800;
 }
 
 .modal-medicine strong {
   flex: 1;
-  color: #466d84;
+  color: #1671b7;
   font-size: 11px;
 }
 
 .modal-medicine svg {
-  color: #10af7e;
+  color: #16a34a;
 }
 
 /* ============================================================
@@ -1008,13 +1008,13 @@
   margin: 8px auto 16px;
   border-radius: 20px;
   background: var(--primary-soft);
-  color: #087bce;
+  color: #1671b7;
 }
 
 .scan-modal h3,
 .ticket-modal h3 {
   margin: 0;
-  color: #164f73;
+  color: #0a4979;
   font-size: 20px;
   font-weight: 800;
 }
@@ -1022,7 +1022,7 @@
 .scan-modal p {
   max-width: 390px;
   margin: 9px auto 21px;
-  color: #7791a3;
+  color: #368ad1;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -1046,11 +1046,11 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #0875bf;
+  color: #1671b7;
 }
 
 .ticket-logo span {
-  color: #0ba779;
+  color: #16a34a;
 }
 
 .ticket-modal h3 {
@@ -1071,7 +1071,7 @@
 }
 
 .ticket-line strong {
-  color: #315b74;
+  color: #0b5d98;
 }
 
 .ticket-actions {
@@ -1093,11 +1093,11 @@
   bottom: 24px;
   max-width: 330px;
   padding: 13px 17px;
-  border: 1px solid #bce9d9;
+  border: 1px solid #86efac;
   border-radius: 8px;
   background: var(--bg);
-  color: #087e60;
-  box-shadow: 0 10px 30px rgba(12, 91, 72, 0.14);
+  color: #15803d;
+  box-shadow: 0 10px 30px rgba(11, 93, 152, 0.14);
   font-size: 12px;
   font-weight: 700;
 }

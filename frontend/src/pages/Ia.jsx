@@ -99,15 +99,6 @@ export default function Ia() {
   return (
     <div className="ia-page">
       <header className="ia-header">
-        <div className="ia-title-area">
-          <div className="ia-title-icon">
-            <BrainCircuit size={25} />
-          </div>
-          <div>
-            <h1>Intelligence artificielle</h1>
-            <p>Des outils intelligents pour une meilleure prise en charge</p>
-          </div>
-        </div>
 
         <div className="ia-status">
           <span className="ia-status-dot"></span>

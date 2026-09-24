@@ -2,6 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import "../styles/Hospitalization.css";
 
 
+import {
+  BedDouble,
+  BedSingle,
+  CircleCheck,
+  Eye,
+  LogOut,
+  Plus,
+  Search,
+  X,
+} from "lucide-react";
 // ============================================================
 // DONNÉES INITIALES DES HOSPITALISATIONS
 // ============================================================
@@ -764,32 +774,6 @@ const Hospitalization = () => {
 
       <div className="hospitalization-header">
 
-        <div>
-
-          <div className="hospitalization-breadcrumb">
-
-            Tableau de bord
-
-            <span>
-              /
-            </span>
-
-            Hospitalisation
-
-          </div>
-
-
-          <h1>
-            Hospitalisation
-          </h1>
-
-
-          <p>
-            Gestion des admissions, des chambres et des
-            patients hospitalisés.
-          </p>
-
-        </div>
 
 
         <button
@@ -800,7 +784,7 @@ const Hospitalization = () => {
         >
 
           <span>
-            +
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
           </span>
 
           Ajout de lits
@@ -822,7 +806,7 @@ const Hospitalization = () => {
         <div className="hospitalization-stat-card">
 
           <div className="stat-icon blue">
-            🛏
+            <BedDouble size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
 
@@ -850,7 +834,7 @@ const Hospitalization = () => {
         <div className="hospitalization-stat-card">
 
           <div className="stat-icon green">
-            ✓
+            <CircleCheck size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
 
@@ -878,7 +862,7 @@ const Hospitalization = () => {
         <div className="hospitalization-stat-card">
 
           <div className="stat-icon orange">
-            ↗
+            <LogOut size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
 
@@ -906,7 +890,7 @@ const Hospitalization = () => {
         <div className="hospitalization-stat-card">
 
           <div className="stat-icon purple">
-            ▣
+            <BedSingle size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
 
@@ -1001,7 +985,7 @@ const Hospitalization = () => {
             <div className="hospitalization-search">
 
               <span>
-                ⌕
+                <Search size={17} strokeWidth={2} aria-hidden="true" />
               </span>
 
 
@@ -1241,7 +1225,7 @@ const Hospitalization = () => {
                               )
                             }
                           >
-                            👁
+                            <Eye size={16} strokeWidth={2} aria-hidden="true" />
                           </button>
 
                         </td>
@@ -1532,7 +1516,7 @@ const Hospitalization = () => {
                 className="modal-close"
                 onClick={closeModals}
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
 
             </div>
@@ -1737,7 +1721,7 @@ const Hospitalization = () => {
                 className="modal-close"
                 onClick={closeModals}
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
 
             </div>

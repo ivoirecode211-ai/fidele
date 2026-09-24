@@ -202,9 +202,9 @@ body {
   font-weight: 500;
 
   text-shadow:
-    0 2px 6px rgba(0, 45, 70, 0.60),
+    0 2px 6px rgba(8, 35, 58, 0.60),
 
-    0 1px 14px rgba(0, 60, 90, 0.40);
+    0 1px 14px rgba(12, 53, 87, 0.40);
 }
 
 
@@ -272,10 +272,10 @@ body {
 
   box-shadow:
     0 14px 38px
-    rgba(20, 92, 125, 0.15),
+    rgba(11, 93, 152, 0.15),
 
     0 3px 12px
-    rgba(0, 80, 120, 0.07);
+    rgba(10, 73, 121, 0.07);
 
   backdrop-filter: blur(10px);
 
@@ -323,13 +323,13 @@ body {
   background:
     linear-gradient(
       135deg,
-      #0075bd,
-      #20c7a2
+      #1671b7,
+      #67aae9
     );
 
   box-shadow:
     0 4px 10px
-    rgba(0, 112, 180, 0.20);
+    rgba(22, 113, 183, 0.20);
 }
 
 
@@ -351,7 +351,7 @@ body {
    ============================================================ */
 
 .login-brand-name {
-  color: #0868a7;
+  color: #1671b7;
 
   font-size: 22px;
 
@@ -362,7 +362,7 @@ body {
 
 
 .login-brand-name strong {
-  color: #15866c;
+  color: #1671b7;
 }
 
 
@@ -373,7 +373,7 @@ body {
 .login-brand-subtitle {
   margin-top: 4px;
 
-  color: #2775a1;
+  color: #1671b7;
 
   font-size: 11px;
 
@@ -391,7 +391,7 @@ body {
   margin:
     0 0 21px;
 
-  color: #164568;
+  color: #0a4979;
 
   font-size: 16px;
 
@@ -416,13 +416,13 @@ body {
   margin-bottom: 14px;
 
   border:
-    1px solid #f3c7c7;
+    1px solid #efcfcf;
 
   border-radius: 6px;
 
   background: #fff0f0;
 
-  color: #b42323;
+  color: #b34242;
 
   font-size: 11px;
 
@@ -452,7 +452,7 @@ body {
 
   margin-bottom: 5px;
 
-  color: #294e68;
+  color: #0a4979;
 
   font-size: 11px;
 
@@ -487,7 +487,7 @@ body {
   transform:
     translateY(-50%);
 
-  color: #76a1b8;
+  color: #67aae9;
 
   pointer-events: none;
 
@@ -519,7 +519,7 @@ body {
   background:
     rgba(255, 255, 255, 0.94);
 
-  color: #254c65;
+  color: #0a4979;
 
   font-family:
     "Segoe UI",
@@ -554,13 +554,13 @@ body {
    ============================================================ */
 
 .input-wrapper input:focus {
-  border-color: #1986c1;
+  border-color: #368ad1;
 
   background: #ffffff;
 
   box-shadow:
     0 0 0 3px
-    rgba(25, 134, 193, 0.10);
+    rgba(54, 138, 209, 0.10);
 }
 
 
@@ -595,7 +595,7 @@ body {
 
   background: transparent;
 
-  color: #76a1b8;
+  color: #67aae9;
 
   cursor: pointer;
 
@@ -605,16 +605,16 @@ body {
 
 
 .password-toggle:hover {
-  color: #0877b7;
+  color: #1671b7;
 }
 
 
 .password-toggle:focus-visible {
-  color: #0877b7;
+  color: #1671b7;
 
   outline:
     2px solid
-    rgba(8, 119, 183, 0.25);
+    rgba(22, 113, 183, 0.25);
 
   outline-offset: 2px;
 
@@ -648,7 +648,7 @@ body {
 
   background: transparent;
 
-  color: #0879ba;
+  color: #1671b7;
 
   font-family:
     "Segoe UI",
@@ -668,7 +668,7 @@ body {
 
 
 .forgot-password:hover {
-  color: #05649b;
+  color: #0b5d98;
 
   text-decoration: underline;
 }
@@ -699,8 +699,8 @@ body {
   background:
     linear-gradient(
       90deg,
-      #0878bd,
-      #0870b5
+      #1671b7,
+      #1671b7
     );
 
   color: #ffffff;
@@ -719,7 +719,7 @@ body {
 
   box-shadow:
     0 5px 12px
-    rgba(0, 107, 177, 0.18);
+    rgba(22, 113, 183, 0.18);
 
   transition:
     transform 0.15s ease,
@@ -738,13 +738,13 @@ body {
   background:
     linear-gradient(
       90deg,
-      #086eac,
-      #05659f
+      #1671b7,
+      #0b5d98
     );
 
   box-shadow:
     0 7px 16px
-    rgba(0, 107, 177, 0.25);
+    rgba(22, 113, 183, 0.25);
 }
 
 
@@ -758,7 +758,7 @@ body {
 
   box-shadow:
     0 3px 8px
-    rgba(0, 107, 177, 0.18);
+    rgba(22, 113, 183, 0.18);
 }
 
 
@@ -775,7 +775,7 @@ body {
 
   box-shadow:
     0 4px 10px
-    rgba(0, 107, 177, 0.10);
+    rgba(22, 113, 183, 0.10);
 }
 
 
@@ -786,7 +786,7 @@ body {
 .login-bottom-text {
   margin-top: 19px;
 
-  color: #63889d;
+  color: #368ad1;
 
   font-size: 9px;
 

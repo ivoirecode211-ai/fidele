@@ -46,7 +46,7 @@
     linear-gradient(
       180deg,
       var(--primary-dark) 0%,
-      #062e50 100%
+      #0c3557 100%
     );
 
   color: white;
@@ -55,7 +55,7 @@
   flex-direction: column;
 
   box-shadow:
-    4px 0 14px rgba(4, 35, 61, 0.12);
+    4px 0 14px rgba(8, 35, 58, 0.12);
 
   position: sticky;
   top: 0;
@@ -92,8 +92,8 @@
   background:
     linear-gradient(
       135deg,
-      #20a7e8,
-      #0a78c5
+      #67aae9,
+      #1671b7
     );
 
   font-size: 20px;
@@ -118,7 +118,7 @@
 .sidebar-brand span {
   font-size: 10px;
   margin-top: 4px;
-  color: #c4e3f7;
+  color: #c2e0ff;
 }
 
 
@@ -178,8 +178,8 @@
   background:
     linear-gradient(
       90deg,
-      #087bd1,
-      #126fc1
+      #1671b7,
+      #1671b7
     );
 
   color: white;
@@ -214,7 +214,7 @@
 }
 
 .sidebar-version {
-  color: #82abc4;
+  color: #67aae9;
   font-size: 11px;
   text-align: center;
 }
@@ -290,8 +290,8 @@
   background:
     linear-gradient(
       135deg,
-      #0d78c7,
-      #56b7e8
+      #1671b7,
+      #67aae9
     );
 
   color: white;
@@ -313,12 +313,12 @@
 }
 
 .doctor-info strong {
-  color: #174565;
+  color: #0a4979;
   font-size: 15px;
 }
 
 .doctor-info span {
-  color: #7a91a4;
+  color: #368ad1;
   font-size: 12px;
   margin-top: 2px;
 }
@@ -365,7 +365,7 @@
 .section-heading h2 {
   margin: 0;
 
-  color: #123f61;
+  color: #0c3557;
 
   font-size: 23px;
 }
@@ -450,10 +450,10 @@
 
 .search-box:focus-within {
   border-color:
-    #73b9e7;
+    #67aae9;
 
   box-shadow:
-    0 0 0 3px rgba(0, 124, 205, 0.08);
+    0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .search-icon {
@@ -503,8 +503,8 @@
   background:
     linear-gradient(
       135deg,
-      #087bd2,
-      #0064b8
+      #1671b7,
+      #0b5d98
     );
 
   color: white;
@@ -523,7 +523,7 @@
   font-weight: 600;
 
   box-shadow:
-    0 3px 8px rgba(0, 112, 194, 0.18);
+    0 3px 8px rgba(22, 113, 183, 0.18);
 
   transition:
     transform 0.2s ease,
@@ -534,7 +534,7 @@
   transform: translateY(-1px);
 
   box-shadow:
-    0 5px 12px rgba(0, 112, 194, 0.25);
+    0 5px 12px rgba(22, 113, 183, 0.25);
 }
 
 .new-consultation-btn {
@@ -630,7 +630,7 @@
 
 .quick-stat strong {
   font-size: 22px;
-  color: #123f61;
+  color: #0c3557;
 }
 
 .quick-stat span {
@@ -675,7 +675,7 @@
 .table-header h3 {
   margin: 0;
 
-  color: #174666;
+  color: #0a4979;
 
   font-size: 17px;
 }
@@ -693,7 +693,7 @@
 .table-date {
   background: var(--primary-soft);
 
-  color: #1973b7;
+  color: #1671b7;
 
   padding:
     7px 12px;
@@ -731,7 +731,7 @@
 
   background: var(--bg);
 
-  color: #5c7488;
+  color: #1671b7;
 
   border-bottom:
     1px solid var(--border);
@@ -752,7 +752,7 @@
   border-bottom:
     1px solid var(--primary-soft);
 
-  color: #38566e;
+  color: #0b5d98;
 
   font-size: 14px;
 }
@@ -769,7 +769,7 @@
 }
 
 .number-cell {
-  color: #7890a3 !important;
+  color: #368ad1 !important;
   font-weight: 600;
   font-size: 14px !important;
 }
@@ -809,8 +809,8 @@
   background:
     linear-gradient(
       135deg,
-      #de7b9c,
-      #bd5b83
+      #dc8a8a,
+      #c94f4f
     );
 }
 
@@ -818,8 +818,8 @@
   background:
     linear-gradient(
       135deg,
-      #3d99d2,
-      #176da7
+      #368ad1,
+      #1671b7
     );
 }
 
@@ -829,7 +829,7 @@
 }
 
 .patient-cell strong {
-  color: #244e6c;
+  color: #0a4979;
   font-size: 14px;
 }
 
@@ -840,13 +840,13 @@
 }
 
 .motif-text {
-  color: #46657c;
+  color: #0b5d98;
   font-size: 14px;
 }
 
 .heure-text {
   font-weight: 600;
-  color: #315773;
+  color: #0b5d98;
   font-size: 14px;
 }
 
@@ -880,22 +880,22 @@
 }
 
 .status-progress {
-  color: #07855b;
+  color: #15803d;
   background: var(--border);
 }
 
 .status-waiting {
-  color: #d47a00;
-  background: #fff0d0;
+  color: #d97706;
+  background: #fef3c7;
 }
 
 .status-coming {
-  color: #0873ca;
+  color: #1671b7;
   background: var(--primary-soft);
 }
 
 .status-done {
-  color: #16825b;
+  color: #15803d;
   background: var(--green-soft);
 }
 
@@ -925,7 +925,7 @@
 
   background: var(--primary-soft);
 
-  color: #0875bf;
+  color: #1671b7;
 
   font-size: 15px;
 }
@@ -959,7 +959,7 @@
 
   background: var(--primary-soft);
 
-  color: #62a6d0;
+  color: #67aae9;
 
   border-radius: 50%;
 
@@ -975,7 +975,7 @@
 
   margin-top: 8px;
 
-  color: #49687e;
+  color: #1671b7;
 
   font-size: 15px;
 }
@@ -1057,7 +1057,7 @@
 }
 
 .blue-icon {
-  color: #0876c2;
+  color: #1671b7;
   background: var(--border);
 }
 
@@ -1127,7 +1127,7 @@
 
   font-size: 15px;
 
-  color: #244d69;
+  color: #0a4979;
 }
 
 .info-card-title p {
@@ -1163,7 +1163,7 @@
 }
 
 .info-row strong {
-  color: #155a8a;
+  color: #0b5d98;
   font-size: 15px;
 }
 
@@ -1187,7 +1187,7 @@
 }
 
 .reminder-time {
-  color: #0b72ba;
+  color: #1671b7;
 
   background: var(--primary-soft);
 
@@ -1207,7 +1207,7 @@
 }
 
 .reminder strong {
-  color: #3a5b72;
+  color: #0b5d98;
   font-size: 13px;
 }
 
@@ -1227,7 +1227,7 @@
   inset: 0;
 
   background:
-    rgba(5, 31, 52, 0.55);
+    rgba(8, 35, 58, 0.55);
 
   display: flex;
 
@@ -1254,7 +1254,7 @@
   border-radius: 12px;
 
   box-shadow:
-    0 15px 50px rgba(0, 30, 60, 0.25);
+    0 15px 50px rgba(8, 35, 58, 0.25);
 
   animation:
     modalAppear 0.2s ease;
@@ -1360,7 +1360,7 @@
 
 .modal-close:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 
@@ -1477,10 +1477,10 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #2563eb;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 
@@ -1598,7 +1598,7 @@
 
   background: #dbeafe;
 
-  color: #1d4ed8;
+  color: #0b5d98;
 
   font-size: 21px;
 
@@ -1651,7 +1651,7 @@
 }
 
 .medical-section h4 {
-  color: #2c536d;
+  color: #0a4979;
 
   font-size: 18px;
 
@@ -1679,7 +1679,7 @@
 }
 
 .medical-section textarea:focus {
-  border-color: #6ab1df;
+  border-color: #67aae9;
 }
 
 
@@ -1709,7 +1709,7 @@
 .file-header h3 {
   margin: 0;
 
-  color: #234f6b;
+  color: #0a4979;
 
   font-size: 16px;
 }
@@ -1748,7 +1748,7 @@
   margin:
     0 0 10px;
 
-  color: #2c536e;
+  color: #0a4979;
 
   font-size: 14px;
 }
@@ -1848,7 +1848,7 @@
 
   color: #ffffff;
 
-  background: #dc2626;
+  background: #c94f4f;
 
   display: inline-flex;
 
@@ -1860,7 +1860,7 @@
 }
 
 .btn-rdv:hover {
-  background: #b91c1c;
+  background: #b34242;
 
   transform:
     translateY(-1px);
@@ -1919,7 +1919,7 @@
 
   background: white;
 
-  color: #537085;
+  color: #1671b7;
 
   border-radius: 7px;
 
@@ -1957,7 +1957,7 @@
 
   color: #ffffff;
 
-  background: #dc2626;
+  background: #c94f4f;
 
   display: inline-flex;
 
@@ -1971,14 +1971,14 @@
 }
 
 .btn-cancel:hover {
-  background: #b91c1c;
+  background: #b34242;
 
   transform:
     translateY(-1px);
 }
 
 .btn-cancel:active {
-  background: #991b1b;
+  background: #8c3434;
 
   transform:
     translateY(0);
@@ -1986,7 +1986,7 @@
 
 .btn-cancel:focus-visible {
   outline:
-    2px solid #ef4444;
+    2px solid #d26868;
 
   outline-offset: 2px;
 }
@@ -2137,7 +2137,7 @@
 
   background: #ecfdf5;
 
-  color: #047857;
+  color: #15803d;
 
   font-size: 13px;
 
@@ -2657,7 +2657,7 @@
 .modal-close:hover {
   background: #fee2e2;
 
-  color: #dc2626;
+  color: #c94f4f;
 
   transform: scale(1.03);
 }
@@ -2793,10 +2793,10 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #2563eb;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 
@@ -2882,7 +2882,7 @@
 
   background: #dbeafe;
 
-  color: #1d4ed8;
+  color: #0b5d98;
   font-size: 22px;
   font-weight: 700;
 }
@@ -2963,10 +2963,10 @@
 }
 
 .medical-section textarea:focus {
-  border-color: #2563eb;
+  border-color: #1671b7;
 
   box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.10);
+    0 0 0 3px rgba(22, 113, 183, 0.10);
 }
 
 
@@ -3012,7 +3012,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #ffffff;
-  background: #dc2626;
+  background: #c94f4f;
 
   cursor: pointer;
   transition:
@@ -3020,7 +3020,7 @@
     transform 0.2s ease;
 }
 .btn-cancel:hover {
-  background: #b91c1c;
+  background: #b34242;
 
   transform:
     translateY(-1px);
@@ -3038,7 +3038,7 @@
   border:
     1px solid #cddfe9;
   background: #ffffff;
-  color: #537085;
+  color: #1671b7;
   border-radius: 9px;
   cursor: pointer;
   font-size: 14px;
@@ -3290,7 +3290,7 @@
 
 /* Numéro patient */
 .consultations-table .patient-number {
-  color: #2563eb;
+  color: #1671b7;
   font-weight: 600;
 }
 
@@ -3333,14 +3333,14 @@
 
 /* Bouton Consulter */
 .consultations-table .btn-consulter {
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
-  border-color: #2563eb;
+  border-color: #1671b7;
 }
 
 .consultations-table .btn-consulter:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #0b5d98;
+  border-color: #0b5d98;
 }
 
 /* Bouton RDV */
@@ -3483,7 +3483,7 @@
 /* Bouton Consulter
    La couleur existante est conservée */
 .consultations-table .row-actions .btn-primary {
-  background: #100ce2;
+  background: #0a4979;
   color: #ffffff;
   border: 1px solid #030518;
   border-radius: 8px;
@@ -3499,9 +3499,9 @@
    La couleur existante est conservée */
 .consultations-table .row-actions .btn-rdv {
   color: #ffffff;
-  background: #e90707;
+  background: #c94f4f;
   color: #ffffff;
-  border: 1px solid #0a1ed3;
+  border: 1px solid #0a4979;
   border-radius: 8px;
   padding: 8px 13px;
   font-size: 12px;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
+import { UserAvatar } from "../components/UserBadge";
 import {
   Search,
   X,
@@ -129,7 +130,6 @@ export default function Modules() {
     );
   }, [search, authorizedModules]);
 
-  const initials = (user?.first_name?.[0] || user?.username?.[0] || "U").toUpperCase();
 
   return (
     <div className="modules-page">
@@ -169,7 +169,7 @@ export default function Modules() {
                 </small>
               </div>
 
-              <div className="modules-avatar">{initials}</div>
+              <UserAvatar size={38} />
 
               <ChevronDown
                 size={16}

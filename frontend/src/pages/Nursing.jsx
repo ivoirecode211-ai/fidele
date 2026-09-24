@@ -23,77 +23,19 @@ import {
   Wind,
 } from "lucide-react";
 
+import api from "../services/api";
+
 import "../styles/nursing.css";
 
 /*
  * ============================================================
- * CONFIGURATION
+ * DONNÉES
  * ============================================================
+ *
+ * Patients et constantes sont servis par l'API
+ * (/api/parcours/soins/). Enregistrer les constantes envoie
+ * le patient en Consultation.
  */
-
-const PATIENTS_STORAGE_KEY = "sante_consultation_patients";
-const NURSING_VITALS_STORAGE_KEY = "sante_nursing_vitals";
-
-/*
- * ============================================================
- * OUTILS DE LECTURE DU STORAGE
- * ============================================================
- */
-
-const readStorage = (key, fallback = null) => {
-  try {
-    const raw = localStorage.getItem(key);
-
-    if (!raw) {
-      return fallback;
-    }
-
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error(`Erreur lecture localStorage ${key}:`, error);
-    return fallback;
-  }
-};
-
-/*
- * ============================================================
- * PATIENTS CAISSE
- * ============================================================
- */
-
-const loadPatientsFromCaisse = () => {
-  const data = readStorage(PATIENTS_STORAGE_KEY, []);
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (Array.isArray(data?.patients)) {
-    return data.patients;
-  }
-
-  if (Array.isArray(data?.data)) {
-    return data.data;
-  }
-
-  return [];
-};
-
-/*
- * ============================================================
- * CONSTANTES INFIRMIÈRES
- * ============================================================
- */
-
-const loadNursingVitals = () => {
-  const data = readStorage(NURSING_VITALS_STORAGE_KEY, {});
-
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return {};
-  }
-
-  return data;
-};
 
 /*
  * ============================================================
@@ -468,20 +410,25 @@ export default function Nursing() {
    * ==========================================================
    */
 
-  const refreshPatients = () => {
-    const caissePatients = loadPatientsFromCaisse();
-    const nursingVitals = loadNursingVitals();
+  const refreshPatients = async () => {
+    try {
+      const response = await api.get(
+        "/parcours/soins/patients/"
+      );
 
-    const normalized = caissePatients.map(
-      (patient) =>
-        normalizePatient(
-          patient,
-          nursingVitals
-        )
-    );
+      const normalized = response.data.map(
+        (patient) =>
+          normalizePatient(patient)
+      );
 
-    setPatients(normalized);
-    setLastRefresh(new Date());
+      setPatients(normalized);
+      setLastRefresh(new Date());
+    } catch (error) {
+      console.error(
+        "Erreur de chargement des patients :",
+        error
+      );
+    }
   };
 
   useEffect(() => {
@@ -729,34 +676,18 @@ export default function Nursing() {
    * ==========================================================
    */
 
-  const saveVitals = () => {
+  const saveVitals = async () => {
     if (!selectedPatient) {
       return;
     }
 
-    const existingVitals =
-      loadNursingVitals();
-
-    const patientId =
-      selectedPatient.id;
-
-    const updatedVitals = {
-      ...existingVitals,
-
-      [patientId]: {
-        ...vitalsForm,
-        updatedAt:
-          new Date().toISOString(),
-      },
-    };
-
     try {
-      localStorage.setItem(
-        NURSING_VITALS_STORAGE_KEY,
-        JSON.stringify(updatedVitals)
+      await api.post(
+        `/parcours/soins/patients/${selectedPatient.admissionId}/constantes/`,
+        vitalsForm
       );
 
-      refreshPatients();
+      await refreshPatients();
 
       window.dispatchEvent(
         new CustomEvent(
@@ -766,9 +697,12 @@ export default function Nursing() {
 
       closeVitalsModal();
     } catch (error) {
-      console.error(
-        "Erreur sauvegarde constantes:",
-        error
+      const errors = error.response?.data;
+
+      alert(
+        errors && typeof errors === "object"
+          ? Object.values(errors).flat().join("\n")
+          : "Impossible d'enregistrer les constantes. Veuillez réessayer."
       );
     }
   };
@@ -825,22 +759,6 @@ export default function Nursing() {
 
       <div className="nursing-header">
 
-        <div className="nursing-header-left">
-
-          <div className="nursing-header-icon">
-            <HeartPulse size={28} />
-          </div>
-
-          <div>
-            <h1>Espace Infirmiers</h1>
-
-            <p>
-              Surveillance et suivi des constantes
-              des patients
-            </p>
-          </div>
-
-        </div>
 
         <div className="nursing-header-actions">
 

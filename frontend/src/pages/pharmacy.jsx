@@ -1,8 +1,10 @@
 
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useEffect, useMemo, useState } from "react";
 import Logo from "../components/Logo";
+import api from "../services/api";
+import SidebarFooter from "../components/SidebarFooter";
+import UserBadge from "../components/UserBadge";
+import NotificationBell from "../components/NotificationBell";
 
 import {
   Home,
@@ -17,11 +19,8 @@ import {
   Clock3,
   Stethoscope,
   X,
-  ChevronRight,
   Menu,
   LayoutDashboard,
-  LayoutGrid,
-  LogOut,
   Eye,
   UserRound,
   AlertTriangle,
@@ -32,53 +31,12 @@ import {
 import "../styles/pharmacy.css";
 
 /* ============================================================
-   DONNÉES DE DÉMONSTRATION
-   ============================================================ */
+   ORDONNANCES
+   ============================================================
 
-const prescriptionsInitial = [
-  {
-    id: "001",
-    patient: "TRAORE Awa",
-    doctor: "Dr. KOUAME",
-    medicines: [
-      "Paracétamol 500 mg",
-      "Amoxicilline 500 mg",
-    ],
-    status: "À préparer",
-    statusClass: "prepare",
-  },
-  {
-    id: "002",
-    patient: "KONE Ibrahim",
-    doctor: "Dr. BAH",
-    medicines: [
-      "Amlodipine 10 mg",
-    ],
-    status: "Prête",
-    statusClass: "ready",
-  },
-  {
-    id: "003",
-    patient: "DIALLO Mariam",
-    doctor: "Dr. KONE",
-    medicines: [
-      "Sérum physiologique",
-      "Paracétamol 1 g",
-    ],
-    status: "À préparer",
-    statusClass: "prepare",
-  },
-  {
-    id: "004",
-    patient: "YAO Claude",
-    doctor: "Dr. KOFFI",
-    medicines: [
-      "Amlodipine 5 mg",
-    ],
-    status: "Servie",
-    statusClass: "served",
-  },
-];
+   Servies par l'API (/api/parcours/pharmacie/) : ce sont les
+   ordonnances validées dans le module Consultation.
+   ============================================================ */
 
 /* ============================================================
    PRODUITS DE DÉMONSTRATION
@@ -159,14 +117,10 @@ const menuItems = [
    ============================================================ */
 
 function Pharmacy({ onNavigate }) {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
 
   const [activeMenu, setActiveMenu] = useState("Accueil");
 
-  const [prescriptions, setPrescriptions] = useState(
-    prescriptionsInitial
-  );
+  const [prescriptions, setPrescriptions] = useState([]);
 
   const [products, setProducts] = useState(
     demoProducts
@@ -206,15 +160,50 @@ function Pharmacy({ onNavigate }) {
     useState("");
 
   /* ==========================================================
-     DÉCONNEXION
+     CHARGEMENT DES ORDONNANCES ET DE L'HISTORIQUE
      ========================================================== */
 
-  function handleLogout() {
-    logout();
-    navigate("/login", {
-      replace: true,
-    });
-  }
+  const loadPrescriptions = () =>
+    api
+      .get("/parcours/pharmacie/ordonnances/")
+      .then((response) =>
+        setPrescriptions(response.data)
+      );
+
+  const loadHistory = () =>
+    api
+      .get("/parcours/pharmacie/historique/")
+      .then((response) =>
+        setHistory(response.data)
+      );
+
+  useEffect(() => {
+    Promise.all([
+      loadPrescriptions(),
+      loadHistory(),
+    ]).catch((error) =>
+      console.error(
+        "Erreur de chargement de la pharmacie :",
+        error
+      )
+    );
+  }, []);
+
+  const replacePrescription = (updated) => {
+    setPrescriptions((current) =>
+      current.map((item) =>
+        item.id === updated.id
+          ? updated
+          : item
+      )
+    );
+  };
+
+  const apiErrorMessage = (error, fallback) =>
+    error.response?.data?.detail ||
+    fallback;
+
+
 
   /* ==========================================================
      TOAST
@@ -345,18 +334,22 @@ function Pharmacy({ onNavigate }) {
      PRÉPARER ORDONNANCE
      ========================================================== */
 
-  const preparePrescription = (id) => {
-    setPrescriptions((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: "Prête",
-              statusClass: "ready",
-            }
-          : item
-      )
-    );
+  const preparePrescription = async (id) => {
+    try {
+      const response = await api.post(
+        `/parcours/pharmacie/ordonnances/${id}/preparer/`
+      );
+
+      replacePrescription(response.data);
+    } catch (error) {
+      showToast(
+        apiErrorMessage(
+          error,
+          "Impossible de préparer l'ordonnance."
+        )
+      );
+      return;
+    }
 
     setSelectedPrescription(null);
 
@@ -369,7 +362,7 @@ function Pharmacy({ onNavigate }) {
      SERVIR ORDONNANCE
      ========================================================== */
 
-  const servePrescription = (id) => {
+  const servePrescription = async (id) => {
     const prescription =
       prescriptions.find(
         (item) => item.id === id
@@ -429,45 +422,34 @@ function Pharmacy({ onNavigate }) {
       return;
     }
 
-    const now = new Date();
-
     /*
-     * Création de l'historique.
-     *
-     * Chaque médicament servi devient
-     * une ligne indépendante.
+     * Enregistrement de la dispensation : l'historique
+     * (un médicament par ligne) est tenu par le backend.
      */
-    const newHistoryItems =
-      prescription.medicines.map(
-        (medicine, index) => ({
-          id: `${id}-${Date.now()}-${index}`,
-          prescriptionId: id,
-          patient: prescription.patient,
-          doctor: prescription.doctor,
-          medicine,
-          quantity: 1,
-          pharmacist: "AHOUE Clara",
-          date: now.toLocaleDateString(
-            "fr-FR"
-          ),
-          time: now.toLocaleTimeString(
-            "fr-FR",
-            {
-              hour: "2-digit",
-              minute: "2-digit",
-            }
-          ),
-          timestamp: now.getTime(),
-        })
+    let servedPrescription;
+
+    try {
+      const response = await api.post(
+        `/parcours/pharmacie/ordonnances/${id}/servir/`
       );
 
-    /*
-     * Ajout à l'historique.
-     */
-    setHistory((current) => [
-      ...newHistoryItems,
-      ...current,
-    ]);
+      servedPrescription = response.data;
+    } catch (error) {
+      showToast(
+        apiErrorMessage(
+          error,
+          "Impossible de servir l'ordonnance."
+        )
+      );
+      return;
+    }
+
+    loadHistory().catch((error) =>
+      console.error(
+        "Erreur de chargement de l'historique :",
+        error
+      )
+    );
 
     /*
      * Diminution du stock local.
@@ -507,20 +489,12 @@ function Pharmacy({ onNavigate }) {
      * Passage de l'ordonnance
      * au statut SERVIE.
      */
-    setPrescriptions((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: "Servie",
-              statusClass: "served",
-            }
-          : item
-      )
+    replacePrescription(
+      servedPrescription
     );
 
     setTicketPrescription(
-      prescription
+      servedPrescription
     );
 
     setSelectedPrescription(null);
@@ -574,7 +548,7 @@ function Pharmacy({ onNavigate }) {
 
           <div>
             <strong>
-              MA<span>SANTE</span>
+              MA <span>SANTÉ</span>
             </strong>
 
             <small>
@@ -617,44 +591,7 @@ function Pharmacy({ onNavigate }) {
 
         </nav>
 
-        <div className="sidebar-footer">
-
-          <Link
-            to="/modules"
-            className="pharmacy-nav-item"
-          >
-            <LayoutGrid
-              size={17}
-              strokeWidth={2}
-            />
-
-            <span>
-              Retour aux modules
-            </span>
-          </Link>
-
-          <button
-            type="button"
-            className="pharmacy-nav-item"
-            onClick={handleLogout}
-          >
-            <LogOut
-              size={17}
-              strokeWidth={2}
-            />
-
-            <span>
-              Déconnexion
-            </span>
-          </button>
-
-          <div className="online-dot" />
-
-          <span>
-            Pharmacie connectée
-          </span>
-
-        </div>
+        <SidebarFooter />
 
       </aside>
 
@@ -697,26 +634,9 @@ function Pharmacy({ onNavigate }) {
 
           </div>
 
-          <div className="pharmacist-profile">
-
-            <div className="avatar">
-              AC
-            </div>
-
-            <div>
-              <strong>
-                AHOUE Clara
-              </strong>
-
-              <span>
-                Pharmacien
-              </span>
-            </div>
-
-            <ChevronRight
-              size={17}
-            />
-
+          <div className="ms-header-tools">
+            <NotificationBell />
+            <UserBadge />
           </div>
 
         </header>

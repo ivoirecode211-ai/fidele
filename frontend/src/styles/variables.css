@@ -36,12 +36,13 @@
   --green-soft-text: #166534;
   --green-soft-border: #bbf7d0;
 
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
-  --danger-soft: #fef2f2;
-  --danger-soft-text: #991b1b;
-  --danger-soft-border: #fecaca;
-  --danger-field-border: #f87171;
+  /* Rouge apaisé : visible pour les alertes, sans agressivité */
+  --danger: #c94f4f;
+  --danger-hover: #b34242;
+  --danger-soft: #fbf1f1;
+  --danger-soft-text: #8c3434;
+  --danger-soft-border: #efcfcf;
+  --danger-field-border: #dc8a8a;
 
   --warning: #f59e0b;
   --warning-soft: #fffbeb;
@@ -78,8 +79,9 @@
   --bg: var(--surface-100);
   --border: var(--surface-200);
 
-  --purple: #7359c7;
-  --purple-soft: #f0edff;
+  /* Anciennes teintes violettes : ramenées au bleu de la charte */
+  --purple: var(--primary-600);
+  --purple-soft: var(--primary-50);
 
   --shadow: var(--shadow-card);
   --radius: var(--radius-xl);

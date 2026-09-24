@@ -2,6 +2,22 @@
 import { useMemo, useState } from "react";
 import "../styles/reports.css";
 
+import {
+  ChartColumn,
+  ChevronRight,
+  Circle,
+  CircleCheck,
+  Download,
+  FileText,
+  FolderOpen,
+  Hospital,
+  Hourglass,
+  Pill,
+  Printer,
+  Search,
+  Users,
+  Wallet,
+} from "lucide-react";
 const reportsData = [
   {
     id: 1,
@@ -235,18 +251,6 @@ function Reports() {
 
       <div className="reports-header">
 
-        <div>
-          <div className="reports-breadcrumb">
-            Directeur Général <span>›</span> Rapports
-          </div>
-
-          <h1>Rapports</h1>
-
-          <p>
-            Consultez et analysez les rapports d'activité de
-            l'établissement.
-          </p>
-        </div>
 
         <div className="reports-header-actions">
 
@@ -254,7 +258,7 @@ function Reports() {
             className="reports-btn reports-btn-secondary"
             onClick={handlePrint}
           >
-            <span>🖨</span>
+            <span><Printer size={16} strokeWidth={2} aria-hidden="true" /></span>
             Imprimer
           </button>
 
@@ -262,7 +266,7 @@ function Reports() {
             className="reports-btn reports-btn-primary"
             onClick={downloadCSV}
           >
-            <span>↓</span>
+            <span><Download size={16} strokeWidth={2} aria-hidden="true" /></span>
             Exporter
           </button>
 
@@ -277,7 +281,7 @@ function Reports() {
         <div className="report-stat-card">
 
           <div className="report-stat-icon blue">
-            📄
+            <FileText size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
           <div className="report-stat-content">
@@ -299,7 +303,7 @@ function Reports() {
         <div className="report-stat-card">
 
           <div className="report-stat-icon green">
-            ✓
+            <CircleCheck size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
           <div className="report-stat-content">
@@ -321,7 +325,7 @@ function Reports() {
         <div className="report-stat-card">
 
           <div className="report-stat-icon orange">
-            ⏳
+            <Hourglass size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
           <div className="report-stat-content">
@@ -343,7 +347,7 @@ function Reports() {
         <div className="report-stat-card">
 
           <div className="report-stat-icon purple">
-            📊
+            <ChartColumn size={22} strokeWidth={2} aria-hidden="true" />
           </div>
 
           <div className="report-stat-content">
@@ -401,7 +405,7 @@ function Reports() {
             <div className="search-input-wrapper">
 
               <span>
-                ⌕
+                <Search size={17} strokeWidth={2} aria-hidden="true" />
               </span>
 
               <input
@@ -553,7 +557,7 @@ function Reports() {
                         <div className="report-name-cell">
 
                           <div className="document-icon">
-                            📄
+                            <FileText size={18} strokeWidth={2} aria-hidden="true" />
                           </div>
 
                           <div>
@@ -649,7 +653,7 @@ function Reports() {
                       <div>
 
                         <span>
-                          📂
+                          <FolderOpen size={28} strokeWidth={2} aria-hidden="true" />
                         </span>
 
                         <strong>
@@ -765,7 +769,7 @@ function Reports() {
           <button className="quick-report-card">
 
             <div className="quick-report-icon blue">
-              👥
+              <Users size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -782,7 +786,7 @@ function Reports() {
             </div>
 
             <b>
-              ›
+              <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </b>
 
           </button>
@@ -792,7 +796,7 @@ function Reports() {
           <button className="quick-report-card">
 
             <div className="quick-report-icon green">
-              💰
+              <Wallet size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -808,7 +812,7 @@ function Reports() {
             </div>
 
             <b>
-              ›
+              <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </b>
 
           </button>
@@ -818,7 +822,7 @@ function Reports() {
           <button className="quick-report-card">
 
             <div className="quick-report-icon orange">
-              💊
+              <Pill size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -834,7 +838,7 @@ function Reports() {
             </div>
 
             <b>
-              ›
+              <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </b>
 
           </button>
@@ -844,7 +848,7 @@ function Reports() {
           <button className="quick-report-card">
 
             <div className="quick-report-icon purple">
-              🏥
+              <Hospital size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
             <div>
@@ -860,7 +864,7 @@ function Reports() {
             </div>
 
             <b>
-              ›
+              <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </b>
 
           </button>
@@ -872,7 +876,7 @@ function Reports() {
       <div className="reports-footer-info">
 
         <span>
-          ●
+          <Circle size={8} fill="currentColor" className="ms-inline-icon" aria-hidden="true" />
         </span>
 
         Données mises à jour automatiquement par MA SANTÉ

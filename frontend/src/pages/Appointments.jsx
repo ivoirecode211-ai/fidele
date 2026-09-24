@@ -307,27 +307,6 @@ function Appointments() {
           HEADER
           ====================================================== */}
 
-      <div className="appointments-header">
-        <div>
-          <div className="appointments-title-wrapper">
-
-            <div className="appointments-main-icon">
-              <CalendarDays size={26} />
-            </div>
-
-            <div>
-              <h1>Rendez-vous</h1>
-
-              <p>
-                Gérez les rendez-vous des patients et le planning
-                médical.
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
 
       {/* ======================================================
           STATISTIQUES

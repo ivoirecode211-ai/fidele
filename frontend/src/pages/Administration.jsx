@@ -115,15 +115,6 @@ export default function Administration() {
   return (
     <div className="administration-page">
       <header className="administration-header">
-        <div className="administration-title-area">
-          <div className="administration-title-icon">
-            <ShieldCheck size={25} />
-          </div>
-          <div>
-            <h1>Administration</h1>
-            <p>Gestion des utilisateurs, droits, paramètres et documents administratifs</p>
-          </div>
-        </div>
 
         <div className="administration-header-actions">
           <button type="button" className="administration-primary-button" onClick={openNewUser}>

@@ -1,39 +1,42 @@
 
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { LogOut, Menu, X, Bell, LayoutGrid } from "lucide-react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import Logo from "../components/Logo";
+import SidebarFooter from "../components/SidebarFooter";
+import UserBadge from "../components/UserBadge";
+import NotificationBell from "../components/NotificationBell";
 
 // Structure générale après authentification :
-// sidebar (logo + modules + déconnexion),
+// sidebar (logo + retour aux modules + déconnexion en pied),
 // barre supérieure,
 // contenu de la page via <Outlet/>.
+// Titre et sous-titre de chaque module, affichés dans la barre du haut.
+const MODULE_HEADERS = {
+  "/dashboard": ["Tableau de bord", "Vue globale de l'activité de la clinique MA SANTÉ"],
+  "/patients/new": ["Nouveau patient", "Créer un dossier patient électronique"],
+  "/appointments": ["Rendez-vous", "Gérez les rendez-vous des patients et le planning médical."],
+  "/hospitalization": ["Hospitalisation", "Gestion des admissions, des chambres et des patients hospitalisés."],
+  "/billing": ["Encaissements", "Suivi des paiements enregistrés à la caisse"],
+  "/laboratory": ["Laboratoire", "Gérez les demandes d'analyses et les résultats biologiques des patients."],
+  "/nursing": ["Espace Infirmiers", "Surveillance et suivi des constantes des patients"],
+  "/employees": ["Ressources humaines", "Gérez les employés, leurs postes, contrats et informations professionnelles."],
+  "/equipments": ["Équipements médicaux", "Module prévu dans l'architecture MA SANTÉ"],
+  "/maintenance": ["Maintenance", "Gestion des équipements, interventions et maintenance technique"],
+  "/administration": ["Administration", "Gestion des utilisateurs, droits, paramètres et documents administratifs"],
+  "/hygiene": ["Hygiène", "Suivi de la propreté, de la désinfection et de la gestion des déchets médicaux"],
+  "/archives": ["Archives", "Gestion et consultation des documents médicaux et administratifs"],
+  "/reports": ["Rapports", "Consultez et analysez les rapports d'activité de l'établissement."],
+  "/ia": ["Intelligence artificielle", "Des outils intelligents pour une meilleure prise en charge"],
+  "/procurement": ["Approvisionnement", "Module prévu dans l'architecture MA SANTÉ"],
+  "/reception": ["Accueil / Réception", "Module prévu dans l'architecture MA SANTÉ"],
+  "/settings": ["Paramètres", "Module prévu dans l'architecture MA SANTÉ"],
+};
+
 export default function AppLayout() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
-  function handleLogout() {
-    logout();
-    navigate("/login", { replace: true });
-  }
-
-  const userInitial = (
-    user?.first_name?.[0] ||
-    user?.username?.[0] ||
-    "U"
-  ).toUpperCase();
-
-  const userFullName =
-    [user?.first_name, user?.last_name]
-      .filter(Boolean)
-      .join(" ") || "Utilisateur";
-
-  const userRole =
-    user?.role_label ||
-    user?.role ||
-    "Utilisateur";
+  const { pathname } = useLocation();
+  const [title, subtitle] = MODULE_HEADERS[pathname] || ["MA SANTÉ", "Clinique & Gestion Hospitalière"];
 
   return (
     <div className="app-shell">
@@ -73,33 +76,7 @@ export default function AppLayout() {
           </button>
         </div>
 
-        <nav className="nav-list">
-          <Link
-            to="/modules"
-            className="nav-item"
-          >
-            <LayoutGrid
-              size={20}
-              strokeWidth={2}
-            />
-
-            <span>Modules</span>
-          </Link>
-
-          <button
-            className="nav-item logout-navigation"
-            onClick={handleLogout}
-            type="button"
-            title="Déconnexion"
-          >
-            <LogOut
-              size={20}
-              strokeWidth={2}
-            />
-
-            <span>Déconnexion</span>
-          </button>
-        </nav>
+        <SidebarFooter />
       </aside>
 
       <div className="main-area">
@@ -116,51 +93,15 @@ export default function AppLayout() {
             />
           </button>
 
-          <Link
-            to="/modules"
-            className="topbar-brand-container"
-            title="Retour aux modules"
-          >
-            <div className="top-brand">
-              MA <span>SANTÉ</span>
-            </div>
-
-            <div className="top-slogan">
-              Clinique & Gestion Hospitalière
-            </div>
-          </Link>
+          <div className="topbar-title">
+            <h1>{title}</h1>
+            <p>{subtitle}</p>
+          </div>
 
           <div className="top-actions">
-            <button
-              className="icon-button"
-              title="Notifications"
-              type="button"
-            >
-              <Bell
-                size={19}
-                strokeWidth={2}
-              />
+            <NotificationBell />
 
-              <span className="notification-badge">
-                3
-              </span>
-            </button>
-
-            <div className="top-user">
-              <div className="avatar small">
-                {userInitial}
-              </div>
-
-              <div>
-                <strong>
-                  {userFullName}
-                </strong>
-
-                <small>
-                  {userRole}
-                </small>
-              </div>
-            </div>
+            <UserBadge />
           </div>
         </header>
 

@@ -1,9 +1,29 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import Logo from "../components/Logo";
+import SidebarFooter from "../components/SidebarFooter";
+import UserBadge from "../components/UserBadge";
+import NotificationBell from "../components/NotificationBell";
 import "../styles/Stocks.css";
 
+import {
+  ArrowDownLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  ArrowUpRight,
+  Building2,
+  ChartColumn,
+  Check,
+  CircleCheck,
+  FileText,
+  Minus,
+  Package,
+  Plus,
+  Printer,
+  Search,
+  TriangleAlert,
+  Truck,
+  X,
+} from "lucide-react";
 /*
  * ============================================================
  * PRODUITS INITIAUX
@@ -183,8 +203,6 @@ const fournisseursInitiaux = [
  */
 
 export default function Stocks() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
 
   /*
    * ==========================================================
@@ -307,17 +325,6 @@ export default function Stocks() {
 
   const [filtreRapport, setFiltreRapport] =
     useState("Tous");
-
-  /*
-   * ==========================================================
-   * DÉCONNEXION
-   * ==========================================================
-   */
-
-  function handleLogout() {
-    logout();
-    navigate("/login", { replace: true });
-  }
 
   /*
    * ==========================================================
@@ -1024,7 +1031,7 @@ export default function Stocks() {
           </div>
           <div className="stocks-logo-text">
             <strong>
-              MASANTE
+              MA SANTÉ
             </strong>
             <span>
               Gestion de clinique
@@ -1033,22 +1040,6 @@ export default function Stocks() {
         </div>
 
         <nav className="stocks-navigation">
-
-          {/* ACCUEIL */}
-
-          <button
-            type="button"
-            className="stocks-nav-item"
-               onClick={() => navigate("/modules")}
-          >
-            
-            <span className="stocks-nav-icon">
-              ⌂
-              </span>
-         <span>
-            Accueil
-         </span>
-         </button>
 
           {/* PRODUITS */}
 
@@ -1064,7 +1055,7 @@ export default function Stocks() {
             }
           >
             <span className="stocks-nav-icon">
-              ▣
+              <Package size={18} strokeWidth={2} aria-hidden="true" />
             </span>
             <span>
               Produits
@@ -1087,7 +1078,7 @@ export default function Stocks() {
             }
           >
             <span className="stocks-nav-icon">
-              ⇄
+              <ArrowLeftRight size={18} strokeWidth={2} aria-hidden="true" />
             </span>
             <span>
               Entrées / Sorties
@@ -1111,7 +1102,7 @@ export default function Stocks() {
             }
           >
             <span className="stocks-nav-icon">
-              ⚠
+              <TriangleAlert size={18} strokeWidth={2} aria-hidden="true" />
             </span>
             <span>
               Seuils d'alerte
@@ -1133,7 +1124,7 @@ export default function Stocks() {
             }
           >
             <span className="stocks-nav-icon">
-              ♙
+              <Truck size={18} strokeWidth={2} aria-hidden="true" />
             </span>
 
             <span>
@@ -1155,7 +1146,7 @@ export default function Stocks() {
             }
           >
             <span className="stocks-nav-icon">
-              ▤
+              <FileText size={18} strokeWidth={2} aria-hidden="true" />
             </span>
             <span>
               Rapports
@@ -1163,40 +1154,7 @@ export default function Stocks() {
           </button>
         </nav>
 
-        {/* RETOUR */}
-
-        <Link
-          to="/modules"
-          className="stocks-nav-item"
-        >
-          <span className="stocks-nav-icon">
-            ⌘
-          </span>
-          <span>
-            Retour aux modules
-          </span>
-        </Link>
-        {/* DÉCONNEXION */}
-
-        <button
-          type="button"
-          className="stocks-nav-item"
-          onClick={handleLogout}
-        >
-          <span className="stocks-nav-icon">
-            ⏻
-          </span>
-          <span>
-            Déconnexion
-          </span>
-        </button>
-
-        <div className="stocks-sidebar-footer">
-          Ma Santé Clinique
-          <span>
-            v1.0
-          </span>
-        </div>
+        <SidebarFooter />
 
       </aside>
 
@@ -1223,24 +1181,9 @@ export default function Stocks() {
 
           </div>
 
-          <div className="stocks-user">
-
-            <div className="stocks-user-avatar">
-              👨🏾‍💼
-            </div>
-
-            <div className="stocks-user-info">
-
-              <strong>
-                N'GUESSAN Paul
-              </strong>
-
-              <span>
-                Responsable Stocks
-              </span>
-
-            </div>
-
+          <div className="ms-header-tools">
+            <NotificationBell />
+            <UserBadge />
           </div>
 
         </header>
@@ -1258,7 +1201,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  📦
+                  <Package size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1276,7 +1219,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  📊
+                  <ChartColumn size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1294,7 +1237,7 @@ export default function Stocks() {
               <div className="stocks-stat-card stocks-stat-danger">
 
                 <div className="stocks-stat-icon">
-                  ⚠
+                  <TriangleAlert size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1331,7 +1274,7 @@ export default function Stocks() {
                 <div className="stocks-search">
 
                   <span>
-                    ⌕
+                    <Search size={17} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <input
@@ -1355,7 +1298,7 @@ export default function Stocks() {
                   }
                 >
                   <span>
-                    +
+                    <Plus size={16} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   Nouveau produit
@@ -1510,7 +1453,7 @@ export default function Stocks() {
                     background: "#dcfce7",
                   }}
                 >
-                  ↓
+                  <ArrowDownLeft size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1530,11 +1473,11 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#dc2626",
+                    color: "#c94f4f",
                     background: "#fee2e2",
                   }}
                 >
-                  ↑
+                  <ArrowUpRight size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1552,7 +1495,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  ⇄
+                  <ArrowLeftRight size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -1596,7 +1539,7 @@ export default function Stocks() {
                   }
                 >
                   <span>
-                    +
+                    <Plus size={16} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   Nouvelle entrée
@@ -1606,7 +1549,7 @@ export default function Stocks() {
                   type="button"
                   className="stocks-new-button"
                   style={{
-                    background: "#dc2626",
+                    background: "#c94f4f",
                   }}
                   onClick={() =>
                     ouvrirFormulaireMouvement(
@@ -1615,7 +1558,7 @@ export default function Stocks() {
                   }
                 >
                   <span>
-                    −
+                    <Minus size={16} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   Nouvelle sortie
@@ -1637,7 +1580,7 @@ export default function Stocks() {
               <div className="stocks-search">
 
                 <span>
-                  ⌕
+                  <Search size={17} strokeWidth={2} aria-hidden="true" />
                 </span>
 
                 <input
@@ -1804,7 +1747,7 @@ export default function Stocks() {
                                     "700",
                                 }}
                               >
-                                ↓ Entrée
+                                <ArrowDownLeft size={14} className="ms-inline-icon" aria-hidden="true" /> Entrée
                               </span>
 
                             ) : (
@@ -1814,7 +1757,7 @@ export default function Stocks() {
                                   background:
                                     "#fee2e2",
                                   color:
-                                    "#dc2626",
+                                    "#c94f4f",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -1825,7 +1768,7 @@ export default function Stocks() {
                                     "700",
                                 }}
                               >
-                                ↑ Sortie
+                                <ArrowUpRight size={14} className="ms-inline-icon" aria-hidden="true" /> Sortie
                               </span>
 
                             )}
@@ -1840,7 +1783,7 @@ export default function Stocks() {
                                   mouvement.type ===
                                   "Entrée"
                                     ? "#15803d"
-                                    : "#dc2626",
+                                    : "#c94f4f",
                                 fontSize:
                                   "14px",
                               }}
@@ -2088,7 +2031,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  🏢
+                  <Building2 size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2108,7 +2051,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  ✓
+                  <CircleCheck size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2134,7 +2077,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  📦
+                  <Package size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2185,7 +2128,7 @@ export default function Stocks() {
                 <div className="stocks-search">
 
                   <span>
-                    ⌕
+                    <Search size={17} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   <input
@@ -2211,7 +2154,7 @@ export default function Stocks() {
                   }
                 >
                   <span>
-                    +
+                    <Plus size={16} strokeWidth={2} aria-hidden="true" />
                   </span>
 
                   Nouveau fournisseur
@@ -2371,7 +2314,7 @@ export default function Stocks() {
                                   background:
                                     "#ffffff",
                                   color:
-                                    "#0f766e",
+                                    "#1671b7",
                                   borderRadius:
                                     "7px",
                                   padding:
@@ -2396,11 +2339,11 @@ export default function Stocks() {
                                 }
                                 style={{
                                   border:
-                                    "1px solid #fecaca",
+                                    "1px solid #efcfcf",
                                   background:
                                     "#fff1f2",
                                   color:
-                                    "#dc2626",
+                                    "#c94f4f",
                                   borderRadius:
                                     "7px",
                                   padding:
@@ -2538,7 +2481,7 @@ export default function Stocks() {
                     imprimerRapport
                   }
                 >
-                  🖨 Imprimer le rapport
+                  <Printer size={16} className="ms-inline-icon" aria-hidden="true" /> Imprimer le rapport
                 </button>
 
               </div>
@@ -2555,7 +2498,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  📦
+                  <Package size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2575,7 +2518,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  📊
+                  <ChartColumn size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2595,7 +2538,7 @@ export default function Stocks() {
               <div className="stocks-stat-card stocks-stat-danger">
 
                 <div className="stocks-stat-icon">
-                  ⚠
+                  <TriangleAlert size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2615,7 +2558,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  🏢
+                  <Building2 size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2650,7 +2593,7 @@ export default function Stocks() {
                     background: "#dcfce7",
                   }}
                 >
-                  ↓
+                  <ArrowDownLeft size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2672,11 +2615,11 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#dc2626",
+                    color: "#c94f4f",
                     background: "#fee2e2",
                   }}
                 >
-                  ↑
+                  <ArrowUpRight size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2696,7 +2639,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  ⇄
+                  <ArrowLeftRight size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2716,7 +2659,7 @@ export default function Stocks() {
               <div className="stocks-stat-card">
 
                 <div className="stocks-stat-icon">
-                  ✓
+                  <CircleCheck size={22} strokeWidth={2} aria-hidden="true" />
                 </div>
 
                 <div>
@@ -2837,7 +2780,7 @@ export default function Stocks() {
                               style={{
                                 color:
                                   ecart < 0
-                                    ? "#dc2626"
+                                    ? "#c94f4f"
                                     : ecart === 0
                                     ? "#d97706"
                                     : "#15803d",
@@ -2855,13 +2798,13 @@ export default function Stocks() {
                             {critique ? (
 
                               <span className="stocks-status critical">
-                                ⚠ Critique
+                                <TriangleAlert size={13} className="ms-inline-icon" aria-hidden="true" /> Critique
                               </span>
 
                             ) : (
 
                               <span className="stocks-status ok">
-                                ✓ OK
+                                <Check size={13} className="ms-inline-icon" aria-hidden="true" /> OK
                               </span>
 
                             )}
@@ -2910,7 +2853,7 @@ export default function Stocks() {
               <div>
 
                 <h2>
-                  ⚠ Produits en alerte
+                  <TriangleAlert size={20} className="ms-inline-icon" aria-hidden="true" /> Produits en alerte
                 </h2>
 
                 <p>
@@ -2985,7 +2928,7 @@ export default function Stocks() {
                               <strong
                                 style={{
                                   color:
-                                    "#dc2626",
+                                    "#c94f4f",
                                 }}
                               >
                                 {manque > 0
@@ -3018,7 +2961,7 @@ export default function Stocks() {
                         colSpan="7"
                         className="stocks-empty"
                       >
-                        ✓ Aucun produit en alerte.
+                        <CircleCheck size={16} className="ms-inline-icon" aria-hidden="true" /> Aucun produit en alerte.
                       </td>
 
                     </tr>
@@ -3178,7 +3121,7 @@ export default function Stocks() {
                                     "700",
                                 }}
                               >
-                                ↓ Entrée
+                                <ArrowDownLeft size={14} className="ms-inline-icon" aria-hidden="true" /> Entrée
                               </span>
 
                             ) : (
@@ -3188,7 +3131,7 @@ export default function Stocks() {
                                   background:
                                     "#fee2e2",
                                   color:
-                                    "#dc2626",
+                                    "#c94f4f",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -3199,7 +3142,7 @@ export default function Stocks() {
                                     "700",
                                 }}
                               >
-                                ↑ Sortie
+                                <ArrowUpRight size={14} className="ms-inline-icon" aria-hidden="true" /> Sortie
                               </span>
 
                             )}
@@ -3214,7 +3157,7 @@ export default function Stocks() {
                                   mouvement.type ===
                                   "Entrée"
                                     ? "#15803d"
-                                    : "#dc2626",
+                                    : "#c94f4f",
                                 fontSize:
                                   "14px",
                               }}
@@ -3519,7 +3462,7 @@ export default function Stocks() {
 
                 <strong
                   style={{
-                    color: "#0f766e",
+                    color: "#1671b7",
                     fontSize: "20px",
                   }}
                 >
@@ -3546,7 +3489,7 @@ export default function Stocks() {
                   style={{
                     color:
                       produitsCritiques > 0
-                        ? "#dc2626"
+                        ? "#c94f4f"
                         : "#15803d",
                     fontSize: "20px",
                   }}
@@ -3641,7 +3584,7 @@ export default function Stocks() {
                 className="stocks-modal-close"
                 onClick={fermerFormulaire}
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
 
             </div>
@@ -3776,8 +3719,8 @@ export default function Stocks() {
                       Number(
                         nouveauProduit.seuil
                       )
-                        ? "⚠ Critique"
-                        : "✓ OK"}
+                        ? <><TriangleAlert size={14} className="ms-inline-icon" aria-hidden="true" /> Critique</>
+                        : <><Check size={14} className="ms-inline-icon" aria-hidden="true" /> OK</>}
                     </strong>
                   </div>
                 )}
@@ -3795,7 +3738,7 @@ export default function Stocks() {
                   className="stocks-submit-button"
                 >
                   <span>
-                    +
+                    <Plus size={16} strokeWidth={2} aria-hidden="true" />
                   </span>
                   Ajouter le produit
                 </button>
@@ -3842,7 +3785,7 @@ export default function Stocks() {
                       typeMouvement ===
                       "Entrée"
                         ? "#15803d"
-                        : "#dc2626",
+                        : "#c94f4f",
                     marginBottom:
                       "6px",
                   }}
@@ -3876,7 +3819,7 @@ export default function Stocks() {
                   fermerFormulaireMouvement
                 }
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
 
@@ -4228,7 +4171,7 @@ export default function Stocks() {
                       typeMouvement ===
                       "Entrée"
                         ? "1px solid #bbf7d0"
-                        : "1px solid #fecaca",
+                        : "1px solid #efcfcf",
                     borderRadius:
                       "10px",
                     padding:
@@ -4281,7 +4224,7 @@ export default function Stocks() {
                         "#94a3b8",
                     }}
                   >
-                    →
+                    <ArrowRight size={20} strokeWidth={2} aria-hidden="true" />
                   </div>
                   <div>
                     <span
@@ -4306,7 +4249,7 @@ export default function Stocks() {
                           typeMouvement ===
                           "Entrée"
                             ? "#15803d"
-                            : "#dc2626",
+                            : "#c94f4f",
                       }}
                     >
                       {(() => {
@@ -4354,14 +4297,14 @@ export default function Stocks() {
                     background:
                       typeMouvement ===
                       "Entrée"
-                        ? "#0f766e"
-                        : "#dc2626",
+                        ? "#1671b7"
+                        : "#c94f4f",
                   }}
                 >
                   {typeMouvement ===
                   "Entrée"
-                    ? "+ Enregistrer l'entrée"
-                    : "− Enregistrer la sortie"}
+                    ? <><Plus size={16} className="ms-inline-icon" aria-hidden="true" /> Enregistrer l'entrée</>
+                    : <><Minus size={16} className="ms-inline-icon" aria-hidden="true" /> Enregistrer la sortie</>}
                 </button>
               </div>
             </form>
@@ -4400,7 +4343,7 @@ export default function Stocks() {
                     fontWeight: "800",
                     letterSpacing:
                       "0.8px",
-                    color: "#0f766e",
+                    color: "#1671b7",
                     marginBottom:
                       "6px",
                   }}
@@ -4423,7 +4366,7 @@ export default function Stocks() {
                   fermerFormulaireFournisseur
                 }
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
 
@@ -4568,7 +4511,7 @@ export default function Stocks() {
                   className="stocks-submit-button"
                   style={{
                     background:
-                      "#0f766e",
+                      "#1671b7",
                   }}
                 >
                   + Ajouter le fournisseur
@@ -4612,7 +4555,7 @@ export default function Stocks() {
                     fontWeight: "800",
                     letterSpacing:
                       "0.8px",
-                    color: "#0f766e",
+                    color: "#1671b7",
                     marginBottom:
                       "6px",
                   }}
@@ -4639,7 +4582,7 @@ export default function Stocks() {
                   )
                 }
               >
-                ×
+                <X size={18} strokeWidth={2} aria-hidden="true" />
               </button>
 
             </div>
@@ -4850,7 +4793,7 @@ export default function Stocks() {
                       fontSize:
                         "18px",
                       color:
-                        "#0f766e",
+                        "#1671b7",
                     }}
                   >
                     {
@@ -4921,7 +4864,7 @@ export default function Stocks() {
                 className="stocks-submit-button"
                 style={{
                   background:
-                    "#dc2626",
+                    "#c94f4f",
                 }}
                 onClick={() => {
                   handleSupprimerFournisseur(

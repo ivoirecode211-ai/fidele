@@ -46,12 +46,12 @@
   border-radius: 16px;
   background: linear-gradient(
     135deg,
-    #0f766e,
-    #14b8a6
+    #1671b7,
+    #67aae9
   );
   color: white;
   box-shadow:
-    0 8px 20px rgba(15, 118, 110, 0.2);
+    0 8px 20px rgba(22, 113, 183, 0.2);
 }
 
 .nursing-header h1 {
@@ -92,7 +92,7 @@
 
 .nursing-refresh-button:hover {
   color: var(--primary);
-  border-color: #99f6e4;
+  border-color: #e0effe;
   background: var(--bg);
 }
 
@@ -115,7 +115,7 @@
   gap: 14px;
   margin-bottom: 22px;
   padding: 16px 18px;
-  border: 1px solid #fed7aa;
+  border: 1px solid #fcd34d;
   border-radius: 13px;
   background:
     linear-gradient(
@@ -160,7 +160,7 @@
   align-items: center;
   gap: 5px;
   padding: 0 11px;
-  border: 1px solid #fed7aa;
+  border: 1px solid #fcd34d;
   border-radius: 8px;
   background: white;
   color: #b45309;
@@ -298,9 +298,9 @@
 }
 
 .nursing-search input:focus {
-  border-color: #5eead4;
+  border-color: #c2e0ff;
   box-shadow:
-    0 0 0 3px rgba(20, 184, 166, 0.09);
+    0 0 0 3px rgba(103, 170, 233, 0.09);
 }
 
 .nursing-clear-search {
@@ -345,7 +345,7 @@
 }
 
 .nursing-filter:hover {
-  border-color: #99f6e4;
+  border-color: #e0effe;
   color: var(--primary);
 }
 
@@ -471,7 +471,7 @@
   padding: 4px 7px;
   border-radius: 999px;
   background: #fee2e2;
-  color: #b91c1c;
+  color: #b34242;
   font-size: 9px;
   font-weight: 800;
   white-space: nowrap;
@@ -553,23 +553,23 @@
    ============================================================ */
 
 .nursing-vital-abnormal {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
   background: #fee2e2 !important;
-  border: 1px solid #fecaca !important;
+  border: 1px solid #efcfcf !important;
   font-weight: 750;
 }
 
 .nursing-vital-abnormal svg {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
 }
 
 .nursing-vital-abnormal span,
 .nursing-vital-abnormal strong {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
 }
 
 .nursing-abnormal-value {
-  color: #dc2626 !important;
+  color: #c94f4f !important;
   font-weight: 800 !important;
 }
 
@@ -620,7 +620,7 @@
 
 .nursing-secondary-button:hover {
   background: var(--bg);
-  border-color: #99f6e4;
+  border-color: #e0effe;
   color: var(--primary);
 }
 
@@ -751,7 +751,7 @@
 
 .nursing-modal-close:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .nursing-modal-body {
@@ -865,9 +865,9 @@
 
 .nursing-form-group input:focus,
 .nursing-form-group textarea:focus {
-  border-color: #5eead4;
+  border-color: #c2e0ff;
   box-shadow:
-    0 0 0 3px rgba(20, 184, 166, 0.08);
+    0 0 0 3px rgba(103, 170, 233, 0.08);
 }
 
 .nursing-input-unit {
@@ -880,24 +880,24 @@
 }
 
 .nursing-input-abnormal {
-  border-color: #ef4444 !important;
+  border-color: #d26868 !important;
   background: #fef2f2 !important;
-  color: #b91c1c !important;
+  color: #b34242 !important;
 }
 
 .nursing-input-abnormal:focus {
-  border-color: #dc2626 !important;
+  border-color: #c94f4f !important;
   box-shadow:
-    0 0 0 3px rgba(220, 38, 38, 0.10) !important;
+    0 0 0 3px rgba(201, 79, 79, 0.10) !important;
 }
 
 .nursing-input-abnormal + .nursing-input-unit {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .nursing-form-warning {
   margin-top: -2px;
-  color: #dc2626;
+  color: #c94f4f;
   font-size: 10px;
   font-weight: 700;
 }
@@ -945,7 +945,7 @@
 .nursing-normal-range span {
   display: block;
   margin-top: 4px;
-  color: #4d7c5a;
+  color: #15803d;
   font-size: 10px;
   line-height: 1.6;
 }
@@ -1026,7 +1026,7 @@
 
 .nursing-detail-abnormal {
   background: #fef2f2 !important;
-  border: 1px solid #fecaca;
+  border: 1px solid #efcfcf;
 }
 
 
@@ -1260,7 +1260,7 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border: 1px dashed #99f6e4;
+  border: 1px dashed #e0effe;
   border-radius: 8px;
   background: var(--primary-soft);
   color: var(--primary);

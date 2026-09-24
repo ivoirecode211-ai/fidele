@@ -113,15 +113,6 @@ export default function Archives() {
   return (
     <div className="archives-page">
       <header className="archives-header">
-        <div className="archives-title-area">
-          <div className="archives-title-icon">
-            <Archive size={24} />
-          </div>
-          <div>
-            <h1>Archives</h1>
-            <p>Gestion et consultation des documents médicaux et administratifs</p>
-          </div>
-        </div>
 
         <div className="archives-user-status">
           <span></span>
