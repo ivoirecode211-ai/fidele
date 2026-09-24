@@ -1268,7 +1268,7 @@ function Laboratory() {
                   <tr>
 
                     <th>
-                      ID
+                      Identifiant
                     </th>
                     <th>
                       Patient

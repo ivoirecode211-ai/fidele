@@ -1,7 +1,9 @@
+
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Logo from "../components/Logo";
+
 import {
   Home,
   Package,
@@ -14,20 +16,24 @@ import {
   CheckCircle2,
   Clock3,
   Stethoscope,
-  AlertTriangle,
   X,
-  Pill,
-  RefreshCw,
-  Eye,
-  UserRound,
   ChevronRight,
   Menu,
   LayoutDashboard,
   LayoutGrid,
   LogOut,
+  Eye,
+  UserRound,
+  AlertTriangle,
+  Boxes,
+  RefreshCw,
 } from "lucide-react";
 
 import "../styles/pharmacy.css";
+
+/* ============================================================
+   DONNÉES DE DÉMONSTRATION
+   ============================================================ */
 
 const prescriptionsInitial = [
   {
@@ -74,36 +80,56 @@ const prescriptionsInitial = [
   },
 ];
 
-const stockInitial = [
+/* ============================================================
+   PRODUITS DE DÉMONSTRATION
+   ============================================================ */
+
+const demoProducts = [
   {
-    id: 1,
-    name: "Paracétamol",
-    quantity: 120,
-    unit: "boîtes",
-    level: "normal",
+    id: "P001",
+    name: "Paracétamol 500 mg",
+    category: "Antalgique",
+    reference: "PAR-500",
+    stock: 120,
+    alertStock: 20,
+    price: 500,
+    unit: "Boîte",
   },
   {
-    id: 2,
-    name: "Amoxicilline",
-    quantity: 45,
-    unit: "boîtes",
-    level: "normal",
+    id: "P002",
+    name: "Amoxicilline 500 mg",
+    category: "Antibiotique",
+    reference: "AMO-500",
+    stock: 45,
+    alertStock: 15,
+    price: 1500,
+    unit: "Boîte",
   },
   {
-    id: 3,
-    name: "Amlodipine",
-    quantity: 8,
-    unit: "boîtes",
-    level: "critical",
+    id: "P003",
+    name: "Amlodipine 10 mg",
+    category: "Antihypertenseur",
+    reference: "AML-010",
+    stock: 8,
+    alertStock: 10,
+    price: 1200,
+    unit: "Boîte",
   },
   {
-    id: 4,
+    id: "P004",
     name: "Sérum physiologique",
-    quantity: 35,
-    unit: "flacons",
-    level: "normal",
+    category: "Dispositif médical",
+    reference: "SER-001",
+    stock: 65,
+    alertStock: 10,
+    price: 750,
+    unit: "Flacon",
   },
 ];
+
+/* ============================================================
+   MENU
+   ============================================================ */
 
 const menuItems = [
   {
@@ -123,23 +149,18 @@ const menuItems = [
     icon: ClipboardList,
   },
   {
-    label: "Stocks",
-    icon: Package,
-  },
-  {
     label: "Historique",
     icon: History,
   },
 ];
 
+/* ============================================================
+   COMPOSANT
+   ============================================================ */
+
 function Pharmacy({ onNavigate }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
-
-  function handleLogout() {
-    logout();
-    navigate("/login", { replace: true });
-  }
 
   const [activeMenu, setActiveMenu] = useState("Accueil");
 
@@ -147,29 +168,84 @@ function Pharmacy({ onNavigate }) {
     prescriptionsInitial
   );
 
-  const [stock] = useState(stockInitial);
+  const [products, setProducts] = useState(
+    demoProducts
+  );
+
+  /*
+   * Historique des médicaments réellement servis.
+   *
+   * Chaque médicament est enregistré séparément.
+   */
+  const [history, setHistory] = useState([]);
 
   const [search, setSearch] = useState("");
 
-  const [filter, setFilter] = useState("Toutes");
+  const [productSearch, setProductSearch] =
+    useState("");
+
+  const [filter, setFilter] =
+    useState("Toutes");
 
   const [selectedPrescription, setSelectedPrescription] =
     useState(null);
 
-  const [showScan, setShowScan] = useState(false);
+  const [selectedProduct, setSelectedProduct] =
+    useState(null);
 
-  const [showTicket, setShowTicket] = useState(false);
+  const [showScan, setShowScan] =
+    useState(false);
 
-  const [toast, setToast] = useState("");
+  const [showTicket, setShowTicket] =
+    useState(false);
+
+  const [ticketPrescription, setTicketPrescription] =
+    useState(null);
+
+  const [toast, setToast] =
+    useState("");
+
+  /* ==========================================================
+     DÉCONNEXION
+     ========================================================== */
+
+  function handleLogout() {
+    logout();
+    navigate("/login", {
+      replace: true,
+    });
+  }
+
+  /* ==========================================================
+     TOAST
+     ========================================================== */
+
+  const showToast = (message) => {
+    setToast(message);
+
+    window.setTimeout(() => {
+      setToast("");
+    }, 2500);
+  };
+
+  /* ==========================================================
+     PRESCRIPTIONS FILTRÉES
+     ========================================================== */
 
   const filteredPrescriptions = useMemo(() => {
-    const q = search.toLowerCase().trim();
+    const q = search
+      .toLowerCase()
+      .trim();
 
     return prescriptions.filter((item) => {
       const matchesSearch =
         !q ||
-        item.patient.toLowerCase().includes(q) ||
-        item.doctor.toLowerCase().includes(q) ||
+        item.patient
+          .toLowerCase()
+          .includes(q) ||
+        item.doctor
+          .toLowerCase()
+          .includes(q) ||
         item.id.includes(q);
 
       const matchesFilter =
@@ -181,35 +257,93 @@ function Pharmacy({ onNavigate }) {
         (filter === "Servies" &&
           item.status === "Servie");
 
-      return matchesSearch && matchesFilter;
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
     });
-  }, [prescriptions, search, filter]);
+  }, [
+    prescriptions,
+    search,
+    filter,
+  ]);
 
-  const showToast = (message) => {
-    setToast(message);
+  /* ==========================================================
+     PRODUITS FILTRÉS
+     ========================================================== */
 
-    window.setTimeout(() => {
-      setToast("");
-    }, 2500);
-  };
+  const filteredProducts = useMemo(() => {
+    const q = productSearch
+      .toLowerCase()
+      .trim();
 
-  const servePrescription = (id) => {
-    setPrescriptions((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: "Servie",
-              statusClass: "served",
-            }
-          : item
-      )
+    if (!q) {
+      return products;
+    }
+
+    return products.filter(
+      (product) =>
+        String(product.name || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(product.category || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(product.reference || "")
+          .toLowerCase()
+          .includes(q)
     );
+  }, [
+    products,
+    productSearch,
+  ]);
 
-    setSelectedPrescription(null);
+  /* ==========================================================
+     STATUT DU STOCK
+     ========================================================== */
 
-    showToast("Ordonnance marquée comme servie.");
+  const getStockStatus = (product) => {
+    const stock =
+      Number(product.stock || 0);
+
+    const alertStock =
+      Number(product.alertStock || 0);
+
+    if (stock <= 0) {
+      return {
+        label: "Rupture",
+        className: "stock-danger",
+      };
+    }
+
+    if (stock <= alertStock) {
+      return {
+        label: "Stock faible",
+        className: "stock-warning",
+      };
+    }
+
+    return {
+      label: "Disponible",
+      className: "stock-success",
+    };
   };
+
+  /* ==========================================================
+     NAVIGATION
+     ========================================================== */
+
+  const handleMenu = (label) => {
+    setActiveMenu(label);
+
+    if (onNavigate) {
+      onNavigate(label);
+    }
+  };
+
+  /* ==========================================================
+     PRÉPARER ORDONNANCE
+     ========================================================== */
 
   const preparePrescription = (id) => {
     setPrescriptions((current) =>
@@ -226,26 +360,216 @@ function Pharmacy({ onNavigate }) {
 
     setSelectedPrescription(null);
 
-    showToast("Ordonnance préparée avec succès.");
+    showToast(
+      "Ordonnance préparée avec succès."
+    );
   };
 
-  const handleMenu = (label) => {
-    setActiveMenu(label);
+  /* ==========================================================
+     SERVIR ORDONNANCE
+     ========================================================== */
 
-    if (onNavigate) {
-      onNavigate(label);
+  const servePrescription = (id) => {
+    const prescription =
+      prescriptions.find(
+        (item) => item.id === id
+      );
+
+    if (!prescription) {
+      showToast(
+        "Ordonnance introuvable."
+      );
+      return;
     }
+
+    if (prescription.status === "Servie") {
+      showToast(
+        "Cette ordonnance est déjà servie."
+      );
+      return;
+    }
+
+    /*
+     * Vérification des médicaments.
+     *
+     * Pour cette version, chaque médicament
+     * correspond à une unité servie.
+     */
+    const insufficientProducts = [];
+
+    prescription.medicines.forEach(
+      (medicine) => {
+        const product = products.find(
+          (item) =>
+            item.name
+              .toLowerCase()
+              .trim() ===
+            medicine
+              .toLowerCase()
+              .trim()
+        );
+
+        if (
+          product &&
+          Number(product.stock || 0) <= 0
+        ) {
+          insufficientProducts.push(
+            medicine
+          );
+        }
+      }
+    );
+
+    if (insufficientProducts.length > 0) {
+      showToast(
+        `Stock insuffisant : ${insufficientProducts.join(
+          ", "
+        )}`
+      );
+      return;
+    }
+
+    const now = new Date();
+
+    /*
+     * Création de l'historique.
+     *
+     * Chaque médicament servi devient
+     * une ligne indépendante.
+     */
+    const newHistoryItems =
+      prescription.medicines.map(
+        (medicine, index) => ({
+          id: `${id}-${Date.now()}-${index}`,
+          prescriptionId: id,
+          patient: prescription.patient,
+          doctor: prescription.doctor,
+          medicine,
+          quantity: 1,
+          pharmacist: "AHOUE Clara",
+          date: now.toLocaleDateString(
+            "fr-FR"
+          ),
+          time: now.toLocaleTimeString(
+            "fr-FR",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          ),
+          timestamp: now.getTime(),
+        })
+      );
+
+    /*
+     * Ajout à l'historique.
+     */
+    setHistory((current) => [
+      ...newHistoryItems,
+      ...current,
+    ]);
+
+    /*
+     * Diminution du stock local.
+     *
+     * Cette partie sera reliée à Stocks.jsx
+     * lorsque nous ferons la synchronisation
+     * avec le module Gestion des stocks.
+     */
+    setProducts((current) =>
+      current.map((product) => {
+        const medicine =
+          prescription.medicines.find(
+            (item) =>
+              item
+                .toLowerCase()
+                .trim() ===
+              String(product.name)
+                .toLowerCase()
+                .trim()
+          );
+
+        if (!medicine) {
+          return product;
+        }
+
+        return {
+          ...product,
+          stock: Math.max(
+            0,
+            Number(product.stock || 0) - 1
+          ),
+        };
+      })
+    );
+
+    /*
+     * Passage de l'ordonnance
+     * au statut SERVIE.
+     */
+    setPrescriptions((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              status: "Servie",
+              statusClass: "served",
+            }
+          : item
+      )
+    );
+
+    setTicketPrescription(
+      prescription
+    );
+
+    setSelectedPrescription(null);
+
+    /*
+     * Ouverture automatique de
+     * l'historique après la dispensation.
+     */
+    setActiveMenu("Historique");
+
+    showToast(
+      "Ordonnance servie. Les médicaments ont été enregistrés dans l'historique."
+    );
   };
+
+  /* ==========================================================
+     RAFRAÎCHIR PRODUITS
+     ========================================================== */
+
+  const refreshProducts = () => {
+    setProducts((current) => [
+      ...current,
+    ]);
+
+    showToast(
+      "Liste des produits actualisée."
+    );
+  };
+
+  /* ==========================================================
+     RENDU
+     ========================================================== */
 
   return (
     <div className="pharmacy-page">
+
+      {/* ======================================================
+          SIDEBAR
+          ====================================================== */}
 
       <aside className="pharmacy-sidebar">
 
         <div className="pharmacy-sidebar-brand">
 
           <div className="mini-heart-logo">
-            <Logo size={26} inverted />
+            <Logo
+              size={26}
+              inverted
+            />
           </div>
 
           <div>
@@ -263,7 +587,10 @@ function Pharmacy({ onNavigate }) {
         <nav className="pharmacy-nav">
 
           {menuItems.map(
-            ({ label, icon: Icon }) => (
+            ({
+              label,
+              icon: Icon,
+            }) => (
               <button
                 key={label}
                 type="button"
@@ -296,8 +623,14 @@ function Pharmacy({ onNavigate }) {
             to="/modules"
             className="pharmacy-nav-item"
           >
-            <LayoutGrid size={17} strokeWidth={2} />
-            <span>Retour aux modules</span>
+            <LayoutGrid
+              size={17}
+              strokeWidth={2}
+            />
+
+            <span>
+              Retour aux modules
+            </span>
           </Link>
 
           <button
@@ -305,8 +638,14 @@ function Pharmacy({ onNavigate }) {
             className="pharmacy-nav-item"
             onClick={handleLogout}
           >
-            <LogOut size={17} strokeWidth={2} />
-            <span>Déconnexion</span>
+            <LogOut
+              size={17}
+              strokeWidth={2}
+            />
+
+            <span>
+              Déconnexion
+            </span>
           </button>
 
           <div className="online-dot" />
@@ -319,9 +658,15 @@ function Pharmacy({ onNavigate }) {
 
       </aside>
 
+      {/* ======================================================
+          CONTENU PRINCIPAL
+          ====================================================== */}
+
       <main className="pharmacy-main">
 
-        {/* HEADER */}
+        {/* ====================================================
+            HEADER
+            ==================================================== */}
 
         <header className="pharmacy-header">
 
@@ -331,7 +676,9 @@ function Pharmacy({ onNavigate }) {
               className="mobile-menu"
               type="button"
               onClick={() =>
-                showToast("Menu pharmacie")
+                showToast(
+                  "Menu pharmacie"
+                )
               }
               aria-label="Menu"
             >
@@ -339,7 +686,6 @@ function Pharmacy({ onNavigate }) {
             </button>
 
             <div>
-
               <h1>
                 Espace Pharmacien
               </h1>
@@ -347,7 +693,6 @@ function Pharmacy({ onNavigate }) {
               <p>
                 Gestion des ordonnances et des médicaments
               </p>
-
             </div>
 
           </div>
@@ -359,7 +704,6 @@ function Pharmacy({ onNavigate }) {
             </div>
 
             <div>
-
               <strong>
                 AHOUE Clara
               </strong>
@@ -367,597 +711,1234 @@ function Pharmacy({ onNavigate }) {
               <span>
                 Pharmacien
               </span>
-
             </div>
 
-            <ChevronRight size={17} />
+            <ChevronRight
+              size={17}
+            />
 
           </div>
 
         </header>
 
-        {/* CONTENT */}
+        {/* ====================================================
+            CONTENU
+            ==================================================== */}
 
         <section className="pharmacy-content">
 
-          {/* TOOLBAR */}
+          {/* ==================================================
+              ACCUEIL
+              ================================================== */}
 
-          <div className="page-toolbar">
+          {activeMenu === "Accueil" && (
+            <>
+              <div className="page-toolbar">
 
-            <div className="toolbar-title">
+                <div className="toolbar-title">
 
-              <div className="title-icon">
-                <ClipboardList size={20} />
-              </div>
+                  <div className="title-icon">
+                    <ClipboardList
+                      size={20}
+                    />
+                  </div>
 
-              <div>
+                  <div>
+                    <h2>
+                      Ordonnances du jour
+                    </h2>
 
-                <h2>
-                  Ordonnances du jour
-                </h2>
-
-                <p>
-                  {filteredPrescriptions.length}
-                  {" "}
-                  ordonnance(s) affichée(s)
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="toolbar-actions">
-
-              <div className="search-box">
-
-                <Search size={17} />
-
-                <input
-                  value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
-                  placeholder="Rechercher un patient..."
-                  aria-label="Rechercher une ordonnance"
-                />
-
-                {search && (
-                  <button
-                    type="button"
-                    className="clear-search"
-                    onClick={() =>
-                      setSearch("")
-                    }
-                    aria-label="Effacer"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-
-              </div>
-
-              <button
-                className="primary-btn"
-                type="button"
-                onClick={() =>
-                  setShowScan(true)
-                }
-              >
-                <ScanLine size={17} />
-
-                Scanner ordonnance
-              </button>
-
-            </div>
-
-          </div>
-
-          {/* DASHBOARD */}
-
-          <div className="dashboard-grid">
-
-            {/* ORDERS */}
-
-            <section className="orders-card card">
-
-              <div className="card-header">
-
-                <div>
-
-                  <h3>
-                    Ordonnances du jour
-                  </h3>
-
-                  <span>
-                    Suivi des prescriptions à traiter
-                  </span>
+                    <p>
+                      {
+                        filteredPrescriptions.length
+                      }{" "}
+                      ordonnance(s)
+                      affichée(s)
+                    </p>
+                  </div>
 
                 </div>
 
-                <div className="filter-tabs">
+                <div className="toolbar-actions">
 
-                  {[
-                    "Toutes",
-                    "À préparer",
-                    "Prêtes",
-                    "Servies",
-                  ].map((item) => (
-                    <button
-                      type="button"
-                      key={item}
-                      className={
-                        filter === item
-                          ? "selected"
-                          : ""
+                  <div className="search-box">
+
+                    <Search size={17} />
+
+                    <input
+                      value={search}
+                      onChange={(e) =>
+                        setSearch(
+                          e.target.value
+                        )
                       }
-                      onClick={() =>
-                        setFilter(item)
-                      }
-                    >
-                      {item}
-                    </button>
-                  ))}
-
-                </div>
-
-              </div>
-
-              <div className="table-wrap">
-
-                <table className="orders-table">
-
-                  <thead>
-
-                    <tr>
-
-                      <th>#</th>
-
-                      <th>
-                        Patient
-                      </th>
-
-                      <th>
-                        Médecin
-                      </th>
-
-                      <th>
-                        Médicaments
-                      </th>
-
-                      <th>
-                        Statut
-                      </th>
-
-                      <th>
-                        Action
-                      </th>
-
-                    </tr>
-
-                  </thead>
-
-                  <tbody>
-
-                    {filteredPrescriptions.map(
-                      (item) => (
-                        <tr key={item.id}>
-
-                          <td className="number-cell">
-                            {item.id}
-                          </td>
-
-                          <td>
-
-                            <div className="patient-cell">
-
-                              <div className="table-avatar">
-                                <UserRound size={15} />
-                              </div>
-
-                              <strong>
-                                {item.patient}
-                              </strong>
-
-                            </div>
-
-                          </td>
-
-                          <td>
-
-                            <div className="doctor-cell">
-
-                              <Stethoscope size={14} />
-
-                              {item.doctor}
-
-                            </div>
-
-                          </td>
-
-                          <td>
-
-                            <div className="medicine-list">
-
-                              {item.medicines.map(
-                                (medicine) => (
-                                  <span
-                                    key={medicine}
-                                  >
-                                    {medicine}
-                                  </span>
-                                )
-                              )}
-
-                            </div>
-
-                          </td>
-
-                          <td>
-
-                            <span
-                              className={`status-badge ${item.statusClass}`}
-                            >
-
-                              {item.status ===
-                                "À préparer" && (
-                                <Clock3
-                                  size={14}
-                                />
-                              )}
-
-                              {item.status ===
-                                "Prête" && (
-                                <CheckCircle2
-                                  size={14}
-                                />
-                              )}
-
-                              {item.status ===
-                                "Servie" && (
-                                <CheckCircle2
-                                  size={14}
-                                />
-                              )}
-
-                              {item.status}
-
-                            </span>
-
-                          </td>
-
-                          <td>
-
-                            <button
-                              type="button"
-                              className="icon-action"
-                              onClick={() =>
-                                setSelectedPrescription(
-                                  item
-                                )
-                              }
-                              title="Voir l'ordonnance"
-                            >
-                              <Eye size={16} />
-                            </button>
-
-                          </td>
-
-                        </tr>
-                      )
-                    )}
-
-                    {filteredPrescriptions.length ===
-                      0 && (
-                      <tr>
-
-                        <td
-                          colSpan="6"
-                          className="empty-state"
-                        >
-
-                          <ClipboardList
-                            size={30}
-                          />
-
-                          <strong>
-                            Aucune ordonnance trouvée
-                          </strong>
-
-                          <span>
-                            Modifiez votre recherche ou
-                            votre filtre.
-                          </span>
-
-                        </td>
-
-                      </tr>
-                    )}
-
-                  </tbody>
-
-                </table>
-
-              </div>
-
-              {/* ACTIONS */}
-
-              <div className="card-footer-actions">
-
-                <button
-                  type="button"
-                  className="green-btn"
-                  onClick={() =>
-                    setShowScan(true)
-                  }
-                >
-                  <ScanLine size={17} />
-
-                  Scanner ordonnance
-                </button>
-
-                <button
-                  type="button"
-                  className="purple-btn"
-                  onClick={() => {
-
-                    const ready =
-                      prescriptions.find(
-                        (p) =>
-                          p.status === "Prête"
-                      );
-
-                    if (ready) {
-                      setSelectedPrescription(
-                        ready
-                      );
-                    } else {
-                      showToast(
-                        "Aucune ordonnance prête à servir."
-                      );
-                    }
-
-                  }}
-                >
-                  <ShoppingCart size={17} />
-
-                  Servir
-                </button>
-
-                <button
-                  type="button"
-                  className="blue-btn"
-                  onClick={() =>
-                    setShowTicket(true)
-                  }
-                >
-                  <Printer size={17} />
-
-                  Imprimer ticket
-                </button>
-
-              </div>
-
-            </section>
-
-            {/* STOCK */}
-
-            <section className="stock-card card">
-
-              <div className="card-header">
-
-                <div>
-
-                  <h3>
-                    Stock médicaments
-                  </h3>
-
-                  <span>
-                    Disponibilité en temps réel
-                  </span>
-
-                </div>
-
-                <button
-                  type="button"
-                  className="refresh-btn"
-                  onClick={() =>
-                    showToast(
-                      "Stock actualisé."
-                    )
-                  }
-                  title="Actualiser"
-                >
-                  <RefreshCw size={16} />
-                </button>
-
-              </div>
-
-              <div className="stock-list">
-
-                {stock.map((item) => (
-
-                  <div
-                    className="stock-row"
-                    key={item.id}
-                  >
-
-                    <div
-                      className={`stock-icon ${
-                        item.level
-                      }`}
-                    >
-                      <Pill size={18} />
-                    </div>
-
-                    <div className="stock-info">
-
-                      <strong>
-                        {item.name}
-                      </strong>
-
-                      <span>
-                        {item.unit}
-                      </span>
-
-                    </div>
-
-                    <div
-                      className={`stock-quantity ${
-                        item.level ===
-                        "critical"
-                          ? "critical"
-                          : ""
-                      }`}
-                    >
-                      {item.quantity}
-                    </div>
-
-                    {item.level ===
-                      "critical" && (
-                      <AlertTriangle
-                        className="stock-warning"
-                        size={19}
-                      />
+                      placeholder="Rechercher un patient..."
+                    />
+
+                    {search && (
+                      <button
+                        type="button"
+                        className="clear-search"
+                        onClick={() =>
+                          setSearch("")
+                        }
+                      >
+                        <X size={14} />
+                      </button>
                     )}
 
                   </div>
 
-                ))}
+                  <button
+                    className="primary-btn"
+                    type="button"
+                    onClick={() =>
+                      setShowScan(true)
+                    }
+                  >
+                    <ScanLine size={17} />
+                    Scanner ordonnance
+                  </button>
+
+                </div>
 
               </div>
 
-              <button
-                type="button"
-                className="full-stock-btn"
-                onClick={() =>
-                  handleMenu("Stocks")
-                }
-              >
-                <Package size={17} />
+              <div className="dashboard-grid">
 
-                Voir tous les stocks
+                <section className="orders-card card">
 
-                <ChevronRight size={16} />
-              </button>
+                  <div className="card-header">
 
-            </section>
+                    <div>
+                      <h3>
+                        Ordonnances du jour
+                      </h3>
 
-          </div>
+                      <span>
+                        Suivi des prescriptions à traiter
+                      </span>
+                    </div>
 
-          {/* STATISTIQUES */}
+                    <div className="filter-tabs">
 
-          <section className="quick-stats">
+                      {[
+                        "Toutes",
+                        "À préparer",
+                        "Prêtes",
+                        "Servies",
+                      ].map(
+                        (item) => (
+                          <button
+                            type="button"
+                            key={item}
+                            className={
+                              filter === item
+                                ? "selected"
+                                : ""
+                            }
+                            onClick={() =>
+                              setFilter(item)
+                            }
+                          >
+                            {item}
+                          </button>
+                        )
+                      )}
 
-            <div className="stat-card">
+                    </div>
 
-              <div className="stat-icon blue">
-                <ClipboardList size={19} />
+                  </div>
+
+                  <div className="table-wrap">
+
+                    <table className="orders-table">
+
+                      <thead>
+                        <tr>
+                          <th>
+                            Identifiants
+                          </th>
+                          <th>
+                            Patient
+                          </th>
+                          <th>
+                            Médecin
+                          </th>
+                          <th>
+                            Médicaments
+                          </th>
+                          <th>
+                            Statut
+                          </th>
+                          <th>
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+
+                        {filteredPrescriptions.map(
+                          (item) => (
+                            <tr key={item.id}>
+
+                              <td className="number-cell">
+                                {item.id}
+                              </td>
+
+                              <td>
+                                <div className="patient-cell">
+
+                                  <div className="table-avatar">
+                                    <UserRound
+                                      size={15}
+                                    />
+                                  </div>
+
+                                  <strong>
+                                    {item.patient}
+                                  </strong>
+
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="doctor-cell">
+                                  <Stethoscope
+                                    size={14}
+                                  />
+                                  {item.doctor}
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="medicine-list">
+                                  {item.medicines.map(
+                                    (medicine) => (
+                                      <span
+                                        key={
+                                          medicine
+                                        }
+                                      >
+                                        {medicine}
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+                              </td>
+
+                              <td>
+                                <span
+                                  className={`status-badge ${item.statusClass}`}
+                                >
+                                  {item.status ===
+                                    "À préparer" && (
+                                    <Clock3
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {item.status ===
+                                    "Prête" && (
+                                    <CheckCircle2
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {item.status ===
+                                    "Servie" && (
+                                    <CheckCircle2
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {item.status}
+                                </span>
+                              </td>
+
+                              <td>
+                                <button
+                                  type="button"
+                                  className="icon-action"
+                                  onClick={() =>
+                                    setSelectedPrescription(
+                                      item
+                                    )
+                                  }
+                                  title="Voir l'ordonnance"
+                                >
+                                  <Eye size={16} />
+                                </button>
+                              </td>
+
+                            </tr>
+                          )
+                        )}
+
+                        {filteredPrescriptions.length ===
+                          0 && (
+                          <tr>
+                            <td
+                              colSpan="6"
+                              className="empty-state"
+                            >
+                              <ClipboardList
+                                size={30}
+                              />
+
+                              <strong>
+                                Aucune ordonnance trouvée
+                              </strong>
+
+                              <span>
+                                Modifiez votre recherche
+                                ou votre filtre.
+                              </span>
+                            </td>
+                          </tr>
+                        )}
+
+                      </tbody>
+
+                    </table>
+
+                  </div>
+
+                </section>
+
               </div>
 
-              <div>
+              <section className="quick-stats">
 
-                <strong>
-                  {prescriptions.length}
-                </strong>
+                <div className="stat-card">
 
-                <span>
-                  Ordonnances aujourd'hui
-                </span>
+                  <div className="stat-icon blue">
+                    <ClipboardList
+                      size={19}
+                    />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {prescriptions.length}
+                    </strong>
+
+                    <span>
+                      Ordonnances aujourd'hui
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="stat-card">
+
+                  <div className="stat-icon orange">
+                    <Clock3 size={19} />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {
+                        prescriptions.filter(
+                          (p) =>
+                            p.status ===
+                            "À préparer"
+                        ).length
+                      }
+                    </strong>
+
+                    <span>
+                      À préparer
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="stat-card">
+
+                  <div className="stat-icon green">
+                    <CheckCircle2
+                      size={19}
+                    />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {
+                        prescriptions.filter(
+                          (p) =>
+                            p.status ===
+                            "Prête"
+                        ).length
+                      }
+                    </strong>
+
+                    <span>
+                      Prêtes
+                    </span>
+                  </div>
+
+                </div>
+
+              </section>
+            </>
+          )}
+
+          {/* ==================================================
+              PRODUITS
+              ================================================== */}
+
+          {activeMenu === "Produits" && (
+            <>
+              <div className="page-toolbar">
+
+                <div className="toolbar-title">
+
+                  <div className="title-icon">
+                    <Package size={20} />
+                  </div>
+
+                  <div>
+                    <h2>
+                      Produits pharmaceutiques
+                    </h2>
+
+                    <p>
+                      Produits disponibles dans la pharmacie
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="toolbar-actions">
+
+                  <div className="search-box">
+
+                    <Search size={17} />
+
+                    <input
+                      value={productSearch}
+                      onChange={(e) =>
+                        setProductSearch(
+                          e.target.value
+                        )
+                      }
+                      placeholder="Rechercher un produit..."
+                    />
+
+                    {productSearch && (
+                      <button
+                        type="button"
+                        className="clear-search"
+                        onClick={() =>
+                          setProductSearch("")
+                        }
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+
+                  </div>
+
+                  <button
+                    type="button"
+                    className="secondary-btn"
+                    onClick={refreshProducts}
+                  >
+                    <RefreshCw size={16} />
+                    Actualiser
+                  </button>
+
+                </div>
 
               </div>
 
-            </div>
+              <div className="quick-stats">
 
-            <div className="stat-card">
+                <div className="stat-card">
+                  <div className="stat-icon blue">
+                    <Package size={19} />
+                  </div>
 
-              <div className="stat-icon orange">
-                <Clock3 size={19} />
+                  <div>
+                    <strong>
+                      {products.length}
+                    </strong>
+
+                    <span>
+                      Produits
+                    </span>
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-icon green">
+                    <Boxes size={19} />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {
+                        products.filter(
+                          (product) =>
+                            getStockStatus(
+                              product
+                            ).className ===
+                            "stock-success"
+                        ).length
+                      }
+                    </strong>
+
+                    <span>
+                      Disponibles
+                    </span>
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-icon orange">
+                    <AlertTriangle
+                      size={19}
+                    />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {
+                        products.filter(
+                          (product) =>
+                            getStockStatus(
+                              product
+                            ).className ===
+                            "stock-warning"
+                        ).length
+                      }
+                    </strong>
+
+                    <span>
+                      Stock faible
+                    </span>
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-icon red">
+                    <AlertTriangle
+                      size={19}
+                    />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {
+                        products.filter(
+                          (product) =>
+                            getStockStatus(
+                              product
+                            ).className ===
+                            "stock-danger"
+                        ).length
+                      }
+                    </strong>
+
+                    <span>
+                      Ruptures
+                    </span>
+                  </div>
+                </div>
+
               </div>
 
-              <div>
+              <section className="orders-card card">
 
-                <strong>
-                  {
-                    prescriptions.filter(
-                      (p) =>
-                        p.status ===
-                        "À préparer"
-                    ).length
-                  }
-                </strong>
+                <div className="card-header">
 
-                <span>
-                  À préparer
-                </span>
+                  <div>
+                    <h3>
+                      Liste des produits
+                    </h3>
+
+                    <span>
+                      {
+                        filteredProducts.length
+                      }{" "}
+                      produit(s) affiché(s)
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="table-wrap">
+
+                  <table className="orders-table">
+
+                    <thead>
+                      <tr>
+                        <th>
+                          Référence
+                        </th>
+                        <th>
+                          Produit
+                        </th>
+                        <th>
+                          Catégorie
+                        </th>
+                        <th>
+                          Stock
+                        </th>
+                        <th>
+                          Prix
+                        </th>
+                        <th>
+                          Statut
+                        </th>
+                        <th>
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                      {filteredProducts.map(
+                        (product) => {
+                          const stockStatus =
+                            getStockStatus(
+                              product
+                            );
+
+                          return (
+                            <tr
+                              key={
+                                product.id
+                              }
+                            >
+
+                              <td className="number-cell">
+                                {product.reference ||
+                                  product.id}
+                              </td>
+
+                              <td>
+                                <div className="patient-cell">
+
+                                  <div className="table-avatar">
+                                    <Package
+                                      size={15}
+                                    />
+                                  </div>
+
+                                  <strong>
+                                    {product.name}
+                                  </strong>
+
+                                </div>
+                              </td>
+
+                              <td>
+                                {product.category ||
+                                  "-"}
+                              </td>
+
+                              <td>
+                                <strong>
+                                  {
+                                    product.stock ??
+                                    0
+                                  }
+                                </strong>{" "}
+                                <span>
+                                  {product.unit ||
+                                    "unité"}
+                                </span>
+                              </td>
+
+                              <td>
+                                {Number(
+                                  product.price ||
+                                    0
+                                ).toLocaleString(
+                                  "fr-FR"
+                                )}{" "}
+                                FCFA
+                              </td>
+
+                              <td>
+
+                                <span
+                                  className={`status-badge ${stockStatus.className}`}
+                                >
+                                  {stockStatus.className ===
+                                    "stock-danger" && (
+                                    <AlertTriangle
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {stockStatus.className ===
+                                    "stock-warning" && (
+                                    <Clock3
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {stockStatus.className ===
+                                    "stock-success" && (
+                                    <CheckCircle2
+                                      size={14}
+                                    />
+                                  )}
+
+                                  {stockStatus.label}
+                                </span>
+
+                              </td>
+
+                              <td>
+
+                                <button
+                                  type="button"
+                                  className="icon-action"
+                                  onClick={() =>
+                                    setSelectedProduct(
+                                      product
+                                    )
+                                  }
+                                  title="Voir le produit"
+                                >
+                                  <Eye size={16} />
+                                </button>
+
+                              </td>
+
+                            </tr>
+                          );
+                        }
+                      )}
+
+                      {filteredProducts.length ===
+                        0 && (
+                        <tr>
+                          <td
+                            colSpan="7"
+                            className="empty-state"
+                          >
+                            <Package
+                              size={30}
+                            />
+
+                            <strong>
+                              Aucun produit trouvé
+                            </strong>
+
+                            <span>
+                              Ajoutez des produits depuis
+                              le module Gestion des stocks.
+                            </span>
+                          </td>
+                        </tr>
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </section>
+            </>
+          )}
+
+          {/* ==================================================
+              DISPENSATION
+              ================================================== */}
+
+          {activeMenu === "Dispensation" && (
+            <>
+              <div className="page-toolbar">
+
+                <div className="toolbar-title">
+
+                  <div className="title-icon">
+                    <ShoppingCart
+                      size={20}
+                    />
+                  </div>
+
+                  <div>
+                    <h2>
+                      Dispensation
+                    </h2>
+
+                    <p>
+                      Préparation et délivrance des médicaments
+                    </p>
+                  </div>
+
+                </div>
 
               </div>
 
-            </div>
+              <section className="orders-card card">
 
-            <div className="stat-card">
+                <div className="card-header">
 
-              <div className="stat-icon green">
-                <CheckCircle2 size={19} />
+                  <div>
+                    <h3>
+                      Ordonnances prêtes
+                    </h3>
+
+                    <span>
+                      Les ordonnances prêtes peuvent être servies.
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="table-wrap">
+
+                  <table className="orders-table">
+
+                    <thead>
+                      <tr>
+                        <th>
+                          Ordonnance
+                        </th>
+                        <th>
+                          Patient
+                        </th>
+                        <th>
+                          Médicaments
+                        </th>
+                        <th>
+                          Statut
+                        </th>
+                        <th>
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                      {prescriptions
+                        .filter(
+                          (item) =>
+                            item.status ===
+                            "Prête"
+                        )
+                        .map((item) => (
+                          <tr
+                            key={item.id}
+                          >
+
+                            <td className="number-cell">
+                              {item.id}
+                            </td>
+
+                            <td>
+                              <strong>
+                                {item.patient}
+                              </strong>
+                            </td>
+
+                            <td>
+                              <div className="medicine-list">
+                                {item.medicines.map(
+                                  (medicine) => (
+                                    <span
+                                      key={
+                                        medicine
+                                      }
+                                    >
+                                      {medicine}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </td>
+
+                            <td>
+                              <span className="status-badge ready">
+                                <CheckCircle2
+                                  size={14}
+                                />
+                                Prête
+                              </span>
+                            </td>
+
+                            <td>
+                              <button
+                                type="button"
+                                className="purple-btn"
+                                onClick={() =>
+                                  setSelectedPrescription(
+                                    item
+                                  )
+                                }
+                              >
+                                <ShoppingCart
+                                  size={16}
+                                />
+                                Servir
+                              </button>
+                            </td>
+
+                          </tr>
+                        ))}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </section>
+            </>
+          )}
+
+          {/* ==================================================
+              ORDONNANCES
+              ================================================== */}
+
+          {activeMenu === "Ordonnances" && (
+            <>
+              <div className="page-toolbar">
+
+                <div className="toolbar-title">
+
+                  <div className="title-icon">
+                    <ClipboardList
+                      size={20}
+                    />
+                  </div>
+
+                  <div>
+                    <h2>
+                      Ordonnances
+                    </h2>
+
+                    <p>
+                      Gestion des prescriptions médicales
+                    </p>
+                  </div>
+
+                </div>
+
               </div>
 
-              <div>
+              <section className="orders-card card">
 
-                <strong>
-                  {
-                    prescriptions.filter(
-                      (p) =>
-                        p.status ===
-                        "Prête"
-                    ).length
-                  }
-                </strong>
+                <div className="card-header">
 
-                <span>
-                  Prêtes
-                </span>
+                  <div>
+                    <h3>
+                      Ordonnances
+                    </h3>
+
+                    <span>
+                      Consultez les prescriptions à traiter.
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="table-wrap">
+
+                  <table className="orders-table">
+
+                    <thead>
+                      <tr>
+                        <th>
+                          Référence
+                        </th>
+                        <th>
+                          Patient
+                        </th>
+                        <th>
+                          Médecin
+                        </th>
+                        <th>
+                          Statut
+                        </th>
+                        <th>
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                      {prescriptions.map(
+                        (item) => (
+                          <tr
+                            key={item.id}
+                          >
+
+                            <td className="number-cell">
+                              {item.id}
+                            </td>
+
+                            <td>
+                              <strong>
+                                {item.patient}
+                              </strong>
+                            </td>
+
+                            <td>
+                              {item.doctor}
+                            </td>
+
+                            <td>
+                              <span
+                                className={`status-badge ${item.statusClass}`}
+                              >
+                                {item.status}
+                              </span>
+                            </td>
+
+                            <td>
+                              <button
+                                type="button"
+                                className="icon-action"
+                                onClick={() =>
+                                  setSelectedPrescription(
+                                    item
+                                  )
+                                }
+                                title="Voir"
+                              >
+                                <Eye size={16} />
+                              </button>
+                            </td>
+
+                          </tr>
+                        )
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </section>
+            </>
+          )}
+
+          {/* ==================================================
+              HISTORIQUE
+              ================================================== */}
+
+          {activeMenu === "Historique" && (
+            <>
+              <div className="page-toolbar">
+
+                <div className="toolbar-title">
+
+                  <div className="title-icon">
+                    <History size={20} />
+                  </div>
+
+                  <div>
+                    <h2>
+                      Historique
+                    </h2>
+
+                    <p>
+                      Médicaments réellement servis
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="toolbar-actions">
+
+                  <span className="status-badge served">
+                    <CheckCircle2
+                      size={14}
+                    />
+                    {history.length} opération(s)
+                  </span>
+
+                </div>
 
               </div>
 
-            </div>
+              <section className="orders-card card">
 
-            <div className="stat-card">
+                <div className="card-header">
 
-              <div className="stat-icon red">
-                <AlertTriangle size={19} />
-              </div>
+                  <div>
+                    <h3>
+                      Historique des médicaments servis
+                    </h3>
 
-              <div>
+                    <span>
+                      Chaque médicament apparaît après la validation de sa dispensation.
+                    </span>
+                  </div>
 
-                <strong>
-                  {
-                    stock.filter(
-                      (item) =>
-                        item.level ===
-                        "critical"
-                    ).length
-                  }
-                </strong>
+                </div>
 
-                <span>
-                  Stock(s) critique(s)
-                </span>
+                {history.length === 0 ? (
+                  <div className="empty-state">
 
-              </div>
+                    <History size={36} />
 
-            </div>
+                    <strong>
+                      Aucun historique disponible
+                    </strong>
 
-          </section>
+                    <span>
+                      Les médicaments servis apparaîtront automatiquement ici.
+                    </span>
+
+                  </div>
+                ) : (
+                  <div className="table-wrap">
+
+                    <table className="orders-table">
+
+                      <thead>
+                        <tr>
+                          <th>
+                            Date
+                          </th>
+
+                          <th>
+                            Ordonnance
+                          </th>
+
+                          <th>
+                            Patient
+                          </th>
+
+                          <th>
+                            Médicament
+                          </th>
+
+                          <th>
+                            Quantité
+                          </th>
+
+                          <th>
+                            Pharmacien
+                          </th>
+
+                          <th>
+                            Statut
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+
+                        {history.map(
+                          (item) => (
+                            <tr
+                              key={item.id}
+                            >
+
+                              <td>
+                                <strong>
+                                  {item.date}
+                                </strong>
+
+                                <br />
+
+                                <span>
+                                  {item.time}
+                                </span>
+                              </td>
+
+                              <td className="number-cell">
+                                {item.prescriptionId}
+                              </td>
+
+                              <td>
+                                <div className="patient-cell">
+
+                                  <div className="table-avatar">
+                                    <UserRound
+                                      size={15}
+                                    />
+                                  </div>
+
+                                  <strong>
+                                    {item.patient}
+                                  </strong>
+
+                                </div>
+                              </td>
+
+                              <td>
+
+                                <div className="medicine-list">
+
+                                  <span>
+                                    {item.medicine}
+                                  </span>
+
+                                </div>
+
+                              </td>
+
+                              <td>
+                                <strong>
+                                  {item.quantity}
+                                </strong>
+                              </td>
+
+                              <td>
+                                {item.pharmacist}
+                              </td>
+
+                              <td>
+
+                                <span className="status-badge served">
+
+                                  <CheckCircle2
+                                    size={14}
+                                  />
+
+                                  Servi
+
+                                </span>
+
+                              </td>
+
+                            </tr>
+                          )
+                        )}
+
+                      </tbody>
+
+                    </table>
+
+                  </div>
+                )}
+
+              </section>
+            </>
+          )}
 
         </section>
 
       </main>
 
-      {selectedPrescription && (
+      {/* ======================================================
+          MODALE ORDONNANCE
+          ====================================================== */}
 
+      {selectedPrescription && (
         <div
           className="modal-overlay"
           onMouseDown={() =>
-            setSelectedPrescription(null)
+            setSelectedPrescription(
+              null
+            )
           }
         >
 
@@ -974,11 +1955,15 @@ function Pharmacy({ onNavigate }) {
 
                 <span className="modal-kicker">
                   ORDONNANCE #
-                  {selectedPrescription.id}
+                  {
+                    selectedPrescription.id
+                  }
                 </span>
 
                 <h3>
-                  {selectedPrescription.patient}
+                  {
+                    selectedPrescription.patient
+                  }
                 </h3>
 
               </div>
@@ -987,7 +1972,9 @@ function Pharmacy({ onNavigate }) {
                 type="button"
                 className="close-modal"
                 onClick={() =>
-                  setSelectedPrescription(null)
+                  setSelectedPrescription(
+                    null
+                  )
                 }
               >
                 <X size={18} />
@@ -998,17 +1985,21 @@ function Pharmacy({ onNavigate }) {
             <div className="prescription-meta">
 
               <span>
+                <Stethoscope
+                  size={15}
+                />
 
-                <Stethoscope size={15} />
-
-                {selectedPrescription.doctor}
-
+                {
+                  selectedPrescription.doctor
+                }
               </span>
 
               <span
                 className={`status-badge ${selectedPrescription.statusClass}`}
               >
-                {selectedPrescription.status}
+                {
+                  selectedPrescription.status
+                }
               </span>
 
             </div>
@@ -1020,8 +2011,10 @@ function Pharmacy({ onNavigate }) {
               </h4>
 
               {selectedPrescription.medicines.map(
-                (medicine, index) => (
-
+                (
+                  medicine,
+                  index
+                ) => (
                   <div
                     className="modal-medicine"
                     key={medicine}
@@ -1040,7 +2033,6 @@ function Pharmacy({ onNavigate }) {
                     />
 
                   </div>
-
                 )
               )}
 
@@ -1050,7 +2042,6 @@ function Pharmacy({ onNavigate }) {
 
               {selectedPrescription.status ===
                 "À préparer" && (
-
                 <button
                   type="button"
                   className="green-btn"
@@ -1060,16 +2051,16 @@ function Pharmacy({ onNavigate }) {
                     )
                   }
                 >
-                  <CheckCircle2 size={17} />
+                  <CheckCircle2
+                    size={17}
+                  />
 
                   Marquer comme prête
                 </button>
-
               )}
 
               {selectedPrescription.status ===
                 "Prête" && (
-
                 <button
                   type="button"
                   className="purple-btn"
@@ -1079,17 +2070,32 @@ function Pharmacy({ onNavigate }) {
                     )
                   }
                 >
-                  <ShoppingCart size={17} />
+                  <ShoppingCart
+                    size={17}
+                  />
 
                   Servir l'ordonnance
                 </button>
+              )}
 
+              {selectedPrescription.status ===
+                "Servie" && (
+                <span className="status-badge served">
+                  <CheckCircle2
+                    size={15}
+                  />
+                  Ordonnance déjà servie
+                </span>
               )}
 
               <button
                 type="button"
                 className="blue-btn"
                 onClick={() => {
+
+                  setTicketPrescription(
+                    selectedPrescription
+                  );
 
                   setSelectedPrescription(
                     null
@@ -1109,11 +2115,154 @@ function Pharmacy({ onNavigate }) {
           </div>
 
         </div>
-
       )}
 
-      {showScan && (
+      {/* ======================================================
+          MODALE PRODUIT
+          ====================================================== */}
 
+      {selectedProduct && (
+        <div
+          className="modal-overlay"
+          onMouseDown={() =>
+            setSelectedProduct(null)
+          }
+        >
+
+          <div
+            className="pharmacy-modal"
+            onMouseDown={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            <div className="modal-header">
+
+              <div>
+
+                <span className="modal-kicker">
+                  PRODUIT
+                </span>
+
+                <h3>
+                  {
+                    selectedProduct.name
+                  }
+                </h3>
+
+              </div>
+
+              <button
+                type="button"
+                className="close-modal"
+                onClick={() =>
+                  setSelectedProduct(
+                    null
+                  )
+                }
+              >
+                <X size={18} />
+              </button>
+
+            </div>
+
+            <div className="modal-section">
+
+              <div className="modal-medicine">
+                <Package size={19} />
+
+                <strong>
+                  Référence :
+                </strong>
+
+                <span>
+                  {
+                    selectedProduct.reference ||
+                    selectedProduct.id
+                  }
+                </span>
+              </div>
+
+              <div className="modal-medicine">
+                <Boxes size={19} />
+
+                <strong>
+                  Stock :
+                </strong>
+
+                <span>
+                  {
+                    selectedProduct.stock ??
+                    0
+                  }{" "}
+                  {
+                    selectedProduct.unit ||
+                    "unité"
+                  }
+                </span>
+              </div>
+
+              <div className="modal-medicine">
+
+                <strong>
+                  Catégorie :
+                </strong>
+
+                <span>
+                  {
+                    selectedProduct.category ||
+                    "-"
+                  }
+                </span>
+
+              </div>
+
+              <div className="modal-medicine">
+
+                <strong>
+                  Prix :
+                </strong>
+
+                <span>
+                  {Number(
+                    selectedProduct.price ||
+                      0
+                  ).toLocaleString(
+                    "fr-FR"
+                  )}{" "}
+                  FCFA
+                </span>
+
+              </div>
+
+            </div>
+
+            <div className="modal-actions">
+
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() =>
+                  setSelectedProduct(
+                    null
+                  )
+                }
+              >
+                Fermer
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ======================================================
+          MODALE SCANNER
+          ====================================================== */}
+
+      {showScan && (
         <div
           className="modal-overlay"
           onMouseDown={() =>
@@ -1139,9 +2288,7 @@ function Pharmacy({ onNavigate }) {
             </button>
 
             <div className="scan-illustration">
-
               <ScanLine size={44} />
-
             </div>
 
             <h3>
@@ -1149,9 +2296,9 @@ function Pharmacy({ onNavigate }) {
             </h3>
 
             <p>
-              Placez l'ordonnance dans le
-              scanner ou utilisez votre caméra
-              pour importer le document.
+              Placez l'ordonnance dans le scanner
+              ou utilisez votre caméra pour importer
+              le document.
             </p>
 
             <button
@@ -1168,7 +2315,6 @@ function Pharmacy({ onNavigate }) {
               }}
             >
               <ScanLine size={18} />
-
               Démarrer le scan
             </button>
 
@@ -1185,11 +2331,13 @@ function Pharmacy({ onNavigate }) {
           </div>
 
         </div>
-
       )}
 
-      {showTicket && (
+      {/* ======================================================
+          MODALE TICKET
+          ====================================================== */}
 
+      {showTicket && (
         <div
           className="modal-overlay"
           onMouseDown={() =>
@@ -1216,7 +2364,9 @@ function Pharmacy({ onNavigate }) {
 
             <div className="ticket-logo">
 
-              <LayoutDashboard size={20} />
+              <LayoutDashboard
+                size={20}
+              />
 
               <strong>
                 MA<span>SANTE</span>
@@ -1235,7 +2385,10 @@ function Pharmacy({ onNavigate }) {
               </span>
 
               <strong>
-                TRAORE Awa
+                {
+                  ticketPrescription?.patient ||
+                  "—"
+                }
               </strong>
 
             </div>
@@ -1273,7 +2426,11 @@ function Pharmacy({ onNavigate }) {
               </span>
 
               <strong>
-                ORD-001
+                ORD-
+                {
+                  ticketPrescription?.id ||
+                  "000"
+                }
               </strong>
 
             </div>
@@ -1303,15 +2460,16 @@ function Pharmacy({ onNavigate }) {
           </div>
 
         </div>
-
       )}
 
-      {toast && (
+      {/* ======================================================
+          TOAST
+          ====================================================== */}
 
+      {toast && (
         <div className="pharmacy-toast">
           {toast}
         </div>
-
       )}
 
     </div>
@@ -1319,3 +2477,4 @@ function Pharmacy({ onNavigate }) {
 }
 
 export default Pharmacy;
+

@@ -1,417 +1,676 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Search,
-  Plus,
-  Receipt,
   Wallet,
   CreditCard,
   Banknote,
   TrendingUp,
-  TrendingDown,
-  FileText,
-  UserRound,
+  ShieldCheck,
+  Users,
   CalendarDays,
-  MoreVertical,
+  UserRound,
   Download,
   Eye,
-  CheckCircle2,
-  Clock3,
-  AlertCircle,
   X,
-  ArrowUpRight,
   RefreshCw,
+  Filter,
+  Receipt,
+  UserCheck,
+  Building2,
 } from "lucide-react";
 
 import "../styles/billing.css";
 
 
-const INITIAL_INVOICES = [
+/* ============================================================
+   DONNÉES DE DÉMONSTRATION
+   ------------------------------------------------------------
+   Ces données servent uniquement si l'API de la Caisse
+   n'est pas encore disponible.
+   ============================================================ */
+
+const INITIAL_PAYMENTS = [
   {
-    id: "FAC-2026-001",
+    id: "CAISSE-2026-001",
     patient: "Kouassi Jean",
     patientId: "PAT-0001",
-    date: "17/09/2026",
-    dueDate: "17/09/2026",
-    amount: 45000,
-    paid: 45000,
+    date: "2026-09-24",
+    totalAmount: 45000,
+    patientAmount: 45000,
+    insuranceAmount: 0,
     method: "Espèces",
-    status: "PAID",
+    cashier: "Administrateur",
     service: "Consultation + Analyses",
   },
+
   {
-    id: "FAC-2026-002",
+    id: "CAISSE-2026-002",
     patient: "Yao Marie",
     patientId: "PAT-0002",
-    date: "17/09/2026",
-    dueDate: "20/09/2026",
-    amount: 78000,
-    paid: 30000,
+    date: "2026-09-24",
+    totalAmount: 78000,
+    patientAmount: 30000,
+    insuranceAmount: 48000,
     method: "Mobile Money",
-    status: "PARTIAL",
+    cashier: "Koffi Armel",
     service: "Consultation + Pharmacie",
   },
+
   {
-    id: "FAC-2026-003",
+    id: "CAISSE-2026-003",
     patient: "Adjoua Esther",
     patientId: "PAT-0003",
-    date: "16/09/2026",
-    dueDate: "16/09/2026",
-    amount: 125000,
-    paid: 0,
-    method: "—",
-    status: "UNPAID",
+    date: "2026-09-23",
+    totalAmount: 125000,
+    patientAmount: 50000,
+    insuranceAmount: 75000,
+    method: "Carte bancaire",
+    cashier: "N'Guessan Marie",
     service: "Hospitalisation",
   },
+
   {
-    id: "FAC-2026-004",
+    id: "CAISSE-2026-004",
     patient: "N'Guessan Paul",
     patientId: "PAT-0004",
-    date: "16/09/2026",
-    dueDate: "16/09/2026",
-    amount: 32500,
-    paid: 32500,
-    method: "Carte bancaire",
-    status: "PAID",
+    date: "2026-09-23",
+    totalAmount: 32500,
+    patientAmount: 32500,
+    insuranceAmount: 0,
+    method: "Espèces",
+    cashier: "Administrateur",
     service: "Consultation",
   },
+
   {
-    id: "FAC-2026-005",
+    id: "CAISSE-2026-005",
     patient: "Aka Bernard",
     patientId: "PAT-0005",
-    date: "15/09/2026",
-    dueDate: "22/09/2026",
-    amount: 96000,
-    paid: 50000,
-    method: "Chèque",
-    status: "PARTIAL",
+    date: "2026-09-22",
+    totalAmount: 96000,
+    patientAmount: 50000,
+    insuranceAmount: 46000,
+    method: "Mobile Money",
+    cashier: "Koffi Armel",
     service: "Laboratoire + Consultation",
   },
+
   {
-    id: "FAC-2026-006",
+    id: "CAISSE-2026-006",
     patient: "Koffi Clarisse",
     patientId: "PAT-0006",
-    date: "15/09/2026",
-    dueDate: "15/09/2026",
-    amount: 18000,
-    paid: 0,
-    method: "—",
-    status: "UNPAID",
+    date: "2026-09-21",
+    totalAmount: 18000,
+    patientAmount: 18000,
+    insuranceAmount: 0,
+    method: "Espèces",
+    cashier: "N'Guessan Marie",
     service: "Pharmacie",
   },
 ];
 
 
+/* ============================================================
+   UTILITAIRES
+   ============================================================ */
+
 function formatCurrency(value) {
-  return new Intl.NumberFormat("fr-FR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value) + " FCFA";
-}
-
-
-function getStatusLabel(status) {
-  switch (status) {
-    case "PAID":
-      return "Payée";
-
-    case "PARTIAL":
-      return "Partiellement payée";
-
-    case "UNPAID":
-      return "Impayée";
-
-    default:
-      return status;
-  }
-}
-
-
-function StatusBadge({ status }) {
-  if (status === "PAID") {
-    return (
-      <span className="billing-status billing-status-paid">
-        <CheckCircle2 size={15} />
-        Payée
-      </span>
-    );
-  }
-
-  if (status === "PARTIAL") {
-    return (
-      <span className="billing-status billing-status-partial">
-        <Clock3 size={15} />
-        Partielle
-      </span>
-    );
-  }
-
   return (
-    <span className="billing-status billing-status-unpaid">
-      <AlertCircle size={15} />
-      Impayée
-    </span>
+    new Intl.NumberFormat("fr-FR", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(value) || 0) + " FCFA"
   );
 }
 
 
+function formatDate(dateValue) {
+  if (!dateValue) {
+    return "—";
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue;
+  }
+
+  return date.toLocaleDateString("fr-FR");
+}
+
+
+function normalizeDate(dateValue) {
+  if (!dateValue) {
+    return "";
+  }
+
+  if (
+    typeof dateValue === "string" &&
+    /^\d{4}-\d{2}-\d{2}/.test(dateValue)
+  ) {
+    return dateValue.substring(0, 10);
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+/* ============================================================
+   NORMALISATION DES DONNÉES DE LA CAISSE
+   ------------------------------------------------------------
+   Cette fonction accepte plusieurs noms de champs afin que
+   Billing puisse s'adapter à la structure actuelle de Caisse.
+   ============================================================ */
+
+function normalizePayment(item, index) {
+  const totalAmount = Number(
+    item.totalAmount ??
+    item.total ??
+    item.amount ??
+    item.montant ??
+    item.montantTotal ??
+    0
+  );
+
+  const insuranceAmount = Number(
+    item.insuranceAmount ??
+    item.insurance ??
+    item.assurance ??
+    item.partAssurance ??
+    item.montantAssurance ??
+    0
+  );
+
+  const patientAmount = Number(
+    item.patientAmount ??
+    item.patientPaid ??
+    item.paidByPatient ??
+    item.partPatient ??
+    item.montantPatient ??
+    Math.max(totalAmount - insuranceAmount, 0)
+  );
+
+  return {
+    id:
+      item.id ??
+      item.reference ??
+      item.paymentId ??
+      `CAISSE-2026-${String(index + 1).padStart(3, "0")}`,
+
+    patient:
+      item.patient ??
+      item.patientName ??
+      item.nomPatient ??
+      item.name ??
+      "Patient inconnu",
+
+    patientId:
+      item.patientId ??
+      item.patient_id ??
+      item.codePatient ??
+      "—",
+
+    date: normalizeDate(
+      item.date ??
+      item.paymentDate ??
+      item.createdAt ??
+      item.created_at
+    ),
+
+    totalAmount,
+
+    patientAmount,
+
+    insuranceAmount,
+
+    method:
+      item.method ??
+      item.paymentMethod ??
+      item.modePaiement ??
+      item.mode ??
+      "—",
+
+    cashier:
+      item.cashier ??
+      item.cashierName ??
+      item.caissier ??
+      item.caissierName ??
+      "—",
+
+    service:
+      item.service ??
+      item.serviceName ??
+      item.motif ??
+      item.description ??
+      "—",
+
+    insuranceName:
+      item.insuranceName ??
+      item.assuranceName ??
+      item.assurance ??
+      "",
+
+    raw: item,
+  };
+}
+
+
+/* ============================================================
+   COMPOSANT PRINCIPAL
+   ============================================================ */
+
 export default function Billing() {
 
+  const [payments, setPayments] = useState([]);
 
-  const [invoices, setInvoices] = useState(INITIAL_INVOICES);
+  const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
 
+  const [startDate, setStartDate] = useState("");
 
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [endDate, setEndDate] = useState("");
 
+  const [cashierFilter, setCashierFilter] = useState("ALL");
 
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [methodFilter, setMethodFilter] = useState("ALL");
 
+  const [selectedPayment, setSelectedPayment] = useState(null);
 
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
-
-
-  const [openMenu, setOpenMenu] = useState(null);
+  const [showFilters, setShowFilters] = useState(true);
 
 
-  const [invoiceForm, setInvoiceForm] = useState({
-    patient: "",
-    service: "",
-    amount: "",
-    dueDate: "",
-  });
+  /* ==========================================================
+     CHARGEMENT DES PAIEMENTS DE LA CAISSE
+     ========================================================== */
+
+  async function loadPayments() {
+
+    setLoading(true);
+
+    setError("");
+
+    try {
+
+      const response = await fetch(
+        "/api/caisse/payments/",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
 
 
-  const [paymentForm, setPaymentForm] = useState({
-    invoiceId: "",
-    amount: "",
-    method: "Espèces",
-  });
+      if (!response.ok) {
+        throw new Error(
+          `Erreur serveur : ${response.status}`
+        );
+      }
 
 
-  const statistics = useMemo(() => {
+      const data = await response.json();
 
-    const totalRevenue = invoices.reduce(
-      (sum, invoice) => sum + invoice.paid,
-      0
+
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+          ? data.results
+          : Array.isArray(data.payments)
+            ? data.payments
+            : Array.isArray(data.data)
+              ? data.data
+              : [];
+
+
+      setPayments(
+        list.map(normalizePayment)
+      );
+
+    } catch (apiError) {
+
+      console.warn(
+        "API Caisse indisponible. Tentative avec localStorage.",
+        apiError
+      );
+
+
+      try {
+
+        const localData =
+          localStorage.getItem("caissePayments");
+
+
+        if (localData) {
+
+          const parsed =
+            JSON.parse(localData);
+
+
+          const list =
+            Array.isArray(parsed)
+              ? parsed
+              : Array.isArray(parsed?.payments)
+                ? parsed.payments
+                : [];
+
+
+          setPayments(
+            list.map(normalizePayment)
+          );
+
+          setError("");
+
+        } else {
+
+          /*
+           * Mode démonstration.
+           * À supprimer lorsque Caisse sera connectée
+           * définitivement à l'API.
+           */
+
+          setPayments(
+            INITIAL_PAYMENTS.map(normalizePayment)
+          );
+
+          setError(
+            "Les données réelles de la Caisse ne sont pas encore disponibles. Affichage des données de démonstration."
+          );
+        }
+
+      } catch (localError) {
+
+        console.error(localError);
+
+        setPayments(
+          INITIAL_PAYMENTS.map(normalizePayment)
+        );
+
+        setError(
+          "Impossible de récupérer les paiements de la Caisse."
+        );
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+
+
+  useEffect(() => {
+
+    loadPayments();
+
+  }, []);
+
+
+  /* ==========================================================
+     LISTE DES CAISSIERS
+     ========================================================== */
+
+  const cashiers = useMemo(() => {
+
+    const values = payments
+      .map((payment) => payment.cashier)
+      .filter(Boolean)
+      .filter(
+        (value) => value !== "—"
+      );
+
+    return [
+      ...new Set(values),
+    ].sort(
+      (a, b) =>
+        a.localeCompare(b, "fr")
     );
 
-    const totalBilled = invoices.reduce(
-      (sum, invoice) => sum + invoice.amount,
-      0
+  }, [payments]);
+
+
+  /* ==========================================================
+     LISTE DES MODES DE PAIEMENT
+     ========================================================== */
+
+  const paymentMethods = useMemo(() => {
+
+    const values = payments
+      .map((payment) => payment.method)
+      .filter(Boolean)
+      .filter(
+        (value) => value !== "—"
+      );
+
+    return [
+      ...new Set(values),
+    ].sort(
+      (a, b) =>
+        a.localeCompare(b, "fr")
     );
 
-    const totalRemaining = invoices.reduce(
-      (sum, invoice) =>
-        sum + (invoice.amount - invoice.paid),
-      0
-    );
-
-    const paidInvoices = invoices.filter(
-      (invoice) => invoice.status === "PAID"
-    ).length;
-
-    const unpaidInvoices = invoices.filter(
-      (invoice) => invoice.status === "UNPAID"
-    ).length;
-
-    return {
-      totalRevenue,
-      totalBilled,
-      totalRemaining,
-      paidInvoices,
-      unpaidInvoices,
-    };
-
-  }, [invoices]);
+  }, [payments]);
 
 
-  const filteredInvoices = useMemo(() => {
+  /* ==========================================================
+     FILTRAGE
+     ========================================================== */
+
+  const filteredPayments = useMemo(() => {
 
     const normalizedSearch =
       search.trim().toLowerCase();
 
-    return invoices.filter((invoice) => {
+
+    return payments.filter((payment) => {
 
       const matchesSearch =
-        !normalizedSearch
-        ||
-        invoice.id.toLowerCase().includes(normalizedSearch)
-        ||
-        invoice.patient.toLowerCase().includes(normalizedSearch)
-        ||
-        invoice.patientId.toLowerCase().includes(normalizedSearch)
-        ||
-        invoice.service.toLowerCase().includes(normalizedSearch);
+        !normalizedSearch ||
+        payment.patient
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        payment.patientId
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        payment.id
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        payment.service
+          .toLowerCase()
+          .includes(normalizedSearch);
 
-      const matchesStatus =
-        statusFilter === "ALL"
-        ||
-        invoice.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      const paymentDate =
+        normalizeDate(payment.date);
+
+
+      const matchesStartDate =
+        !startDate ||
+        paymentDate >= startDate;
+
+
+      const matchesEndDate =
+        !endDate ||
+        paymentDate <= endDate;
+
+
+      const matchesCashier =
+        cashierFilter === "ALL" ||
+        payment.cashier === cashierFilter;
+
+
+      const matchesMethod =
+        methodFilter === "ALL" ||
+        payment.method === methodFilter;
+
+
+      return (
+        matchesSearch &&
+        matchesStartDate &&
+        matchesEndDate &&
+        matchesCashier &&
+        matchesMethod
+      );
 
     });
 
-  }, [invoices, search, statusFilter]);
+  }, [
+    payments,
+    search,
+    startDate,
+    endDate,
+    cashierFilter,
+    methodFilter,
+  ]);
 
 
-  function handleOpenPayment(invoice) {
+  /* ==========================================================
+     STATISTIQUES
+     ========================================================== */
 
-    setSelectedInvoice(invoice);
+  const statistics = useMemo(() => {
 
-    setPaymentForm({
-      invoiceId: invoice.id,
-      amount: String(invoice.amount - invoice.paid),
-      method: "Espèces",
-    });
-
-    setShowPaymentModal(true);
-
-  }
+    const totalCollected =
+      filteredPayments.reduce(
+        (sum, payment) =>
+          sum + payment.totalAmount,
+        0
+      );
 
 
-  function handleCreateInvoice(event) {
+    const totalWithoutInsurance =
+      filteredPayments.reduce(
+        (sum, payment) =>
+          sum + payment.patientAmount,
+        0
+      );
 
-    event.preventDefault();
 
-    const amount = Number(invoiceForm.amount);
+    const totalWithInsurance =
+      filteredPayments.reduce(
+        (sum, payment) =>
+          sum + payment.insuranceAmount,
+        0
+      );
 
-    if (
-      !invoiceForm.patient.trim()
-      ||
-      !invoiceForm.service.trim()
-      ||
-      !amount
-      ||
-      amount <= 0
-    ) {
-      return;
-    }
 
-    const newInvoice = {
-      id: `FAC-2026-${String(invoices.length + 1).padStart(3, "0")}`,
-      patient: invoiceForm.patient.trim(),
-      patientId: "PAT-NOUVEAU",
-      date: new Date().toLocaleDateString("fr-FR"),
-      dueDate:
-        invoiceForm.dueDate
-        ||
-        new Date().toLocaleDateString("fr-FR"),
-      amount,
-      paid: 0,
-      method: "—",
-      status: "UNPAID",
-      service: invoiceForm.service.trim(),
+    const totalInsurance =
+      filteredPayments.reduce(
+        (sum, payment) =>
+          sum + payment.insuranceAmount,
+        0
+      );
+
+
+    const patientsCount =
+      new Set(
+        filteredPayments.map(
+          (payment) =>
+            payment.patientId ||
+            payment.patient
+        )
+      ).size;
+
+
+    return {
+      totalCollected,
+      totalWithoutInsurance,
+      totalWithInsurance,
+      totalInsurance,
+      patientsCount,
     };
 
-    setInvoices((current) => [
-      newInvoice,
-      ...current,
-    ]);
-
-    setInvoiceForm({
-      patient: "",
-      service: "",
-      amount: "",
-      dueDate: "",
-    });
-
-    setShowInvoiceModal(false);
-
-  }
+  }, [filteredPayments]);
 
 
-  function handleRegisterPayment(event) {
+  /* ==========================================================
+     EXPORT CSV
+     ========================================================== */
 
-    event.preventDefault();
+  function handleExportCSV() {
 
-    const amount = Number(paymentForm.amount);
-
-    if (!selectedInvoice || !amount || amount <= 0) {
-      return;
-    }
-
-    setInvoices((currentInvoices) =>
-      currentInvoices.map((invoice) => {
-
-        if (invoice.id !== selectedInvoice.id) {
-          return invoice;
-        }
-
-        const newPaid =
-          Math.min(
-            invoice.amount,
-            invoice.paid + amount
-          );
-
-        let newStatus = "PARTIAL";
-
-        if (newPaid >= invoice.amount) {
-          newStatus = "PAID";
-        }
-
-        return {
-          ...invoice,
-          paid: newPaid,
-          method: paymentForm.method,
-          status: newStatus,
-        };
-
-      })
-    );
-
-    setPaymentForm({
-      invoiceId: "",
-      amount: "",
-      method: "Espèces",
-    });
-
-    setSelectedInvoice(null);
-
-    setShowPaymentModal(false);
-
-  }
+    const headers = [
+      "Référence",
+      "Patient",
+      "Identifiant patient",
+      "Date",
+      "Montant total",
+      "Part patient",
+      "Part assurance",
+      "Mode de paiement",
+      "Caissier",
+      "Service",
+    ];
 
 
-  function handleDownload(invoice) {
+    const rows =
+      filteredPayments.map(
+        (payment) => [
+          payment.id,
+          payment.patient,
+          payment.patientId,
+          payment.date,
+          payment.totalAmount,
+          payment.patientAmount,
+          payment.insuranceAmount,
+          payment.method,
+          payment.cashier,
+          payment.service,
+        ]
+      );
 
-    const content = [
-      "MA SANTÉ",
-      "Clinique & Gestion Hospitalière",
-      "",
-      `FACTURE : ${invoice.id}`,
-      `Patient : ${invoice.patient}`,
-      `Service : ${invoice.service}`,
-      `Date : ${invoice.date}`,
-      `Échéance : ${invoice.dueDate}`,
-      `Montant : ${formatCurrency(invoice.amount)}`,
-      `Payé : ${formatCurrency(invoice.paid)}`,
-      `Reste : ${formatCurrency(invoice.amount - invoice.paid)}`,
-      `Statut : ${getStatusLabel(invoice.status)}`,
-    ].join("\n");
+
+    const csv = [
+      headers,
+      ...rows,
+    ]
+      .map((row) =>
+        row
+          .map((value) =>
+            `"${String(value ?? "").replaceAll('"', '""')}"`
+          )
+          .join(";")
+      )
+      .join("\n");
+
 
     const blob = new Blob(
-      [content],
+      [
+        "\uFEFF" + csv,
+      ],
       {
-        type: "text/plain;charset=utf-8",
+        type: "text/csv;charset=utf-8;",
       }
     );
 
-    const url = URL.createObjectURL(blob);
+
+    const url =
+      URL.createObjectURL(blob);
+
 
     const link =
       document.createElement("a");
 
+
     link.href = url;
 
     link.download =
-      `${invoice.id}.txt`;
+      "encaissements-caisse.csv";
+
 
     document.body.appendChild(link);
 
@@ -420,32 +679,185 @@ export default function Billing() {
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
-
   }
 
+
+  /* ==========================================================
+     IMPRESSION / REÇU
+     ========================================================== */
+
+  function handlePrint(payment) {
+
+    const printWindow =
+      window.open(
+        "",
+        "_blank",
+        "width=800,height=700"
+      );
+
+
+    if (!printWindow) {
+      return;
+    }
+
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Encaissement ${payment.id}</title>
+
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            color: #111827;
+          }
+
+          h1 {
+            margin-bottom: 4px;
+          }
+
+          .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+          }
+
+          .line {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+          }
+
+          .total {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <h1>MA SANTÉ</h1>
+
+        <div class="subtitle">
+          Relevé d'encaissement
+        </div>
+
+        <div class="line">
+          <span>Référence</span>
+          <strong>${payment.id}</strong>
+        </div>
+
+        <div class="line">
+          <span>Patient</span>
+          <strong>${payment.patient}</strong>
+        </div>
+
+        <div class="line">
+          <span>Date</span>
+          <strong>${formatDate(payment.date)}</strong>
+        </div>
+
+        <div class="line">
+          <span>Service</span>
+          <strong>${payment.service}</strong>
+        </div>
+
+        <div class="line">
+          <span>Caissier</span>
+          <strong>${payment.cashier}</strong>
+        </div>
+
+        <div class="line">
+          <span>Montant total</span>
+          <strong>${formatCurrency(payment.totalAmount)}</strong>
+        </div>
+
+        <div class="line">
+          <span>Part patient</span>
+          <strong>${formatCurrency(payment.patientAmount)}</strong>
+        </div>
+
+        <div class="line">
+          <span>Part assurance</span>
+          <strong>${formatCurrency(payment.insuranceAmount)}</strong>
+        </div>
+
+        <div class="line">
+          <span>Mode de paiement</span>
+          <strong>${payment.method}</strong>
+        </div>
+
+        <div class="total">
+          Total encaissé :
+          ${formatCurrency(payment.totalAmount)}
+        </div>
+
+      </body>
+      </html>
+    `);
+
+
+    printWindow.document.close();
+
+    printWindow.focus();
+
+    printWindow.print();
+
+    printWindow.close();
+  }
+
+
+  /* ==========================================================
+     RÉINITIALISATION FILTRES
+     ========================================================== */
+
+  function resetFilters() {
+
+    setSearch("");
+
+    setStartDate("");
+
+    setEndDate("");
+
+    setCashierFilter("ALL");
+
+    setMethodFilter("ALL");
+  }
+
+
+  /* ==========================================================
+     AFFICHAGE
+     ========================================================== */
 
   return (
 
     <div className="billing-page">
 
+      {/* ======================================================
+          EN-TÊTE
+          ====================================================== */}
 
       <div className="billing-header">
 
         <div className="billing-header-left">
 
           <div className="billing-header-icon">
-            <CalculatorIcon />
+            <Receipt size={26} />
           </div>
 
           <div>
 
             <h1>
-              Comptabilité
+              Encaissements
             </h1>
 
             <p>
-              Gestion de la facturation, des paiements et
-              des opérations financières
+              Suivi des paiements enregistrés à la caisse
             </p>
 
           </div>
@@ -458,24 +870,34 @@ export default function Billing() {
           <button
             type="button"
             className="billing-secondary-button"
-            onClick={() =>
-              window.location.reload()
-            }
+            onClick={loadPayments}
+            disabled={loading}
           >
-            <RefreshCw size={18} />
+
+            <RefreshCw
+              size={18}
+              className={
+                loading
+                  ? "billing-spin"
+                  : ""
+              }
+            />
+
             Actualiser
+
           </button>
 
 
           <button
             type="button"
             className="billing-primary-button"
-            onClick={() =>
-              setShowInvoiceModal(true)
-            }
+            onClick={handleExportCSV}
           >
-            <Plus size={19} />
-            Nouvelle facture
+
+            <Download size={18} />
+
+            Exporter
+
           </button>
 
         </div>
@@ -483,78 +905,118 @@ export default function Billing() {
       </div>
 
 
+      {/* ======================================================
+          MESSAGE
+          ====================================================== */}
+
+      {error && (
+
+        <div className="billing-info-message">
+
+          <AlertCircleIcon />
+
+          <span>
+            {error}
+          </span>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          STATISTIQUES
+          ====================================================== */}
+
       <section className="billing-stats-grid">
 
+
+        {/* TOTAL ENCAISSÉ */}
 
         <div className="billing-stat-card">
 
           <div className="billing-stat-icon billing-stat-blue">
+
             <Wallet size={24} />
+
           </div>
 
           <div className="billing-stat-content">
 
             <span>
-              Chiffre d'affaires
+              Total encaissé
             </span>
 
             <strong>
-              {formatCurrency(statistics.totalRevenue)}
+              {formatCurrency(
+                statistics.totalCollected
+              )}
             </strong>
 
-            <small className="billing-stat-positive">
-              <ArrowUpRight size={14} />
-              Encaissements
+            <small>
+              {filteredPayments.length} opération(s)
             </small>
 
           </div>
 
         </div>
 
+
+        {/* SANS ASSURANCE */}
 
         <div className="billing-stat-card">
 
           <div className="billing-stat-icon billing-stat-green">
-            <Receipt size={24} />
+
+            <UserCheck size={24} />
+
           </div>
 
           <div className="billing-stat-content">
 
             <span>
-              Total facturé
+              Payé sans assurance
             </span>
 
             <strong>
-              {formatCurrency(statistics.totalBilled)}
+              {formatCurrency(
+                statistics.totalWithoutInsurance
+              )}
             </strong>
 
             <small>
-              {invoices.length} facture(s)
+              Part directement payée par les patients
             </small>
 
           </div>
 
         </div>
 
+
+        {/* AVEC ASSURANCE */}
 
         <div className="billing-stat-card">
 
           <div className="billing-stat-icon billing-stat-orange">
-            <TrendingDown size={24} />
+
+            <ShieldCheck size={24} />
+
           </div>
 
           <div className="billing-stat-content">
 
             <span>
-              Créances
+              Payé avec assurance
             </span>
 
             <strong>
-              {formatCurrency(statistics.totalRemaining)}
+              {formatCurrency(
+                statistics.totalWithInsurance
+              )}
             </strong>
 
             <small>
-              Montant restant à recouvrer
+              Part prise en charge
             </small>
 
           </div>
@@ -562,24 +1024,30 @@ export default function Billing() {
         </div>
 
 
+        {/* TOTAL ASSURANCE */}
+
         <div className="billing-stat-card">
 
           <div className="billing-stat-icon billing-stat-red">
-            <AlertCircle size={24} />
+
+            <Building2 size={24} />
+
           </div>
 
           <div className="billing-stat-content">
 
             <span>
-              Factures impayées
+              Total assurances
             </span>
 
             <strong>
-              {statistics.unpaidInvoices}
+              {formatCurrency(
+                statistics.totalInsurance
+              )}
             </strong>
 
             <small>
-              À traiter
+              Montant pris en charge par les assurances
             </small>
 
           </div>
@@ -588,6 +1056,10 @@ export default function Billing() {
 
       </section>
 
+
+      {/* ======================================================
+          RÉSUMÉ
+          ====================================================== */}
 
       <section className="billing-overview-grid">
 
@@ -599,11 +1071,11 @@ export default function Billing() {
             <div>
 
               <h2>
-                Situation financière
+                Synthèse des encaissements
               </h2>
 
               <p>
-                Synthèse des factures enregistrées
+                Répartition des paiements patients et assurances
               </p>
 
             </div>
@@ -619,17 +1091,17 @@ export default function Billing() {
             <div className="billing-financial-line">
 
               <div>
+
                 <span className="billing-dot billing-dot-green" />
-                Factures payées
+
+                Payé sans assurance
+
               </div>
 
               <strong>
-                {
-                  invoices.filter(
-                    (invoice) =>
-                      invoice.status === "PAID"
-                  ).length
-                }
+                {formatCurrency(
+                  statistics.totalWithoutInsurance
+                )}
               </strong>
 
             </div>
@@ -638,17 +1110,17 @@ export default function Billing() {
             <div className="billing-financial-line">
 
               <div>
+
                 <span className="billing-dot billing-dot-orange" />
-                Factures partielles
+
+                Part assurance
+
               </div>
 
               <strong>
-                {
-                  invoices.filter(
-                    (invoice) =>
-                      invoice.status === "PARTIAL"
-                  ).length
-                }
+                {formatCurrency(
+                  statistics.totalInsurance
+                )}
               </strong>
 
             </div>
@@ -657,17 +1129,17 @@ export default function Billing() {
             <div className="billing-financial-line">
 
               <div>
-                <span className="billing-dot billing-dot-red" />
-                Factures impayées
+
+                <span className="billing-dot billing-dot-blue" />
+
+                Total encaissé
+
               </div>
 
               <strong>
-                {
-                  invoices.filter(
-                    (invoice) =>
-                      invoice.status === "UNPAID"
-                  ).length
-                }
+                {formatCurrency(
+                  statistics.totalCollected
+                )}
               </strong>
 
             </div>
@@ -684,71 +1156,36 @@ export default function Billing() {
             <div>
 
               <h2>
-                Modes de paiement
+                Patients
               </h2>
 
               <p>
-                Principaux moyens d'encaissement
+                Patients concernés par les encaissements
               </p>
 
             </div>
 
-            <CreditCard size={22} />
+            <Users size={22} />
 
           </div>
 
 
-          <div className="billing-payment-methods">
+          <div className="billing-patient-summary">
 
-            <div className="billing-payment-method">
+            <div className="billing-big-number">
 
-              <Banknote size={20} />
+              <Users size={28} />
 
-              <div>
-                <strong>
-                  Espèces
-                </strong>
-
-                <span>
-                  Paiement direct
-                </span>
-              </div>
+              <strong>
+                {statistics.patientsCount}
+              </strong>
 
             </div>
 
-
-            <div className="billing-payment-method">
-
-              <CreditCard size={20} />
-
-              <div>
-                <strong>
-                  Carte bancaire
-                </strong>
-
-                <span>
-                  Paiement électronique
-                </span>
-              </div>
-
-            </div>
-
-
-            <div className="billing-payment-method">
-
-              <Wallet size={20} />
-
-              <div>
-                <strong>
-                  Mobile Money
-                </strong>
-
-                <span>
-                  Orange Money / MTN / Moov
-                </span>
-              </div>
-
-            </div>
+            <span>
+              patient(s) enregistré(s)
+              dans les opérations de caisse
+            </span>
 
           </div>
 
@@ -756,6 +1193,10 @@ export default function Billing() {
 
       </section>
 
+
+      {/* ======================================================
+          TABLEAU
+          ====================================================== */}
 
       <section className="billing-table-card">
 
@@ -765,79 +1206,248 @@ export default function Billing() {
           <div>
 
             <h2>
-              Factures
+              Historique des encaissements
             </h2>
 
             <p>
-              Liste des factures et opérations de paiement
+              Tous les paiements enregistrés par la caisse
             </p>
 
           </div>
 
 
-          <div className="billing-table-tools">
+          <button
+            type="button"
+            className="billing-filter-toggle"
+            onClick={() =>
+              setShowFilters(
+                (current) => !current
+              )
+            }
+          >
+
+            <Filter size={17} />
+
+            Filtres
+
+          </button>
+
+        </div>
 
 
-            <div className="billing-search">
+        {/* ====================================================
+            FILTRES
+            ==================================================== */}
 
-              <Search size={19} />
+        {showFilters && (
 
-              <input
-                type="text"
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                placeholder="Rechercher une facture..."
-              />
+          <div className="billing-filters-panel">
 
-              {search && (
 
-                <button
-                  type="button"
-                  className="billing-clear-button"
-                  onClick={() =>
-                    setSearch("")
+            {/* RECHERCHE */}
+
+            <div className="billing-filter-group billing-filter-search">
+
+              <label>
+                Rechercher
+              </label>
+
+              <div className="billing-search">
+
+                <Search size={18} />
+
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(
+                      event.target.value
+                    )
                   }
-                >
-                  <X size={16} />
-                </button>
+                  placeholder="Patient, référence, service..."
+                />
 
-              )}
+                {search && (
+
+                  <button
+                    type="button"
+                    className="billing-clear-button"
+                    onClick={() =>
+                      setSearch("")
+                    }
+                  >
+
+                    <X size={16} />
+
+                  </button>
+
+                )}
+
+              </div>
 
             </div>
 
 
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value)
-              }
-              className="billing-filter-select"
+            {/* DATE DÉBUT */}
+
+            <div className="billing-filter-group">
+
+              <label htmlFor="billingStartDate">
+                Date début
+              </label>
+
+              <div className="billing-date-input">
+
+                <CalendarDays size={17} />
+
+                <input
+                  id="billingStartDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(event) =>
+                    setStartDate(
+                      event.target.value
+                    )
+                  }
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* DATE FIN */}
+
+            <div className="billing-filter-group">
+
+              <label htmlFor="billingEndDate">
+                Date fin
+              </label>
+
+              <div className="billing-date-input">
+
+                <CalendarDays size={17} />
+
+                <input
+                  id="billingEndDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(event) =>
+                    setEndDate(
+                      event.target.value
+                    )
+                  }
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* CAISSIER */}
+
+            <div className="billing-filter-group">
+
+              <label htmlFor="billingCashier">
+                Caissier
+              </label>
+
+              <select
+                id="billingCashier"
+                value={cashierFilter}
+                onChange={(event) =>
+                  setCashierFilter(
+                    event.target.value
+                  )
+                }
+                className="billing-filter-select"
+              >
+
+                <option value="ALL">
+                  Tous les caissiers
+                </option>
+
+                {cashiers.map(
+                  (cashier) => (
+
+                    <option
+                      key={cashier}
+                      value={cashier}
+                    >
+                      {cashier}
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+
+            {/* MODE */}
+
+            <div className="billing-filter-group">
+
+              <label htmlFor="billingMethod">
+                Mode de paiement
+              </label>
+
+              <select
+                id="billingMethod"
+                value={methodFilter}
+                onChange={(event) =>
+                  setMethodFilter(
+                    event.target.value
+                  )
+                }
+                className="billing-filter-select"
+              >
+
+                <option value="ALL">
+                  Tous les modes
+                </option>
+
+                {paymentMethods.map(
+                  (method) => (
+
+                    <option
+                      key={method}
+                      value={method}
+                    >
+                      {method}
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+
+            {/* RESET */}
+
+            <button
+              type="button"
+              className="billing-reset-button"
+              onClick={resetFilters}
             >
 
-              <option value="ALL">
-                Tous les statuts
-              </option>
+              <RefreshCw size={16} />
 
-              <option value="PAID">
-                Payées
-              </option>
+              Réinitialiser
 
-              <option value="PARTIAL">
-                Partielles
-              </option>
-
-              <option value="UNPAID">
-                Impayées
-              </option>
-
-            </select>
+            </button>
 
           </div>
 
-        </div>
+        )}
 
+
+        {/* ====================================================
+            TABLEAU
+            ==================================================== */}
 
         <div className="billing-table-wrapper">
 
@@ -848,7 +1458,7 @@ export default function Billing() {
               <tr>
 
                 <th>
-                  Facture
+                  Référence
                 </th>
 
                 <th>
@@ -864,19 +1474,23 @@ export default function Billing() {
                 </th>
 
                 <th>
-                  Montant
+                  Caissier
                 </th>
 
                 <th>
-                  Payé
+                  Total
                 </th>
 
                 <th>
-                  Reste
+                  Sans assurance
                 </th>
 
                 <th>
-                  Statut
+                  Assurance
+                </th>
+
+                <th>
+                  Mode
                 </th>
 
                 <th>
@@ -890,28 +1504,50 @@ export default function Billing() {
 
             <tbody>
 
-              {filteredInvoices.length > 0 ? (
+              {loading ? (
 
-                filteredInvoices.map((invoice) => {
+                <tr>
 
-                  const remaining =
-                    invoice.amount - invoice.paid;
+                  <td
+                    colSpan="10"
+                    className="billing-empty"
+                  >
 
-                  return (
+                    <RefreshCw
+                      size={34}
+                      className="billing-spin"
+                    />
 
-                    <tr key={invoice.id}>
+                    <strong>
+                      Chargement des encaissements...
+                    </strong>
 
+                  </td>
+
+                </tr>
+
+              ) : filteredPayments.length > 0 ? (
+
+                filteredPayments.map(
+                  (payment) => (
+
+                    <tr key={payment.id}>
+
+
+                      {/* RÉFÉRENCE */}
 
                       <td>
 
                         <div className="billing-invoice-id">
 
                           <div className="billing-mini-icon">
-                            <FileText size={17} />
+
+                            <Receipt size={17} />
+
                           </div>
 
                           <strong>
-                            {invoice.id}
+                            {payment.id}
                           </strong>
 
                         </div>
@@ -919,22 +1555,26 @@ export default function Billing() {
                       </td>
 
 
+                      {/* PATIENT */}
+
                       <td>
 
                         <div className="billing-patient-cell">
 
                           <div className="billing-patient-avatar">
+
                             <UserRound size={16} />
+
                           </div>
 
                           <div>
 
                             <strong>
-                              {invoice.patient}
+                              {payment.patient}
                             </strong>
 
                             <span>
-                              {invoice.patientId}
+                              {payment.patientId}
                             </span>
 
                           </div>
@@ -944,121 +1584,163 @@ export default function Billing() {
                       </td>
 
 
+                      {/* SERVICE */}
+
                       <td>
-                        {invoice.service}
+                        {payment.service}
                       </td>
 
 
+                      {/* DATE */}
+
                       <td>
+
                         <div className="billing-date-cell">
+
                           <CalendarDays size={15} />
-                          {invoice.date}
+
+                          {formatDate(
+                            payment.date
+                          )}
+
                         </div>
+
                       </td>
 
 
+                      {/* CAISSIER */}
+
                       <td>
-                        <strong>
-                          {formatCurrency(invoice.amount)}
+
+                        <div className="billing-cashier-cell">
+
+                          <UserCheck size={15} />
+
+                          <span>
+                            {payment.cashier}
+                          </span>
+
+                        </div>
+
+                      </td>
+
+
+                      {/* TOTAL */}
+
+                      <td>
+
+                        <strong className="billing-total-value">
+
+                          {formatCurrency(
+                            payment.totalAmount
+                          )}
+
                         </strong>
+
                       </td>
 
 
+                      {/* SANS ASSURANCE */}
+
                       <td>
-                        <span className="billing-paid-value">
-                          {formatCurrency(invoice.paid)}
+
+                        <span className="billing-patient-paid">
+
+                          {formatCurrency(
+                            payment.patientAmount
+                          )}
+
                         </span>
-                      </td>
-
-
-                      <td>
-
-                        <strong
-                          className={
-                            remaining > 0
-                              ? "billing-remaining"
-                              : "billing-remaining-zero"
-                          }
-                        >
-                          {formatCurrency(remaining)}
-                        </strong>
 
                       </td>
 
 
+                      {/* ASSURANCE */}
+
                       <td>
-                        <StatusBadge status={invoice.status} />
+
+                        {payment.insuranceAmount > 0 ? (
+
+                          <span className="billing-insurance-value">
+
+                            <ShieldCheck size={14} />
+
+                            {formatCurrency(
+                              payment.insuranceAmount
+                            )}
+
+                          </span>
+
+                        ) : (
+
+                          <span className="billing-no-insurance">
+
+                            Sans assurance
+
+                          </span>
+
+                        )}
+
                       </td>
 
 
+                      {/* MODE */}
+
                       <td>
 
-                        <div className="billing-actions-wrapper">
+                        <div className="billing-method-cell">
+
+                          {payment.method === "Espèces" ? (
+                            <Banknote size={15} />
+                          ) : (
+                            <CreditCard size={15} />
+                          )}
+
+                          <span>
+                            {payment.method}
+                          </span>
+
+                        </div>
+
+                      </td>
+
+
+                      {/* ACTIONS */}
+
+                      <td>
+
+                        <div className="billing-row-actions">
 
                           <button
                             type="button"
                             className="billing-action-button"
+                            title="Voir"
                             onClick={() =>
-                              setOpenMenu(
-                                openMenu === invoice.id
-                                  ? null
-                                  : invoice.id
+                              setSelectedPayment(
+                                payment
                               )
                             }
                           >
 
-                            <MoreVertical size={19} />
+                            <Eye size={18} />
 
                           </button>
 
 
-                          {openMenu === invoice.id && (
+                          <button
+                            type="button"
+                            className="billing-action-button"
+                            title="Imprimer"
+                            onClick={() =>
+                              handlePrint(
+                                payment
+                              )
+                            }
+                          >
 
-                            <div className="billing-action-menu">
+                            <Download size={18} />
 
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedInvoice(invoice);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <Eye size={16} />
-                                Voir
-                              </button>
-
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  handleDownload(invoice);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <Download size={16} />
-                                Télécharger
-                              </button>
-
-
-                              {remaining > 0 && (
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleOpenPayment(invoice);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <Wallet size={16} />
-                                  Enregistrer paiement
-                                </button>
-
-                              )}
-
-                            </div>
-
-                          )}
+                          </button>
 
                         </div>
 
@@ -1066,27 +1748,28 @@ export default function Billing() {
 
                     </tr>
 
-                  );
+                  )
 
-                })
+                )
 
               ) : (
 
                 <tr>
 
                   <td
-                    colSpan="9"
+                    colSpan="10"
                     className="billing-empty"
                   >
 
                     <Search size={38} />
 
                     <strong>
-                      Aucune facture trouvée
+                      Aucun encaissement trouvé
                     </strong>
 
                     <span>
-                      Modifiez votre recherche ou votre filtre.
+                      Modifiez les dates,
+                      le caissier ou votre recherche.
                     </span>
 
                   </td>
@@ -1102,18 +1785,18 @@ export default function Billing() {
         </div>
 
 
+        {/* ====================================================
+            FOOTER TABLEAU
+            ==================================================== */}
+
         <div className="billing-table-footer">
 
           <span>
-            {filteredInvoices.length} facture(s) affichée(s)
-          </span>
 
-          <span>
-            Total restant :
+            {filteredPayments.length}
             {" "}
-            <strong>
-              {formatCurrency(statistics.totalRemaining)}
-            </strong>
+            opération(s) affichée(s)
+
           </span>
 
         </div>
@@ -1121,389 +1804,23 @@ export default function Billing() {
       </section>
 
 
-      {showInvoiceModal && (
+      {/* ======================================================
+          MODAL DÉTAIL
+          ====================================================== */}
+
+      {selectedPayment && (
 
         <div
           className="billing-modal-overlay"
           onMouseDown={(event) => {
 
             if (
-              event.target === event.currentTarget
+              event.target ===
+              event.currentTarget
             ) {
-              setShowInvoiceModal(false);
-            }
 
-          }}
-        >
+              setSelectedPayment(null);
 
-          <div className="billing-modal">
-
-            <div className="billing-modal-header">
-
-              <div>
-
-                <h2>
-                  Nouvelle facture
-                </h2>
-
-                <p>
-                  Créer une nouvelle facture patient
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="billing-modal-close"
-                onClick={() =>
-                  setShowInvoiceModal(false)
-                }
-              >
-                <X size={21} />
-              </button>
-
-            </div>
-
-
-            <form
-              className="billing-form"
-              onSubmit={handleCreateInvoice}
-            >
-
-              <div className="billing-form-group">
-
-                <label htmlFor="patient">
-                  Patient
-                </label>
-
-                <input
-                  id="patient"
-                  type="text"
-                  value={invoiceForm.patient}
-                  onChange={(event) =>
-                    setInvoiceForm((current) => ({
-                      ...current,
-                      patient: event.target.value,
-                    }))
-                  }
-                  placeholder="Nom complet du patient"
-                  required
-                />
-
-              </div>
-
-
-              <div className="billing-form-group">
-
-                <label htmlFor="service">
-                  Service
-                </label>
-
-                <input
-                  id="service"
-                  type="text"
-                  value={invoiceForm.service}
-                  onChange={(event) =>
-                    setInvoiceForm((current) => ({
-                      ...current,
-                      service: event.target.value,
-                    }))
-                  }
-                  placeholder="Ex. Consultation médicale"
-                  required
-                />
-
-              </div>
-
-
-              <div className="billing-form-row">
-
-                <div className="billing-form-group">
-
-                  <label htmlFor="amount">
-                    Montant
-                  </label>
-
-                  <input
-                    id="amount"
-                    type="number"
-                    min="1"
-                    value={invoiceForm.amount}
-                    onChange={(event) =>
-                      setInvoiceForm((current) => ({
-                        ...current,
-                        amount: event.target.value,
-                      }))
-                    }
-                    placeholder="0"
-                    required
-                  />
-
-                </div>
-
-
-                <div className="billing-form-group">
-
-                  <label htmlFor="dueDate">
-                    Date d'échéance
-                  </label>
-
-                  <input
-                    id="dueDate"
-                    type="date"
-                    value={invoiceForm.dueDate}
-                    onChange={(event) =>
-                      setInvoiceForm((current) => ({
-                        ...current,
-                        dueDate: event.target.value,
-                      }))
-                    }
-                  />
-
-                </div>
-
-              </div>
-
-
-              <div className="billing-modal-actions">
-
-                <button
-                  type="button"
-                  className="billing-secondary-button"
-                  onClick={() =>
-                    setShowInvoiceModal(false)
-                  }
-                >
-                  Annuler
-                </button>
-
-                <button
-                  type="submit"
-                  className="billing-primary-button"
-                >
-                  <CheckCircle2 size={18} />
-                  Créer la facture
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      {showPaymentModal && selectedInvoice && (
-
-        <div
-          className="billing-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget
-            ) {
-              setShowPaymentModal(false);
-            }
-
-          }}
-        >
-
-          <div className="billing-modal">
-
-            <div className="billing-modal-header">
-
-              <div>
-
-                <h2>
-                  Enregistrer un paiement
-                </h2>
-
-                <p>
-                  {selectedInvoice.id} — {selectedInvoice.patient}
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="billing-modal-close"
-                onClick={() =>
-                  setShowPaymentModal(false)
-                }
-              >
-                <X size={21} />
-              </button>
-
-            </div>
-
-
-            <div className="billing-payment-summary">
-
-              <div>
-
-                <span>
-                  Montant facture
-                </span>
-
-                <strong>
-                  {formatCurrency(selectedInvoice.amount)}
-                </strong>
-
-              </div>
-
-
-              <div>
-
-                <span>
-                  Déjà payé
-                </span>
-
-                <strong>
-                  {formatCurrency(selectedInvoice.paid)}
-                </strong>
-
-              </div>
-
-
-              <div>
-
-                <span>
-                  Reste à payer
-                </span>
-
-                <strong className="billing-payment-rest">
-                  {formatCurrency(
-                    selectedInvoice.amount -
-                    selectedInvoice.paid
-                  )}
-                </strong>
-
-              </div>
-
-            </div>
-
-
-            <form
-              className="billing-form"
-              onSubmit={handleRegisterPayment}
-            >
-
-              <div className="billing-form-group">
-
-                <label htmlFor="paymentAmount">
-                  Montant du paiement
-                </label>
-
-                <input
-                  id="paymentAmount"
-                  type="number"
-                  min="1"
-                  max={
-                    selectedInvoice.amount -
-                    selectedInvoice.paid
-                  }
-                  value={paymentForm.amount}
-                  onChange={(event) =>
-                    setPaymentForm((current) => ({
-                      ...current,
-                      amount: event.target.value,
-                    }))
-                  }
-                  required
-                />
-
-              </div>
-
-
-              <div className="billing-form-group">
-
-                <label htmlFor="paymentMethod">
-                  Mode de paiement
-                </label>
-
-                <select
-                  id="paymentMethod"
-                  value={paymentForm.method}
-                  onChange={(event) =>
-                    setPaymentForm((current) => ({
-                      ...current,
-                      method: event.target.value,
-                    }))
-                  }
-                >
-
-                  <option value="Espèces">
-                    Espèces
-                  </option>
-
-                  <option value="Mobile Money">
-                    Mobile Money
-                  </option>
-
-                  <option value="Carte bancaire">
-                    Carte bancaire
-                  </option>
-
-                  <option value="Chèque">
-                    Chèque
-                  </option>
-
-                  <option value="Virement">
-                    Virement bancaire
-                  </option>
-
-                </select>
-
-              </div>
-
-
-              <div className="billing-modal-actions">
-
-                <button
-                  type="button"
-                  className="billing-secondary-button"
-                  onClick={() =>
-                    setShowPaymentModal(false)
-                  }
-                >
-                  Annuler
-                </button>
-
-
-                <button
-                  type="submit"
-                  className="billing-primary-button"
-                >
-                  <Wallet size={18} />
-                  Enregistrer le paiement
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      {selectedInvoice && !showPaymentModal && !showInvoiceModal && (
-
-        <div
-          className="billing-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget
-            ) {
-              setSelectedInvoice(null);
             }
 
           }}
@@ -1517,11 +1834,11 @@ export default function Billing() {
               <div>
 
                 <h2>
-                  Détail de la facture
+                  Détail de l'encaissement
                 </h2>
 
                 <p>
-                  {selectedInvoice.id}
+                  {selectedPayment.id}
                 </p>
 
               </div>
@@ -1531,10 +1848,12 @@ export default function Billing() {
                 type="button"
                 className="billing-modal-close"
                 onClick={() =>
-                  setSelectedInvoice(null)
+                  setSelectedPayment(null)
                 }
               >
+
                 <X size={21} />
+
               </button>
 
             </div>
@@ -1550,7 +1869,7 @@ export default function Billing() {
                 </span>
 
                 <strong>
-                  {selectedInvoice.patient}
+                  {selectedPayment.patient}
                 </strong>
 
               </div>
@@ -1563,20 +1882,7 @@ export default function Billing() {
                 </span>
 
                 <strong>
-                  {selectedInvoice.patientId}
-                </strong>
-
-              </div>
-
-
-              <div className="billing-detail-item">
-
-                <span>
-                  Service
-                </span>
-
-                <strong>
-                  {selectedInvoice.service}
+                  {selectedPayment.patientId}
                 </strong>
 
               </div>
@@ -1589,7 +1895,9 @@ export default function Billing() {
                 </span>
 
                 <strong>
-                  {selectedInvoice.date}
+                  {formatDate(
+                    selectedPayment.date
+                  )}
                 </strong>
 
               </div>
@@ -1598,24 +1906,24 @@ export default function Billing() {
               <div className="billing-detail-item">
 
                 <span>
-                  Échéance
+                  Caissier
                 </span>
 
                 <strong>
-                  {selectedInvoice.dueDate}
+                  {selectedPayment.cashier}
                 </strong>
 
               </div>
 
 
-              <div className="billing-detail-item">
+              <div className="billing-detail-item billing-detail-full">
 
                 <span>
-                  Mode de paiement
+                  Service
                 </span>
 
                 <strong>
-                  {selectedInvoice.method}
+                  {selectedPayment.service}
                 </strong>
 
               </div>
@@ -1628,7 +1936,9 @@ export default function Billing() {
                 </span>
 
                 <strong>
-                  {formatCurrency(selectedInvoice.amount)}
+                  {formatCurrency(
+                    selectedPayment.totalAmount
+                  )}
                 </strong>
 
               </div>
@@ -1637,40 +1947,80 @@ export default function Billing() {
               <div className="billing-detail-item">
 
                 <span>
-                  Montant payé
+                  Part payée par le patient
+                </span>
+
+                <strong className="billing-patient-paid-detail">
+
+                  {formatCurrency(
+                    selectedPayment.patientAmount
+                  )}
+
+                </strong>
+
+              </div>
+
+
+              <div className="billing-detail-item">
+
+                <span>
+                  Part assurance
+                </span>
+
+                <strong className="billing-insurance-detail">
+
+                  {formatCurrency(
+                    selectedPayment.insuranceAmount
+                  )}
+
+                </strong>
+
+              </div>
+
+
+              <div className="billing-detail-item">
+
+                <span>
+                  Mode de paiement
                 </span>
 
                 <strong>
-                  {formatCurrency(selectedInvoice.paid)}
+                  {selectedPayment.method}
                 </strong>
 
               </div>
 
 
-              <div className="billing-detail-item billing-detail-full">
+              {selectedPayment.insuranceName && (
 
-                <span>
-                  Reste à payer
-                </span>
+                <div className="billing-detail-item">
 
-                <strong className="billing-payment-rest">
-                  {formatCurrency(
-                    selectedInvoice.amount -
-                    selectedInvoice.paid
-                  )}
-                </strong>
+                  <span>
+                    Assurance
+                  </span>
 
-              </div>
+                  <strong>
+                    {selectedPayment.insuranceName}
+                  </strong>
 
+                </div>
+
+              )}
 
             </div>
 
 
-            <div className="billing-detail-status">
+            <div className="billing-detail-total">
 
-              <StatusBadge
-                status={selectedInvoice.status}
-              />
+              <span>
+                Total encaissé
+              </span>
+
+              <strong>
+                {formatCurrency(
+                  selectedPayment.totalAmount
+                )}
+              </strong>
 
             </div>
 
@@ -1681,33 +2031,32 @@ export default function Billing() {
                 type="button"
                 className="billing-secondary-button"
                 onClick={() =>
-                  handleDownload(selectedInvoice)
+                  handlePrint(
+                    selectedPayment
+                  )
                 }
               >
+
                 <Download size={18} />
-                Télécharger
+
+                Imprimer
+
               </button>
 
 
-              {
-                selectedInvoice.amount >
-                selectedInvoice.paid
-                && (
-                  <button
-                    type="button"
-                    className="billing-primary-button"
-                    onClick={() =>
-                      handleOpenPayment(selectedInvoice)
-                    }
-                  >
-                    <Wallet size={18} />
-                    Enregistrer un paiement
-                  </button>
-                )
-              }
+              <button
+                type="button"
+                className="billing-primary-button"
+                onClick={() =>
+                  setSelectedPayment(null)
+                }
+              >
+
+                Fermer
+
+              </button>
 
             </div>
-
 
           </div>
 
@@ -1715,24 +2064,52 @@ export default function Billing() {
 
       )}
 
-
     </div>
 
   );
-
 }
 
 
-function CalculatorIcon() {
+/* ============================================================
+   ICÔNE ERREUR
+   ============================================================ */
+
+function AlertCircleIcon() {
 
   return (
-    <div className="billing-calculator-icon">
-      <span />
-      <span />
-      <span />
-      <span />
-    </div>
+
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+
+      <line
+        x1="12"
+        y1="8"
+        x2="12"
+        y2="12"
+      />
+
+      <line
+        x1="12"
+        y1="16"
+        x2="12.01"
+        y2="16"
+      />
+
+    </svg>
+
   );
-
 }
-
