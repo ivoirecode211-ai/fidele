@@ -913,3 +913,1158 @@
     width: 100%;
   }
 }
+
+/*
+ * ============================================================
+ * MA SANTÉ — PAGE MAINTENANCE
+ * ============================================================
+ */
+
+
+/* ============================================================
+   PAGE
+============================================================ */
+
+.maintenance-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 24px 28px 40px;
+  box-sizing: border-box;
+
+  background: var(--bg, #f5f8fb);
+  color: var(--text, #17324d);
+}
+
+
+/* ============================================================
+   EN-TÊTE
+============================================================ */
+
+.maintenance-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  margin-bottom: 22px;
+}
+
+
+/* ============================================================
+   BOUTONS
+============================================================ */
+
+.maintenance-primary-button,
+.maintenance-secondary-button,
+.maintenance-cancel-button {
+  min-height: 42px;
+
+  border-radius: 8px;
+  padding: 0 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.maintenance-primary-button {
+  border: 1px solid #368ad1;
+  background: #368ad1;
+  color: #ffffff;
+}
+
+.maintenance-primary-button:hover {
+  background: #1671b7;
+  border-color: #1671b7;
+  transform: translateY(-1px);
+}
+
+.maintenance-secondary-button {
+  border: 1px solid #cbd8e3;
+  background: #ffffff;
+  color: #0b5d98;
+}
+
+.maintenance-secondary-button:hover {
+  background: #eef6fd;
+  border-color: #368ad1;
+}
+
+.maintenance-cancel-button {
+  border: 1px solid #d7e0e8;
+  background: #ffffff;
+  color: #536b7e;
+}
+
+.maintenance-cancel-button:hover {
+  background: #f3f6f8;
+}
+
+
+/* ============================================================
+   STATISTIQUES
+============================================================ */
+
+.maintenance-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+
+/* ============================================================
+   BARRE DE RECHERCHE / FILTRES
+============================================================ */
+
+.maintenance-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.maintenance-search {
+  flex: 1;
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 0 13px;
+
+  background: #ffffff;
+  border: 1px solid #d8e2eb;
+  border-radius: 8px;
+
+  box-sizing: border-box;
+}
+
+.maintenance-search svg {
+  flex-shrink: 0;
+  color: #5d9bd0;
+}
+
+.maintenance-search input {
+  width: 100%;
+
+  border: 0;
+  outline: none;
+  background: transparent;
+
+  color: #17324d;
+  font-size: 14px;
+}
+
+.maintenance-search input::placeholder {
+  color: #91a2b0;
+}
+
+.maintenance-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.maintenance-filters select {
+  min-width: 165px;
+  height: 44px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d8e2eb;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #17324d;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  outline: none;
+  cursor: pointer;
+}
+
+.maintenance-filters select:focus {
+  border-color: #368ad1;
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.1);
+}
+
+
+/* ============================================================
+   PANELS
+============================================================ */
+
+.maintenance-panel {
+  background: #ffffff;
+
+  border: 1px solid #dce5ec;
+  border-radius: 10px;
+
+  box-shadow: 0 3px 12px rgba(10, 73, 121, 0.05);
+
+  overflow: hidden;
+}
+
+.maintenance-panel-header {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #e5edf3;
+}
+
+.maintenance-panel-header > div {
+  min-width: 0;
+}
+
+.maintenance-panel-header h2 {
+  margin: 0;
+
+  color: #0c3557;
+
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.maintenance-panel-header p {
+  margin: 6px 0 0;
+
+  color: #718697;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.maintenance-panel-header > svg {
+  flex-shrink: 0;
+  color: #368ad1;
+}
+
+
+/* ============================================================
+   GRILLE PRINCIPALE
+============================================================ */
+
+.maintenance-main-grid {
+  display: grid;
+
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 0.9fr);
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+
+/* ============================================================
+   TABLEAU DES INTERVENTIONS
+============================================================ */
+
+.maintenance-interventions-panel {
+  min-width: 0;
+}
+
+.maintenance-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.maintenance-table {
+  width: 100%;
+  min-width: 800px;
+
+  border-collapse: collapse;
+}
+
+.maintenance-table thead {
+  background: #f5f8fb;
+}
+
+.maintenance-table th {
+  height: 48px;
+
+  padding: 0 16px;
+
+  border-bottom: 1px solid #dce5ec;
+
+  text-align: left;
+
+  color: #476174;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.maintenance-table td {
+  padding: 16px;
+
+  border-bottom: 1px solid #edf1f4;
+
+  color: #344f63;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  vertical-align: middle;
+}
+
+.maintenance-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.maintenance-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.maintenance-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+/* ============================================================
+   CELLULE ÉQUIPEMENT
+============================================================ */
+
+.maintenance-equipment-cell {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 190px;
+}
+
+.maintenance-equipment-cell strong {
+  color: #0b5d98;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.maintenance-equipment-cell span {
+  color: #8295a5;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   DATE
+============================================================ */
+
+.maintenance-date-cell {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.maintenance-date-cell span {
+  color: #344f63;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.maintenance-date-cell small {
+  color: #8b9ca9;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   PRIORITÉS
+============================================================ */
+
+.maintenance-priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.maintenance-priority.normale {
+  background: #eef6ff;
+  color: #2879b8;
+}
+
+.maintenance-priority.haute {
+  background: #fff7e6;
+  color: #c77a08;
+}
+
+.maintenance-priority.critique {
+  background: #fff0f0;
+  color: #d92d20;
+}
+
+
+/* ============================================================
+   ÉTAT VIDE
+============================================================ */
+
+.maintenance-empty-state {
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  gap: 8px;
+
+  color: #91a2b0;
+}
+
+.maintenance-empty-state svg {
+  color: #7ca7c8;
+}
+
+.maintenance-empty-state p {
+  margin: 0;
+
+  color: #718697;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   ÉTAT DES ÉQUIPEMENTS
+============================================================ */
+
+.maintenance-status-panel {
+  min-width: 0;
+}
+
+.maintenance-donut-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px 20px 20px;
+}
+
+.maintenance-donut {
+  width: 170px;
+  height: 170px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    conic-gradient(
+      #16a34a 0deg 240deg,
+      #f59e0b 240deg 300deg,
+      #dc2626 300deg 360deg
+    );
+
+  position: relative;
+}
+
+.maintenance-donut::before {
+  content: "";
+
+  position: absolute;
+
+  width: 122px;
+  height: 122px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+}
+
+.maintenance-donut-inner {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+}
+
+.maintenance-donut-inner strong {
+  color: #0c3557;
+
+  font-size: 30px;
+  line-height: 1;
+
+  font-weight: 800;
+}
+
+.maintenance-donut-inner span {
+  margin-top: 6px;
+
+  color: #718697;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   LÉGENDE
+============================================================ */
+
+.maintenance-status-legend {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 0 22px 22px;
+}
+
+.maintenance-status-legend > div {
+  display: grid;
+
+  grid-template-columns: 10px 1fr auto;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+}
+
+.legend-dot.operational {
+  background: #16a34a;
+}
+
+.legend-dot.attention {
+  background: #f59e0b;
+}
+
+.legend-dot.critical {
+  background: #dc2626;
+}
+
+.maintenance-status-legend span:not(.legend-dot) {
+  color: #536b7e;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.maintenance-status-legend strong {
+  color: #0c3557;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+
+/* ============================================================
+   PARC DES ÉQUIPEMENTS
+============================================================ */
+
+.maintenance-equipment-panel {
+  margin-bottom: 18px;
+}
+
+.maintenance-equipment-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 15px;
+
+  padding: 18px;
+}
+
+.maintenance-equipment-card {
+  padding: 18px;
+
+  border: 1px solid #dce5ec;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  transition: all 0.2s ease;
+}
+
+.maintenance-equipment-card:hover {
+  border-color: #b9d8ef;
+
+  box-shadow: 0 6px 18px rgba(10, 73, 121, 0.08);
+
+  transform: translateY(-2px);
+}
+
+.maintenance-equipment-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.maintenance-equipment-icon {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eef6ff;
+  color: #368ad1;
+}
+
+.maintenance-equipment-card h3 {
+  margin: 0;
+
+  color: #0c3557;
+
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.maintenance-equipment-category {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #8295a5;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   INFORMATIONS ÉQUIPEMENT
+============================================================ */
+
+.maintenance-equipment-info {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+  margin-top: 18px;
+  padding-top: 15px;
+
+  border-top: 1px solid #edf1f4;
+}
+
+.maintenance-equipment-info > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.maintenance-equipment-info span {
+  color: #8b9ca9;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.maintenance-equipment-info strong {
+  color: #405a6d;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+
+/* ============================================================
+   ALERTES
+============================================================ */
+
+.maintenance-critical-panel {
+  margin-bottom: 20px;
+}
+
+.maintenance-critical-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  padding: 18px;
+}
+
+.maintenance-critical-item {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #f0d5d5;
+  border-radius: 9px;
+
+  background: #fffafa;
+}
+
+.maintenance-critical-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  border-radius: 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff0f0;
+  color: #dc2626;
+}
+
+.maintenance-critical-content {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.maintenance-critical-content strong {
+  color: #0c3557;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.maintenance-critical-content span {
+  color: #8a9aa8;
+
+  font-size: 12px;
+}
+
+.maintenance-critical-content p {
+  margin: 2px 0 0;
+
+  color: #c24141;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   MODALE
+============================================================ */
+
+.maintenance-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  padding: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15, 23, 42, 0.58);
+
+  overflow-y: auto;
+}
+
+.maintenance-modal {
+  width: min(850px, 100%);
+  max-height: 92vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25);
+}
+
+
+/* ============================================================
+   HEADER MODALE
+============================================================ */
+
+.maintenance-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 22px 25px;
+
+  border-bottom: 1px solid #e3eaf0;
+}
+
+.maintenance-modal-header h2 {
+  margin: 0;
+
+  color: #0c3557;
+
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.maintenance-modal-header p {
+  margin: 6px 0 0;
+
+  color: #718697;
+
+  font-size: 13px;
+}
+
+.maintenance-modal-close {
+  width: 40px;
+  height: 40px;
+
+  border: 0;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f1f5f8;
+  color: #536b7e;
+
+  cursor: pointer;
+}
+
+.maintenance-modal-close:hover {
+  background: #e5edf3;
+  color: #0c3557;
+}
+
+
+/* ============================================================
+   FORMULAIRE
+============================================================ */
+
+.maintenance-modal form {
+  padding: 24px 25px;
+}
+
+.maintenance-form-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+}
+
+.maintenance-form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.maintenance-form-group label {
+  color: #34566f;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.maintenance-form-group input,
+.maintenance-form-group select,
+.maintenance-form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #ccd9e3;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #17324d;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+}
+
+.maintenance-form-group input,
+.maintenance-form-group select {
+  height: 43px;
+  padding: 0 12px;
+}
+
+.maintenance-form-group textarea {
+  padding: 12px;
+
+  min-height: 110px;
+
+  resize: vertical;
+}
+
+.maintenance-form-group input::placeholder,
+.maintenance-form-group textarea::placeholder {
+  color: #9aabb8;
+}
+
+.maintenance-form-group input:focus,
+.maintenance-form-group select:focus,
+.maintenance-form-group textarea:focus {
+  border-color: #368ad1;
+
+  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.1);
+}
+
+.maintenance-form-full {
+  grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   ACTIONS MODALE
+============================================================ */
+
+.maintenance-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 24px;
+  padding-top: 18px;
+
+  border-top: 1px solid #e5edf3;
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLETTE
+============================================================ */
+
+@media (max-width: 1200px) {
+
+  .maintenance-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .maintenance-equipment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .maintenance-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .maintenance-page {
+    padding: 16px;
+  }
+
+  .maintenance-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .maintenance-filters {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .maintenance-filters select {
+    width: 100%;
+  }
+
+  .maintenance-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-equipment-grid {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .maintenance-equipment-info {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .maintenance-panel-header {
+    padding: 16px;
+  }
+
+  .maintenance-panel-header h2 {
+    font-size: 16px;
+  }
+
+  .maintenance-table th {
+    font-size: 12px;
+  }
+
+  .maintenance-table td {
+    font-size: 13px;
+    padding: 13px;
+  }
+
+  .maintenance-modal-overlay {
+    padding: 10px;
+  }
+
+  .maintenance-modal-header {
+    padding: 18px;
+  }
+
+  .maintenance-modal form {
+    padding: 18px;
+  }
+
+  .maintenance-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-form-full {
+    grid-column: auto;
+  }
+
+  .maintenance-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .maintenance-modal-actions button {
+    width: 100%;
+  }
+
+  .maintenance-critical-item {
+    align-items: flex-start;
+  }
+}
+
+
+/* ============================================================
+   PETIT MOBILE
+============================================================ */
+
+@media (max-width: 450px) {
+
+  .maintenance-page {
+    padding: 12px;
+  }
+
+  .maintenance-header {
+    justify-content: stretch;
+  }
+
+  .maintenance-header .maintenance-primary-button {
+    width: 100%;
+  }
+
+  .maintenance-equipment-info {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-critical-item {
+    flex-wrap: wrap;
+  }
+
+  .maintenance-critical-content {
+    width: calc(100% - 56px);
+  }
+
+  .maintenance-critical-item > .maintenance-priority {
+    margin-left: 56px;
+  }
+}
+
+
+/* ============================================================
+   IMPRESSION
+============================================================ */
+
+@media print {
+
+  .maintenance-page {
+    background: #ffffff;
+    padding: 10px;
+  }
+
+  .maintenance-header,
+  .maintenance-toolbar,
+  .maintenance-secondary-button,
+  .maintenance-modal-overlay {
+    display: none !important;
+  }
+
+  .maintenance-panel {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .maintenance-main-grid {
+    display: block;
+  }
+
+  .maintenance-status-panel {
+    margin-top: 20px;
+  }
+}

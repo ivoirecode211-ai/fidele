@@ -1,458 +1,427 @@
-/* ============================================================
-   MA SANTÉ - MODULE INTELLIGENCE ARTIFICIELLE
-   ============================================================ */
+/* =========================================================
+   MA SANTÉ — MODULE INTELLIGENCE ARTIFICIELLE
+   Version lisible et responsive
+   ========================================================= */
 
 .ia-page {
   width: 100%;
   min-height: 100%;
-  padding: 20px;
+  padding: 24px;
+  background: #f8fafc;
+  color: #172033;
   box-sizing: border-box;
-  background: var(--bg);
-  color: var(--text);
 }
 
-/* ============================================================
-   EN-TÊTE
-   ============================================================ */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .ia-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.ia-title-area {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-
-.ia-title-icon {
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0b5d98, #0c3557);
-  color: white;
-  box-shadow: 0 4px 13px rgba(11, 93, 152, 0.2);
-}
-
-.ia-title-area h1 {
-  margin: 0;
-  color: #0a4979;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.ia-title-area p {
-  margin: 3px 0 0;
-  color: var(--muted);
-  font-size: 11px;
+  justify-content: flex-end;
+  margin-bottom: 22px;
 }
 
 .ia-status {
-  min-height: 31px;
-  padding: 0 10px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: var(--bg);
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 600;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid #dbe5ef;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #26364a;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .ia-status-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+  box-shadow: 0 0 0 3px #dcfce7;
 }
 
-/* ============================================================
+/* =========================================================
    OUTILS IA
-   ============================================================ */
+   ========================================================= */
 
 .ia-tools-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 13px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .ia-tool-card {
-  min-height: 74px;
-  padding: 10px;
   position: relative;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  min-height: 145px;
+  padding: 19px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: white;
-  text-align: left;
-  cursor: pointer;
-  box-sizing: border-box;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  gap: 8px;
+  transition: 0.2s ease;
+  color: #172033;
 }
 
 .ia-tool-card:hover {
   transform: translateY(-2px);
-  border-color: #c2e0ff;
-  box-shadow: 0 7px 18px rgba(11, 93, 152, 0.1);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .ia-tool-icon {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 6px;
-  border-radius: 7px;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 5px;
 }
 
 .ia-tool-icon.blue {
-  background: var(--primary-soft);
-  color: #1671b7;
+  color: #2563eb;
+  background: #eff6ff;
 }
 
 .ia-tool-icon.green {
-  background: var(--green-soft);
-  color: var(--green);
+  color: #16a34a;
+  background: #f0fdf4;
 }
 
 .ia-tool-icon.cyan {
-  background: var(--primary-soft);
-  color: #368ad1;
+  color: #0891b2;
+  background: #ecfeff;
 }
 
 .ia-tool-icon.purple {
-  background: var(--purple-soft);
-  color: #1671b7;
+  color: #7c3aed;
+  background: #f5f3ff;
 }
 
 .ia-tool-card strong {
-  color: #0b5d98;
-  font-size: 12px;
+  color: #172033;
+  font-size: 15px;
+  line-height: 1.35;
   font-weight: 700;
 }
 
 .ia-tool-card span {
-  margin-top: 2px;
-  color: #8298a7;
-  font-size: 11px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .ia-tool-arrow {
   position: absolute;
-  top: 12px;
-  right: 9px;
-  color: #9bb0bc;
+  right: 17px;
+  bottom: 18px;
+  color: #94a3b8;
 }
 
-/* ============================================================
-   BARRE D'OUTILS
-   ============================================================ */
+/* =========================================================
+   BARRE DE RECHERCHE
+   ========================================================= */
 
 .ia-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 13px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .ia-search {
-  width: min(430px, 100%);
-  height: 35px;
-  padding: 0 10px;
+  min-width: 280px;
+  flex: 1;
+  max-width: 620px;
+  height: 43px;
+  padding: 0 13px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: white;
+  gap: 9px;
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+  background: #ffffff;
   color: #64748b;
-  box-sizing: border-box;
+}
+
+.ia-search:focus-within {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
 }
 
 .ia-search input {
   width: 100%;
-  border: none;
+  height: 100%;
+  border: 0;
   outline: none;
   background: transparent;
-  color: #0b5d98;
-  font-family: inherit;
-  font-size: 12px;
+  color: #172033;
+  font-size: 14px;
 }
 
 .ia-search input::placeholder {
-  color: #9babb5;
+  color: #94a3b8;
 }
 
 .ia-clear-search {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-soft);
-  color: var(--muted);
   cursor: pointer;
+  padding: 4px;
 }
 
 .ia-last-update {
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: #7b919f;
-  font-size: 12px;
+  gap: 6px;
+  white-space: nowrap;
+  color: #64748b;
+  font-size: 13px;
 }
 
 .ia-last-update strong {
-  color: #0b5d98;
+  color: #334155;
+  font-size: 13px;
 }
 
-/* ============================================================
-   PANELS
-   ============================================================ */
+/* =========================================================
+   GRILLE PRINCIPALE
+   ========================================================= */
 
 .ia-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 1fr);
-  gap: 13px;
-  margin-bottom: 13px;
-}
-
-.ia-bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 1fr);
-  gap: 13px;
-  margin-bottom: 13px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .ia-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: white;
-  box-shadow: 0 2px 9px rgba(11, 93, 152, 0.05);
 }
 
 .ia-panel-header {
-  min-height: 52px;
-  padding: 9px 12px;
+  min-height: 76px;
+  padding: 17px 19px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid var(--green-soft);
-  box-sizing: border-box;
+  gap: 14px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .ia-panel-header h2 {
   margin: 0;
-  color: #0a4979;
-  font-size: 11px;
-  font-weight: 700;
+  color: #172033;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 750;
 }
 
 .ia-panel-header p {
-  margin: 3px 0 0;
-  color: #8299a8;
-  font-size: 11px;
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .ia-today {
-  margin-left: 5px;
-  padding: 3px 5px;
-  border-radius: 5px;
-  background: var(--green-soft);
-  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  margin-left: 9px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
   font-size: 11px;
   font-weight: 700;
   vertical-align: middle;
 }
 
 .ia-view-all {
-  border: none;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
+  border: 0;
   background: transparent;
-  color: #1671b7;
-  font-size: 11px;
-  font-weight: 600;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.ia-view-all:hover {
-  color: var(--primary);
-}
-
-/* ============================================================
-   SUGGESTIONS IA
-   ============================================================ */
+/* =========================================================
+   SUGGESTIONS
+   ========================================================= */
 
 .ia-suggestions-list {
-  padding: 4px 12px 7px;
+  padding: 6px 18px 10px;
 }
 
 .ia-suggestion-row {
-  min-height: 43px;
+  min-height: 69px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid var(--primary-soft);
+  gap: 12px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .ia-suggestion-row:last-child {
-  border-bottom: none;
+  border-bottom: 0;
 }
 
 .ia-suggestion-icon {
-  width: 29px;
-  height: 29px;
-  flex-shrink: 0;
-  border-radius: 7px;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .ia-suggestion-icon.warning {
-  background: var(--warning-soft);
-  color: #f59e0b;
+  background: #fff7ed;
+  color: #ea580c;
 }
 
 .ia-suggestion-icon.danger {
-  background: var(--danger-soft);
-  color: var(--danger);
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .ia-suggestion-icon.success {
-  background: var(--green-soft);
-  color: var(--green);
+  background: #f0fdf4;
+  color: #16a34a;
 }
 
 .ia-suggestion-icon.info {
-  background: var(--primary-soft);
-  color: #1671b7;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .ia-suggestion-content {
-  flex: 1;
   min-width: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .ia-suggestion-content strong {
-  color: #0b5d98;
-  font-size: 12px;
-  font-weight: 600;
+  color: #172033;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
 }
 
 .ia-suggestion-content span {
-  margin-top: 2px;
-  color: #8299a6;
-  font-size: 11px;
+  color: #64748b;
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 .ia-suggestion-view {
-  border: none;
-  background: transparent;
-  color: #1671b7;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 6px 10px;
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .ia-suggestion-view:hover {
-  text-decoration: underline;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .ia-empty {
-  min-height: 150px;
+  min-height: 180px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  color: #91a5b1;
-  font-size: 12px;
+  gap: 10px;
+  color: #64748b;
 }
 
-/* ============================================================
-   ANALYSE DES DONNÉES / GRAPHIQUE
-   ============================================================ */
+.ia-empty span {
+  font-size: 13px;
+}
+
+/* =========================================================
+   GRAPHIQUE
+   ========================================================= */
 
 .analysis-panel {
-  min-height: 226px;
+  min-width: 0;
 }
 
 .ia-analysis-icon {
-  width: 29px;
-  height: 29px;
-  border-radius: 7px;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--green-soft);
-  color: var(--green);
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .ia-chart {
-  height: 150px;
-  padding: 10px 13px 0;
+  height: 250px;
+  padding: 18px 18px 4px 14px;
   display: flex;
-  box-sizing: border-box;
+  gap: 10px;
 }
 
 .ia-chart-y {
-  width: 25px;
-  height: 122px;
-  padding-bottom: 20px;
+  width: 28px;
+  height: 205px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-sizing: border-box;
+  align-items: flex-end;
+  padding-bottom: 2px;
 }
 
 .ia-chart-y span {
-  color: #8ca0ac;
+  color: #64748b;
   font-size: 11px;
 }
 
 .ia-chart-body {
-  flex: 1;
-  height: 130px;
   position: relative;
-  border-left: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  flex: 1;
+  min-width: 0;
+  height: 210px;
 }
 
 .ia-chart-grid-line {
   position: absolute;
   left: 0;
   right: 0;
-  height: 1px;
-  border-top: 1px dashed var(--green-soft);
+  border-top: 1px dashed #e2e8f0;
 }
 
 .line-40 {
@@ -472,539 +441,548 @@
 }
 
 .line-0 {
-  bottom: 0;
+  top: 100%;
 }
 
 .ia-chart-svg {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0 0 26px 0;
   width: 100%;
-  height: 105px;
-  color: #67aae9;
+  height: calc(100% - 26px);
+  color: #2563eb;
   overflow: visible;
 }
 
-.ia-chart-svg circle {
-  fill: #67aae9;
-  stroke: white;
-  stroke-width: 2;
-}
-
 .ia-chart-svg .prediction-line {
-  color: #368ad1;
-}
-
-.ia-chart-svg .prediction-line + circle {
-  fill: #368ad1;
+  color: #16a34a;
 }
 
 .ia-chart-x {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -17px;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
+  gap: 5px;
 }
 
 .ia-chart-x span {
-  color: #879ba8;
-  font-size: 11px;
+  color: #64748b;
+  font-size: 10px;
 }
 
 .ia-chart-legend {
-  padding: 3px 13px 10px 38px;
   display: flex;
   align-items: center;
-  gap: 13px;
+  justify-content: center;
+  gap: 22px;
+  padding: 4px 18px 18px;
 }
 
 .ia-chart-legend span {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--muted);
-  font-size: 11px;
+  gap: 7px;
+  color: #475569;
+  font-size: 12px;
 }
 
 .ia-chart-legend i {
-  width: 17px;
-  height: 2px;
+  width: 18px;
+  height: 3px;
   display: inline-block;
+  border-radius: 999px;
 }
 
 .legend-real {
-  background: #67aae9;
+  background: #2563eb;
 }
 
 .legend-prediction {
-  border-top: 2px dashed #368ad1;
+  background: #16a34a;
 }
 
-/* ============================================================
-   BLOC L'IA AU SERVICE DE LA SANTÉ
-   ============================================================ */
+/* =========================================================
+   BAS DE PAGE
+   ========================================================= */
+
+.ia-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
 
 .ia-health-card {
-  min-height: 136px;
-  padding: 15px;
+  min-height: 180px;
+  padding: 23px;
   display: flex;
   align-items: center;
-  gap: 13px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: linear-gradient(
-    135deg,
-    var(--bg),
-    var(--primary-soft)
-  );
+  gap: 18px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #eff6ff;
   box-sizing: border-box;
 }
 
 .ia-health-icon {
+  flex: 0 0 58px;
   width: 58px;
   height: 58px;
-  flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    var(--primary-soft),
-    #e0effe
-  );
-  color: #368ad1;
-  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.45);
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 5px 18px rgba(37, 99, 235, 0.08);
 }
 
 .ia-health-content {
-  flex: 1;
+  min-width: 0;
 }
 
 .ia-health-content h2 {
-  margin: 0;
-  color: #0b5d98;
-  font-size: 12px;
+  margin: 0 0 8px;
+  color: #172033;
+  font-size: 18px;
+  line-height: 1.35;
 }
 
 .ia-health-content p {
-  max-width: 440px;
-  margin: 5px 0 9px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 13px;
+  margin: 0 0 14px;
+  max-width: 600px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .ia-health-content button {
-  min-height: 28px;
-  padding: 0 10px;
-  border: none;
-  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #368ad1;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.ia-health-content button:hover {
-  background: #1671b7;
+.models-panel {
+  min-width: 0;
 }
 
-/* ============================================================
-   MODÈLES IA
-   ============================================================ */
-
 .models-sparkle {
-  color: #1671b7;
+  color: #7c3aed;
 }
 
 .ia-models-list {
-  padding: 5px 12px 7px;
+  padding: 5px 18px 10px;
 }
 
 .ia-model-row {
-  min-height: 35px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid var(--primary-soft);
+  gap: 12px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .ia-model-row:last-child {
-  border-bottom: none;
+  border-bottom: 0;
 }
 
 .ia-model-name {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: #1671b7;
-  font-size: 12px;
+  gap: 9px;
+  color: #334155;
+}
+
+.ia-model-name span {
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .ia-model-name svg {
-  color: #368ad1;
+  color: #64748b;
+  flex-shrink: 0;
 }
 
 .ia-model-status {
-  padding: 3px 7px;
-  border-radius: 7px;
-  background: #d9f8e8;
-  color: var(--green);
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f0fdf4;
+  color: #15803d;
   font-size: 11px;
   font-weight: 700;
 }
 
-/* ============================================================
+/* =========================================================
    INFORMATION
-   ============================================================ */
+   ========================================================= */
 
 .ia-information {
-  min-height: 50px;
-  padding: 9px 12px;
+  min-height: 60px;
+  padding: 12px 15px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: white;
-  box-sizing: border-box;
+  gap: 11px;
+  border: 1px solid #dbe5ef;
+  border-radius: 12px;
+  background: #ffffff;
 }
 
 .ia-information-icon {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  border-radius: 7px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-soft);
-  color: #1671b7;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .ia-information > div:nth-child(2) {
+  min-width: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .ia-information strong {
-  color: #0b5d98;
-  font-size: 12px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .ia-information span {
-  margin-top: 2px;
-  color: #8299a7;
-  font-size: 11px;
-  line-height: 11px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .ia-information-check {
-  color: var(--green);
+  flex-shrink: 0;
+  color: #16a34a;
 }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
+/* =========================================================
+   MODALE
+   ========================================================= */
 
 .ia-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 1000;
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 35, 58, 0.5);
-  backdrop-filter: blur(2px);
+  background: rgba(15, 23, 42, 0.48);
   box-sizing: border-box;
 }
 
 .ia-modal {
   width: min(620px, 100%);
   max-height: calc(100vh - 40px);
-  overflow-y: auto;
-  border-radius: 11px;
-  background: white;
-  box-shadow: 0 20px 60px rgba(8, 35, 58, 0.27);
+  overflow: auto;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25);
 }
 
 .ia-modal-header {
-  padding: 15px 17px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border);
+  gap: 15px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .ia-modal-title {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
 }
 
 .ia-modal-icon {
-  width: 39px;
-  height: 39px;
-  border-radius: 8px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .ia-modal-icon.blue {
-  background: var(--primary-soft);
-  color: #1671b7;
+  color: #2563eb;
+  background: #eff6ff;
 }
 
 .ia-modal-icon.green {
-  background: var(--green-soft);
-  color: var(--green);
+  color: #16a34a;
+  background: #f0fdf4;
 }
 
 .ia-modal-icon.cyan {
-  background: var(--primary-soft);
-  color: #368ad1;
+  color: #0891b2;
+  background: #ecfeff;
 }
 
 .ia-modal-icon.purple {
-  background: var(--purple-soft);
-  color: #1671b7;
+  color: #7c3aed;
+  background: #f5f3ff;
 }
 
 .ia-modal-title h2 {
   margin: 0;
-  color: #0a4979;
-  font-size: 15px;
+  color: #172033;
+  font-size: 18px;
+  line-height: 1.35;
 }
 
 .ia-modal-title p {
-  margin: 3px 0 0;
-  color: #8298a6;
-  font-size: 12px;
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
 }
 
 .ia-modal-close {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
-  color: var(--muted);
+  background: #ffffff;
+  color: #64748b;
   cursor: pointer;
 }
 
 .ia-modal-close:hover {
-  background: var(--green-soft);
+  background: #f8fafc;
 }
 
 .ia-modal-body {
-  padding: 25px 18px;
+  padding: 24px;
 }
 
 .ia-modal-placeholder {
-  min-height: 230px;
-  padding: 20px;
-  border: 1px dashed #c9dfe9;
-  border-radius: 9px;
+  min-height: 220px;
+  padding: 25px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 13px;
+  background: #f8fafc;
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   text-align: center;
-  background: var(--bg);
 }
 
 .ia-placeholder-icon {
-  width: 57px;
-  height: 57px;
-  margin-bottom: 10px;
-  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 13px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-soft);
-  color: #368ad1;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .ia-modal-placeholder h3 {
-  margin: 0;
-  color: #0b5d98;
-  font-size: 13px;
+  margin: 0 0 8px;
+  color: #172033;
+  font-size: 17px;
 }
 
 .ia-modal-placeholder > p {
-  max-width: 400px;
-  margin: 6px 0 12px;
-  color: #7c94a2;
-  font-size: 12px;
-  line-height: 13px;
+  max-width: 460px;
+  margin: 0 0 15px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .ia-development-info {
-  max-width: 450px;
-  padding: 8px 10px;
+  max-width: 500px;
+  padding: 11px 13px;
   display: flex;
-  align-items: center;
-  gap: 7px;
-  border-radius: 6px;
-  background: var(--primary-soft);
-  color: #368ad1;
-  font-size: 11px;
-  line-height: 11px;
+  align-items: flex-start;
+  gap: 9px;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #64748b;
+  text-align: left;
 }
 
 .ia-development-info svg {
   flex-shrink: 0;
-  color: #1671b7;
+  color: #2563eb;
+  margin-top: 2px;
+}
+
+.ia-development-info span {
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .ia-modal-footer {
-  padding: 12px 17px;
+  padding: 15px 20px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  border-top: 1px solid var(--border);
+  gap: 9px;
+  border-top: 1px solid #eef2f7;
 }
 
 .ia-modal-cancel,
 .ia-modal-action {
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 6px;
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .ia-modal-cancel {
-  border: 1px solid var(--border);
-  background: white;
-  color: var(--muted);
+  border: 1px solid #dbe3ec;
+  background: #ffffff;
+  color: #475569;
 }
 
 .ia-modal-action {
-  border: none;
-  background: linear-gradient(
-    135deg,
-    #0b5d98,
-    #0a4979
-  );
-  color: white;
+  border: 0;
+  background: #2563eb;
+  color: #ffffff;
 }
 
-.ia-modal-action:hover {
-  background: linear-gradient(
-    135deg,
-    #0b5d98,
-    #0c3557
-  );
-}
-
-/* ============================================================
+/* =========================================================
    RESPONSIVE
-   ============================================================ */
+   ========================================================= */
 
-@media (max-width: 1200px) {
-
+@media (max-width: 1100px) {
   .ia-tools-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ia-main-grid,
   .ia-bottom-grid {
     grid-template-columns: 1fr;
   }
-
 }
 
-@media (max-width: 750px) {
-
+@media (max-width: 760px) {
   .ia-page {
-    padding: 14px;
-  }
-
-  .ia-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .ia-status {
-    align-self: flex-start;
+    padding: 16px;
   }
 
   .ia-toolbar {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: stretch;
   }
 
   .ia-search {
-    width: 100%;
+    max-width: none;
   }
 
   .ia-last-update {
-    width: 100%;
-  }
-
-}
-
-@media (max-width: 520px) {
-
-  .ia-tools-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ia-title-area h1 {
-    font-size: 19px;
-  }
-
-  .ia-title-area p {
-    font-size: 12px;
+    justify-content: flex-start;
   }
 
   .ia-health-card {
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .ia-tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ia-tool-card {
+    min-height: 125px;
+  }
+
+  .ia-panel-header {
+    padding: 15px;
+  }
+
+  .ia-panel-header h2 {
+    font-size: 16px;
+  }
+
+  .ia-suggestions-list,
+  .ia-models-list {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .ia-suggestion-content strong {
+    font-size: 13px;
+  }
+
+  .ia-suggestion-content span {
+    font-size: 12px;
+  }
+
+  .ia-health-card {
+    padding: 18px;
     flex-direction: column;
   }
 
-  .ia-health-icon {
-    width: 48px;
-    height: 48px;
+  .ia-information {
+    align-items: flex-start;
+  }
+
+  .ia-information-check {
+    display: none;
   }
 
   .ia-modal-overlay {
-    padding: 10px;
+    padding: 12px;
   }
 
   .ia-modal {
-    max-height: calc(100vh - 20px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .ia-modal-header,
+  .ia-modal-body,
+  .ia-modal-footer {
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
   .ia-modal-footer {
     flex-direction: column-reverse;
+    align-items: stretch;
   }
 
   .ia-modal-cancel,
   .ia-modal-action {
     width: 100%;
   }
-
 }
