@@ -196,6 +196,12 @@ def serve_prescription(*, prescription, user):
         prescription = type(prescription).objects.select_for_update().get(pk=prescription.pk)
         if prescription.status == "SERVED":
             raise WorkflowError("Cette ordonnance est déjà servie.")
+        from stocks.services import StockError, dispense
+
+        try:
+            dispense(prescription=prescription, user=user)
+        except StockError as error:
+            raise WorkflowError(str(error)) from error
         prescription.status = "SERVED"
         prescription.served_by = user
         prescription.served_at = timezone.now()

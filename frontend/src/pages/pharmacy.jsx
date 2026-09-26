@@ -42,49 +42,6 @@ import "../styles/pharmacy.css";
    PRODUITS DE DÉMONSTRATION
    ============================================================ */
 
-const demoProducts = [
-  {
-    id: "P001",
-    name: "Paracétamol 500 mg",
-    category: "Antalgique",
-    reference: "PAR-500",
-    stock: 120,
-    alertStock: 20,
-    price: 500,
-    unit: "Boîte",
-  },
-  {
-    id: "P002",
-    name: "Amoxicilline 500 mg",
-    category: "Antibiotique",
-    reference: "AMO-500",
-    stock: 45,
-    alertStock: 15,
-    price: 1500,
-    unit: "Boîte",
-  },
-  {
-    id: "P003",
-    name: "Amlodipine 10 mg",
-    category: "Antihypertenseur",
-    reference: "AML-010",
-    stock: 8,
-    alertStock: 10,
-    price: 1200,
-    unit: "Boîte",
-  },
-  {
-    id: "P004",
-    name: "Sérum physiologique",
-    category: "Dispositif médical",
-    reference: "SER-001",
-    stock: 65,
-    alertStock: 10,
-    price: 750,
-    unit: "Flacon",
-  },
-];
-
 /* ============================================================
    MENU
    ============================================================ */
@@ -122,9 +79,7 @@ function Pharmacy({ onNavigate }) {
 
   const [prescriptions, setPrescriptions] = useState([]);
 
-  const [products, setProducts] = useState(
-    demoProducts
-  );
+  const [products, setProducts] = useState([]);
 
   /*
    * Historique des médicaments réellement servis.
@@ -170,6 +125,14 @@ function Pharmacy({ onNavigate }) {
         setPrescriptions(response.data)
       );
 
+  // Médicaments du stock (catégorie « Médicament » des Stocks).
+  const loadProducts = () =>
+    api
+      .get("/stocks/pharmacie/produits/")
+      .then((response) =>
+        setProducts(response.data)
+      );
+
   const loadHistory = () =>
     api
       .get("/parcours/pharmacie/historique/")
@@ -181,6 +144,7 @@ function Pharmacy({ onNavigate }) {
     Promise.all([
       loadPrescriptions(),
       loadHistory(),
+      loadProducts(),
     ]).catch((error) =>
       console.error(
         "Erreur de chargement de la pharmacie :",
@@ -452,43 +416,16 @@ function Pharmacy({ onNavigate }) {
     );
 
     /*
-     * Diminution du stock local.
-     *
-     * Cette partie sera reliée à Stocks.jsx
-     * lorsque nous ferons la synchronisation
-     * avec le module Gestion des stocks.
+     * Le stock est diminué par le serveur (sorties de stock
+     * enregistrées dans le module Gestion des stocks).
      */
-    setProducts((current) =>
-      current.map((product) => {
-        const medicine =
-          prescription.medicines.find(
-            (item) =>
-              item
-                .toLowerCase()
-                .trim() ===
-              String(product.name)
-                .toLowerCase()
-                .trim()
-          );
-
-        if (!medicine) {
-          return product;
-        }
-
-        return {
-          ...product,
-          stock: Math.max(
-            0,
-            Number(product.stock || 0) - 1
-          ),
-        };
-      })
+    loadProducts().catch((error) =>
+      console.error(
+        "Erreur de chargement des produits :",
+        error
+      )
     );
 
-    /*
-     * Passage de l'ordonnance
-     * au statut SERVIE.
-     */
     replacePrescription(
       servedPrescription
     );
@@ -515,9 +452,9 @@ function Pharmacy({ onNavigate }) {
      ========================================================== */
 
   const refreshProducts = () => {
-    setProducts((current) => [
-      ...current,
-    ]);
+    loadProducts().catch((error) =>
+      console.error("Erreur de chargement des produits :", error)
+    );
 
     showToast(
       "Liste des produits actualisée."

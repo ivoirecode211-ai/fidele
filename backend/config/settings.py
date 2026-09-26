@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "reports",
     "ia",
     "laboratory",
+    "stocks",
 ]
 
 MIDDLEWARE = [

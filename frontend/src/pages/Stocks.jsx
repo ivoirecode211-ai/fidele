@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Logo from "../components/Logo";
+import api from "../services/api";
 import SidebarFooter from "../components/SidebarFooter";
 import UserBadge from "../components/UserBadge";
 import NotificationBell from "../components/NotificationBell";
@@ -30,171 +31,17 @@ import {
  * ============================================================
  */
 
-const produitsInitiaux = [
-  {
-    id: "001",
-    produit: "Gants",
-    categorie: "Consommable",
-    stock: 25,
-    seuil: 50,
-  },
-  {
-    id: "002",
-    produit: "Sérum 500ml",
-    categorie: "Consommable",
-    stock: 120,
-    seuil: 50,
-  },
-  {
-    id: "003",
-    produit: "Réactif NFS",
-    categorie: "Laboratoire",
-    stock: 15,
-    seuil: 30,
-  },
-  {
-    id: "004",
-    produit: "Masques",
-    categorie: "Consommable",
-    stock: 200,
-    seuil: 100,
-  },
-];
-
 /*
  * ============================================================
  * MOUVEMENTS INITIAUX
  * ============================================================
  */
 
-const mouvementsInitiaux = [
-  {
-    id: 1,
-    reference: "ENT-001",
-    date: "22/09/2026",
-    heure: "08:45",
-    produitId: "001",
-    produit: "Gants",
-    type: "Entrée",
-    quantite: 100,
-    motif: "Réapprovisionnement",
-    utilisateur: "N'GUESSAN Paul",
-    stockApres: 125,
-    fournisseur: "Pharmacie Centrale de Côte d'Ivoire",
-    referenceDocument: "BL-2026-001",
-    service: "",
-    patient: "",
-    observation: "",
-  },
-  {
-    id: 2,
-    reference: "SOR-001",
-    date: "22/09/2026",
-    heure: "09:12",
-    produitId: "001",
-    produit: "Gants",
-    type: "Sortie",
-    quantite: 20,
-    motif: "Consultation",
-    utilisateur: "N'GUESSAN Paul",
-    stockApres: 105,
-    fournisseur: "",
-    referenceDocument: "",
-    service: "Consultation",
-    patient: "",
-    observation: "",
-  },
-  {
-    id: 3,
-    reference: "ENT-002",
-    date: "22/09/2026",
-    heure: "09:30",
-    produitId: "002",
-    produit: "Sérum 500ml",
-    type: "Entrée",
-    quantite: 50,
-    motif: "Livraison",
-    utilisateur: "N'GUESSAN Paul",
-    stockApres: 170,
-    fournisseur: "MedEquip CI",
-    referenceDocument: "BL-2026-002",
-    service: "",
-    patient: "",
-    observation: "",
-  },
-  {
-    id: 4,
-    reference: "SOR-002",
-    date: "21/09/2026",
-    heure: "14:20",
-    produitId: "004",
-    produit: "Masques",
-    type: "Sortie",
-    quantite: 15,
-    motif: "Soins infirmiers",
-    utilisateur: "N'GUESSAN Paul",
-    stockApres: 200,
-    fournisseur: "",
-    referenceDocument: "",
-    service: "Soins infirmiers",
-    patient: "",
-    observation: "",
-  },
-  {
-    id: 5,
-    reference: "ENT-003",
-    date: "20/09/2026",
-    heure: "10:05",
-    produitId: "003",
-    produit: "Réactif NFS",
-    type: "Entrée",
-    quantite: 30,
-    motif: "Livraison",
-    utilisateur: "N'GUESSAN Paul",
-    stockApres: 45,
-    fournisseur: "LabSupply Côte d'Ivoire",
-    referenceDocument: "BL-2026-003",
-    service: "",
-    patient: "",
-    observation: "",
-  },
-];
-
 /*
  * ============================================================
  * FOURNISSEURS INITIAUX
  * ============================================================
  */
-
-const fournisseursInitiaux = [
-  {
-    id: "FOU-001",
-    fournisseur: "Pharmacie Centrale de Côte d'Ivoire",
-    contact: "M. Kouassi Jean",
-    telephone: "07 08 09 10 11",
-    produits: 45,
-    derniereCommande: "20/09/2026",
-    statut: "Actif",
-  },
-  {
-    id: "FOU-002",
-    fournisseur: "MedEquip CI",
-    contact: "Mme Aya N'Guessan",
-    telephone: "05 22 34 56 78",
-    produits: 18,
-    derniereCommande: "15/09/2026",
-    statut: "Actif",
-  },
-  {
-    id: "FOU-003",
-    fournisseur: "LabSupply Côte d'Ivoire",
-    contact: "M. Yao Marc",
-    telephone: "01 72 45 89 20",
-    produits: 23,
-    derniereCommande: "02/09/2026",
-    statut: "Inactif",
-  },
-];
 
 /*
  * ============================================================
@@ -218,7 +65,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const [produits, setProduits] = useState(produitsInitiaux);
+  const [produits, setProduits] = useState([]);
   const [recherche, setRecherche] = useState("");
 
   /*
@@ -243,9 +90,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const [mouvements, setMouvements] = useState(
-    mouvementsInitiaux
-  );
+  const [mouvements, setMouvements] = useState([]);
 
   const [rechercheMouvement, setRechercheMouvement] =
     useState("");
@@ -286,9 +131,30 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const [fournisseurs, setFournisseurs] = useState(
-    fournisseursInitiaux
-  );
+  const [fournisseurs, setFournisseurs] = useState([]);
+
+  /*
+   * Produits, mouvements et fournisseurs servis par l'API
+   * (/api/stocks/). Le stock ne change que par des mouvements.
+   */
+  const chargerStocks = () =>
+    api
+      .get("/stocks/overview/")
+      .then((response) => {
+        setProduits(response.data.produits);
+        setMouvements(response.data.mouvements);
+        setFournisseurs(response.data.fournisseurs);
+      })
+      .catch((error) => console.error("Erreur de chargement des stocks :", error));
+
+  useEffect(() => {
+    chargerStocks();
+  }, []);
+
+  const erreurApi = (error, message) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : message;
+  };
 
   const [rechercheFournisseur, setRechercheFournisseur] =
     useState("");
@@ -419,7 +285,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const handleAjouterProduit = (event) => {
+  const handleAjouterProduit = async (event) => {
     event.preventDefault();
 
     const nomProduit = nouveauProduit.produit.trim();
@@ -444,29 +310,19 @@ export default function Stocks() {
       return;
     }
 
-    const prochainNumero =
-      produits.length > 0
-        ? Math.max(
-            ...produits.map((p) => Number(p.id))
-          ) + 1
-        : 1;
+    try {
+      await api.post("/stocks/produits/", {
+        produit: nomProduit,
+        categorie,
+        stock,
+        seuil,
+      });
+    } catch (error) {
+      alert(erreurApi(error, "Impossible d'ajouter le produit."));
+      return;
+    }
 
-    const nouvelId =
-      String(prochainNumero).padStart(3, "0");
-
-    const produitAjoute = {
-      id: nouvelId,
-      produit: nomProduit,
-      categorie,
-      stock,
-      seuil,
-    };
-
-    setProduits((anciensProduits) => [
-      ...anciensProduits,
-      produitAjoute,
-    ]);
-
+    chargerStocks();
     fermerFormulaire();
   };
 
@@ -537,7 +393,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const handleAjouterMouvement = (event) => {
+  const handleAjouterMouvement = async (event) => {
     event.preventDefault();
 
     const produit = produits.find(
@@ -579,76 +435,17 @@ export default function Stocks() {
       return;
     }
 
-    const nouveauStock =
-      typeMouvement === "Entrée"
-        ? produit.stock + quantite
-        : produit.stock - quantite;
-
-    const dateObjet = new Date(
-      nouveauMouvement.date
-    );
-
-    const dateFormatee =
-      dateObjet.toLocaleDateString("fr-FR");
-
-    const heure =
-      new Date().toLocaleTimeString("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
+    try {
+      await api.post("/stocks/mouvements/", {
+        ...nouveauMouvement,
+        type: typeMouvement,
       });
+    } catch (error) {
+      alert(erreurApi(error, "Impossible d'enregistrer le mouvement."));
+      return;
+    }
 
-    const prefix =
-      typeMouvement === "Entrée"
-        ? "ENT"
-        : "SOR";
-
-    const mouvementsDuType =
-      mouvements.filter(
-        (item) => item.type === typeMouvement
-      ).length + 1;
-
-    const reference =
-      `${prefix}-${String(
-        mouvementsDuType
-      ).padStart(3, "0")}`;
-
-    const mouvementAjoute = {
-      id: Date.now(),
-      reference,
-      date: dateFormatee,
-      heure,
-      produitId: produit.id,
-      produit: produit.produit,
-      type: typeMouvement,
-      quantite,
-      motif: nouveauMouvement.motif,
-      utilisateur: "N'GUESSAN Paul",
-      stockApres: nouveauStock,
-      fournisseur:
-        nouveauMouvement.fournisseur,
-      referenceDocument:
-        nouveauMouvement.referenceDocument,
-      service: nouveauMouvement.service,
-      patient: nouveauMouvement.patient,
-      observation: nouveauMouvement.observation,
-    };
-
-    setMouvements((anciens) => [
-      mouvementAjoute,
-      ...anciens,
-    ]);
-
-    setProduits((anciens) =>
-      anciens.map((item) =>
-        item.id === produit.id
-          ? {
-              ...item,
-              stock: nouveauStock,
-            }
-          : item
-      )
-    );
-
+    chargerStocks();
     fermerFormulaireMouvement();
   };
 
@@ -848,7 +645,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const handleAjouterFournisseur = (event) => {
+  const handleAjouterFournisseur = async (event) => {
     event.preventDefault();
 
     const nom =
@@ -880,47 +677,20 @@ export default function Stocks() {
       return;
     }
 
-    const prochainNumero =
-      fournisseurs.length > 0
-        ? Math.max(
-            ...fournisseurs.map(
-              (fournisseur) =>
-                Number(
-                  fournisseur.id.replace(
-                    "FOU-",
-                    ""
-                  )
-                )
-            )
-          ) + 1
-        : 1;
+    try {
+      await api.post("/stocks/fournisseurs/", {
+        fournisseur: nom,
+        contact,
+        telephone,
+        produits: nouveauFournisseur.produits,
+        statut: nouveauFournisseur.statut,
+      });
+    } catch (error) {
+      alert(erreurApi(error, "Impossible d'ajouter le fournisseur."));
+      return;
+    }
 
-    const nouvelId =
-      `FOU-${String(
-        prochainNumero
-      ).padStart(3, "0")}`;
-
-    const fournisseurAjoute = {
-      id: nouvelId,
-      fournisseur: nom,
-      contact,
-      telephone,
-      produits:
-        nouveauFournisseur.produits === ""
-          ? 0
-          : nombreProduits,
-      derniereCommande:
-        nouveauFournisseur.derniereCommande ||
-        "Aucune",
-      statut:
-        nouveauFournisseur.statut,
-    };
-
-    setFournisseurs((anciens) => [
-      ...anciens,
-      fournisseurAjoute,
-    ]);
-
+    chargerStocks();
     fermerFormulaireFournisseur();
   };
 
@@ -930,9 +700,7 @@ export default function Stocks() {
    * ==========================================================
    */
 
-  const handleSupprimerFournisseur = (
-    fournisseur
-  ) => {
+  const handleSupprimerFournisseur = async (fournisseur) => {
     const confirmation = window.confirm(
       `Voulez-vous vraiment supprimer le fournisseur "${fournisseur.fournisseur}" ?`
     );
@@ -940,12 +708,14 @@ export default function Stocks() {
     if (!confirmation) {
       return;
     }
-    setFournisseurs((anciens) =>
-      anciens.filter(
-        (item) =>
-          item.id !== fournisseur.id
-      )
-    );
+    try {
+      await api.delete(`/stocks/fournisseurs/${fournisseur.id}/`);
+    } catch (error) {
+      alert(erreurApi(error, "Impossible de supprimer le fournisseur."));
+      return;
+    }
+
+    chargerStocks();
 
     if (
       fournisseurSelectionne?.id ===
