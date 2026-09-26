@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import api from "../services/api";
 import "../styles/Hospitalization.css";
 
 
@@ -16,155 +17,9 @@ import {
 // DONNÉES INITIALES DES HOSPITALISATIONS
 // ============================================================
 
-const initialHospitalizations = [
-  {
-    id: 1,
-    patient: "KOFFI Jean",
-    dossier: "PAT-000125",
-    age: 42,
-    sexe: "Homme",
-    service: "Médecine générale",
-    chambre: "A-102",
-    lit: "Lit 01",
-    admission: "15/09/2026",
-    sortiePrevue: "20/09/2026",
-    medecin: "Dr. DJE",
-    motif: "Paludisme",
-    status: "En cours",
-  },
-
-  {
-    id: 2,
-    patient: "KOUASSI Marie",
-    dossier: "PAT-000126",
-    age: 34,
-    sexe: "Femme",
-    service: "Maternité",
-    chambre: "B-204",
-    lit: "Lit 02",
-    admission: "16/09/2026",
-    sortiePrevue: "19/09/2026",
-    medecin: "Dr. YAO",
-    motif: "Surveillance",
-    status: "En cours",
-  },
-
-  {
-    id: 3,
-    patient: "YAO Ibrahim",
-    dossier: "PAT-000127",
-    age: 58,
-    sexe: "Homme",
-    service: "Cardiologie",
-    chambre: "C-301",
-    lit: "Lit 01",
-    admission: "14/09/2026",
-    sortiePrevue: "18/09/2026",
-    medecin: "Dr. KOFFI",
-    motif: "Hypertension",
-    status: "Sortie prévue",
-  },
-
-  {
-    id: 4,
-    patient: "ADJE Fatou",
-    dossier: "PAT-000128",
-    age: 27,
-    sexe: "Femme",
-    service: "Chirurgie",
-    chambre: "D-105",
-    lit: "Lit 01",
-    admission: "12/09/2026",
-    sortiePrevue: "17/09/2026",
-    medecin: "Dr. N'GUESSAN",
-    motif: "Intervention chirurgicale",
-    status: "En cours",
-  },
-
-  {
-    id: 5,
-    patient: "KOUAME Paul",
-    dossier: "PAT-000129",
-    age: 63,
-    sexe: "Homme",
-    service: "Médecine générale",
-    chambre: "A-103",
-    lit: "Lit 02",
-    admission: "10/09/2026",
-    sortiePrevue: "16/09/2026",
-    medecin: "Dr. DJE",
-    motif: "Diabète",
-    status: "Sortie",
-  },
-];
-
-
 // ============================================================
 // DONNÉES INITIALES DES CHAMBRES
 // ============================================================
-
-const initialRooms = [
-  {
-    id: 1,
-    number: "A-101",
-    service: "Médecine générale",
-    type: "Standard",
-    totalBeds: 2,
-    occupiedBeds: 1,
-    beds: ["Lit 01", "Lit 02"],
-  },
-
-  {
-    id: 2,
-    number: "A-102",
-    service: "Médecine générale",
-    type: "Standard",
-    totalBeds: 2,
-    occupiedBeds: 2,
-    beds: ["Lit 01", "Lit 02"],
-  },
-
-  {
-    id: 3,
-    number: "B-201",
-    service: "Maternité",
-    type: "Standard",
-    totalBeds: 3,
-    occupiedBeds: 2,
-    beds: ["Lit 01", "Lit 02", "Lit 03"],
-  },
-
-  {
-    id: 4,
-    number: "B-204",
-    service: "Maternité",
-    type: "VIP",
-    totalBeds: 2,
-    occupiedBeds: 1,
-    beds: ["Lit 01", "Lit 02"],
-  },
-
-  {
-    id: 5,
-    number: "C-301",
-    service: "Cardiologie",
-    type: "VIP",
-    totalBeds: 1,
-    occupiedBeds: 1,
-    beds: ["Lit 01"],
-  },
-
-  {
-    id: 6,
-    number: "D-105",
-    service: "Chirurgie",
-    type: "Standard",
-    totalBeds: 2,
-    occupiedBeds: 1,
-    beds: ["Lit 01", "Lit 02"],
-  },
-];
-
 
 // ============================================================
 // COMPOSANT
@@ -211,190 +66,31 @@ const Hospitalization = () => {
   // ==========================================================
 
   const [hospitalizations, setHospitalizations] =
-    useState(() => {
+    useState([]);
 
-      const saved =
-        localStorage.getItem(
-          "hospitalizations"
-        );
+  const [rooms, setRooms] = useState([]);
 
-      if (saved) {
-
-        try {
-
-          return JSON.parse(saved);
-
-        } catch (error) {
-
-          console.error(
-            "Erreur lors de la lecture des hospitalisations :",
-            error
-          );
-
-        }
-      }
-
-      return initialHospitalizations;
-    });
-
-
-  // ==========================================================
-  // CHAMBRES
-  // ==========================================================
-
-  const [rooms, setRooms] = useState(() => {
-
-    const savedRooms =
-      localStorage.getItem(
-        "hospitalization_rooms"
+  // Séjours, chambres et lits servis par l'API
+  // (/api/hospitalization/service/).
+  const loadWard = () =>
+    api
+      .get("/hospitalization/service/")
+      .then((response) => {
+        setHospitalizations(response.data.hospitalizations);
+        setRooms(response.data.rooms);
+      })
+      .catch((error) =>
+        console.error("Erreur de chargement de l'hospitalisation :", error)
       );
 
-    if (savedRooms) {
-
-      try {
-
-        const parsedRooms =
-          JSON.parse(savedRooms);
-
-        return parsedRooms.map((room) => {
-
-          if (!room.beds) {
-
-            return {
-              ...room,
-              beds: Array.from(
-                { length: room.totalBeds },
-                (_, index) =>
-                  `Lit ${String(index + 1).padStart(
-                    2,
-                    "0"
-                  )}`
-              ),
-            };
-
-          }
-
-          return room;
-
-        });
-
-      } catch (error) {
-
-        console.error(
-          "Erreur lors de la lecture des chambres :",
-          error
-        );
-
-      }
-    }
-
-    return initialRooms;
-  });
-
-
-  // ==========================================================
-  // SAUVEGARDE DES HOSPITALISATIONS
-  // ==========================================================
-
   useEffect(() => {
-
-    localStorage.setItem(
-      "hospitalizations",
-      JSON.stringify(hospitalizations)
-    );
-
-  }, [hospitalizations]);
-
-
-  // ==========================================================
-  // SAUVEGARDE DES CHAMBRES
-  // ==========================================================
-
-  useEffect(() => {
-
-    localStorage.setItem(
-      "hospitalization_rooms",
-      JSON.stringify(rooms)
-    );
-
-  }, [rooms]);
-
-
-  // ==========================================================
-  // SYNCHRONISATION AVEC CONSULTATIONS
-  // ==========================================================
-
-  useEffect(() => {
-
-    const handleStorageChange = (event) => {
-
-      if (
-        event.key === "hospitalizations" &&
-        event.newValue
-      ) {
-
-        try {
-
-          const updated =
-            JSON.parse(event.newValue);
-
-          setHospitalizations(updated);
-
-        } catch (error) {
-
-          console.error(
-            "Erreur de synchronisation des hospitalisations :",
-            error
-          );
-
-        }
-
-      }
-
-
-      if (
-        event.key === "hospitalization_rooms" &&
-        event.newValue
-      ) {
-
-        try {
-
-          const updatedRooms =
-            JSON.parse(event.newValue);
-
-          setRooms(updatedRooms);
-
-        } catch (error) {
-
-          console.error(
-            "Erreur de synchronisation des chambres :",
-            error
-          );
-
-        }
-
-      }
-
-    };
-
-
-    window.addEventListener(
-      "storage",
-      handleStorageChange
-    );
-
-
-    return () => {
-
-      window.removeEventListener(
-        "storage",
-        handleStorageChange
-      );
-
-    };
-
+    loadWard();
   }, []);
 
+  const apiError = (error, fallback) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : fallback;
+  };
 
   // ==========================================================
   // STATISTIQUES
@@ -508,7 +204,7 @@ const Hospitalization = () => {
   // AJOUTER UN LIT
   // ==========================================================
 
-  const handleAddBed = () => {
+  const handleAddBed = async () => {
 
     const roomNumber =
       newBedRoom.trim();
@@ -585,38 +281,17 @@ const Hospitalization = () => {
     // --------------------------------------------------------
     // AJOUT DU LIT
     // --------------------------------------------------------
-
-    const updatedRooms =
-      rooms.map((item) => {
-
-        if (
-          item.number !== roomNumber
-        ) {
-
-          return item;
-
-        }
-
-
-        return {
-
-          ...item,
-
-          totalBeds:
-            item.totalBeds + 1,
-
-          beds: [
-            ...existingBeds,
-            bedNumber,
-          ],
-
-        };
-
+    try {
+      await api.post("/hospitalization/service/lits/", {
+        room: roomNumber,
+        bed: bedNumber,
       });
+    } catch (error) {
+      alert(apiError(error, "Impossible d'ajouter le lit."));
+      return;
+    }
 
-
-    setRooms(updatedRooms);
-
+    loadWard();
 
     // --------------------------------------------------------
     // RÉINITIALISATION DU FORMULAIRE
@@ -641,7 +316,7 @@ const Hospitalization = () => {
   // ==========================================================
 
   const handleTerminateHospitalization =
-    (patientId) => {
+    async (patientId) => {
 
       const hospitalization =
         hospitalizations.find(
@@ -668,60 +343,16 @@ const Hospitalization = () => {
 
 
       // ------------------------------------------------------
-      // MISE À JOUR DU STATUT
+      // SORTIE : le lit est libéré côté serveur
       // ------------------------------------------------------
+      try {
+        await api.post(`/hospitalization/service/sejours/${patientId}/sortie/`);
+      } catch (error) {
+        alert(apiError(error, "Impossible d'enregistrer la sortie."));
+        return;
+      }
 
-      const updatedHospitalizations =
-        hospitalizations.map(
-          (item) =>
-            item.id === patientId
-              ? {
-                  ...item,
-                  status: "Sortie",
-                }
-              : item
-        );
-
-
-      setHospitalizations(
-        updatedHospitalizations
-      );
-
-
-      // ------------------------------------------------------
-      // LIBÉRATION DU LIT
-      // ------------------------------------------------------
-
-      const updatedRooms =
-        rooms.map((room) => {
-
-          if (
-            room.number ===
-            hospitalization.chambre
-          ) {
-
-            return {
-
-              ...room,
-
-              occupiedBeds:
-                Math.max(
-                  0,
-                  room.occupiedBeds - 1
-                ),
-
-            };
-
-          }
-
-
-          return room;
-
-        });
-
-
-      setRooms(updatedRooms);
-
+      loadWard();
 
       // ------------------------------------------------------
       // MISE À JOUR DU PATIENT DANS LE MODAL

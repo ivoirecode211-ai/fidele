@@ -44,3 +44,43 @@ class AppointmentApiTests(APITestCase):
         self.client.force_authenticate(None)
         response = self.client.get("/api/appointments/")
         self.assertEqual(response.status_code, 401)
+
+
+from datetime import timedelta as _td
+
+from django.utils import timezone as _tz
+
+from parcours.tests import ParcoursBase
+
+
+class AgendaTests(ParcoursBase):
+    def payload(self, **overrides):
+        day = (_tz.localdate() + _td(days=3)).isoformat()
+        data = {"patientId": "PAT-001", "date": day, "time": "09:30", "motif": "Contrôle"}
+        data.update(overrides)
+        return data
+
+    def test_doctor_books_follow_up_from_consultation(self):
+        self.as_user(self.medecin)
+        response = self.client.post("/api/appointments/agenda/", self.payload(), format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual((response.data["patient"], response.data["doctor"], response.data["status"], response.data["time"]),
+                         ("TRAORE Awa", "Dr. KOUAME Jean", "En attente", "09:30"))
+        self.assertEqual(response.data["service"], "Médecine générale")
+
+    def test_reception_confirms_moves_and_cancels(self):
+        self.as_user(self.medecin)
+        pk = self.client.post("/api/appointments/agenda/", self.payload(), format="json").data["id"]
+        self.as_user(self.caissier)
+        self.assertEqual(self.client.post(f"/api/appointments/agenda/{pk}/statut/", {"status": "Confirmé"}, format="json").data["status"], "Confirmé")
+        moved = self.client.put(f"/api/appointments/agenda/{pk}/", self.payload(time="11:00", status="Confirmé"), format="json").data
+        self.assertEqual((moved["time"], moved["doctor"]), ("11:00", "Dr. KOUAME Jean"))
+        self.assertEqual(self.client.delete(f"/api/appointments/agenda/{pk}/").status_code, 204)
+
+    def test_rules(self):
+        self.as_user(self.medecin)
+        past = (_tz.localdate() - _td(days=1)).isoformat()
+        self.assertEqual(self.client.post("/api/appointments/agenda/", self.payload(date=past), format="json").status_code, 400)
+        self.assertEqual(self.client.post("/api/appointments/agenda/", self.payload(patientId="PAT-999"), format="json").status_code, 400)
+        self.as_user(self.pharmacien)
+        self.assertEqual(self.client.get("/api/appointments/agenda/").status_code, 403)

@@ -4,6 +4,7 @@ from patients.models import Patient
 class Room(models.Model):
     name = models.CharField(max_length=100)
     department = models.CharField(max_length=120)
+    type = models.CharField(max_length=40, default="Standard")
     def __str__(self):
         return self.name
 
@@ -27,3 +28,12 @@ class Hospitalization(models.Model):
     discharge_date = models.DateTimeField(null=True, blank=True)
     reason = models.TextField(blank=True)
     notes = models.TextField(blank=True)
+    # Parcours : séjour décidé en consultation.
+    planned_discharge = models.DateField(null=True, blank=True)
+    service = models.CharField(max_length=120, blank=True)
+    doctor = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.PROTECT, related_name="hospitalizations"
+    )
+    admission = models.ForeignKey(
+        "parcours.Admission", null=True, blank=True, on_delete=models.PROTECT, related_name="hospitalizations"
+    )

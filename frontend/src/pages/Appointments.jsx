@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   Clock,
@@ -16,67 +16,12 @@ import {
   Filter,
   Phone,
 } from "lucide-react";
+import api from "../services/api";
 import "../styles/appointments.css";
 
-const initialAppointments = [
-  {
-    id: 1,
-    patient: "Kouassi Jean",
-    phone: "07 08 09 10 11",
-    doctor: "Dr. Yao Kouadio",
-    service: "Médecine générale",
-    date: "2026-09-17",
-    time: "08:30",
-    motif: "Consultation générale",
-    status: "Confirmé",
-  },
-  {
-    id: 2,
-    patient: "Amani Marie",
-    phone: "05 12 34 56 78",
-    doctor: "Dr. N'Guessan Alice",
-    service: "Pédiatrie",
-    date: "2026-09-17",
-    time: "10:00",
-    motif: "Contrôle médical",
-    status: "En attente",
-  },
-  {
-    id: 3,
-    patient: "Yao Christian",
-    phone: "01 23 45 67 89",
-    doctor: "Dr. Kouamé Paul",
-    service: "Cardiologie",
-    date: "2026-09-18",
-    time: "09:00",
-    motif: "Suivi tensionnel",
-    status: "Confirmé",
-  },
-  {
-    id: 4,
-    patient: "Konan Béatrice",
-    phone: "07 55 44 33 22",
-    doctor: "Dr. Yao Kouadio",
-    service: "Médecine générale",
-    date: "2026-09-18",
-    time: "11:30",
-    motif: "Douleurs abdominales",
-    status: "Annulé",
-  },
-  {
-    id: 5,
-    patient: "N'Guessan Serge",
-    phone: "05 98 76 54 32",
-    doctor: "Dr. N'Guessan Alice",
-    service: "Pédiatrie",
-    date: "2026-09-19",
-    time: "14:00",
-    motif: "Consultation",
-    status: "Confirmé",
-  },
-];
-
 const emptyForm = {
+  patientId: "",
+  doctorId: "",
   patient: "",
   phone: "",
   doctor: "",
@@ -89,7 +34,23 @@ const emptyForm = {
 
 function Appointments() {
   const [appointments, setAppointments] =
-    useState(initialAppointments);
+    useState([]);
+
+  // Agenda servi par l'API (/api/appointments/agenda/).
+  const loadAppointments = () =>
+    api
+      .get("/appointments/agenda/")
+      .then((response) => setAppointments(response.data))
+      .catch((error) => console.error("Erreur de chargement des rendez-vous :", error));
+
+  useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  const apiError = (error, fallback) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : fallback;
+  };
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
@@ -156,6 +117,8 @@ function Appointments() {
 
     setForm({
       ...emptyForm,
+      patientId: appointment.patientId,
+      doctorId: appointment.doctorId,
       patient: appointment.patient,
       phone: appointment.phone,
       doctor: appointment.doctor,
@@ -175,6 +138,8 @@ function Appointments() {
     setEditingAppointment(appointment);
 
     setForm({
+      patientId: appointment.patientId,
+      doctorId: appointment.doctorId,
       patient: appointment.patient,
       phone: appointment.phone,
       doctor: appointment.doctor,
@@ -209,7 +174,7 @@ function Appointments() {
    * ============================================================
    */
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -223,28 +188,18 @@ function Appointments() {
       return;
     }
 
-    if (editingAppointment) {
-      setAppointments((previous) =>
-        previous.map((appointment) =>
-          appointment.id === editingAppointment.id
-            ? {
-                ...appointment,
-                ...form,
-              }
-            : appointment
-        )
-      );
-    } else {
-      const newAppointment = {
-        id: Date.now(),
-        ...form,
-      };
-
-      setAppointments((previous) => [
-        newAppointment,
-        ...previous,
-      ]);
+    try {
+      if (editingAppointment) {
+        await api.put(`/appointments/agenda/${editingAppointment.id}/`, form);
+      } else {
+        await api.post("/appointments/agenda/", form);
+      }
+    } catch (error) {
+      alert(apiError(error, "Impossible d'enregistrer le rendez-vous."));
+      return;
     }
+
+    loadAppointments();
 
     closeModal();
   };
@@ -255,18 +210,19 @@ function Appointments() {
    * ============================================================
    */
 
-  const deleteAppointment = (id) => {
+  const deleteAppointment = async (id) => {
     const confirmed = window.confirm(
       "Voulez-vous vraiment supprimer ce rendez-vous ?"
     );
 
     if (!confirmed) return;
 
-    setAppointments((previous) =>
-      previous.filter(
-        (appointment) => appointment.id !== id
-      )
-    );
+    try {
+      await api.delete(`/appointments/agenda/${id}/`);
+      loadAppointments();
+    } catch (error) {
+      alert(apiError(error, "Impossible de supprimer le rendez-vous."));
+    }
   };
 
   /*
@@ -275,17 +231,13 @@ function Appointments() {
    * ============================================================
    */
 
-  const updateStatus = (id, status) => {
-    setAppointments((previous) =>
-      previous.map((appointment) =>
-        appointment.id === id
-          ? {
-              ...appointment,
-              status,
-            }
-          : appointment
-      )
-    );
+  const updateStatus = async (id, status) => {
+    try {
+      await api.post(`/appointments/agenda/${id}/statut/`, { status });
+      loadAppointments();
+    } catch (error) {
+      alert(apiError(error, "Impossible de changer le statut."));
+    }
   };
 
   const formatDate = (date) => {

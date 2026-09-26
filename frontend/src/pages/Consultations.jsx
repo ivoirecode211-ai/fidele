@@ -617,7 +617,7 @@ export default function Consultations() {
    */
 
   const enregistrerRendezVous =
-    (e) => {
+    async (e) => {
 
       e.preventDefault();
 
@@ -631,126 +631,43 @@ export default function Consultations() {
       }
 
 
-      const nouveauRendezVous = {
-
-        id:
-          Date.now(),
-
-        patientId:
-          patientSelectionne.id,
-
-        numero:
-          patientSelectionne.numero ||
-          "",
-
-        patient:
-          patientSelectionne.patient,
-
-        sexe:
-          patientSelectionne.sexe ||
-          "",
-
-        age:
-          patientSelectionne.age ||
-          "--",
-
-        telephone:
-          patientSelectionne.telephone ||
-          "",
-
-        parentContact:
-          patientSelectionne.parentContact ||
-          "",
-
-        service:
-          patientSelectionne.service ||
-          "Médecine générale",
-
-        doctor:
-          currentDoctor,
-
-        date:
-          rendezVous.date,
-
-        heure:
-          rendezVous.heure,
-
-        motif:
-          rendezVous.motif ||
-          "Suivi médical",
-
-        statut:
-          "Programmé",
-
-        createdAt:
-          new Date().toISOString(),
-
-        consultationId:
-          patientSelectionne.id,
-
-        diagnostic:
-          patientSelectionne.diagnostic ||
-          "",
-
-        traitement:
-          patientSelectionne.traitement ||
-          "",
-
-        prescription:
-          patientSelectionne.prescription ||
-          patientSelectionne.traitement ||
-          "",
-
-      };
-
-
-      let rendezVousExistants =
-        [];
+      /*
+       * Le rendez-vous est enregistré dans l'agenda
+       * (module Rendez-vous) au nom du médecin connecté.
+       */
 
       try {
 
-        rendezVousExistants =
-          JSON.parse(
-            localStorage.getItem(
-              "sante_rendezvous_patients"
-            ) || "[]"
-          );
+        await api.post(
+          "/appointments/agenda/",
+          {
+            patientId:
+              patientSelectionne.id,
+            service:
+              patientSelectionne.service ||
+              "Médecine générale",
+            date:
+              rendezVous.date,
+            time:
+              rendezVous.heure,
+            motif:
+              rendezVous.motif ||
+              "Suivi médical",
+          }
+        );
 
       } catch (error) {
 
-        console.error(
-          "Erreur de récupération des rendez-vous :",
-          error
+        const errors = error.response?.data;
+
+        alert(
+          errors && typeof errors === "object"
+            ? Object.values(errors).flat().join("\n")
+            : "Impossible d'enregistrer le rendez-vous."
         );
 
-        rendezVousExistants =
-          [];
+        return;
       }
-
-
-      const nouvelleListe = [
-        ...rendezVousExistants,
-        nouveauRendezVous,
-      ];
-
-
-      localStorage.setItem(
-        "sante_rendezvous_patients",
-        JSON.stringify(
-          nouvelleListe
-        )
-      );
-
-
-      window.dispatchEvent(
-        new CustomEvent(
-          "sante:rendezvous-added",
-          {
-            detail:
-              nouveauRendezVous,
-          }
-        )
-      );
 
 
       setRendezVous({
@@ -809,7 +726,7 @@ export default function Consultations() {
    */
 
   const enregistrerHospitalisation =
-    (e) => {
+    async (e) => {
 
       e.preventDefault();
 
@@ -823,110 +740,48 @@ export default function Consultations() {
         return;
       }
 
-      const nouvelleHospitalisation = {
+      /*
+       * Le séjour est enregistré par le service d'hospitalisation :
+       * le lit doit exister et être libre.
+       */
 
-        id:
-          Date.now(),
-
-        patientId:
-          patientSelectionne.id,
-
-        numero:
-          patientSelectionne.numero ||
-          "",
-
-        patient:
-          patientSelectionne.patient,
-
-        sexe:
-          patientSelectionne.sexe ||
-          "",
-
-        age:
-          patientSelectionne.age ||
-          "--",
-
-        telephone:
-          patientSelectionne.telephone ||
-          "",
-
-        parentContact:
-          patientSelectionne.parentContact ||
-          "",
-
-        service:
-          patientSelectionne.service ||
-          "Médecine générale",
-
-        doctor:
-          patientSelectionne.doctor ||
-          currentDoctor,
-
-        chambre:
-          hospitalisation.chambre,
-
-        lit:
-          hospitalisation.lit,
-
-        dateAdmission:
-          hospitalisation.dateAdmission,
-
-        dateSortie:
-          hospitalisation.dateSortie,
-
-        statut:
-          "Hospitalisé",
-
-        motif:
-          patientSelectionne.motif ||
-          "",
-
-        diagnostic:
-          patientSelectionne.diagnostic ||
-          "",
-
-        createdAt:
-          new Date().toISOString(),
-
-      };
-
-
-      let hospitalisationsExistantes =
-        [];
+      if (!patientSelectionne.admissionId) {
+        alert(
+          "Ce patient n'est rattaché à aucun passage en caisse : il ne peut pas être hospitalisé."
+        );
+        return;
+      }
 
       try {
 
-        hospitalisationsExistantes =
-          JSON.parse(
-            localStorage.getItem(
-              "sante_hospitalisation_patients"
-            ) || "[]"
-          );
+        await api.post(
+          "/hospitalization/service/sejours/",
+          {
+            admissionId:
+              patientSelectionne.admissionId,
+            chambre:
+              hospitalisation.chambre,
+            lit:
+              hospitalisation.lit,
+            dateAdmission:
+              hospitalisation.dateAdmission,
+            dateSortie:
+              hospitalisation.dateSortie,
+          }
+        );
 
       } catch (error) {
 
-        console.error(
-          "Erreur de récupération des hospitalisations :",
-          error
+        const errors = error.response?.data;
+
+        alert(
+          errors && typeof errors === "object"
+            ? Object.values(errors).flat().join("\n")
+            : "Impossible d'enregistrer l'hospitalisation."
         );
 
-        hospitalisationsExistantes =
-          [];
+        return;
       }
-
-
-      const nouvelleListe = [
-        ...hospitalisationsExistantes,
-        nouvelleHospitalisation,
-      ];
-
-
-      localStorage.setItem(
-        "sante_hospitalisation_patients",
-        JSON.stringify(
-          nouvelleListe
-        )
-      );
 
 
       /*
@@ -962,20 +817,6 @@ export default function Consultations() {
       );
 
 
-      window.dispatchEvent(
-        new CustomEvent(
-          "sante:hospitalisation-added",
-          {
-            detail:
-              nouvelleHospitalisation,
-          }
-        )
-      );
-
-
-      setPatientSelectionne(
-        patientHospitalise
-      );
 
 
       setHospitalisation({
@@ -992,7 +833,7 @@ export default function Consultations() {
        */
 
       navigate(
-        "/hospitalisation"
+        "/hospitalization"
       );
 
     };
