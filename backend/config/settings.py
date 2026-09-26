@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "ia",
     "laboratory",
     "stocks",
+    "rh",
 ]
 
 MIDDLEWARE = [

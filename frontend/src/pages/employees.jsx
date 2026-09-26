@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Users,
   UserPlus,
@@ -20,94 +20,8 @@ import {
   UserCheck,
 } from "lucide-react";
 
+import api from "../services/api";
 import "../styles/employees.css";
-
-const initialEmployees = [
-  {
-    id: 1,
-    matricule: "EMP-0001",
-    nom: "Kouassi",
-    prenom: "Jean",
-    sexe: "Homme",
-    telephone: "07 08 09 10 11",
-    email: "jean.kouassi@sante.ci",
-    poste: "Médecin généraliste",
-    departement: "Médecine générale",
-    dateEmbauche: "2024-01-15",
-    contrat: "CDI",
-    statut: "Actif",
-  },
-  {
-    id: 2,
-    matricule: "EMP-0002",
-    nom: "N'Guessan",
-    prenom: "Alice",
-    sexe: "Femme",
-    telephone: "05 12 34 56 78",
-    email: "alice.nguessan@sante.ci",
-    poste: "Infirmière",
-    departement: "Soins infirmiers",
-    dateEmbauche: "2024-03-10",
-    contrat: "CDI",
-    statut: "Actif",
-  },
-  {
-    id: 3,
-    matricule: "EMP-0003",
-    nom: "Yao",
-    prenom: "Christian",
-    sexe: "Homme",
-    telephone: "01 23 45 67 89",
-    email: "christian.yao@sante.ci",
-    poste: "Technicien laboratoire",
-    departement: "Laboratoire",
-    dateEmbauche: "2024-06-01",
-    contrat: "CDD",
-    statut: "Actif",
-  },
-  {
-    id: 4,
-    matricule: "EMP-0004",
-    nom: "Konan",
-    prenom: "Béatrice",
-    sexe: "Femme",
-    telephone: "07 55 44 33 22",
-    email: "beatrice.konan@sante.ci",
-    poste: "Pharmacienne",
-    departement: "Pharmacie",
-    dateEmbauche: "2023-09-20",
-    contrat: "CDI",
-    statut: "Actif",
-  },
-  {
-    id: 5,
-    matricule: "EMP-0005",
-    nom: "Kouamé",
-    prenom: "Paul",
-    sexe: "Homme",
-    telephone: "05 98 76 54 32",
-    email: "paul.kouame@sante.ci",
-    poste: "Administrateur",
-    departement: "Administration",
-    dateEmbauche: "2023-02-05",
-    contrat: "CDI",
-    statut: "Congé",
-  },
-  {
-    id: 6,
-    matricule: "EMP-0006",
-    nom: "Amani",
-    prenom: "Marie",
-    sexe: "Femme",
-    telephone: "07 11 22 33 44",
-    email: "marie.amani@sante.ci",
-    poste: "Secrétaire médicale",
-    departement: "Administration",
-    dateEmbauche: "2025-01-10",
-    contrat: "CDD",
-    statut: "Actif",
-  },
-];
 
 const emptyForm = {
   matricule: "",
@@ -124,7 +38,23 @@ const emptyForm = {
 };
 
 function Employees() {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
+
+  // Personnel servi par l'API (/api/rh/employes/).
+  const loadEmployees = () =>
+    api
+      .get("/rh/employes/")
+      .then((response) => setEmployees(response.data))
+      .catch((error) => console.error("Erreur de chargement du personnel :", error));
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
+
+  const apiError = (error, fallback) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : fallback;
+  };
 
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] =
@@ -263,7 +193,7 @@ function Employees() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (
@@ -279,33 +209,22 @@ function Employees() {
       return;
     }
 
-    if (editingEmployee) {
-      setEmployees((previous) =>
-        previous.map((employee) =>
-          employee.id === editingEmployee.id
-            ? {
-                ...employee,
-                ...form,
-              }
-            : employee
-        )
-      );
-    } else {
-      const newEmployee = {
-        id: Date.now(),
-        ...form,
-      };
-
-      setEmployees((previous) => [
-        ...previous,
-        newEmployee,
-      ]);
+    try {
+      if (editingEmployee) {
+        await api.put(`/rh/employes/${editingEmployee.id}/`, form);
+      } else {
+        await api.post("/rh/employes/", form);
+      }
+    } catch (error) {
+      alert(apiError(error, "Impossible d'enregistrer l'employé."));
+      return;
     }
 
+    loadEmployees();
     closeModal();
   };
 
-  const deleteEmployee = (id) => {
+  const deleteEmployee = async (id) => {
     const confirmation = window.confirm(
       "Voulez-vous vraiment supprimer cet employé ?"
     );
@@ -314,22 +233,21 @@ function Employees() {
       return;
     }
 
-    setEmployees((previous) =>
-      previous.filter((employee) => employee.id !== id)
-    );
+    try {
+      await api.delete(`/rh/employes/${id}/`);
+      loadEmployees();
+    } catch (error) {
+      alert(apiError(error, "Impossible de supprimer l'employé."));
+    }
   };
 
-  const changeStatus = (id, status) => {
-    setEmployees((previous) =>
-      previous.map((employee) =>
-        employee.id === id
-          ? {
-              ...employee,
-              statut: status,
-            }
-          : employee
-      )
-    );
+  const changeStatus = async (id, status) => {
+    try {
+      await api.patch(`/rh/employes/${id}/`, { statut: status });
+      loadEmployees();
+    } catch (error) {
+      alert(apiError(error, "Impossible de changer le statut."));
+    }
   };
 
   const formatDate = (date) => {
