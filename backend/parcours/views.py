@@ -97,7 +97,7 @@ def consultation_queryset(user):
     queryset = nursing_queryset().filter(sent_to_consultation_at__isnull=False).select_related(
         "consultation__doctor"
     ).order_by("sent_to_consultation_at", "id")
-    if user.is_superuser or user.role in {"ADMIN", "DIRECTOR"}:
+    if user.has_role("ADMIN", "DIRECTOR"):
         return queryset
     # Un médecin voit la file d'attente et ses propres patients.
     return queryset.filter(Q(consultation__isnull=True) | Q(consultation__doctor=user))

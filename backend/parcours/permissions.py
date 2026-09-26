@@ -15,7 +15,7 @@ class RoleAccess(BasePermission):
         if user.is_superuser:
             return True
         allowed = self.roles if request.method in SAFE_METHODS or self.write_roles is None else self.write_roles
-        return user.role in allowed
+        return bool(user.role_codes & allowed)
 
 
 class CaisseAccess(RoleAccess):

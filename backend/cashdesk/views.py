@@ -25,7 +25,7 @@ from .presenters import bill_data, session_data, actor_name, payment_data
 
 class CashAccess(BasePermission):
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and (request.user.is_superuser or request.user.role in services.CASHIERS))
+        return bool(request.user.is_authenticated and (request.user.is_superuser or request.user.role_codes & services.CASHIERS))
 
 
 class CashView(APIView):
@@ -249,7 +249,7 @@ class QueueView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.role not in services.CASHIERS | {"NURSE", "DOCTOR", "LAB"} and not request.user.is_superuser:
+        if not request.user.has_role(*(services.CASHIERS | {"NURSE", "DOCTOR", "LAB"})):
             raise PermissionDenied()
         qs = ServiceQueue.objects.select_related("line__bill__visit__patient", "line__item").order_by("created_at")
         return paginate(request, qs, lambda e: {"id": e.pk, "patient": str(e.line.bill.visit.patient),
@@ -257,7 +257,7 @@ class QueueView(APIView):
             "created_at": e.created_at})
 
     def patch(self, request):
-        if request.user.role not in {"ADMIN", "DIRECTOR", "NURSE", "DOCTOR", "LAB"} and not request.user.is_superuser:
+        if not request.user.has_role("ADMIN", "DIRECTOR", "NURSE", "DOCTOR", "LAB"):
             raise PermissionDenied("Le service de soins met à jour la prise en charge.")
         with transaction.atomic():
             obj = services.fetch(ServiceQueue, request.data.get("id"))

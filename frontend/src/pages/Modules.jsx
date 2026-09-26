@@ -105,7 +105,10 @@ export default function Modules() {
   const authorizedModules = useMemo(() => {
     if (!user) return [];
 
-    if (user.is_superuser || ["ADMIN", "ADMINISTRATOR", "ADMINISTRATEUR"].includes(userRole)) {
+    // Rôle principal + rôles supplémentaires attribués dans l'Administration.
+    const roles = [userRole, ...(user.roles || []).map(normalizeRole)];
+
+    if (user.is_superuser || roles.some((role) => ["ADMIN", "ADMINISTRATOR", "ADMINISTRATEUR"].includes(role))) {
       return ALL_MODULES;
     }
 
@@ -113,10 +116,9 @@ export default function Modules() {
       return ALL_MODULES.filter((module) => user.modules.includes(module.id));
     }
 
-    const roleModules = DEFAULT_ROLE_MODULES[userRole];
-    if (!roleModules) return [];
+    const roleModules = new Set(roles.flatMap((role) => DEFAULT_ROLE_MODULES[role] || []));
 
-    return ALL_MODULES.filter((module) => roleModules.includes(module.id));
+    return ALL_MODULES.filter((module) => roleModules.has(module.id));
   }, [user, userRole]);
 
   const filteredModules = useMemo(() => {

@@ -19,6 +19,10 @@ class User(AbstractUser):
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default="RECEPTION")
     phone = models.CharField(max_length=30, blank=True)
     department = models.CharField(max_length=120, blank=True)
+    # Intitulé de poste affiché dans l'Administration (ex. « Médecin chef »).
+    job_title = models.CharField(max_length=120, blank=True)
+    # Rôles supplémentaires : ils s'ajoutent au rôle principal pour les accès.
+    extra_roles = models.JSONField(default=list, blank=True)
 
     class Meta(AbstractUser.Meta):
         constraints = [
@@ -41,6 +45,17 @@ class User(AbstractUser):
                 kwargs["update_fields"] = set(update_fields) | {"role", "is_staff"}
 
         return super().save(*args, **kwargs)
+
+    @property
+    def role_codes(self):
+        """Tous les rôles de l'utilisateur (principal + supplémentaires)."""
+        codes = {self.role, *self.extra_roles}
+        if self.is_superuser:
+            codes.add("ADMIN")
+        return codes
+
+    def has_role(self, *codes):
+        return self.is_superuser or bool(self.role_codes & set(codes))
 
     def __str__(self):
         return f"{self.get_full_name() or self.username} — {self.get_role_display()}"

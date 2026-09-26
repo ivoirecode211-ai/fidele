@@ -25,106 +25,13 @@ import {
 
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
+import api from "../services/api";
 import "../styles/administration.css";
 
 // ============================================================
-// RÔLES DISPONIBLES
+// FORMULAIRE UTILISATEUR — utilisateurs, rôles et documents
+// viennent de l'API (/api/administration/)
 // ============================================================
-
-const AVAILABLE_ROLES = [
-  "Administrateur",
-  "Médecin",
-  "Infirmier",
-  "Pharmacien",
-  "Laborantin",
-  "Secrétaire",
-  "Comptable",
-  "Caissier",
-  "Directeur Général",
-];
-
-// ============================================================
-// DONNÉES DE DÉMONSTRATION
-// ============================================================
-
-const USERS = [
-  {
-    id: 1,
-    name: "KOUADIO Jean",
-    function: "Médecin",
-    roles: ["Médecin"],
-    status: "Actif",
-    connection: "10/09/2026 08:45",
-  },
-  {
-    id: 2,
-    name: "TRAORE Awa",
-    function: "Infirmier",
-    roles: ["Infirmier"],
-    status: "Actif",
-    connection: "09/09/2026 07:32",
-  },
-  {
-    id: 3,
-    name: "DIARRA Samuel",
-    function: "Pharmacien",
-    roles: ["Pharmacien", "Gestionnaire de stock"],
-    status: "Actif",
-    connection: "09/09/2026 16:20",
-  },
-  {
-    id: 4,
-    name: "KONAN Bintou",
-    function: "Secrétaire",
-    roles: ["Secrétaire", "Caissier"],
-    status: "Actif",
-    connection: "09/09/2026 14:12",
-  },
-  {
-    id: 5,
-    name: "YAO Claude",
-    function: "Comptable",
-    roles: ["Comptable"],
-    status: "Actif",
-    connection: "09/09/2026 11:05",
-  },
-];
-
-const DOCUMENTS = [
-  {
-    id: 1,
-    name: "Règlement intérieur",
-    type: "PDF",
-    date: "10/09/2026",
-  },
-  {
-    id: 2,
-    name: "Procès-verbal CA",
-    type: "PDF",
-    date: "05/09/2026",
-  },
-  {
-    id: 3,
-    name: "Contrats de travail",
-    type: "PDF",
-    date: "28/08/2026",
-  },
-  {
-    id: 4,
-    name: "Conventions",
-    type: "PDF",
-    date: "20/08/2026",
-  },
-];
-
-const ROLES = [
-  { name: "Médecin", percentage: 31, className: "doctor" },
-  { name: "Infirmier", percentage: 25, className: "nurse" },
-  { name: "Pharmacien", percentage: 16, className: "pharmacy" },
-  { name: "Secrétaire", percentage: 12, className: "secretary" },
-  { name: "Comptable", percentage: 8, className: "accounting" },
-  { name: "Autres", percentage: 8, className: "other" },
-];
 
 const EMPTY_USER_FORM = {
   name: "",
@@ -134,11 +41,51 @@ const EMPTY_USER_FORM = {
   phone: "",
 };
 
+// Couleur de chaque rôle dans l'anneau (identique aux pastilles .role-dot).
+const ROLE_COLORS = {
+  doctor: "#0a4979",
+  nurse: "#1671b7",
+  pharmacy: "#67aae9",
+  secretary: "#98caf9",
+  accounting: "#c2e0ff",
+  other: "#cbd5e1",
+};
+
 // ============================================================
 // COMPOSANT
 // ============================================================
 
 export default function Administration() {
+  const [overview, setOverview] = useState({
+    stats: { activeUsers: 0, roles: 0, documents: 0 },
+    users: [],
+    roleDistribution: [],
+    availableRoles: [],
+    documents: [],
+  });
+
+  const loadOverview = () =>
+    api
+      .get("/administration/overview/")
+      .then((response) => setOverview(response.data))
+      .catch((error) => console.error("Erreur de chargement de l'administration :", error));
+
+  useEffect(() => {
+    loadOverview();
+  }, []);
+
+  const {
+    stats,
+    users: USERS,
+    roleDistribution: ROLES,
+    availableRoles: AVAILABLE_ROLES,
+    documents: DOCUMENTS,
+  } = overview;
+
+  const apiError = (error, fallback) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : fallback;
+  };
   const [search, setSearch] = useState("");
 
   const [showUserModal, setShowUserModal] = useState(false);
@@ -198,7 +145,7 @@ export default function Administration() {
         user.status.toLowerCase().includes(value)
       );
     });
-  }, [search]);
+  }, [search, USERS]);
 
   // ============================================================
   // MODIFICATION DES CHAMPS
@@ -239,7 +186,7 @@ export default function Administration() {
   // SOUMISSION UTILISATEUR
   // ============================================================
 
-  const handleUserSubmit = (event) => {
+  const handleUserSubmit = async (event) => {
     event.preventDefault();
 
     if (form.roles.length === 0) {
@@ -247,13 +194,22 @@ export default function Administration() {
       return;
     }
 
-    console.log("Utilisateur :", form);
+    try {
+      if (selectedUser) {
+        await api.put(`/administration/users/${selectedUser.id}/`, form);
+        alert("Utilisateur modifié avec succès.");
+      } else {
+        const { data } = await api.post("/administration/users/", form);
+        alert(
+          `Utilisateur créé avec succès.\n\nIdentifiant : ${data.username}\nMot de passe provisoire : ${data.temporaryPassword}\n\nCommuniquez-le à la personne : il ne sera plus affiché.`
+        );
+      }
+    } catch (error) {
+      alert(apiError(error, "Impossible d'enregistrer l'utilisateur."));
+      return;
+    }
 
-    alert(
-      selectedUser
-        ? "Utilisateur modifié avec succès."
-        : "Utilisateur créé avec succès."
-    );
+    loadOverview();
 
     setForm(EMPTY_USER_FORM);
     setSelectedUser(null);
@@ -272,12 +228,29 @@ export default function Administration() {
       name: user.name,
       function: user.function,
       roles: [...user.roles],
-      email: "",
-      phone: "",
+      email: user.email || "",
+      phone: user.phone || "",
     });
 
     setShowRoleDropdown(false);
     setShowUserModal(true);
+  };
+
+  // ============================================================
+  // DÉSACTIVATION (le compte est conservé pour l'historique)
+  // ============================================================
+
+  const handleDeactivateUser = async (user) => {
+    if (!window.confirm(`Désactiver le compte de ${user.name} ? Il ne pourra plus se connecter.`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/administration/users/${user.id}/`);
+      loadOverview();
+    } catch (error) {
+      alert(apiError(error, "Impossible de désactiver ce compte."));
+    }
   };
 
   // ============================================================
@@ -293,9 +266,17 @@ export default function Administration() {
     }));
   };
 
-  const handleDocumentSubmit = (event) => {
+  const handleDocumentSubmit = async (event) => {
     event.preventDefault();
 
+    try {
+      await api.post("/administration/documents/", documentForm);
+    } catch (error) {
+      alert(apiError(error, "Impossible d'ajouter le document."));
+      return;
+    }
+
+    loadOverview();
     alert("Document administratif ajouté avec succès.");
 
     setDocumentForm({
@@ -359,21 +340,21 @@ export default function Administration() {
       <section className="administration-stat-grid">
         <StatCard
           icon={<UserRound size={24} strokeWidth={2.2} />}
-          value="32"
+          value={String(stats.activeUsers)}
           label="Utilisateurs actifs"
           tone="blue"
         />
 
         <StatCard
           icon={<Users size={24} strokeWidth={2.2} />}
-          value="5"
+          value={String(stats.roles)}
           label="Rôles"
           tone="green"
         />
 
         <StatCard
           icon={<FileText size={24} strokeWidth={2.2} />}
-          value="18"
+          value={String(stats.documents)}
           label="Documents administratifs"
           tone="purple"
         />
@@ -532,7 +513,7 @@ export default function Administration() {
                           title="Supprimer"
                           className="delete-action"
                           onClick={() =>
-                            alert(`Suppression de ${user.name}`)
+                            handleDeactivateUser(user)
                           }
                         >
                           <Trash2 size={14} />
@@ -574,9 +555,22 @@ export default function Administration() {
               <div
                 className="roles-donut"
                 aria-label="Répartition des rôles"
+                style={
+                  ROLES.length
+                    ? {
+                        background: `conic-gradient(${ROLES.reduce(
+                          (parts, role, index) => {
+                            const start = ROLES.slice(0, index).reduce((sum, item) => sum + item.percentage, 0);
+                            return [...parts, `${ROLE_COLORS[role.className] || ROLE_COLORS.other} ${start}% ${start + role.percentage}%`];
+                          },
+                          []
+                        ).join(", ")})`,
+                      }
+                    : undefined
+                }
               >
                 <div className="roles-donut-center">
-                  <strong>32</strong>
+                  <strong>{stats.activeUsers}</strong>
                   <span>Utilisateurs</span>
                 </div>
               </div>

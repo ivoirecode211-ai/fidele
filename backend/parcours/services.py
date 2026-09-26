@@ -121,7 +121,7 @@ def start_consultation(*, admission, user):
         if admission.sent_to_consultation_at is None:
             raise WorkflowError("Les constantes du patient n'ont pas encore été prises en Soins infirmiers.")
         consultation = Consultation.objects.filter(admission=admission).select_related("doctor").first()
-        if consultation and consultation.doctor_id != user.pk and not user.is_superuser and user.role != "ADMIN":
+        if consultation and consultation.doctor_id != user.pk and not user.has_role("ADMIN"):
             raise WorkflowError(f"Ce patient est déjà pris en charge par {doctor_label(consultation.doctor)}.")
         if consultation is None:
             Consultation.objects.create(
@@ -211,11 +211,10 @@ def notifications_for(user):
     from django.db.models import Q
     from prescriptions.models import Prescription
 
-    role = "ADMIN" if user.is_superuser else user.role
-    sees_all = role in {"ADMIN", "DIRECTOR"}
+    sees_all = user.has_role("ADMIN", "DIRECTOR")
     items = []
 
-    if sees_all or role == "NURSE":
+    if sees_all or user.has_role("NURSE"):
         waiting = Admission.objects.filter(sent_to_consultation_at__isnull=True).count()
         items.append({
             "id": "vitals",
@@ -224,7 +223,7 @@ def notifications_for(user):
             "link": "/nursing",
         })
 
-    if sees_all or role == "DOCTOR":
+    if sees_all or user.has_role("DOCTOR"):
         queue = Admission.objects.filter(sent_to_consultation_at__isnull=False).exclude(statut="Terminée")
         if not sees_all:
             queue = queue.filter(
@@ -237,7 +236,7 @@ def notifications_for(user):
             "link": "/consultations",
         })
 
-    if sees_all or role == "PHARMACY":
+    if sees_all or user.has_role("PHARMACY"):
         prescriptions = Prescription.objects.filter(consultation__isnull=False)
         items.append({
             "id": "to-prepare",

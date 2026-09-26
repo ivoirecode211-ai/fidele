@@ -445,27 +445,27 @@
 }
 
 .role-dot.doctor {
-  background: #22c55e;
+  background: #0a4979;
 }
 
 .role-dot.nurse {
-  background: #368ad1;
+  background: #1671b7;
 }
 
 .role-dot.pharmacy {
-  background: #368ad1;
+  background: #67aae9;
 }
 
 .role-dot.secretary {
-  background: #dc8a8a;
+  background: #98caf9;
 }
 
 .role-dot.accounting {
-  background: #f59e0b;
+  background: #c2e0ff;
 }
 
 .role-dot.other {
-  background: #a9bac6;
+  background: #cbd5e1;
 }
 
 /* ============================================================

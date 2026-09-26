@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/forms/", include("formengine.urls")),
     path("api/cashdesk/", include("cashdesk.urls")),
     path("api/parcours/", include("parcours.urls")),
+    path("api/administration/", include("administration.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]

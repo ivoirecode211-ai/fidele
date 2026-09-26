@@ -19,7 +19,7 @@ ZERO = Decimal("0.00")
 
 
 def manager(user):
-    return user.is_superuser or user.role in MANAGERS
+    return user.has_role(*MANAGERS)
 
 
 def require_manager(user):
