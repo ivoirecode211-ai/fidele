@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BrainCircuit,
   MessageCircle,
@@ -18,6 +18,7 @@ import {
   FileText,
   Info,
 } from "lucide-react";
+import api from "../services/api";
 import "../styles/ia.css";
 
 // Données de démonstration — seront reliées aux API Django/PostgreSQL.
@@ -29,29 +30,15 @@ const AI_TOOLS = [
   { id: "images", title: "Analyse d'images", description: "Radiologie & imagerie", icon: ImageIcon, color: "purple" },
 ];
 
-const AI_SUGGESTIONS = [
-  { id: 1, type: "warning", title: "Risque d'hypertension détecté", patient: "Patient : KONE Brahim (45 ans)" },
-  { id: 2, type: "danger", title: "Suspicion de diabète", patient: "Patient : DIALLO Mariam (38 ans)" },
-  { id: 3, type: "success", title: "Suivi post-opératoire", patient: "Patient : TRAORE Awa (52 ans)" },
-  { id: 4, type: "info", title: "Rendez-vous de contrôle", patient: "Patient : YAO Claude (60 ans)" },
-];
+// Suggestions, courbe et modèles servis par /api/ia/ (règles cliniques
+// appliquées aux constantes réelles).
+const MODEL_ICONS = { Stethoscope, TrendingUp, ImageIcon, MessageCircle };
 
-const AI_MODELS = [
-  { id: 1, name: "Diagnostic médical", status: "Actif", icon: Stethoscope },
-  { id: 2, name: "Prédiction des risques", status: "Actif", icon: TrendingUp },
-  { id: 3, name: "Analyse d'images", status: "Actif", icon: ImageIcon },
-  { id: 4, name: "Assistant conversationnel", status: "Actif", icon: MessageCircle },
-];
-
-const ANALYSIS_DATA = [
-  { date: "10/09", reel: 20, prediction: 21 },
-  { date: "11/09", reel: 24, prediction: 23 },
-  { date: "12/09", reel: 18, prediction: 20 },
-  { date: "13/09", reel: 27, prediction: 25 },
-  { date: "14/09", reel: 22, prediction: 23 },
-  { date: "15/09", reel: 30, prediction: 28 },
-  { date: "16/09", reel: 26, prediction: 29 },
-];
+// Points de la courbe dans le repère du SVG (700 × 210).
+function chartPoints(values, max) {
+  const step = values.length > 1 ? 670 / (values.length - 1) : 0;
+  return values.map((value, index) => [10 + index * step, 210 - (value / max) * 205]);
+}
 
 function AIToolCard({ icon: Icon, title, description, color, onClick }) {
   return (
@@ -82,6 +69,24 @@ function SuggestionIcon({ type }) {
 export default function Ia() {
   const [search, setSearch] = useState("");
   const [activeTool, setActiveTool] = useState(null);
+  const [data, setData] = useState({ suggestions: [], analysis: [], models: [] });
+
+  useEffect(() => {
+    api
+      .get("/ia/overview/")
+      .then((response) => setData(response.data))
+      .catch((error) => console.error("Erreur de chargement de l'IA :", error));
+  }, []);
+
+  const analysedAt = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const AI_SUGGESTIONS = data.suggestions;
+  const ANALYSIS_DATA = data.analysis;
+  const AI_MODELS = data.models.map((model) => ({ ...model, icon: MODEL_ICONS[model.icon] || Stethoscope }));
+
+  // Échelle : un multiple de 4 au-dessus de la plus haute valeur.
+  const chartMax = Math.max(4, Math.ceil(Math.max(0, ...ANALYSIS_DATA.flatMap((d) => [d.reel, d.prediction])) / 4) * 4);
+  const realPoints = chartPoints(ANALYSIS_DATA.map((d) => d.reel), chartMax);
+  const predictionPoints = chartPoints(ANALYSIS_DATA.map((d) => d.prediction), chartMax);
 
   const filteredSuggestions = useMemo(() => {
     const value = search.toLowerCase().trim();
@@ -92,7 +97,7 @@ export default function Ia() {
         item.title.toLowerCase().includes(value) ||
         item.patient.toLowerCase().includes(value)
     );
-  }, [search]);
+  }, [search, AI_SUGGESTIONS]);
 
   const closeTool = () => setActiveTool(null);
 
@@ -143,7 +148,7 @@ export default function Ia() {
         <div className="ia-last-update">
           <Clock3 size={13} />
           Dernière analyse :
-          <strong>aujourd'hui à 09:42</strong>
+          <strong>aujourd'hui à {analysedAt}</strong>
         </div>
       </div>
 
@@ -161,7 +166,7 @@ export default function Ia() {
             <button
               type="button"
               className="ia-view-all"
-              onClick={() => alert("Affichage de toutes les suggestions IA.")}
+              onClick={() => setSearch("")}
             >
               Voir tout
               <ChevronRight size={13} />
@@ -208,11 +213,9 @@ export default function Ia() {
 
           <div className="ia-chart">
             <div className="ia-chart-y">
-              <span>40</span>
-              <span>30</span>
-              <span>20</span>
-              <span>10</span>
-              <span>0</span>
+              {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
+                <span key={ratio}>{chartMax * ratio}</span>
+              ))}
             </div>
 
             <div className="ia-chart-body">
@@ -224,26 +227,22 @@ export default function Ia() {
 
               <svg className="ia-chart-svg" viewBox="0 0 700 210" preserveAspectRatio="none">
                 <polyline
-                  points="10,108 120,87 230,120 340,72 450,98 560,50 680,73"
+                  points={realPoints.map((p) => p.join(",")).join(" ")}
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="3"
                 />
                 <polyline
-                  points="10,102 120,94 230,105 340,82 450,92 560,58 680,62"
+                  points={predictionPoints.map((p) => p.join(",")).join(" ")}
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeDasharray="7 5"
                   className="prediction-line"
                 />
-                <circle cx="10" cy="108" r="4" />
-                <circle cx="120" cy="87" r="4" />
-                <circle cx="230" cy="120" r="4" />
-                <circle cx="340" cy="72" r="4" />
-                <circle cx="450" cy="98" r="4" />
-                <circle cx="560" cy="50" r="4" />
-                <circle cx="680" cy="73" r="4" />
+                {realPoints.map(([x, y], index) => (
+                  <circle key={index} cx={x} cy={y} r="4" />
+                ))}
               </svg>
 
               <div className="ia-chart-x">
@@ -381,7 +380,7 @@ export default function Ia() {
                 <button
                   type="button"
                   className="ia-modal-action"
-                  onClick={() => alert("Fonctionnalité IA prête à être connectée.")}
+                  onClick={() => alert("Cet outil n'est pas encore disponible : les alertes de la page sont calculées à partir des constantes réelles.")}
                 >
                   <Sparkles size={15} />
                   Démarrer l'analyse

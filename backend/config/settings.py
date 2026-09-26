@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "hygiene",
     "archives",
     "reports",
+    "ia",
 ]
 
 MIDDLEWARE = [
