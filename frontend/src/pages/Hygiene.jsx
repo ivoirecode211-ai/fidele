@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ShieldCheck,
   FlaskConical,
@@ -19,31 +19,12 @@ import {
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
+import api from "../services/api";
 import "../styles/hygiene.css";
 
-// Données de démonstration — seront reliées aux API Django/PostgreSQL.
-
-const CLEANING_TASKS = [
-  { id: 1, zone: "Bloc opératoire", type: "Désinfection", responsible: "ADOU K.", status: "Terminée", hour: "08:00" },
-  { id: 2, zone: "Chambres patients", type: "Nettoyage", responsible: "KOUAME S.", status: "En cours", hour: "10:30" },
-  { id: 3, zone: "Salle d'attente", type: "Nettoyage", responsible: "TRAORE M.", status: "Planifiée", hour: "14:00" },
-  { id: 4, zone: "Laboratoire", type: "Désinfection", responsible: "DIARRA L.", status: "En cours", hour: "12:00" },
-  { id: 5, zone: "Sanitaires", type: "Nettoyage", responsible: "YAO F.", status: "En retard", hour: "11:30" },
-];
-
-const HYGIENE_PRODUCTS = [
-  { id: 1, name: "Désinfectant", quantity: "12/09/2026", icon: FlaskConical, color: "blue" },
-  { id: 2, name: "Savon liquide", quantity: "12/09/2026", icon: LockKeyhole, color: "green" },
-  { id: 3, name: "Gants", quantity: "12/09/2026", icon: ShieldCheck, color: "cyan" },
-  { id: 4, name: "Masques", quantity: "11/09/2026", icon: Biohazard, color: "purple" },
-  { id: 5, name: "Sacs DASRI", quantity: "11/09/2026", icon: Package, color: "blue" },
-];
-
-const WASTE_TYPES = [
-  { id: 1, name: "Déchets infectieux", quantity: "12 kg", collection: "10/09/2026", icon: Biohazard, color: "red" },
-  { id: 2, name: "Déchets chimiques", quantity: "3 kg", collection: "09/09/2026", icon: Trash2, color: "orange" },
-  { id: 3, name: "Déchets assimilés", quantity: "8 kg", collection: "09/09/2026", icon: Trash2, color: "gray" },
-];
+// Données servies par l'API (/api/hygiene/).
+// Icônes lucide référencées par nom dans les réponses de l'API.
+const ICONS = { FlaskConical, LockKeyhole, ShieldCheck, Biohazard, Package, Trash2 };
 
 const TASK_STATUS_TONES = {
   "Terminée": "success",
@@ -55,6 +36,29 @@ const TASK_STATUS_TONES = {
 const EMPTY_TASK_FORM = { zone: "", type: "Nettoyage", responsible: "", date: "", hour: "" };
 
 export default function Hygiene() {
+  const [data, setData] = useState({
+    updatedAt: "—",
+    stats: { compliance: null, inProgress: 0, late: 0, incidents: 0 },
+    tasks: [],
+    products: [],
+    wastes: [],
+    audit: { last: "—", lastResult: "Aucun contrôle", next: "—" },
+  });
+
+  const loadOverview = () =>
+    api
+      .get("/hygiene/overview/")
+      .then((response) => setData(response.data))
+      .catch((error) => console.error("Erreur de chargement de l'hygiène :", error));
+
+  useEffect(() => {
+    loadOverview();
+  }, []);
+
+  const CLEANING_TASKS = data.tasks;
+  const HYGIENE_PRODUCTS = data.products.map((item) => ({ ...item, icon: ICONS[item.icon] || Package }));
+  const WASTE_TYPES = data.wastes.map((item) => ({ ...item, icon: ICONS[item.icon] || Trash2 }));
+  const compliance = data.stats.compliance === null ? "—" : `${data.stats.compliance}%`;
   const [search, setSearch] = useState("");
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -71,7 +75,7 @@ export default function Hygiene() {
         task.responsible.toLowerCase().includes(value) ||
         task.status.toLowerCase().includes(value)
     );
-  }, [search]);
+  }, [search, CLEANING_TASKS]);
 
   const handleTaskChange = (event) => {
     const { name, value } = event.target;
@@ -86,7 +90,7 @@ export default function Hygiene() {
 
   const openEditTask = (task) => {
     setSelectedTask(task);
-    setTaskForm({ zone: task.zone, type: task.type, responsible: task.responsible, date: "", hour: task.hour });
+    setTaskForm({ zone: task.zone, type: task.type, responsible: task.responsible, date: task.date, hour: task.hour });
     setShowTaskModal(true);
   };
 
@@ -96,9 +100,26 @@ export default function Hygiene() {
     setTaskForm(EMPTY_TASK_FORM);
   };
 
-  // Plus tard : api.post("/hygiene/tasks/", taskForm) ou api.put(`/hygiene/tasks/${selectedTask.id}/`, taskForm).
-  const handleTaskSubmit = (event) => {
+  const handleTaskSubmit = async (event) => {
     event.preventDefault();
+
+    try {
+      if (selectedTask) {
+        await api.put(`/hygiene/tasks/${selectedTask.id}/`, taskForm);
+      } else {
+        await api.post("/hygiene/tasks/", taskForm);
+      }
+    } catch (error) {
+      const errors = error.response?.data;
+      alert(
+        errors && typeof errors === "object"
+          ? Object.values(errors).flat().join("\n")
+          : "Impossible d'enregistrer la tâche."
+      );
+      return;
+    }
+
+    loadOverview();
     alert(selectedTask ? "Tâche modifiée avec succès." : "Nouvelle tâche créée avec succès.");
     closeTaskModal();
   };
@@ -114,10 +135,10 @@ export default function Hygiene() {
       </header>
 
       <section className="hygiene-stat-grid">
-        <StatCard icon={<ShieldCheck size={22} strokeWidth={2.2} />} value="96%" label="Taux de conformité" tone="green" />
-        <StatCard icon={<FlaskConical size={22} strokeWidth={2.2} />} value="8" label="Tâches en cours" tone="blue" />
-        <StatCard icon={<CalendarDays size={22} strokeWidth={2.2} />} value="3" label="Tâches en retard" tone="orange" />
-        <StatCard icon={<Biohazard size={22} strokeWidth={2.2} />} value="2" label="Incidents d'hygiène" tone="purple" />
+        <StatCard icon={<ShieldCheck size={22} strokeWidth={2.2} />} value={compliance} label="Taux de conformité" tone="green" />
+        <StatCard icon={<FlaskConical size={22} strokeWidth={2.2} />} value={String(data.stats.inProgress)} label="Tâches en cours" tone="blue" />
+        <StatCard icon={<CalendarDays size={22} strokeWidth={2.2} />} value={String(data.stats.late)} label="Tâches en retard" tone="orange" />
+        <StatCard icon={<Biohazard size={22} strokeWidth={2.2} />} value={String(data.stats.incidents)} label="Incidents d'hygiène" tone="purple" />
       </section>
 
       <div className="hygiene-toolbar">
@@ -144,7 +165,7 @@ export default function Hygiene() {
         <div className="hygiene-date-info">
           <CalendarDays size={14} />
           Mise à jour :
-          <strong>10/09/2026</strong>
+          <strong>{data.updatedAt}</strong>
         </div>
       </div>
 
@@ -288,9 +309,9 @@ export default function Hygiene() {
               </div>
               <div className="audit-info">
                 <strong>Dernier contrôle</strong>
-                <span>09/09/2026</span>
+                <span>{data.audit.last}</span>
               </div>
-              <span className="audit-status">Conforme</span>
+              <span className="audit-status">{data.audit.lastResult}</span>
             </div>
 
             <div className="audit-separator"></div>
@@ -301,18 +322,18 @@ export default function Hygiene() {
               </div>
               <div className="audit-info">
                 <strong>Prochain contrôle</strong>
-                <span>16/09/2026</span>
+                <span>{data.audit.next}</span>
               </div>
               <ChevronRight size={15} className="audit-arrow" />
             </div>
 
             <div className="audit-summary">
               <div>
-                <strong>96%</strong>
+                <strong>{compliance}</strong>
                 <span>conformité globale</span>
               </div>
               <div className="audit-progress">
-                <div className="audit-progress-bar" style={{ width: "96%" }}></div>
+                <div className="audit-progress-bar" style={{ width: `${data.stats.compliance || 0}%` }}></div>
               </div>
             </div>
           </div>
@@ -331,7 +352,7 @@ export default function Hygiene() {
           </span>
         </div>
         <div className="summary-score">
-          <strong>96%</strong>
+          <strong>{compliance}</strong>
           <span>Conformité</span>
         </div>
       </section>

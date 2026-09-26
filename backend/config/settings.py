@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "parcours",
     "administration",
     "maintenance",
+    "hygiene",
 ]
 
 MIDDLEWARE = [
