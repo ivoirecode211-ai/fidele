@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../styles/Laboratory.css";
@@ -15,313 +15,15 @@ import {
   X,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import api from "../services/api";
 import SidebarFooter from "../components/SidebarFooter";
 /* ============================================================
    TARIFS DES EXAMENS
    ============================================================ */
 
-const EXAMS = [
-  {
-    id: "nfs",
-    name: "NFS",
-    category: "Hématologie",
-    price: 5000,
-  },
-  {
-    id: "glycemie",
-    name: "Glycémie",
-    category: "Biochimie",
-    price: 2500,
-  },
-  {
-    id: "groupe-sanguin",
-    name: "Groupe sanguin",
-    category: "Immuno-hématologie",
-    price: 3000,
-  },
-  {
-    id: "creatinine",
-    name: "Créatinine",
-    category: "Biochimie",
-    price: 3000,
-  },
-  {
-    id: "uree",
-    name: "Urée",
-    category: "Biochimie",
-    price: 3000,
-  },
-  {
-    id: "crp",
-    name: "CRP",
-    category: "Immunologie",
-    price: 5000,
-  },
-  {
-    id: "bilan-lipidique",
-    name: "Bilan lipidique",
-    category: "Biochimie",
-    price: 10000,
-  },
-  {
-    id: "cholesterol",
-    name: "Cholestérol total",
-    category: "Biochimie",
-    price: 3000,
-  },
-  {
-    id: "triglycerides",
-    name: "Triglycérides",
-    category: "Biochimie",
-    price: 3000,
-  },
-  {
-    id: "transaminases",
-    name: "Transaminases",
-    category: "Biochimie",
-    price: 6000,
-  },
-  {
-    id: "vih",
-    name: "Sérologie VIH",
-    category: "Sérologie",
-    price: 5000,
-  },
-  {
-    id: "hepatite-b",
-    name: "Ag HBs - Hépatite B",
-    category: "Sérologie",
-    price: 5000,
-  },
-  {
-    id: "hepatite-c",
-    name: "Sérologie Hépatite C",
-    category: "Sérologie",
-    price: 5000,
-  },
-  {
-    id: "urines",
-    name: "ECBU",
-    category: "Bactériologie",
-    price: 7000,
-  },
-  {
-    id: "test-paludisme",
-    name: "Test de diagnostic du paludisme",
-    category: "Parasitologie",
-    price: 3000,
-  },
-];
-
 /* ============================================================
    DONNÉES DE DÉMONSTRATION
    ============================================================ */
-
-const INITIAL_ANALYSES = [
-  {
-    id: "LAB-001",
-    patient: "TRAORE Awa",
-    type: "NFS",
-    date: "10/09/2026",
-    heure: "08:30",
-    medecin: "Dr. KOUAME",
-    statut: "En cours",
-    priorite: "Normale",
-    resultat: "",
-    observation: "",
-
-    caisse: {
-      numero: "CAI-2026-00125",
-      date: "10/09/2026",
-      montant: 5000,
-      montantPaye: 5000,
-      reste: 0,
-      modePaiement: "Espèces",
-    },
-
-    examens: [
-      {
-        id: "nfs",
-        name: "NFS",
-        category: "Hématologie",
-        price: 5000,
-        result: "",
-        unit: "",
-        reference: "",
-      },
-    ],
-  },
-
-  {
-    id: "LAB-002",
-    patient: "KONE Ibrahim",
-    type: "Glycémie",
-    date: "10/09/2026",
-    heure: "09:00",
-    medecin: "Dr. BAH",
-    statut: "En attente",
-    priorite: "Urgente",
-    resultat: "",
-    observation: "",
-
-    caisse: {
-      numero: "CAI-2026-00126",
-      date: "10/09/2026",
-      montant: 2500,
-      montantPaye: 2500,
-      reste: 0,
-      modePaiement: "Mobile Money",
-    },
-
-    examens: [
-      {
-        id: "glycemie",
-        name: "Glycémie",
-        category: "Biochimie",
-        price: 2500,
-        result: "",
-        unit: "g/L",
-        reference: "0,70 - 1,10",
-      },
-    ],
-  },
-
-  {
-    id: "LAB-003",
-    patient: "DIALLO Mariam",
-    type: "Groupe sanguin",
-    date: "09/09/2026",
-    heure: "10:15",
-    medecin: "Dr. KONE",
-    statut: "Terminée",
-    priorite: "Normale",
-    resultat: "A+",
-    observation: "Résultat confirmé.",
-
-    caisse: {
-      numero: "CAI-2026-00118",
-      date: "09/09/2026",
-      montant: 3000,
-      montantPaye: 3000,
-      reste: 0,
-      modePaiement: "Espèces",
-    },
-
-    examens: [
-      {
-        id: "groupe-sanguin",
-        name: "Groupe sanguin",
-        category: "Immuno-hématologie",
-        price: 3000,
-        result: "A+",
-        unit: "",
-        reference: "",
-      },
-    ],
-  },
-
-  {
-    id: "LAB-004",
-    patient: "YAO Claude",
-    type: "Créatinine",
-    date: "09/09/2026",
-    heure: "11:20",
-    medecin: "Dr. KOUAME",
-    statut: "En attente",
-    priorite: "Normale",
-    resultat: "",
-    observation: "",
-
-    caisse: {
-      numero: "CAI-2026-00119",
-      date: "09/09/2026",
-      montant: 3000,
-      montantPaye: 3000,
-      reste: 0,
-      modePaiement: "Carte bancaire",
-    },
-
-    examens: [
-      {
-        id: "creatinine",
-        name: "Créatinine",
-        category: "Biochimie",
-        price: 3000,
-        result: "",
-        unit: "mg/L",
-        reference: "6 - 13",
-      },
-    ],
-  },
-
-  {
-    id: "LAB-005",
-    patient: "N'GUESSAN Marie",
-    type: "CRP",
-    date: "08/09/2026",
-    heure: "14:00",
-    medecin: "Dr. BAH",
-    statut: "Terminée",
-    priorite: "Normale",
-    resultat: "6 mg/L",
-    observation: "Résultat dans les normes.",
-
-    caisse: {
-      numero: "CAI-2026-00107",
-      date: "08/09/2026",
-      montant: 5000,
-      montantPaye: 5000,
-      reste: 0,
-      modePaiement: "Espèces",
-    },
-
-    examens: [
-      {
-        id: "crp",
-        name: "CRP",
-        category: "Immunologie",
-        price: 5000,
-        result: "6",
-        unit: "mg/L",
-        reference: "< 6",
-      },
-    ],
-  },
-
-  {
-    id: "LAB-006",
-    patient: "KOFFI Jean",
-    type: "Bilan lipidique",
-    date: "08/09/2026",
-    heure: "15:30",
-    medecin: "Dr. KONE",
-    statut: "En cours",
-    priorite: "Normale",
-    resultat: "",
-    observation: "",
-
-    caisse: {
-      numero: "CAI-2026-00108",
-      date: "08/09/2026",
-      montant: 10000,
-      montantPaye: 10000,
-      reste: 0,
-      modePaiement: "Mobile Money",
-    },
-
-    examens: [
-      {
-        id: "bilan-lipidique",
-        name: "Bilan lipidique",
-        category: "Biochimie",
-        price: 10000,
-        result: "",
-        unit: "",
-        reference: "",
-      },
-    ],
-  },
-];
 
 /* ============================================================
    UTILITAIRES
@@ -358,7 +60,31 @@ function Laboratory() {
   const [statusFilter, setStatusFilter] = useState("Tous");
 
   const [analyses, setAnalyses] =
-    useState(INITIAL_ANALYSES);
+    useState([]);
+
+  // Catalogue d'examens et liste de travail servis par /api/laboratory/.
+  const [EXAMS, setExams] = useState([]);
+
+  const loadLaboratory = () =>
+    api
+      .get("/laboratory/overview/")
+      .then((response) => {
+        setExams(response.data.exams);
+        setAnalyses(response.data.analyses);
+      })
+      .catch((error) => console.error("Erreur de chargement du laboratoire :", error));
+
+  useEffect(() => {
+    loadLaboratory();
+  }, []);
+
+  const replaceAnalysis = (updated) =>
+    setAnalyses((previous) => previous.map((item) => (item.id === updated.id ? updated : item)));
+
+  const apiError = (error, fallback) => {
+    const data = error.response?.data;
+    return data && typeof data === "object" ? Object.values(data).flat().join("\n") : fallback;
+  };
 
   const [selectedAnalysis, setSelectedAnalysis] =
     useState(null);
@@ -414,7 +140,7 @@ function Laboratory() {
     return EXAMS.filter((exam) =>
       selectedExamIds.includes(exam.id)
     );
-  }, [selectedExamIds]);
+  }, [selectedExamIds, EXAMS]);
 
   const totalAnalysisCost = useMemo(() => {
     return selectedExams.reduce(
@@ -485,11 +211,9 @@ function Laboratory() {
     });
   };
 
-  const validateAnalysisRequest = (event) => {
+  const validateAnalysisRequest = async (event) => {
     event.preventDefault();
-
     if (!selectedAnalysis) return;
-
     if (selectedExams.length === 0) {
       alert(
         "Veuillez sélectionner au moins un examen."
@@ -497,63 +221,22 @@ function Laboratory() {
       return;
     }
 
-    const now = new Date();
-
-    const updatedAnalysis = {
-      ...selectedAnalysis,
-
-      type:
-        selectedExams.length === 1
-          ? selectedExams[0].name
-          : `${selectedExams.length} examens`,
-
-      examens: selectedExams.map((exam) => {
-        const oldExam =
-          selectedAnalysis.examens?.find(
-            (item) => item.id === exam.id
-          );
-
-        return {
-          ...exam,
-          result: oldExam?.result || "",
-          unit: oldExam?.unit || "",
-          reference:
-            oldExam?.reference ||
-            "",
-        };
-      }),
-
-      caisse: {
-        ...selectedAnalysis.caisse,
-        montant: totalAnalysisCost,
-      },
-
-      date:
-        now.toLocaleDateString("fr-FR"),
-
-      heure:
-        now.toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-
-      statut: "En attente",
-    };
-
-    setAnalyses((previous) =>
-      previous.map((item) =>
-        item.id === selectedAnalysis.id
-          ? updatedAnalysis
-          : item
-      )
-    );
+    try {
+      const { data } = await api.post(
+        `/laboratory/analyses/${selectedAnalysis.admissionId}/demande/`,
+        { examIds: selectedExamIds }
+      );
+      replaceAnalysis(data);
+    } catch (error) {
+      alert(apiError(error, "Impossible d'enregistrer la demande d'analyse."));
+      return;
+    }
 
     alert(
       `Demande d'analyse enregistrée.\n\nTotal : ${formatMoney(
         totalAnalysisCost
       )}`
     );
-
     closeAnalysisRequest();
   };
 
@@ -600,59 +283,24 @@ function Laboratory() {
     }));
   };
 
-  const validateResult = (event) => {
+  const validateResult = async (event) => {
     event.preventDefault();
-
     if (!selectedAnalysis) return;
 
-    const updatedExams =
-      (selectedAnalysis.examens || []).map(
-        (exam) => ({
-          ...exam,
-          result:
-            examResults[exam.id] || "",
-        })
+    try {
+      const { data } = await api.post(
+        `/laboratory/analyses/${selectedAnalysis.admissionId}/resultat/`,
+        { results: examResults, observation: resultData.observation }
       );
-
-    const summaryResult =
-      updatedExams
-        .map((exam) => {
-          const result =
-            examResults[exam.id] || "";
-
-          if (!result) return "";
-
-          return `${exam.name}: ${result} ${
-            exam.unit || ""
-          }`;
-        })
-        .filter(Boolean)
-        .join(" | ");
-
-    setAnalyses((previous) =>
-      previous.map((item) =>
-        item.id === selectedAnalysis.id
-          ? {
-              ...item,
-              resultat:
-                summaryResult ||
-                resultData.result,
-
-              observation:
-                resultData.observation,
-
-              examens: updatedExams,
-
-              statut: "Terminée",
-            }
-          : item
-      )
-    );
+      replaceAnalysis(data);
+    } catch (error) {
+      alert(apiError(error, "Impossible d'enregistrer le résultat."));
+      return;
+    }
 
     alert(
       `Résultat enregistré pour ${selectedAnalysis.patient}.`
     );
-
     closeResultForm();
   };
 

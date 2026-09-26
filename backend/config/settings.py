@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "archives",
     "reports",
     "ia",
+    "laboratory",
 ]
 
 MIDDLEWARE = [

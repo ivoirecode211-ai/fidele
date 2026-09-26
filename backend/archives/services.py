@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from administration.models import AdminDocument
 from consultations.models import Consultation
+from laboratory.models import LabRequest
 from parcours.models import Admission
 from patients.models import Patient
 
@@ -54,6 +55,11 @@ def collect():
             "when": admission.created_at, "type": "Facture", "patient": patient_name(admission.patient),
             "reference": f"FAC-{admission.created_at:%Y}-{admission.pk:05d}",
             "author": person(admission.created_by),
+        })
+    for lab in LabRequest.objects.filter(status="Terminée").select_related("admission__patient", "completed_by"):
+        rows.append({
+            "when": lab.completed_at, "type": "Résultat labo", "patient": patient_name(lab.admission.patient),
+            "reference": f"LAB-{lab.completed_at:%Y}-{lab.pk:05d}", "author": person(lab.completed_by),
         })
     for document in AdminDocument.objects.select_related("created_by"):
         rows.append({
