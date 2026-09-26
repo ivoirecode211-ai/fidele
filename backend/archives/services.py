@@ -50,7 +50,7 @@ def collect():
             "reference": f"CR-{consultation.completed_at:%Y}-{consultation.pk:05d}",
             "author": f"Dr. {person(consultation.doctor)}",
         })
-    for admission in Admission.objects.select_related("patient", "created_by"):
+    for admission in Admission.objects.encaissees().select_related("patient", "created_by"):
         rows.append({
             "when": admission.created_at, "type": "Facture", "patient": patient_name(admission.patient),
             "reference": f"FAC-{admission.created_at:%Y}-{admission.pk:05d}",

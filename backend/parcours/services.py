@@ -35,13 +35,48 @@ def age_from_birth_date(birth_date):
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
 
-def register_patient(*, data, user):
-    """Crée le patient et son passage en caisse en une seule transaction."""
+def open_admission(*, patient, data, user):
+    """Passage en caisse d'un patient : « à payer », ou « pris en charge » si l'assurance couvre tout."""
+    from .caisse import Duplicate, recent_duplicate, ticket_reference
+
     service = data["service"]
+    duplicate = recent_duplicate(patient, service)
+    if duplicate is not None:
+        raise Duplicate(duplicate)
     insurance = data.get("assuranceId")
     coverage = insurance.coverage if insurance else Decimal("0")
     price = service.price
-    cost = price - price * coverage / Decimal("100")
+    cost = (price - price * coverage / Decimal("100")).quantize(Decimal("0.01"))
+    admission = Admission.objects.create(
+        patient=patient,
+        service=service,
+        service_name=service.name,
+        service_price=price,
+        insurance=insurance,
+        insurance_name=insurance.name if insurance else "",
+        insurance_number=data.get("insuranceNumber", "").strip() if insurance else "",
+        insurance_coverage=coverage,
+        cost=cost,
+        payment_status=Admission.INSURED if cost == 0 else Admission.UNPAID,
+        created_by=user,
+    )
+    admission.reference = ticket_reference(admission)
+    admission.save(update_fields=["reference"])
+    return admission
+
+
+def register_patient(*, data, user):
+    """Nouveau dossier patient et son premier passage, en une seule transaction.
+    Pour un patient déjà connu (data["patientId"]), seul un passage est ouvert."""
+    insurance = data.get("assuranceId")
+    existing = data.get("patientId")
+    if existing is not None:
+        with transaction.atomic():
+            if insurance:
+                existing.insurance = insurance.name
+                existing.insurance_number = data.get("insuranceNumber", "").strip()
+                existing.save(update_fields=["insurance", "insurance_number"])
+            return open_admission(patient=existing, data=data, user=user)
 
     for _ in range(5):
         number = next_patient_number()
@@ -59,18 +94,7 @@ def register_patient(*, data, user):
                     insurance=insurance.name if insurance else "",
                     insurance_number=data.get("insuranceNumber", "").strip() if insurance else "",
                 )
-                return Admission.objects.create(
-                    patient=patient,
-                    service=service,
-                    service_name=service.name,
-                    service_price=price,
-                    insurance=insurance,
-                    insurance_name=insurance.name if insurance else "",
-                    insurance_number=patient.insurance_number,
-                    insurance_coverage=coverage,
-                    cost=cost.quantize(Decimal("0.01")),
-                    created_by=user,
-                )
+                return open_admission(patient=patient, data=data, user=user)
         except IntegrityError:
             # Deux caissiers ont obtenu le même numéro : on recalcule.
             # Toute autre violation de contrainte remonte telle quelle.
@@ -221,7 +245,7 @@ def notifications_for(user):
     items = []
 
     if sees_all or user.has_role("NURSE"):
-        waiting = Admission.objects.filter(sent_to_consultation_at__isnull=True).count()
+        waiting = Admission.objects.parcours_soins().filter(sent_to_consultation_at__isnull=True).count()
         items.append({
             "id": "vitals",
             "count": waiting,

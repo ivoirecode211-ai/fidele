@@ -49,17 +49,24 @@ class CaissePatientsView(generics.ListAPIView):
     """Liste des passages en caisse (GET) et enregistrement d'un nouveau patient (POST)."""
     permission_classes = [CaisseAccess]
     serializer_class = CaissePatientSerializer
-    queryset = Admission.objects.select_related("patient")
+    queryset = Admission.objects.select_related("patient", "service")
 
     def post(self, request):
         serializer = CaissePatientInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        admission = register_patient(data=serializer.validated_data, user=request.user)
+        from .caisse import Duplicate
+
+        try:
+            admission = register_patient(data=serializer.validated_data, user=request.user)
+        except Duplicate as duplicate:
+            # Double saisie probable : on propose de réimprimer l'ancien ticket.
+            return Response({"detail": str(duplicate), "doublon": CaissePatientSerializer(duplicate.admission).data},
+                            status=status.HTTP_409_CONFLICT)
         return Response(CaissePatientSerializer(admission).data, status=status.HTTP_201_CREATED)
 
 
 def nursing_queryset():
-    return Admission.objects.select_related("patient").prefetch_related(
+    return Admission.objects.parcours_soins().select_related("patient").prefetch_related(
         Prefetch("vitals", queryset=VitalSigns.objects.order_by("-recorded_at", "-id"))
     )
 
@@ -198,7 +205,7 @@ class PaymentsView(APIView):
     permission_classes = [AccountingAccess]
 
     def get(self, request):
-        admissions = Admission.objects.select_related("patient", "created_by").order_by("-created_at", "-id")
+        admissions = Admission.objects.encaissees().select_related("patient", "created_by").order_by("-created_at", "-id")
         return Response(PaymentSerializer(admissions, many=True).data)
 
 

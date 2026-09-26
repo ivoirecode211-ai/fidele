@@ -73,7 +73,7 @@ def get_summary():
         "beds_reserved": Bed.objects.filter(status="RESERVED").count(),
         "beds_cleaning": Bed.objects.filter(status="CLEANING").count(),
         "unpaid_invoices": Invoice.objects.filter(status__in=["UNPAID", "PARTIAL"]).count(),
-        "revenue_today": Admission.objects.filter(created_at__date=today).aggregate(total=Sum("cost"))["total"] or 0,
+        "revenue_today": Admission.objects.encaissees().filter(paid_at__date=today).aggregate(total=Sum("cost"))["total"] or 0,
         "alerts": [f"{row['title']}{' — ' + row['text'] if row['text'] else ''}" for row in alerts()],
     }
 
@@ -94,11 +94,12 @@ def direction_overview():
     yesterday = today - timedelta(days=1)
 
     def per_day(day):
-        admissions = Admission.objects.filter(created_at__date=day)
+        admissions = Admission.objects.actives().filter(created_at__date=day)
+        paid = Admission.objects.encaissees().filter(paid_at__date=day)
         return {
             "patients": admissions.count(),
             "consultations": Consultation.objects.filter(completed_at__date=day).count(),
-            "revenue": admissions.aggregate(total=Sum("cost"))["total"] or 0,
+            "revenue": paid.aggregate(total=Sum("cost"))["total"] or 0,
             "analyses": LabRequest.objects.filter(status="Terminée", completed_at__date=day).count(),
             "medicines": PrescriptionItem.objects.filter(prescription__served_at__date=day).count(),
         }
@@ -116,7 +117,7 @@ def direction_overview():
         chart.append({"day": DAYS[day.weekday()], "consultations": counts["consultations"], "patients": counts["patients"]})
 
     since = today - timedelta(days=30)
-    by_service = Counter(Admission.objects.filter(created_at__date__gte=since).values_list("service_name", flat=True))
+    by_service = Counter(Admission.objects.actives().filter(created_at__date__gte=since).values_list("service_name", flat=True))
     total = sum(by_service.values())
     ranked = by_service.most_common()
     rows = ranked[:5] + ([("Autres", sum(n for _, n in ranked[5:]))] if len(ranked) > 5 else [])

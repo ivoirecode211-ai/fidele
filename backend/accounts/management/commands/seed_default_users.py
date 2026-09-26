@@ -13,6 +13,7 @@ USERS = [
     ("stocks", "stocks@masante.local", "Responsable", "Stocks", "STOCK", "Stocks@2026!"),
     ("rh", "rh@masante.local", "Responsable", "RH", "HR", "RH@2026!"),
     ("maintenance", "maintenance@masante.local", "Responsable", "Maintenance", "MAINTENANCE", "Maintenance@2026!"),
+    ("regisseur", "regisseur@masante.local", "Régisseur", "Caisse", "REGISSEUR", "Regisseur@2026!"),
 ]
 
 class Command(BaseCommand):

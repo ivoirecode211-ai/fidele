@@ -65,6 +65,7 @@ const DEFAULT_ROLE_MODULES = {
   STOCK: ["stocks", "pharmacy"],
   HR: ["hr", "reports"],
   MAINTENANCE: ["maintenance"],
+  REGISSEUR: ["patients", "accounting", "reports"],
 };
 
 // Le backend peut renvoyer le rôle sous différentes casses (ADMIN, admin, Admin...).

@@ -9,7 +9,7 @@ from .services import overview
 
 class ReportsAccess(RoleAccess):
     # Module « Rapports et statistiques » (DEFAULT_ROLE_MODULES).
-    roles = {"ADMIN", "DIRECTOR", "DOCTOR", "ACCOUNTING", "HR"}
+    roles = {"ADMIN", "DIRECTOR", "DOCTOR", "ACCOUNTING", "HR", "REGISSEUR"}
 
 
 class OverviewView(APIView):

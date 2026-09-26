@@ -3,6 +3,8 @@ from decimal import Decimal
 from django.utils import timezone
 from rest_framework import serializers
 
+from patients.models import Patient
+
 from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
 from .services import age_from_birth_date, doctor_label
 
@@ -15,7 +17,7 @@ class MedicalServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MedicalService
-        fields = ["id", "name", "price"]
+        fields = ["id", "name", "price", "category"]
 
 
 class InsuranceCompanySerializer(serializers.ModelSerializer):
@@ -42,10 +44,15 @@ class CaissePatientInputSerializer(serializers.Serializer):
     )
     insuranceNumber = serializers.CharField(max_length=120, required=False, allow_blank=True, default="")
     quartier = serializers.CharField(max_length=120)
+    # Patient déjà connu : on ouvre un nouveau passage dans son dossier.
+    patientId = serializers.SlugRelatedField(
+        slug_field="patient_number", queryset=Patient.objects.all(), required=False, allow_null=True
+    )
 
     def to_internal_value(self, data):
         # Le formulaire envoie "" pour les champs non renseignés.
-        data = {key: (None if value == "" and key in {"dateNaissance", "assuranceId"} else value) for key, value in data.items()}
+        data = {key: (None if value == "" and key in {"dateNaissance", "assuranceId", "patientId"} else value)
+                for key, value in data.items()}
         return super().to_internal_value(data)
 
     def validate_dateNaissance(self, value):
@@ -86,14 +93,28 @@ class CaissePatientSerializer(serializers.ModelSerializer):
     )
     quartier = serializers.CharField(source="patient.locality")
     dateEnregistrement = serializers.DateTimeField(source="created_at")
+    reference = serializers.CharField()
+    servicePrice = serializers.DecimalField(source="service_price", max_digits=12, decimal_places=2, coerce_to_string=False)
+    paymentStatus = serializers.SerializerMethodField()
+    statutPaiement = serializers.SerializerMethodField()
+    dateEncaissement = serializers.DateTimeField(source="paid_at")
+    motifAnnulation = serializers.CharField(source="cancel_reason")
+    categorie = serializers.CharField(source="service.category")
 
     class Meta:
         model = Admission
         fields = [
             "id", "admissionId", "patient", "sexe", "age", "dateNaissance", "service", "telephone",
             "parentContact", "cost", "insurance", "insuranceName", "insuranceNumber", "insuranceCoverage",
-            "quartier", "dateEnregistrement",
+            "quartier", "dateEnregistrement", "reference", "servicePrice", "paymentStatus", "statutPaiement",
+            "dateEncaissement", "motifAnnulation", "categorie",
         ]
+
+    def get_paymentStatus(self, obj):
+        return "annule" if obj.cancelled_at else obj.payment_status
+
+    def get_statutPaiement(self, obj):
+        return "Annulé" if obj.cancelled_at else obj.get_payment_status_display()
 
     def get_patient(self, obj):
         return f"{obj.patient.last_name} {obj.patient.first_names}"

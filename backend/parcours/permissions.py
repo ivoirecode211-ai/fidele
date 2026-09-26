@@ -19,7 +19,7 @@ class RoleAccess(BasePermission):
 
 
 class CaisseAccess(RoleAccess):
-    roles = {"ADMIN", "DIRECTOR", "RECEPTION", "ACCOUNTING"}
+    roles = {"ADMIN", "DIRECTOR", "RECEPTION", "ACCOUNTING", "REGISSEUR"}
 
 
 class NursingAccess(RoleAccess):
@@ -37,4 +37,4 @@ class PharmacyAccess(RoleAccess):
 
 
 class AccountingAccess(RoleAccess):
-    roles = {"ADMIN", "DIRECTOR", "ACCOUNTING"}
+    roles = {"ADMIN", "DIRECTOR", "ACCOUNTING", "REGISSEUR"}

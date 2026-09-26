@@ -45,12 +45,13 @@ def section(title, columns, rows):
 
 
 def admissions_section(year, month):
-    rows = [[when(a.created_at), a.patient.patient_number, name(a.patient), a.service_name,
-             a.insurance_name or "—", money(a.service_price), money(a.cost), person(a.created_by)]
+    rows = [[when(a.created_at), a.reference or "—", name(a.patient), a.service_name,
+             a.insurance_name or "—", money(a.service_price), money(a.cost),
+             "Annulé" if a.cancelled_at else a.get_payment_status_display(), person(a.created_by)]
             for a in Admission.objects.filter(**month_filter("created_at", year, month))
             .select_related("patient", "created_by").order_by("created_at")]
-    return section("Passages en caisse", ["Date", "Dossier", "Patient", "Service", "Assurance",
-                                          "Prestation (FCFA)", "Payé patient (FCFA)", "Caissier"], rows)
+    return section("Passages en caisse", ["Date", "Ticket", "Patient", "Prestation", "Assurance",
+                                          "Tarif (FCFA)", "Part patient (FCFA)", "Paiement", "Agent"], rows)
 
 
 def vitals_section(year, month):

@@ -45,7 +45,7 @@ def month_filter(field, year, month):
 
 def figures(kind, year, month):
     """Les chiffres d'un rapport, dans l'ordre d'affichage."""
-    admissions = Admission.objects.filter(**month_filter("created_at", year, month))
+    admissions = Admission.objects.actives().filter(**month_filter("created_at", year, month))
     if kind == "Activité":
         return [
             ("Patients enregistrés à la caisse", admissions.count()),
@@ -61,13 +61,15 @@ def figures(kind, year, month):
             ("Médecins ayant consulté", done.values("doctor").distinct().count()),
         ]
     if kind == "Finances":
-        totals = admissions.aggregate(total=Sum("service_price"), patient=Sum("cost"))
+        paid = Admission.objects.encaissees().filter(**month_filter("paid_at", year, month))
+        totals = paid.aggregate(total=Sum("service_price"), patient=Sum("cost"))
         insurance = (totals["total"] or 0) - (totals["patient"] or 0)
         return [
             ("Montant total des prestations", money(totals["total"])),
             ("Encaissé auprès des patients", money(totals["patient"])),
             ("Part des assurances", money(insurance)),
-            ("Nombre d'encaissements", admissions.count()),
+            ("Nombre d'encaissements", paid.count()),
+            ("Tickets annulés", Admission.objects.filter(cancelled_at__isnull=False, **month_filter("cancelled_at", year, month)).count()),
         ]
     if kind == "Stocks":
         served = Prescription.objects.filter(status="SERVED", **month_filter("served_at", year, month))
@@ -120,7 +122,7 @@ def build_report(kind, year, month, today):
 
 
 def service_activity(year, month):
-    admissions = Admission.objects.filter(**month_filter("created_at", year, month))
+    admissions = Admission.objects.actives().filter(**month_filter("created_at", year, month))
     counts = Counter(admissions.values_list("service_name", flat=True))
     total = sum(counts.values())
     return [

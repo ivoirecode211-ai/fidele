@@ -63,7 +63,8 @@ def serialize_analysis(admission):
 def worklist():
     since = timezone.now() - timedelta(days=WORKLIST_DAYS)
     admissions = (
-        Admission.objects.filter(created_at__gte=since) | Admission.objects.filter(lab_request__isnull=False)
+        Admission.objects.encaissees().filter(created_at__gte=since)
+        | Admission.objects.filter(lab_request__isnull=False)
     ).distinct().select_related("patient", "consultation__doctor", "lab_request").order_by("-created_at")
     return [serialize_analysis(admission) for admission in admissions]
 

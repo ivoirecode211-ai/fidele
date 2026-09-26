@@ -15,6 +15,8 @@ class User(AbstractUser):
         ("STOCK", "Responsable des stocks"),
         ("HR", "Responsable RH"),
         ("MAINTENANCE", "Responsable maintenance"),
+        # Reçoit les fonds des caisses, valide les clôtures, annule les tickets.
+        ("REGISSEUR", "Régisseur"),
     ]
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default="RECEPTION")
     phone = models.CharField(max_length=30, blank=True)

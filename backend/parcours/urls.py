@@ -1,10 +1,17 @@
 from django.urls import path
 
-from . import views
+from . import caisse_views, views
 
 urlpatterns = [
     path("catalogue/", views.CatalogueView.as_view()),
     path("caisse/patients/", views.CaissePatientsView.as_view()),
+    path("caisse/recherche/", caisse_views.PatientSearchView.as_view()),
+    path("caisse/patients/<int:pk>/encaisser/", caisse_views.PayView.as_view()),
+    path("caisse/patients/<int:pk>/annuler/", caisse_views.CancelView.as_view()),
+    path("caisse/patients/<int:pk>/ticket/", caisse_views.TicketView.as_view()),
+    path("caisse/session/", caisse_views.SessionView.as_view()),
+    path("caisse/regie/", caisse_views.RegieView.as_view()),
+    path("caisse/regie/sessions/<int:pk>/<str:action>/", caisse_views.RegieSessionView.as_view()),
     path("soins/patients/", views.NursingPatientsView.as_view()),
     path("soins/patients/<int:pk>/constantes/", views.NursingVitalsView.as_view()),
     path("consultations/", views.ConsultationPatientsView.as_view()),

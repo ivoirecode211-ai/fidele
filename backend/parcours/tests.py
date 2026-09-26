@@ -23,12 +23,20 @@ def form(**overrides):
     return data
 
 
+def encaisser(client, admission_id):
+    """Le caissier connecté ouvre sa caisse et encaisse le ticket (passage aux soins)."""
+    client.post("/api/parcours/caisse/session/")
+    response = client.post(f"/api/parcours/caisse/patients/{admission_id}/encaisser/")
+    assert response.status_code == 200, response.data
+
+
 class CatalogueTests(APITestCase):
     def test_catalogue_matches_frontend_configuration(self):
         self.client.force_authenticate(User.objects.create_user(username="doc", password="x", role="DOCTOR"))
         response = self.client.get("/api/parcours/catalogue/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["services"][0], {"id": response.data["services"][0]["id"], "name": "Médecine générale", "price": 10000})
+        self.assertEqual(response.data["services"][0], {"id": response.data["services"][0]["id"], "name": "Médecine générale",
+                                                        "price": 10000, "category": "CONSULTATION"})
         self.assertEqual([i["name"] for i in response.data["insurances"]], ["MUGEFCI", "CNPS", "NSIA"])
 
 
@@ -96,6 +104,7 @@ class NursingTests(APITestCase):
         caissier = User.objects.create_user(username="caisse", password="x", role="RECEPTION")
         self.client.force_authenticate(caissier)
         self.admission_id = self.client.post(URL, form(), format="json").data["admissionId"]
+        encaisser(self.client, self.admission_id)
         self.client.force_authenticate(User.objects.create_user(username="inf", password="x", role="NURSE"))
         self.vitals_url = f"/api/parcours/soins/patients/{self.admission_id}/constantes/"
 
@@ -160,6 +169,7 @@ class ParcoursBase(APITestCase):
         self.client.force_authenticate(self.caissier)
         cnps = InsuranceCompany.objects.get(name="CNPS")
         self.pk = self.client.post(URL, form(assurance="Oui", assuranceId=cnps.pk, insuranceNumber="C-1"), format="json").data["admissionId"]
+        encaisser(self.client, self.pk)
 
     def as_user(self, user):
         self.client.force_authenticate(user)
@@ -324,3 +334,102 @@ class NotificationsModulesTests(ParcoursBase):
         self.assertEqual(self.client.get("/api/parcours/notifications/").data["count"], 0)
         self.client.post(f"/api/laboratory/analyses/{self.pk}/demande/", {"examIds": ["nfs"]}, format="json")
         self.assertEqual(self.client.get("/api/parcours/notifications/").data["items"][0]["id"], "lab")
+
+
+class CaisseTests(APITestCase):
+    """Sessions, encaissement, annulation, doublons, patient existant, régie."""
+
+    def setUp(self):
+        self.caissier = User.objects.create_user(username="caisse", password="x", role="RECEPTION", first_name="Fatou", last_name="Coulibaly")
+        self.regisseur = User.objects.create_user(username="regie", password="x", role="REGISSEUR")
+        self.infirmier = User.objects.create_user(username="inf", password="x", role="NURSE")
+        self.client.force_authenticate(self.caissier)
+        self.ticket = self.client.post(URL, form(), format="json").data
+
+    def as_user(self, user):
+        self.client.force_authenticate(user)
+
+    def pay(self, pk=None):
+        return self.client.post(f"/api/parcours/caisse/patients/{pk or self.ticket['admissionId']}/encaisser/")
+
+    def test_new_ticket_is_unpaid_and_not_yet_in_nursing(self):
+        self.assertEqual((self.ticket["paymentStatus"], self.ticket["statutPaiement"]), ("en_attente", "À payer"))
+        self.assertRegex(self.ticket["reference"], r"^TCK-\d{4}-\d{6}$")
+        self.as_user(self.infirmier)
+        self.assertEqual(self.client.get("/api/parcours/soins/patients/").data, [])
+
+    def test_paying_requires_an_open_session_and_opens_nursing(self):
+        self.assertIn("fermée", self.pay().data["detail"])
+        self.client.post("/api/parcours/caisse/session/")
+        self.assertEqual(self.pay().data["paymentStatus"], "paye")
+        self.assertIn("déjà réglé", self.pay().data["detail"])
+        self.as_user(self.infirmier)
+        self.assertEqual(len(self.client.get("/api/parcours/soins/patients/").data), 1)
+
+    def test_full_insurance_needs_no_payment_and_exams_skip_nursing(self):
+        from .models import InsuranceCompany
+        full = InsuranceCompany.objects.create(name="CMU 100", coverage=100)
+        insured = self.client.post(URL, form(nom="yao", prenom="Paul", assurance="Oui", assuranceId=full.pk, insuranceNumber="X"), format="json").data
+        self.assertEqual((insured["paymentStatus"], insured["cost"]), ("assurance", 0))
+        exam = MedicalService.objects.get(name="Échographie")
+        self.client.post("/api/parcours/caisse/session/")
+        exam_ticket = self.client.post(URL, form(nom="kone", prenom="Ali", service=exam.pk), format="json").data
+        self.pay(exam_ticket["admissionId"])
+        self.as_user(self.infirmier)
+        self.assertEqual([p["patient"] for p in self.client.get("/api/parcours/soins/patients/").data], ["YAO Paul"])
+
+    def test_close_with_justified_gap_then_regisseur_validates(self):
+        self.client.post("/api/parcours/caisse/session/")
+        self.pay()
+        refused = self.client.patch("/api/parcours/caisse/session/", {"montantCompte": 9000}, format="json")
+        self.assertIn("justifié", refused.data["detail"])
+        closed = self.client.patch("/api/parcours/caisse/session/", {"montantCompte": 9000, "justification": "Rendu monnaie"}, format="json").data
+        self.assertEqual((closed["attendu"], closed["compte"], closed["ecart"], closed["statut"]), (10000.0, 9000.0, -1000.0, "en_attente"))
+        self.assertIsNone(self.client.get("/api/parcours/caisse/session/").data["session"])
+        self.as_user(self.regisseur)
+        regie = self.client.get("/api/parcours/caisse/regie/").data
+        self.assertEqual(len(regie["cloturesAValider"]), 1)
+        url = f"/api/parcours/caisse/regie/sessions/{closed['id']}/valider/"
+        self.assertEqual(self.client.post(url, {"montantRecu": 9000}, format="json").data["statut"], "validee")
+
+    def test_cashier_cannot_validate_own_session_or_cancel(self):
+        self.caissier.extra_roles = []
+        self.client.post("/api/parcours/caisse/session/")
+        closed = self.client.patch("/api/parcours/caisse/session/", {"montantCompte": 0}, format="json").data
+        self.assertEqual(self.client.post(f"/api/parcours/caisse/regie/sessions/{closed['id']}/valider/", {"montantRecu": 0}, format="json").status_code, 403)
+        self.assertEqual(self.client.post(f"/api/parcours/caisse/patients/{self.ticket['admissionId']}/annuler/", {"motif": "Erreur de saisie"}, format="json").status_code, 403)
+
+    def test_regisseur_cancels_with_reason_unless_care_started(self):
+        self.as_user(self.regisseur)
+        url = f"/api/parcours/caisse/patients/{self.ticket['admissionId']}/annuler/"
+        self.assertIn("motif", self.client.post(url, {"motif": "non"}, format="json").data["detail"])
+        cancelled = self.client.post(url, {"motif": "Erreur de saisie"}, format="json").data
+        self.assertEqual((cancelled["paymentStatus"], cancelled["motifAnnulation"]), ("annule", "Erreur de saisie"))
+        self.assertEqual(len(self.client.get("/api/parcours/caisse/regie/").data["corbeille"]), 1)
+        # Soins commencés : annulation refusée.
+        self.as_user(self.caissier)
+        other = self.client.post(URL, form(nom="yao", prenom="Paul"), format="json").data
+        self.client.post("/api/parcours/caisse/session/")
+        self.pay(other["admissionId"])
+        self.as_user(self.infirmier)
+        self.client.post(f"/api/parcours/soins/patients/{other['admissionId']}/constantes/", {"temperature": "37"}, format="json")
+        self.as_user(self.regisseur)
+        refused = self.client.post(f"/api/parcours/caisse/patients/{other['admissionId']}/annuler/", {"motif": "Erreur de saisie"}, format="json")
+        self.assertIn("soins ont déjà commencé", refused.data["detail"])
+
+    def test_duplicate_within_15_days_and_existing_patient(self):
+        duplicate = self.client.post(URL, form(patientId=self.ticket["id"]), format="json")
+        self.assertEqual(duplicate.status_code, 409)
+        self.assertEqual(duplicate.data["doublon"]["reference"], self.ticket["reference"])
+        other_service = MedicalService.objects.get(name="Pédiatrie")
+        again = self.client.post(URL, form(patientId=self.ticket["id"], service=other_service.pk), format="json").data
+        self.assertEqual(again["id"], self.ticket["id"])  # même dossier, nouveau passage
+        self.assertEqual(Patient.objects.count(), 1)
+        found = self.client.get("/api/parcours/caisse/recherche/", {"q": "trao"}).data
+        self.assertEqual(found[0]["patientId"], self.ticket["id"])
+
+    def test_ticket_second_print_is_a_duplicate(self):
+        url = f"/api/parcours/caisse/patients/{self.ticket['admissionId']}/ticket/"
+        first = self.client.post(url).data
+        self.assertEqual((first["duplicata"], first["aPayer"], first["etablissement"]["nom"]), (False, 10000.0, "MA SANTÉ"))
+        self.assertTrue(self.client.post(url).data["duplicata"])

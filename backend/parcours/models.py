@@ -12,8 +12,13 @@ from django.utils import timezone
 
 class MedicalService(models.Model):
     """Service médical proposé à la caisse (select « Service » du formulaire)."""
+    CATEGORIES = [("CONSULTATION", "Consultation"), ("SOIN", "Soin"), ("EXAMEN", "Examen")]
+    # Consultations et soins passent par l'infirmerie ; un examen, non.
+    PARCOURS_SOINS = ("CONSULTATION", "SOIN")
+
     name = models.CharField(max_length=120, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
+    category = models.CharField("catégorie", max_length=20, choices=CATEGORIES, default="CONSULTATION")
     active = models.BooleanField(default=True)
 
     class Meta:
@@ -46,6 +51,54 @@ class InsuranceCompany(models.Model):
         return self.name
 
 
+class CashSession(models.Model):
+    """Journée de caisse d'un caissier : ouverture, clôture, validation par le régisseur."""
+    OPEN, PENDING, VALIDATED = "ouverte", "en_attente", "validee"
+    STATUSES = [(OPEN, "Ouverte"), (PENDING, "En attente de validation"), (VALIDATED, "Validée")]
+
+    cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="cash_sessions_parcours")
+    opened_at = models.DateTimeField(default=timezone.now)
+    session_date = models.DateField(default=timezone.localdate)
+    status = models.CharField(max_length=20, choices=STATUSES, default=OPEN)
+    closed_at = models.DateTimeField(null=True, blank=True)
+    expected = models.DecimalField("montant attendu", max_digits=14, decimal_places=2, default=0)
+    counted = models.DecimalField("montant compté", max_digits=14, decimal_places=2, null=True, blank=True)
+    gap = models.DecimalField("écart", max_digits=14, decimal_places=2, null=True, blank=True)
+    justification = models.TextField(blank=True)
+    closed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    validated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    validated_at = models.DateTimeField(null=True, blank=True)
+    received = models.DecimalField("montant reçu", max_digits=14, decimal_places=2, null=True, blank=True)
+    validation_gap = models.DecimalField("écart à la validation", max_digits=14, decimal_places=2, null=True, blank=True)
+    validation_note = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "session de caisse"
+        verbose_name_plural = "sessions de caisse"
+        ordering = ["-opened_at"]
+        constraints = [
+            # Une seule caisse ouverte à la fois par caissier (plusieurs dans la journée).
+            models.UniqueConstraint(fields=["cashier"], condition=Q(status="ouverte"), name="parcours_une_caisse_ouverte"),
+        ]
+
+    def __str__(self):
+        return f"Caisse du {self.session_date:%d/%m/%Y} — {self.get_status_display()}"
+
+
+class AdmissionQuerySet(models.QuerySet):
+    def actives(self):
+        """Hors tickets annulés."""
+        return self.filter(cancelled_at__isnull=True)
+
+    def encaissees(self):
+        """Réglées en caisse ou prises en charge à 100 % : ce qui compte en recettes et ouvre les soins."""
+        return self.actives().filter(payment_status__in=(Admission.PAID, Admission.INSURED))
+
+    def parcours_soins(self):
+        """File de l'infirmerie : encaissées, et consultation ou soin (pas un examen)."""
+        return self.encaissees().filter(service__category__in=MedicalService.PARCOURS_SOINS)
+
+
 class Admission(models.Model):
     """Passage d'un patient enregistré à la caisse.
 
@@ -68,6 +121,21 @@ class Admission(models.Model):
     sent_to_consultation_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     created_at = models.DateTimeField(default=timezone.now)
+
+    # Paiement : créé « à payer » à l'accueil, réglé en caisse (session ouverte).
+    UNPAID, PAID, INSURED = "en_attente", "paye", "assurance"
+    PAYMENT_STATUSES = [(UNPAID, "À payer"), (PAID, "Payé"), (INSURED, "Pris en charge (100 %)")]
+    reference = models.CharField("n° de ticket", max_length=30, unique=True, null=True, blank=True)
+    payment_status = models.CharField("paiement", max_length=20, choices=PAYMENT_STATUSES, default=UNPAID)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    session = models.ForeignKey(CashSession, null=True, blank=True, on_delete=models.PROTECT, related_name="admissions")
+    # Corbeille : un ticket annulé n'est jamais effacé ; il sort des comptes.
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    cancel_reason = models.TextField(blank=True)
+    printed_count = models.PositiveSmallIntegerField(default=0)
+
+    objects = AdmissionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "passage en caisse"

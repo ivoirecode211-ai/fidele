@@ -15,6 +15,13 @@ import SidebarFooter from "../components/SidebarFooter";
 import UserBadge from "../components/UserBadge";
 import NotificationBell from "../components/NotificationBell";
 import "../styles/Caisse.css";
+import "../styles/caisse-operations.css";
+import CaisseSessionBar from "./caisse/CaisseSessionBar";
+import PatientLookup from "./caisse/PatientLookup";
+import RegiePage from "./caisse/RegiePage";
+import TicketActions from "./caisse/TicketActions";
+import printTicket from "./caisse/ticket";
+import { apiMessage } from "./caisse/CaisseModal";
 
 /*
  * ============================================================
@@ -175,6 +182,19 @@ export default function Caisse() {
   const [insuranceConfiguration, setInsuranceConfiguration] =
     useState([]);
 
+  // Caisse : session du caissier, rôle de régisseur, rafraîchissements.
+  const [caisseInfo, setCaisseInfo] = useState({ session: null, regisseur: false });
+  const [caisseRefresh, setCaisseRefresh] = useState(0);
+  const [lookupPatient, setLookupPatient] = useState(null);
+
+  const reloadPatients = () => {
+    setCaisseRefresh((value) => value + 1);
+    return api
+      .get("/parcours/caisse/patients/")
+      .then((response) => setPatients(response.data))
+      .catch((error) => console.error("Erreur de chargement de la caisse :", error));
+  };
+
   useEffect(() => {
     Promise.all([
       api.get("/parcours/catalogue/"),
@@ -217,6 +237,7 @@ export default function Caisse() {
 
   const [formData, setFormData] =
     useState({
+      patientId: "",
       nom: "",
       prenom: "",
       sexe: "",
@@ -229,6 +250,7 @@ export default function Caisse() {
       assuranceId: "",
       insuranceNumber: "",
       quartier: "",
+      patientId: "",
     });
 
 
@@ -362,15 +384,16 @@ export default function Caisse() {
       1
     );
 
+  // Recettes : uniquement les tickets encaissés, à leur date d'encaissement.
   const getPatientDate = (patient) => {
 
-    if (!patient.dateEnregistrement) {
+    if (patient.paymentStatus !== "paye" || !patient.dateEncaissement) {
       return null;
     }
 
     const date =
       new Date(
-        patient.dateEnregistrement
+        patient.dateEncaissement
       );
 
     return Number.isNaN(
@@ -556,6 +579,8 @@ export default function Caisse() {
 
   const handleNewPatient = () => {
 
+    setLookupPatient(null);
+
     setFormData({
       nom: "",
       prenom: "",
@@ -569,6 +594,7 @@ export default function Caisse() {
       assuranceId: "",
       insuranceNumber: "",
       quartier: "",
+      patientId: "",
     });
 
     setShowNewPatientForm(
@@ -684,29 +710,48 @@ export default function Caisse() {
 
       newPatient = response.data;
     } catch (error) {
-      const errors = error.response?.data;
+      const doublon = error.response?.status === 409 && error.response.data?.doublon;
 
-      alert(
-        errors && typeof errors === "object"
-          ? Object.values(errors).flat().join("\n")
-          : "Impossible d'enregistrer le patient. Veuillez réessayer."
-      );
+      if (doublon) {
+        if (
+          window.confirm(
+            `Un ticket existe déjà pour ce patient et cette prestation (${doublon.reference}, ${new Date(doublon.dateEnregistrement).toLocaleDateString("fr-FR")}).\n\nRéimprimer ce ticket plutôt que de le faire payer deux fois ?`
+          )
+        ) {
+          printTicket(doublon.admissionId);
+        }
+        return;
+      }
+
+      alert(apiMessage(error, "Impossible d'enregistrer le patient. Veuillez réessayer."));
 
       return;
+    }
+
+    reloadPatients();
+    setLookupPatient(null);
+
+    if (newPatient.paymentStatus === "en_attente" && caisseInfo.session) {
+      if (window.confirm(`Dossier enregistré : ${newPatient.patient}.\n\nEncaisser ${newPatient.cost} FCFA maintenant ?`)) {
+        try {
+          await api.post(`/parcours/caisse/patients/${newPatient.admissionId}/encaisser/`);
+          reloadPatients();
+          printTicket(newPatient.admissionId);
+        } catch (error) {
+          alert(apiMessage(error, "Encaissement impossible."));
+        }
+      }
+    } else if (newPatient.paymentStatus === "assurance") {
+      alert(`Dossier enregistré : ${newPatient.patient}. Prise en charge à 100 % par l'assurance.`);
+      printTicket(newPatient.admissionId);
+    } else if (!caisseInfo.session) {
+      alert(`Dossier enregistré : ${newPatient.patient}. Ouvrez votre caisse pour encaisser le ticket ${newPatient.reference}.`);
     }
 
 
     /*
      * AJOUT DANS LA CAISSE
      */
-
-    setPatients(
-      (currentPatients) => [
-        ...currentPatients,
-        newPatient,
-      ]
-    );
-
 
     /*
      * FERMETURE
@@ -734,6 +779,7 @@ export default function Caisse() {
       assuranceId: "",
       insuranceNumber: "",
       quartier: "",
+      patientId: "",
     });
   };
 
@@ -1270,6 +1316,13 @@ export default function Caisse() {
     return (
       <section className="caisse-main">
 
+        {/* MA CAISSE */}
+
+        <CaisseSessionBar
+          key={caisseRefresh}
+          onChange={setCaisseInfo}
+        />
+
         {/* RECHERCHE */}
 
         <div className="patient-toolbar">
@@ -1363,6 +1416,11 @@ export default function Caisse() {
                   </th>
 
                   <th>
+                    Paiement
+                  </th>
+
+                  <th>
+                    Actions
                   </th>
 
                 </tr>
@@ -1452,20 +1510,17 @@ export default function Caisse() {
 
 
                       <td>
+                        <span className={`co-badge ${item.paymentStatus}`}>
+                          {item.statutPaiement}
+                        </span>
+                      </td>
 
-                        <button
-                          type="button"
-                          className="row-action"
-                          aria-label={`Ouvrir ${item.patient}`}
-                        >
-
-                          <Icon
-                            name="arrow"
-                            size={17}
-                          />
-
-                        </button>
-
+                      <td>
+                        <TicketActions
+                          item={item}
+                          regisseur={caisseInfo.regisseur}
+                          onChanged={reloadPatients}
+                        />
                       </td>
 
                     </tr>
@@ -1478,7 +1533,7 @@ export default function Caisse() {
                   <tr>
 
                     <td
-                      colSpan="10"
+                      colSpan="11"
                       className="empty-row"
                     >
                       Aucun patient trouvé.
@@ -1606,6 +1661,30 @@ export default function Caisse() {
 
           </button>
 
+          {/* RÉGIE (régisseur) */}
+
+          {caisseInfo.regisseur && (
+            <button
+              type="button"
+              className={`caisse-nav-item ${
+                activePage === "regie"
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                setActivePage(
+                  "regie"
+                )
+              }
+            >
+              <Icon name="report" />
+
+              <span>
+                Régie
+              </span>
+            </button>
+          )}
+
         </nav>
 
         <SidebarFooter />
@@ -1632,6 +1711,8 @@ export default function Caisse() {
                 ? "Enregistrement / Accueil patient"
                 : activePage === "bilan"
                 ? "Bilan des recettes"
+                : activePage === "regie"
+                ? "Régie : clôtures, caisses et corbeille"
                 : "Gestion des assurances"}
             </p>
 
@@ -1658,6 +1739,10 @@ export default function Caisse() {
 
         {activePage === "assurance" &&
           renderInsurancePage()}
+
+        {activePage === "regie" && (
+          <RegiePage regisseur={caisseInfo.regisseur} />
+        )}
 
       </main>
 
@@ -1775,6 +1860,37 @@ export default function Caisse() {
                 handleAddPatient
               }
             >
+
+              {/* PATIENT DÉJÀ ENREGISTRÉ */}
+
+              <PatientLookup
+                selected={lookupPatient}
+                onClear={() => {
+                  setLookupPatient(null);
+                  setFormData((current) => ({ ...current, patientId: "" }));
+                }}
+                onSelect={(found) => {
+                  const insurance = insuranceConfiguration.find(
+                    (item) => item.name === found.insuranceName
+                  );
+                  setLookupPatient(found);
+                  setFormData((current) => ({
+                    ...current,
+                    patientId: found.patientId,
+                    nom: found.nom,
+                    prenom: found.prenom,
+                    sexe: found.sexe,
+                    age: String(found.age),
+                    dateNaissance: found.dateNaissance,
+                    telephone: found.telephone,
+                    parentContact: found.parentContact,
+                    quartier: found.quartier,
+                    assurance: insurance ? "Oui" : "Non",
+                    assuranceId: insurance ? insurance.id : "",
+                    insuranceNumber: insurance ? found.insuranceNumber : "",
+                  }));
+                }}
+              />
 
               <div
                 style={{
