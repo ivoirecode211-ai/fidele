@@ -1039,8 +1039,8 @@
 }
 
 .roles-dropdown-trigger.active {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #1671b7;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .roles-placeholder {
@@ -1097,7 +1097,7 @@
 .roles-dropdown-header button {
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: #1671b7;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -1166,8 +1166,8 @@
 /* Carré sélectionné */
 
 .role-checkbox-option.selected .custom-role-checkbox {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: #1671b7;
+  border-color: #1671b7;
 }
 
 /* Texte du rôle */
@@ -1179,7 +1179,7 @@
 }
 
 .role-checkbox-option.selected .role-option-text {
-  color: #1d4ed8;
+  color: #0b5d98;
   font-weight: 500;
 }
 
@@ -1202,7 +1202,7 @@
 
 .roles-dropdown-footer button {
   border: none;
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
   border-radius: 5px;
   padding: 5px 10px;
@@ -1212,7 +1212,7 @@
 }
 
 .roles-dropdown-footer button:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
 }
 
 /* Scrollbar */

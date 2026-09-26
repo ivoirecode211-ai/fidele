@@ -878,7 +878,7 @@
   align-items: center;
   justify-content: center;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .report-modal-heading span {
@@ -1016,7 +1016,7 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .report-detail-stat span {
@@ -1059,7 +1059,7 @@
   height: 34px;
   border-radius: 50%;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
   display: flex;
   align-items: center;
   justify-content: center;

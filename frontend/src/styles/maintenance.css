@@ -932,7 +932,7 @@
   box-sizing: border-box;
 
   background: var(--bg, #f5f8fb);
-  color: var(--text, #17324d);
+  color: var(--text, #0c3557);
 }
 
 
@@ -999,7 +999,7 @@
 .maintenance-cancel-button {
   border: 1px solid #d7e0e8;
   background: #ffffff;
-  color: #536b7e;
+  color: #1671b7;
 }
 
 .maintenance-cancel-button:hover {
@@ -1053,7 +1053,7 @@
 
 .maintenance-search svg {
   flex-shrink: 0;
-  color: #5d9bd0;
+  color: #67aae9;
 }
 
 .maintenance-search input {
@@ -1063,7 +1063,7 @@
   outline: none;
   background: transparent;
 
-  color: #17324d;
+  color: #0c3557;
   font-size: 14px;
 }
 
@@ -1086,7 +1086,7 @@
   border-radius: 8px;
 
   background: #ffffff;
-  color: #17324d;
+  color: #0c3557;
 
   font-size: 14px;
   font-weight: 600;
@@ -1207,7 +1207,7 @@
 
   text-align: left;
 
-  color: #476174;
+  color: #0b5d98;
 
   font-size: 13px;
   font-weight: 800;
@@ -1220,7 +1220,7 @@
 
   border-bottom: 1px solid #edf1f4;
 
-  color: #344f63;
+  color: #0a4979;
 
   font-size: 14px;
   font-weight: 500;
@@ -1281,7 +1281,7 @@
 }
 
 .maintenance-date-cell span {
-  color: #344f63;
+  color: #0a4979;
 
   font-size: 14px;
   font-weight: 600;
@@ -1315,17 +1315,17 @@
 
 .maintenance-priority.normale {
   background: #eef6ff;
-  color: #2879b8;
+  color: #1671b7;
 }
 
 .maintenance-priority.haute {
   background: #fff7e6;
-  color: #c77a08;
+  color: #d97706;
 }
 
 .maintenance-priority.critique {
   background: #fff0f0;
-  color: #d92d20;
+  color: #c94f4f;
 }
 
 
@@ -1347,7 +1347,7 @@
 }
 
 .maintenance-empty-state svg {
-  color: #7ca7c8;
+  color: #67aae9;
 }
 
 .maintenance-empty-state p {
@@ -1390,7 +1390,7 @@
     conic-gradient(
       #16a34a 0deg 240deg,
       #f59e0b 240deg 300deg,
-      #dc2626 300deg 360deg
+      #c94f4f 300deg 360deg
     );
 
   position: relative;
@@ -1478,11 +1478,11 @@
 }
 
 .legend-dot.critical {
-  background: #dc2626;
+  background: #c94f4f;
 }
 
 .maintenance-status-legend span:not(.legend-dot) {
-  color: #536b7e;
+  color: #1671b7;
 
   font-size: 13px;
   font-weight: 600;
@@ -1526,7 +1526,7 @@
 }
 
 .maintenance-equipment-card:hover {
-  border-color: #b9d8ef;
+  border-color: #c2e0ff;
 
   box-shadow: 0 6px 18px rgba(10, 73, 121, 0.08);
 
@@ -1613,7 +1613,7 @@
 }
 
 .maintenance-equipment-info strong {
-  color: #405a6d;
+  color: #0b5d98;
 
   font-size: 12px;
   font-weight: 700;
@@ -1665,7 +1665,7 @@
   justify-content: center;
 
   background: #fff0f0;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .maintenance-critical-content {
@@ -1694,7 +1694,7 @@
 .maintenance-critical-content p {
   margin: 2px 0 0;
 
-  color: #c24141;
+  color: #b34242;
 
   font-size: 13px;
   font-weight: 600;
@@ -1781,7 +1781,7 @@
   justify-content: center;
 
   background: #f1f5f8;
-  color: #536b7e;
+  color: #1671b7;
 
   cursor: pointer;
 }
@@ -1816,7 +1816,7 @@
 }
 
 .maintenance-form-group label {
-  color: #34566f;
+  color: #0b5d98;
 
   font-size: 13px;
   font-weight: 700;
@@ -1834,7 +1834,7 @@
 
   background: #ffffff;
 
-  color: #17324d;
+  color: #0c3557;
 
   font-family: inherit;
   font-size: 14px;

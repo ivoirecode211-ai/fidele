@@ -89,7 +89,7 @@
 }
 
 .ia-tool-icon.blue {
-  color: #2563eb;
+  color: #1671b7;
   background: #eff6ff;
 }
 
@@ -99,12 +99,12 @@
 }
 
 .ia-tool-icon.cyan {
-  color: #0891b2;
+  color: #368ad1;
   background: #ecfeff;
 }
 
 .ia-tool-icon.purple {
-  color: #7c3aed;
+  color: #1671b7;
   background: #f5f3ff;
 }
 
@@ -249,7 +249,7 @@
   padding: 4px 8px;
   border-radius: 999px;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
   font-size: 11px;
   font-weight: 700;
   vertical-align: middle;
@@ -261,7 +261,7 @@
   gap: 5px;
   border: 0;
   background: transparent;
-  color: #2563eb;
+  color: #1671b7;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -300,12 +300,12 @@
 
 .ia-suggestion-icon.warning {
   background: #fff7ed;
-  color: #ea580c;
+  color: #d97706;
 }
 
 .ia-suggestion-icon.danger {
   background: #fef2f2;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .ia-suggestion-icon.success {
@@ -315,7 +315,7 @@
 
 .ia-suggestion-icon.info {
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .ia-suggestion-content {
@@ -385,7 +385,7 @@
   align-items: center;
   justify-content: center;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .ia-chart {
@@ -449,7 +449,7 @@
   inset: 0 0 26px 0;
   width: 100%;
   height: calc(100% - 26px);
-  color: #2563eb;
+  color: #1671b7;
   overflow: visible;
 }
 
@@ -496,7 +496,7 @@
 }
 
 .legend-real {
-  background: #2563eb;
+  background: #1671b7;
 }
 
 .legend-prediction {
@@ -535,8 +535,8 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  color: #2563eb;
-  box-shadow: 0 5px 18px rgba(37, 99, 235, 0.08);
+  color: #1671b7;
+  box-shadow: 0 5px 18px rgba(22, 113, 183, 0.08);
 }
 
 .ia-health-content {
@@ -565,7 +565,7 @@
   padding: 8px 12px;
   border: 0;
   border-radius: 8px;
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
@@ -577,7 +577,7 @@
 }
 
 .models-sparkle {
-  color: #7c3aed;
+  color: #1671b7;
 }
 
 .ia-models-list {
@@ -648,7 +648,7 @@
   align-items: center;
   justify-content: center;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .ia-information > div:nth-child(2) {
@@ -728,7 +728,7 @@
 }
 
 .ia-modal-icon.blue {
-  color: #2563eb;
+  color: #1671b7;
   background: #eff6ff;
 }
 
@@ -738,12 +738,12 @@
 }
 
 .ia-modal-icon.cyan {
-  color: #0891b2;
+  color: #368ad1;
   background: #ecfeff;
 }
 
 .ia-modal-icon.purple {
-  color: #7c3aed;
+  color: #1671b7;
   background: #f5f3ff;
 }
 
@@ -804,7 +804,7 @@
   align-items: center;
   justify-content: center;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .ia-modal-placeholder h3 {
@@ -835,7 +835,7 @@
 
 .ia-development-info svg {
   flex-shrink: 0;
-  color: #2563eb;
+  color: #1671b7;
   margin-top: 2px;
 }
 
@@ -875,7 +875,7 @@
 
 .ia-modal-action {
   border: 0;
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
 }
 

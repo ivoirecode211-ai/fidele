@@ -26,7 +26,7 @@
   border: none;
   border-radius: 8px;
   padding: 10px 16px;
-  background: #2563eb;
+  background: #1671b7;
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
@@ -35,7 +35,7 @@
 }
 
 .hygiene-primary-button:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
 }
 
 /* ============================================================
@@ -75,8 +75,8 @@
 }
 
 .hygiene-search:focus-within {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #1671b7;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .hygiene-search svg {
@@ -111,7 +111,7 @@
 }
 
 .hygiene-clear-search:hover {
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .hygiene-date-info {
@@ -124,7 +124,7 @@
 }
 
 .hygiene-date-info svg {
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .hygiene-date-info strong {
@@ -203,7 +203,7 @@
   border-radius: 7px;
   padding: 7px 10px;
   background: #ffffff;
-  color: #1e3a8a;
+  color: #0a4979;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -211,9 +211,9 @@
 }
 
 .hygiene-small-button:hover {
-  border-color: #2563eb;
+  border-color: #1671b7;
   background: #eff6ff;
-  color: #1d4ed8;
+  color: #0b5d98;
 }
 
 .hygiene-link-button {
@@ -222,14 +222,14 @@
   gap: 5px;
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: #1671b7;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .hygiene-link-button:hover {
-  color: #1d4ed8;
+  color: #0b5d98;
 }
 
 /* ============================================================
@@ -294,9 +294,9 @@
 }
 
 .hygiene-edit-button:hover {
-  border-color: #2563eb;
+  border-color: #1671b7;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .hygiene-empty {
@@ -338,22 +338,22 @@
 
 .hygiene-product-icon.blue {
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .hygiene-product-icon.green {
   background: #ecfdf5;
-  color: #059669;
+  color: #16a34a;
 }
 
 .hygiene-product-icon.cyan {
   background: #ecfeff;
-  color: #0891b2;
+  color: #368ad1;
 }
 
 .hygiene-product-icon.purple {
   background: #f5f3ff;
-  color: #7c3aed;
+  color: #1671b7;
 }
 
 .hygiene-product-info {
@@ -421,12 +421,12 @@
 
 .waste-icon.red {
   background: #fef2f2;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 .waste-icon.orange {
   background: #fff7ed;
-  color: #ea580c;
+  color: #d97706;
 }
 
 .waste-icon.gray {
@@ -485,7 +485,7 @@
 
 .audit-icon.next {
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .audit-info {
@@ -609,7 +609,7 @@
 }
 
 .summary-content span {
-  color: #3f6212;
+  color: #166534;
   font-size: 11px;
   line-height: 1.5;
   font-weight: 500;
@@ -629,7 +629,7 @@
 }
 
 .summary-score span {
-  color: #4d7c0f;
+  color: #15803d;
   font-size: 10px;
   font-weight: 600;
 }
@@ -681,7 +681,7 @@
   justify-content: center;
   border-radius: 8px;
   background: #eff6ff;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 .modal-title h2 {
@@ -713,7 +713,7 @@
 
 .modal-close:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: #c94f4f;
 }
 
 /* ============================================================
@@ -765,8 +765,8 @@
 
 .hygiene-form-group input:focus,
 .hygiene-form-group select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #1671b7;
+  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
 }
 
 .hygiene-form-group select {
@@ -789,7 +789,7 @@
 
 .hygiene-form-note svg {
   flex-shrink: 0;
-  color: #2563eb;
+  color: #1671b7;
 }
 
 /* ============================================================
@@ -833,13 +833,13 @@
 }
 
 .hygiene-save-button {
-  border: 1px solid #2563eb;
-  background: #2563eb;
+  border: 1px solid #1671b7;
+  background: #1671b7;
   color: #ffffff;
 }
 
 .hygiene-save-button:hover {
-  background: #1d4ed8;
+  background: #0b5d98;
 }
 
 /* ============================================================
