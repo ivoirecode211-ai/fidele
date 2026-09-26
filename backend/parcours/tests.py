@@ -309,3 +309,18 @@ class NotificationsTests(ParcoursBase):
 
     def test_roles_without_pending_actions_get_nothing(self):
         self.assertEqual(self.notifications(self.comptable), {"count": 0, "items": []})
+
+
+class NotificationsModulesTests(ParcoursBase):
+    def test_lab_and_stock_notifications(self):
+        from stocks.models import Product
+
+        Product.objects.create(name="Gants", category="Consommable", stock=1, threshold=10)
+        stock = User.objects.create_user(username="stk", password="x", role="STOCK")
+        self.as_user(stock)
+        self.assertEqual(self.client.get("/api/parcours/notifications/").data["items"][0]["id"], "stock")
+        labo = User.objects.create_user(username="lab", password="x", role="LAB")
+        self.as_user(labo)
+        self.assertEqual(self.client.get("/api/parcours/notifications/").data["count"], 0)
+        self.client.post(f"/api/laboratory/analyses/{self.pk}/demande/", {"examIds": ["nfs"]}, format="json")
+        self.assertEqual(self.client.get("/api/parcours/notifications/").data["items"][0]["id"], "lab")

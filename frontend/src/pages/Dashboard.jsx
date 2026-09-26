@@ -43,10 +43,10 @@ export default function Dashboard() {
         <section className="panel">
           <div className="panel-title"><h2>Alertes</h2><AlertTriangle size={19}/></div>
           <ul className="alert-list">
-            <li>Stock faible à vérifier</li>
-            <li>Résultats de laboratoire disponibles</li>
-            <li>Maintenance prévue cette semaine</li>
-            <li>Factures impayées à suivre</li>
+            {(data.alerts || []).length === 0 && <li>Aucune alerte pour le moment</li>}
+            {(data.alerts || []).map((alert) => (
+              <li key={alert}>{alert}</li>
+            ))}
           </ul>
         </section>
       </div>

@@ -257,5 +257,27 @@ def notifications_for(user):
             "link": "/pharmacy",
         })
 
+    if sees_all or user.has_role("LAB"):
+        from laboratory.models import LabRequest
+
+        items.append({
+            "id": "lab",
+            "count": LabRequest.objects.exclude(status="Terminée").filter(results__isnull=False).distinct().count(),
+            "label": "analyse(s) en attente de résultat",
+            "link": "/laboratory",
+        })
+
+    if sees_all or user.has_role("STOCK", "PHARMACY"):
+        from django.db.models import F
+
+        from stocks.models import Product
+
+        items.append({
+            "id": "stock",
+            "count": Product.objects.filter(stock__lte=F("threshold")).count(),
+            "label": "produit(s) sous le seuil d'alerte",
+            "link": "/stocks",
+        })
+
     items = [item for item in items if item["count"]]
     return {"count": sum(item["count"] for item in items), "items": items}

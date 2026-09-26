@@ -12,18 +12,36 @@ class DashboardSummaryTests(APITestCase):
         self.user = User.objects.create_user(username="admin", password="pass1234")
         self.client.force_authenticate(self.user)
 
-    def test_revenue_today_sums_todays_paid_invoices(self):
-        patient = Patient.objects.create(
-            patient_number="P-001", last_name="KOFFI", first_names="Jean",
-            birth_date="1990-01-01", sex="M",
-        )
-        Invoice.objects.create(patient=patient, number="INV-001", amount_paid=15000)
-        Invoice.objects.create(patient=patient, number="INV-002", amount_paid=5000)
-
-        response = self.client.get("/api/dashboard/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["revenue_today"], 20000)
-
     def test_revenue_today_is_zero_without_invoices(self):
         response = self.client.get("/api/dashboard/")
         self.assertEqual(response.data["revenue_today"], 0)
+
+
+from parcours.tests import ParcoursBase  # noqa: E402
+from stocks.models import Product  # noqa: E402
+
+
+class DirectionTests(ParcoursBase):
+    def test_revenue_comes_from_the_cash_desk(self):
+        self.as_user(self.comptable)
+        self.assertEqual(self.client.get("/api/dashboard/").data["revenue_today"], 8000)
+
+    def test_direction_figures_follow_the_workflow(self):
+        Product.objects.create(name="Gants", category="Consommable", stock=2, threshold=50)
+        self.envoyer_en_consultation()
+        self.valider()
+        self.as_user(User.objects.create_user(username="dir", password="x", role="DIRECTOR"))
+        data = self.client.get("/api/dashboard/direction/").data
+        stats = {row["title"]: row for row in data["statistics"]}
+        self.assertEqual(stats["Patients aujourd'hui"]["value"], "1")
+        self.assertEqual(stats["Consultations"]["value"], "1")
+        self.assertEqual(stats["Recettes du jour"]["value"], "8 000")
+        self.assertEqual(stats["Stock critiques"]["value"], "1")
+        self.assertEqual(data["consultationData"][-1]["patients"], 1)
+        self.assertEqual(data["services"], [{"name": "Médecine générale", "percentage": 100, "color": "#0a4979"}])
+        self.assertEqual(data["alerts"][0]["title"], "Stock critique : Gants")
+
+    def test_only_direction(self):
+        self.as_user(self.medecin)
+        self.assertEqual(self.client.get("/api/dashboard/direction/").status_code, 403)
+

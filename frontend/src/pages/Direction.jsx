@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import "../styles/direction.css";
 import Logo from "../components/Logo";
+import api from "../services/api";
 import SidebarFooter from "../components/SidebarFooter";
 import UserBadge from "../components/UserBadge";
 import NotificationBell from "../components/NotificationBell";
@@ -41,43 +43,9 @@ const menuItems = [
   { label: "Rapports & Statistiques", icon: FileText, path: "/reports" },
 ];
 
-const statistics = [
-  { title: "Patients aujourd'hui", value: "128", variation: "+12%", icon: Users, color: "blue" },
-  { title: "Consultations", value: "96", variation: "+8%", icon: Stethoscope, color: "blue" },
-  { title: "Recettes du jour", value: "2 450 000", unit: "FCFA", variation: "+18%", icon: Database, color: "green" },
-  { title: "Lits disponibles", value: "18", unit: "/ 50", variation: "62% occupés", icon: BedDouble, color: "blue" },
-  { title: "Analyses réalisées", value: "45", variation: "+5%", icon: FlaskConical, color: "green" },
-  { title: "Médicaments délivrés", value: "230", variation: "+10%", icon: Pill, color: "red" },
-  { title: "Stock critiques", value: "3", action: "Voir détails", icon: Box, color: "orange" },
-  { title: "Urgences", value: "7", action: "En cours", icon: Siren, color: "red" },
-];
-
-const consultationData = [
-  { day: "Lun", consultations: 70, patients: 45 },
-  { day: "Mar", consultations: 90, patients: 55 },
-  { day: "Mer", consultations: 150, patients: 80 },
-  { day: "Jeu", consultations: 75, patients: 45 },
-  { day: "Ven", consultations: 115, patients: 70 },
-  { day: "Sam", consultations: 155, patients: 90 },
-  { day: "Dim", consultations: 170, patients: 105 },
-];
-
-const services = [
-  // Rampe du bleu de la charte : plus la part est grande, plus le bleu est profond.
-  { name: "Médecine générale", percentage: 36, color: "#0a4979" },
-  { name: "Pédiatrie", percentage: 18, color: "#1671b7" },
-  { name: "Gynécologie", percentage: 15, color: "#368ad1" },
-  { name: "Chirurgie", percentage: 12, color: "#67aae9" },
-  { name: "Laboratoire", percentage: 10, color: "#98caf9" },
-  { name: "Autres", percentage: 9, color: "#c2e0ff" },
-];
-
-const alerts = [
-  { type: "critical", title: "Stock critique : Gants", text: "Il reste 25 unités (seuil : 50)", time: "Il y a 20 min", icon: AlertTriangle },
-  { type: "warning", title: "Maintenance : Générateur", text: "Intervention prévue dans 3 jours", time: "Il y a 1 h", icon: Wrench },
-  { type: "info", title: "Affluence élevée aux urgences", text: "Temps d'attente estimé : 45 min", time: "Il y a 2 h", icon: Siren },
-  { type: "success", title: "3 résultats d'analyses à valider", text: "", time: "Il y a 3 h", icon: CheckCircle2 },
-];
+// Données calculées sur tous les modules (/api/dashboard/direction/) ;
+// les icônes arrivent par leur nom lucide.
+const ICONS = { Users, Stethoscope, Database, BedDouble, FlaskConical, Pill, Box, Siren, AlertTriangle, Wrench, CheckCircle2 };
 
 // Carte plus riche que le StatCard partagé (unité, variation, action) :
 // reste locale exprès, un passage au composant générique ferait perdre ces informations.
@@ -115,7 +83,7 @@ function StatCard({ stat }) {
   );
 }
 
-function ConsultationChart() {
+function ConsultationChart({ consultationData }) {
   const width = 560;
   const height = 235;
   const left = 48;
@@ -124,7 +92,9 @@ function ConsultationChart() {
   const bottom = 38;
   const graphWidth = width - left - right;
   const graphHeight = height - top - bottom;
-  const maxValue = 200;
+  // Échelle : un multiple de 4 au-dessus de la plus haute valeur.
+  const peak = Math.max(0, ...consultationData.flatMap((item) => [item.consultations, item.patients]));
+  const maxValue = Math.max(4, Math.ceil(peak / 4) * 4);
 
   const getX = (index) => left + (index * graphWidth) / 6;
   const getY = (value) => top + graphHeight - (value / maxValue) * graphHeight;
@@ -137,7 +107,7 @@ function ConsultationChart() {
   return (
     <div className="direction-chart-wrapper">
       <svg className="direction-chart-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-        {[0, 50, 100, 150, 200].map((value) => (
+        {[0, 0.25, 0.5, 0.75, 1].map((ratio) => maxValue * ratio).map((value) => (
           <g key={value}>
             <line x1={left} y1={getY(value)} x2={width - right} y2={getY(value)} className="chart-grid" />
             <text x="10" y={getY(value) + 4} className="chart-axis">{value}</text>
@@ -178,7 +148,7 @@ function ConsultationChart() {
 }
 
 // Donut construit avec un conic-gradient (pas de librairie de graphiques dans ce projet).
-function ServicesDonut() {
+function ServicesDonut({ services, total }) {
   let current = 0;
   const gradientParts = services.map((service) => {
     const start = current;
@@ -191,7 +161,7 @@ function ServicesDonut() {
       <div className="services-donut" style={{ background: `conic-gradient(${gradientParts.join(", ")})` }}>
         <div className="services-donut-center">
           <span>Total</span>
-          <strong>96</strong>
+          <strong>{total}</strong>
         </div>
       </div>
 
@@ -209,6 +179,18 @@ function ServicesDonut() {
 }
 
 export default function Direction() {
+  const [data, setData] = useState({ statistics: [], consultationData: [], services: [], servicesTotal: 0, alerts: [] });
+
+  useEffect(() => {
+    api
+      .get("/dashboard/direction/")
+      .then((response) => setData(response.data))
+      .catch((error) => console.error("Erreur de chargement du tableau de bord :", error));
+  }, []);
+
+  const statistics = data.statistics.map((stat) => ({ ...stat, icon: ICONS[stat.icon] || Users }));
+  const alerts = data.alerts.map((alert) => ({ ...alert, icon: ICONS[alert.icon] || AlertTriangle }));
+
   return (
     <div className="direction-dashboard">
       <aside className="direction-sidebar">
@@ -284,7 +266,7 @@ export default function Direction() {
                 </div>
               </div>
 
-              <ConsultationChart />
+              <ConsultationChart consultationData={data.consultationData} />
             </div>
 
             <div className="direction-panel direction-services-panel">
@@ -292,7 +274,7 @@ export default function Direction() {
                 <h2>Répartition des services</h2>
               </div>
 
-              <ServicesDonut />
+              <ServicesDonut services={data.services} total={data.servicesTotal} />
             </div>
 
             <div className="direction-panel direction-alerts-panel">

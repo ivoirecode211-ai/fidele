@@ -5,7 +5,9 @@ import {
   BellOff,
   ChevronRight,
   ClipboardList,
+  FlaskConical,
   HeartPulse,
+  Package,
   Pill,
   Stethoscope,
 } from "lucide-react";
@@ -30,6 +32,8 @@ const ITEM_ICONS = {
   consultations: Stethoscope,
   "to-prepare": ClipboardList,
   ready: Pill,
+  lab: FlaskConical,
+  stock: Package,
 };
 
 export default function NotificationBell() {
