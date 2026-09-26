@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import api from "../services/api";
 import "../styles/reports.css";
 
 import {
@@ -18,102 +19,6 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-const reportsData = [
-  {
-    id: 1,
-    title: "Rapport d'activité mensuel",
-    type: "Activité",
-    service: "Tous les services",
-    period: "Septembre 2026",
-    author: "Direction Générale",
-    status: "Disponible",
-    date: "17/09/2026",
-  },
-  {
-    id: 2,
-    title: "Rapport des consultations",
-    type: "Consultations",
-    service: "Médecine",
-    period: "Septembre 2026",
-    author: "Service Médical",
-    status: "Disponible",
-    date: "16/09/2026",
-  },
-  {
-    id: 3,
-    title: "Rapport financier",
-    type: "Finances",
-    service: "Caisse",
-    period: "Septembre 2026",
-    author: "Service Caisse",
-    status: "Disponible",
-    date: "15/09/2026",
-  },
-  {
-    id: 4,
-    title: "Rapport des stocks",
-    type: "Stocks",
-    service: "Pharmacie",
-    period: "Septembre 2026",
-    author: "Pharmacie",
-    status: "Disponible",
-    date: "14/09/2026",
-  },
-  {
-    id: 5,
-    title: "Rapport d'hospitalisation",
-    type: "Hospitalisation",
-    service: "Hospitalisation",
-    period: "Septembre 2026",
-    author: "Service Hospitalisation",
-    status: "Disponible",
-    date: "13/09/2026",
-  },
-  {
-    id: 6,
-    title: "Rapport de maintenance",
-    type: "Maintenance",
-    service: "Maintenance",
-    period: "Septembre 2026",
-    author: "Support IT",
-    status: "En cours",
-    date: "12/09/2026",
-  },
-];
-
-const serviceStats = [
-  {
-    service: "Médecine",
-    value: 35,
-    reports: 12,
-  },
-  {
-    service: "Pédiatrie",
-    value: 20,
-    reports: 8,
-  },
-  {
-    service: "Gynécologie",
-    value: 18,
-    reports: 7,
-  },
-  {
-    service: "Chirurgie",
-    value: 15,
-    reports: 6,
-  },
-  {
-    service: "Laboratoire",
-    value: 8,
-    reports: 4,
-  },
-  {
-    service: "Autres",
-    value: 4,
-    reports: 2,
-  },
-];
-
 const reportTypes = [
   "Tous les types",
   "Activité",
@@ -137,20 +42,59 @@ const services = [
   "Maintenance",
 ];
 
-const periods = [
-  "Septembre 2026",
-  "Août 2026",
-  "Juillet 2026",
-  "Juin 2026",
-  "Mai 2026",
-];
+// Rapports calculés sur les données enregistrées (/api/reports/).
+const escapeHtml = (value) =>
+  String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+function openReport(report) {
+  if (!report) return;
+  const rows = report.figures
+    .map((f) => `<tr><td>${escapeHtml(f.label)}</td><td>${escapeHtml(f.value)}</td></tr>`)
+    .join("");
+  const win = window.open("", "_blank", "width=720,height=820");
+  if (!win) return;
+  win.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(report.title)}</title>
+    <style>body{font-family:system-ui,sans-serif;color:#0f172a;margin:40px}h1{color:#1671b7;margin:0 0 4px}
+    p{color:#475569;margin:0 0 24px}table{width:100%;border-collapse:collapse}td{padding:12px 8px;border-bottom:1px solid #e2e8f0}
+    td:last-child{text-align:right;font-weight:700}footer{margin-top:28px;color:#475569;font-size:12px}</style></head><body>
+    <h1>${escapeHtml(report.title)}</h1><p>${escapeHtml(report.period)} · ${escapeHtml(report.service)} · ${escapeHtml(report.status)}</p>
+    <table>${rows}</table><footer>MA SANTÉ — ${escapeHtml(report.author)} — mis à jour le ${escapeHtml(report.date)}</footer>
+    <script>window.onload = () => window.print();</script></body></html>`);
+  win.document.close();
+}
 
 function Reports() {
+  const [data, setData] = useState({
+    stats: { total: 0, available: 0, inProgress: 0, rate: 0 },
+    periods: [],
+    reports: [],
+    serviceStats: [],
+  });
+
   const [typeFilter, setTypeFilter] = useState("Tous les types");
   const [serviceFilter, setServiceFilter] =
     useState("Tous les services");
   const [periodFilter, setPeriodFilter] =
-    useState("Septembre 2026");
+    useState("");
+
+  useEffect(() => {
+    api
+      .get("/reports/overview/", { params: periodFilter ? { period: periodFilter } : {} })
+      .then((response) => {
+        setData(response.data);
+        if (!periodFilter && response.data.periods.length) {
+          setPeriodFilter(response.data.periods[0]);
+        }
+      })
+      .catch((error) => console.error("Erreur de chargement des rapports :", error));
+  }, [periodFilter]);
+
+  const reportsData = data.reports;
+  const serviceStats = data.serviceStats;
+  const periods = data.periods;
+
+  const quickReport = (type) =>
+    openReport(reportsData.find((report) => report.type === type && report.period === periods[0]));
   const [search, setSearch] = useState("");
 
   const filteredReports = useMemo(() => {
@@ -187,6 +131,7 @@ function Reports() {
     serviceFilter,
     periodFilter,
     search,
+    reportsData,
   ]);
 
   const downloadCSV = () => {
@@ -242,7 +187,7 @@ function Reports() {
   const resetFilters = () => {
     setTypeFilter("Tous les types");
     setServiceFilter("Tous les services");
-    setPeriodFilter("Septembre 2026");
+    setPeriodFilter(periods[0] || "");
     setSearch("");
   };
 
@@ -288,10 +233,10 @@ function Reports() {
 
             <span>Total rapports</span>
 
-            <strong>42</strong>
+            <strong>{data.stats.total}</strong>
 
             <small>
-              Ce mois-ci
+              Tous mois confondus
             </small>
 
           </div>
@@ -310,10 +255,10 @@ function Reports() {
 
             <span>Rapports disponibles</span>
 
-            <strong>38</strong>
+            <strong>{data.stats.available}</strong>
 
             <small>
-              90,5 % du total
+              {data.stats.rate} % du total
             </small>
 
           </div>
@@ -332,7 +277,7 @@ function Reports() {
 
             <span>Rapports en cours</span>
 
-            <strong>4</strong>
+            <strong>{data.stats.inProgress}</strong>
 
             <small>
               À finaliser
@@ -354,10 +299,10 @@ function Reports() {
 
             <span>Taux de production</span>
 
-            <strong>92%</strong>
+            <strong>{data.stats.rate}%</strong>
 
             <small>
-              +6 % ce mois
+              Mois clôturés
             </small>
 
           </div>
@@ -631,6 +576,7 @@ function Reports() {
                         <button
                           className="view-report-btn"
                           title="Consulter le rapport"
+                          onClick={() => openReport(report)}
                         >
                           Voir
                         </button>
@@ -691,7 +637,7 @@ function Reports() {
               </h2>
 
               <p>
-                Répartition des rapports
+                Répartition des passages en caisse
               </p>
 
             </div>
@@ -731,7 +677,7 @@ function Reports() {
                 </div>
 
                 <small>
-                  {item.reports} rapports
+                  {item.reports} passage(s)
                 </small>
 
               </div>
@@ -766,7 +712,7 @@ function Reports() {
 
           {/* RAPPORT PATIENTS */}
 
-          <button className="quick-report-card">
+          <button className="quick-report-card" onClick={() => quickReport("Activité")}>
 
             <div className="quick-report-icon blue">
               <Users size={20} strokeWidth={2} aria-hidden="true" />
@@ -793,7 +739,7 @@ function Reports() {
 
           {/* RAPPORT FINANCIER */}
 
-          <button className="quick-report-card">
+          <button className="quick-report-card" onClick={() => quickReport("Finances")}>
 
             <div className="quick-report-icon green">
               <Wallet size={20} strokeWidth={2} aria-hidden="true" />
@@ -819,7 +765,7 @@ function Reports() {
 
           {/* RAPPORT PHARMACIE */}
 
-          <button className="quick-report-card">
+          <button className="quick-report-card" onClick={() => quickReport("Stocks")}>
 
             <div className="quick-report-icon orange">
               <Pill size={20} strokeWidth={2} aria-hidden="true" />
@@ -845,7 +791,7 @@ function Reports() {
 
           {/* RAPPORT HOSPITALISATION */}
 
-          <button className="quick-report-card">
+          <button className="quick-report-card" onClick={() => quickReport("Hospitalisation")}>
 
             <div className="quick-report-icon purple">
               <Hospital size={20} strokeWidth={2} aria-hidden="true" />
