@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Wrench,
   CalendarDays,
@@ -18,31 +18,20 @@ import {
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
+import api from "../services/api";
 import "../styles/maintenance.css";
 
-// Données de démonstration — seront reliées aux API Django/PostgreSQL.
+// Données servies par l'API (/api/maintenance/).
+// Icône lucide de chaque catégorie d'équipement (champ « icon » de l'API).
+const CATEGORY_ICONS = { Zap, Wind, Settings, Droplets, Activity, Building2, Wrench };
 
-const INTERVENTIONS = [
-  { id: 1, equipment: "Climatiseur Bloc Opératoire", category: "Climatisation", technician: "Jean Kouassi", date: "18/09/2026", time: "08:30", type: "Préventive", status: "Terminée", priority: "Normale", description: "Nettoyage général et contrôle du système de refroidissement." },
-  { id: 2, equipment: "Générateur principal", category: "Électricité", technician: "Marc Yao", date: "18/09/2026", time: "10:15", type: "Corrective", status: "En cours", priority: "Critique", description: "Vérification du démarrage automatique et contrôle du niveau d'huile." },
-  { id: 3, equipment: "Stérilisateur Autoclave", category: "Stérilisation", technician: "Paul N'Guessan", date: "17/09/2026", time: "14:00", type: "Préventive", status: "Terminée", priority: "Normale", description: "Maintenance préventive et test de température." },
-  { id: 4, equipment: "Réfrigérateur pharmacie", category: "Froid médical", technician: "Jean Kouassi", date: "16/09/2026", time: "09:00", type: "Corrective", status: "En attente", priority: "Haute", description: "Température instable détectée dans le compartiment principal." },
-  { id: 5, equipment: "Système d'oxygène", category: "Gaz médicaux", technician: "Marc Yao", date: "15/09/2026", time: "11:30", type: "Préventive", status: "Terminée", priority: "Haute", description: "Contrôle de pression et recherche de fuite." },
-];
+const DONUT_COLORS = {
+  operational: "#16a34a",
+  attention: "#f59e0b",
+  critical: "#c94f4f",
+};
 
-const EQUIPMENTS = [
-  { id: 1, name: "Générateur principal", category: "Électricité", icon: Zap, status: "Critique", location: "Bloc technique", lastMaintenance: "10/09/2026", nextMaintenance: "20/09/2026", uptime: "82%" },
-  { id: 2, name: "Climatisation bloc opératoire", category: "Climatisation", icon: Wind, status: "Opérationnel", location: "Bloc opératoire", lastMaintenance: "18/09/2026", nextMaintenance: "18/10/2026", uptime: "98%" },
-  { id: 3, name: "Autoclave principal", category: "Stérilisation", icon: Settings, status: "Opérationnel", location: "Stérilisation", lastMaintenance: "17/09/2026", nextMaintenance: "17/10/2026", uptime: "96%" },
-  { id: 4, name: "Réfrigérateur pharmacie", category: "Froid médical", icon: Droplets, status: "Attention", location: "Pharmacie", lastMaintenance: "05/09/2026", nextMaintenance: "19/09/2026", uptime: "89%" },
-  { id: 5, name: "Système d'oxygène", category: "Gaz médicaux", icon: Activity, status: "Opérationnel", location: "Service technique", lastMaintenance: "15/09/2026", nextMaintenance: "15/10/2026", uptime: "99%" },
-  { id: 6, name: "Ascenseur principal", category: "Infrastructure", icon: Building2, status: "Opérationnel", location: "Bâtiment principal", lastMaintenance: "01/09/2026", nextMaintenance: "01/10/2026", uptime: "97%" },
-];
-
-const CRITICAL_EQUIPMENTS = [
-  { name: "Générateur principal", location: "Bloc technique", issue: "Batterie faible", priority: "Critique" },
-  { name: "Réfrigérateur pharmacie", location: "Pharmacie", issue: "Température instable", priority: "Haute" },
-];
+const pad = (value) => String(value).padStart(2, "0");
 
 const STAT_TONES = { warning: "orange", danger: "red", success: "green" };
 
@@ -67,6 +56,45 @@ const EMPTY_INTERVENTION = {
 };
 
 export default function Maintenance() {
+  const [data, setData] = useState({
+    stats: { monthInterventions: 0, pending: 0, critical: 0, plannedThisWeek: 0 },
+    equipmentStatus: { total: 0, operational: 0, attention: 0, critical: 0 },
+    interventions: [],
+    equipments: [],
+    criticalEquipments: [],
+  });
+
+  const loadOverview = () =>
+    api
+      .get("/maintenance/overview/")
+      .then((response) => setData(response.data))
+      .catch((error) => console.error("Erreur de chargement de la maintenance :", error));
+
+  useEffect(() => {
+    loadOverview();
+  }, []);
+
+  const {
+    stats,
+    equipmentStatus,
+    interventions: INTERVENTIONS,
+    equipments,
+    criticalEquipments: CRITICAL_EQUIPMENTS,
+  } = data;
+
+  const EQUIPMENTS = equipments.map((equipment) => ({
+    ...equipment,
+    icon: CATEGORY_ICONS[equipment.icon] || Wrench,
+  }));
+
+  const donutBackground = (() => {
+    const { total, operational, attention, critical } = equipmentStatus;
+    if (!total) return undefined;
+    const a = (operational / total) * 360;
+    const b = a + (attention / total) * 360;
+    const c = b + (critical / total) * 360;
+    return `conic-gradient(${DONUT_COLORS.operational} 0deg ${a}deg, ${DONUT_COLORS.attention} ${a}deg ${b}deg, ${DONUT_COLORS.critical} ${b}deg ${c}deg)`;
+  })();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [typeFilter, setTypeFilter] = useState("Tous");
@@ -88,16 +116,29 @@ export default function Maintenance() {
 
       return matchesSearch && matchesStatus && matchesType;
     });
-  }, [search, statusFilter, typeFilter]);
+  }, [search, statusFilter, typeFilter, INTERVENTIONS]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewIntervention((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveIntervention = (e) => {
+  const handleSaveIntervention = async (e) => {
     e.preventDefault();
-    console.log("Nouvelle intervention :", newIntervention);
+
+    try {
+      await api.post("/maintenance/interventions/", newIntervention);
+    } catch (error) {
+      const errors = error.response?.data;
+      alert(
+        errors && typeof errors === "object"
+          ? Object.values(errors).flat().join("\n")
+          : "Impossible d'enregistrer l'intervention."
+      );
+      return;
+    }
+
+    loadOverview();
     setShowModal(false);
     setNewIntervention(EMPTY_INTERVENTION);
   };
@@ -117,10 +158,10 @@ export default function Maintenance() {
       </div>
 
       <div className="maintenance-stats-grid">
-        <StatCard icon={<Wrench size={22} />} label="Interventions" value="24" detail="Ce mois-ci" tone="blue" />
-        <StatCard icon={<Clock3 size={22} />} label="En attente" value="05" detail="À traiter" tone={STAT_TONES.warning} />
-        <StatCard icon={<AlertTriangle size={22} />} label="Équipements critiques" value="02" detail="Intervention requise" tone={STAT_TONES.danger} />
-        <StatCard icon={<CalendarDays size={22} />} label="Maintenance planifiée" value="08" detail="Cette semaine" tone={STAT_TONES.success} />
+        <StatCard icon={<Wrench size={22} />} label="Interventions" value={pad(stats.monthInterventions)} detail="Ce mois-ci" tone="blue" />
+        <StatCard icon={<Clock3 size={22} />} label="En attente" value={pad(stats.pending)} detail="À traiter" tone={STAT_TONES.warning} />
+        <StatCard icon={<AlertTriangle size={22} />} label="Équipements critiques" value={pad(stats.critical)} detail="Intervention requise" tone={STAT_TONES.danger} />
+        <StatCard icon={<CalendarDays size={22} />} label="Maintenance planifiée" value={pad(stats.plannedThisWeek)} detail="Cette semaine" tone={STAT_TONES.success} />
       </div>
 
       <div className="maintenance-toolbar">
@@ -228,9 +269,9 @@ export default function Maintenance() {
           </div>
 
           <div className="maintenance-donut-container">
-            <div className="maintenance-donut">
+            <div className="maintenance-donut" style={donutBackground ? { background: donutBackground } : undefined}>
               <div className="maintenance-donut-inner">
-                <strong>06</strong>
+                <strong>{pad(equipmentStatus.total)}</strong>
                 <span>Équipements</span>
               </div>
             </div>
@@ -240,17 +281,17 @@ export default function Maintenance() {
             <div>
               <span className="legend-dot operational"></span>
               <span>Opérationnels</span>
-              <strong>4</strong>
+              <strong>{equipmentStatus.operational}</strong>
             </div>
             <div>
               <span className="legend-dot attention"></span>
               <span>Attention</span>
-              <strong>1</strong>
+              <strong>{equipmentStatus.attention}</strong>
             </div>
             <div>
               <span className="legend-dot critical"></span>
               <span>Critiques</span>
-              <strong>1</strong>
+              <strong>{equipmentStatus.critical}</strong>
             </div>
           </div>
         </section>

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "cashdesk",
     "parcours",
     "administration",
+    "maintenance",
 ]
 
 MIDDLEWARE = [
