@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "administration",
     "maintenance",
     "hygiene",
+    "archives",
 ]
 
 MIDDLEWARE = [

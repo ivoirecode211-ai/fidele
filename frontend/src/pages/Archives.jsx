@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Archive,
   FileText,
@@ -20,42 +20,19 @@ import {
   Info,
 } from "lucide-react";
 import StatCard from "../components/StatCard";
+import api from "../services/api";
 import "../styles/archives.css";
 
 // Données de démonstration — seront reliées aux API Django/PostgreSQL.
 
-const ARCHIVE_STATS = [
-  { id: "documents", value: "12 458", label: "Documents archivés", icon: FileText, color: "blue" },
-  { id: "dossiers", value: "1 245", label: "Dossiers patients", icon: Folder, color: "green" },
-  { id: "documents-year", value: "320", label: "Documents 2026", icon: CalendarDays, color: "purple" },
-  { id: "security", value: "100%", label: "Sécurisation", icon: ShieldCheck, color: "orange" },
-];
+// Documents produits par les autres modules, servis par /api/archives/.
+const CATEGORY_ICONS = { FileArchive, FileCheck2, FileSpreadsheet, FileText, File, Archive };
 
-const ARCHIVE_CATEGORIES = [
-  { id: "patient", name: "Dossiers patients", count: "1 245", icon: FileArchive },
-  { id: "accounts", name: "Comptes rendus", count: "892", icon: FileCheck2 },
-  { id: "results", name: "Résultats d'analyses", count: "756", icon: FileSpreadsheet },
-  { id: "invoices", name: "Factures", count: "624", icon: FileText },
-  { id: "mail", name: "Courriers", count: "412", icon: File },
-  { id: "administrative", name: "Documents administratifs", count: "321", icon: FileText },
-  { id: "others", name: "Autres", count: "198", icon: Archive },
-];
-
-const ARCHIVED_DOCUMENTS = [
-  { id: 1, date: "10/09/2026", type: "Compte rendu", patient: "KOUMAE Jean", reference: "CR-2026-00984", author: "Dr. KOUAME", format: "PDF", category: "Comptes rendus" },
-  { id: 2, date: "10/09/2026", type: "Résultat labo", patient: "DIALLO Mariam", reference: "LAB-2026-00821", author: "Lab. Central", format: "PDF", category: "Résultats d'analyses" },
-  { id: 3, date: "09/09/2026", type: "Facture", patient: "TRAORE Awa", reference: "FAC-2026-00754", author: "Comptabilité", format: "PDF", category: "Factures" },
-  { id: 4, date: "09/09/2026", type: "Courrier", patient: "Marie Abidjan", reference: "COU-2026-00542", author: "Direction", format: "PDF", category: "Courriers" },
-  { id: 5, date: "09/09/2026", type: "Dossier patient", patient: "YAO Claude", reference: "DOS-2026-00321", author: "Secrétariat", format: "PDF", category: "Dossiers patients" },
-  { id: 6, date: "08/09/2026", type: "Document administratif", patient: "—", reference: "ADM-2026-00218", author: "Administration", format: "PDF", category: "Documents administratifs" },
-  { id: 7, date: "08/09/2026", type: "Résultat labo", patient: "KONE Brahim", reference: "LAB-2026-00197", author: "Lab. Central", format: "PDF", category: "Résultats d'analyses" },
-];
+const formatNumber = (value) => new Intl.NumberFormat("fr-FR").format(value);
 
 const DOCUMENT_TYPES = [
   "Tous les types", "Dossier patient", "Compte rendu", "Résultat labo", "Facture", "Courrier", "Document administratif",
 ];
-
-const YEARS = ["2026", "2025", "2024", "2023", "2022"];
 
 const CATEGORY_TYPE_MAP = {
   "Dossiers patients": "Dossier patient",
@@ -78,8 +55,35 @@ function DocumentIcon({ type }) {
 export default function Archives() {
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState("Tous les types");
-  const [selectedYear, setSelectedYear] = useState("2026");
+  const [selectedYear, setSelectedYear] = useState(String(new Date().getFullYear()));
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [data, setData] = useState({
+    stats: { documents: 0, patientFiles: 0, thisYear: 0, year: new Date().getFullYear() },
+    categories: [],
+    years: [String(new Date().getFullYear())],
+    documents: [],
+  });
+
+  useEffect(() => {
+    api
+      .get("/archives/overview/", { params: { year: selectedYear } })
+      .then((response) => setData(response.data))
+      .catch((error) => console.error("Erreur de chargement des archives :", error));
+  }, [selectedYear]);
+
+  const ARCHIVED_DOCUMENTS = data.documents;
+  const YEARS = data.years;
+  const ARCHIVE_CATEGORIES = data.categories.map((category) => ({
+    ...category,
+    count: formatNumber(category.count),
+    icon: CATEGORY_ICONS[category.icon] || FileText,
+  }));
+  const ARCHIVE_STATS = [
+    { id: "documents", value: formatNumber(data.stats.documents), label: "Documents archivés", icon: FileText, color: "blue" },
+    { id: "dossiers", value: formatNumber(data.stats.patientFiles), label: "Dossiers patients", icon: Folder, color: "green" },
+    { id: "documents-year", value: formatNumber(data.stats.thisYear), label: `Documents ${data.stats.year}`, icon: CalendarDays, color: "purple" },
+    { id: "security", value: "100%", label: "Sécurisation", icon: ShieldCheck, color: "orange" },
+  ];
 
   const filteredDocuments = useMemo(() => {
     const value = search.toLowerCase().trim();
@@ -94,14 +98,32 @@ export default function Archives() {
 
       const matchesType = selectedType === "Tous les types" || document.type === selectedType;
 
-      // Les données de démonstration sont toutes de 2026 ; le filtre d'année
-      // sera actif une fois les archives stockées en base.
+      // L'année est filtrée par l'API.
       return matchesSearch && matchesType;
     });
-  }, [search, selectedType]);
+  }, [search, selectedType, ARCHIVED_DOCUMENTS]);
+
+  const exportCsv = () => {
+    const header = ["Date", "Type", "Patient", "Référence", "Auteur", "Format"];
+    const lines = filteredDocuments.map((doc) =>
+      [doc.date, doc.type, doc.patient, doc.reference, doc.author, doc.format]
+        .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+        .join(";")
+    );
+    const blob = new Blob(["\ufeff" + [header.join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `archives-${selectedYear}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
   const handleAction = (action) => {
-    alert(`${action} : fonctionnalité prête à être connectée au backend Django.`);
+    if (action === "Exporter") {
+      exportCsv();
+      return;
+    }
+    alert(`${action} : la gestion des fichiers numérisés n'est pas encore disponible.`);
   };
 
   const handleCategoryClick = (categoryName) => {
