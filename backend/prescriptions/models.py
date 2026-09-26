@@ -3,6 +3,10 @@ from django.db import models
 from patients.models import Patient
 
 class Prescription(models.Model):
+    class Meta:
+        verbose_name = "ordonnance"
+        verbose_name_plural = "ordonnances"
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="prescriptions")
     doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     date = models.DateField(auto_now_add=True)
@@ -22,6 +26,10 @@ class Prescription(models.Model):
     served_at = models.DateTimeField(null=True, blank=True)
 
 class PrescriptionItem(models.Model):
+    class Meta:
+        verbose_name = "médicament prescrit"
+        verbose_name_plural = "médicaments prescrits"
+
     prescription = models.ForeignKey(Prescription, on_delete=models.CASCADE, related_name="items")
     medicine = models.CharField(max_length=180)
     dose = models.CharField(max_length=80)

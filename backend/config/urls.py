@@ -2,6 +2,10 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+admin.site.site_header = "MA SANTÉ — Administration"
+admin.site.site_title = "MA SANTÉ"
+admin.site.index_title = "Gestion de la clinique"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("accounts.urls")),

@@ -83,5 +83,7 @@ class WardTests(ParcoursBase):
         self.as_user(self.infirmier)
         self.assertEqual(self.client.post("/api/hospitalization/service/lits/", {"room": "A-101", "bed": "Lit 02"}, format="json").data["totalBeds"], 2)
         self.assertEqual(self.client.post("/api/hospitalization/service/lits/", {"room": "A-101", "bed": "lit 02"}, format="json").status_code, 400)
+        new_room = self.client.post("/api/hospitalization/service/lits/", {"room": "e-12", "bed": "Lit 01"}, format="json").data
+        self.assertEqual((new_room["number"], new_room["totalBeds"], new_room["service"]), ("E-12", 1, "Non précisé"))
         self.as_user(self.pharmacien)
         self.assertEqual(self.client.get("/api/hospitalization/service/").status_code, 403)

@@ -14,6 +14,8 @@ class LabExam(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name = "examen"
+        verbose_name_plural = "examens"
         ordering = ["id"]
 
     def __str__(self):
@@ -22,6 +24,10 @@ class LabExam(models.Model):
 
 class LabRequest(models.Model):
     """Demande d'analyse d'un patient passé à la caisse (une par passage)."""
+    class Meta:
+        verbose_name = "demande d'analyse"
+        verbose_name_plural = "demandes d'analyse"
+
     STATUSES = [(s, s) for s in ("En attente", "En cours", "Terminée")]
     PRIORITIES = [(p, p) for p in ("Normale", "Urgente")]
 
@@ -45,5 +51,7 @@ class LabResult(models.Model):
     result = models.CharField(max_length=120, blank=True)
 
     class Meta:
+        verbose_name = "résultat d'analyse"
+        verbose_name_plural = "résultats d'analyse"
         ordering = ["id"]
         constraints = [models.UniqueConstraint(fields=["request", "exam"], name="lab_result_unique_exam")]

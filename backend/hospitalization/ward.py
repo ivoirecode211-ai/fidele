@@ -84,16 +84,21 @@ class OverviewView(APIView):
 
 
 class BedsView(APIView):
-    """« Ajout de lits » : ajoute un lit à une chambre existante."""
+    """« Ajout de lits » : ajoute un lit ; la chambre est créée si besoin."""
     permission_classes = [WardAccess]
 
     def post(self, request):
-        room = Room.objects.filter(name=str(request.data.get("room", "")).strip()).first()
+        name = str(request.data.get("room", "")).strip().upper()
         number = str(request.data.get("bed", "")).strip()
-        if room is None:
-            return Response({"room": "La chambre sélectionnée n'existe pas."}, status=status.HTTP_400_BAD_REQUEST)
+        if not name:
+            return Response({"room": "Indiquez le numéro de la chambre."}, status=status.HTTP_400_BAD_REQUEST)
         if not number:
             return Response({"bed": "Indiquez le numéro du lit."}, status=status.HTTP_400_BAD_REQUEST)
+        # Chambre saisie librement : créée si elle n'existe pas encore
+        # (service et type se précisent ensuite dans l'admin).
+        room = Room.objects.filter(name__iexact=name).first() or Room.objects.create(
+            name=name, department="Non précisé", type="Standard"
+        )
         if room.beds.filter(number__iexact=number).exists():
             return Response({"bed": f"Le lit {number} existe déjà dans la chambre {room.name}."},
                             status=status.HTTP_400_BAD_REQUEST)

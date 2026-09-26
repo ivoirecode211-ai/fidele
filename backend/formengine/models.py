@@ -3,6 +3,10 @@ from django.db import models
 
 
 class FormInstance(models.Model):
+    class Meta:
+        verbose_name = "formulaire"
+        verbose_name_plural = "formulaires"
+
     STATUS = [
         ("draft", "Brouillon"),
         ("in_progress", "En cours"),

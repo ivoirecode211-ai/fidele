@@ -26,6 +26,8 @@ class Equipment(models.Model):
     maintenance_interval_days = models.PositiveSmallIntegerField(default=30)
 
     class Meta:
+        verbose_name = "équipement"
+        verbose_name_plural = "équipements"
         ordering = ["name"]
 
     def __str__(self):
@@ -50,6 +52,8 @@ class Intervention(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        verbose_name = "intervention"
+        verbose_name_plural = "interventions"
         ordering = ["-date", "-time", "-id"]
 
     def __str__(self):

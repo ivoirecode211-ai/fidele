@@ -52,12 +52,14 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Journal d'audit (Administration) : actions, connexions, adresses IP.
+    "administration.audit.AuditMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",
-    "DIRS": [],
+    "DIRS": [BASE_DIR / "templates"],
     "APP_DIRS": True,
     "OPTIONS": {"context_processors": [
         "django.template.context_processors.request",
@@ -79,6 +81,9 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = "accounts.User"
+
+# Connexion par e-mail ou identifiant (application et admin Django).
+AUTHENTICATION_BACKENDS = ["accounts.backends.EmailOrUsernameBackend"]
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

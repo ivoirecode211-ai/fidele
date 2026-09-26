@@ -46,20 +46,78 @@ const services = [
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-function openReport(report) {
+async function openReport(report) {
   if (!report) return;
-  const rows = report.figures
-    .map((f) => `<tr><td>${escapeHtml(f.label)}</td><td>${escapeHtml(f.value)}</td></tr>`)
-    .join("");
-  const win = window.open("", "_blank", "width=720,height=820");
+
+  // La fenêtre est ouverte tout de suite (sinon le navigateur la bloque),
+  // puis remplie une fois le rapport complet chargé.
+  const win = window.open("", "_blank", "width=1100,height=860");
   if (!win) return;
-  win.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(report.title)}</title>
-    <style>body{font-family:system-ui,sans-serif;color:#0f172a;margin:40px}h1{color:#1671b7;margin:0 0 4px}
-    p{color:#475569;margin:0 0 24px}table{width:100%;border-collapse:collapse}td{padding:12px 8px;border-bottom:1px solid #e2e8f0}
-    td:last-child{text-align:right;font-weight:700}footer{margin-top:28px;color:#475569;font-size:12px}</style></head><body>
-    <h1>${escapeHtml(report.title)}</h1><p>${escapeHtml(report.period)} · ${escapeHtml(report.service)} · ${escapeHtml(report.status)}</p>
-    <table>${rows}</table><footer>MA SANTÉ — ${escapeHtml(report.author)} — mis à jour le ${escapeHtml(report.date)}</footer>
-    <script>window.onload = () => window.print();</script></body></html>`);
+  win.document.write("<p style='font-family:system-ui;padding:32px'>Chargement du rapport…</p>");
+
+  let detail;
+  try {
+    detail = (await api.get(`/reports/${encodeURIComponent(report.id)}/`)).data;
+  } catch {
+    win.document.body.innerHTML = "<p style='font-family:system-ui;padding:32px'>Rapport indisponible.</p>";
+    return;
+  }
+
+  const csvCell = (value) => `"${String(value).replace(/"/g, '""')}"`;
+  const csv = [
+    [detail.title, detail.period].map(csvCell).join(";"),
+    "",
+    ...detail.figures.map((f) => [f.label, f.value].map(csvCell).join(";")),
+    ...detail.sections.flatMap((section) => [
+      "",
+      csvCell(section.title),
+      section.columns.map(csvCell).join(";"),
+      ...section.rows.map((row) => row.map(csvCell).join(";")),
+    ]),
+  ].join("\n");
+  const csvHref = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+
+  const figures = detail.figures
+    .map((f) => `<div class="fig"><span>${escapeHtml(f.label)}</span><strong>${escapeHtml(f.value)}</strong></div>`)
+    .join("");
+  const sections = detail.sections
+    .map((section) => `<section><h2>${escapeHtml(section.title)} <small>(${section.rows.length})</small></h2>${
+      section.rows.length
+        ? `<table><thead><tr>${section.columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${section.rows
+            .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`)
+            .join("")}</tbody></table>`
+        : "<p class='empty'>Aucun événement sur la période.</p>"
+    }</section>`)
+    .join("");
+
+  win.document.open();
+  win.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(detail.title)} — ${escapeHtml(detail.period)}</title>
+    <style>
+      body{font-family:system-ui,sans-serif;color:#0f172a;margin:32px}
+      h1{color:#1671b7;margin:0 0 4px}
+      .meta{color:#475569;margin:0 0 20px}
+      .toolbar{display:flex;gap:10px;margin-bottom:24px}
+      .toolbar a,.toolbar button{font:inherit;padding:9px 16px;border-radius:8px;border:1px solid #1671b7;cursor:pointer;text-decoration:none}
+      .toolbar button{background:#1671b7;color:#fff}.toolbar a{color:#1671b7;background:#fff}
+      .figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:28px}
+      .fig{border:1px solid #e2e8f0;border-radius:10px;padding:12px}
+      .fig span{display:block;color:#475569;font-size:12px}.fig strong{font-size:20px}
+      section{margin-bottom:26px;break-inside:auto}
+      h2{font-size:16px;color:#0b5d98;border-bottom:2px solid #e0effe;padding-bottom:6px}
+      h2 small{color:#475569;font-weight:500}
+      table{width:100%;border-collapse:collapse;font-size:12px}
+      th{background:#f1f8ff;color:#0b5d98;text-align:left;padding:7px}
+      td{padding:7px;border-bottom:1px solid #e2e8f0;vertical-align:top}
+      .empty{color:#475569}
+      footer{margin-top:24px;color:#475569;font-size:12px}
+      @media print{.toolbar{display:none}body{margin:12mm}tr{break-inside:avoid}}
+    </style></head><body>
+    <h1>${escapeHtml(detail.title)}</h1>
+    <p class="meta">${escapeHtml(detail.period)} · ${escapeHtml(detail.service)} · généré le ${escapeHtml(detail.generatedAt)}</p>
+    <div class="toolbar"><button onclick="window.print()">Imprimer / PDF</button>
+      <a href="${csvHref}" download="${escapeHtml(detail.id)}.csv">Télécharger CSV</a></div>
+    <div class="figs">${figures}</div>${sections}
+    <footer>MA SANTÉ — ${escapeHtml(detail.author)}</footer></body></html>`);
   win.document.close();
 }
 

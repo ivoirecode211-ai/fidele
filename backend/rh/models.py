@@ -20,6 +20,8 @@ class Employee(models.Model):
     statut = models.CharField(max_length=20, choices=STATUSES, default="Actif")
 
     class Meta:
+        verbose_name = "employé"
+        verbose_name_plural = "employés"
         ordering = ["matricule"]
 
     def __str__(self):

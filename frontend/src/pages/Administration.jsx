@@ -21,11 +21,14 @@ import {
   Activity,
   KeyRound,
   Check,
+  Copy,
 } from "lucide-react";
 
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
 import api from "../services/api";
+import AuditLogModal from "../components/admin/AuditLogModal";
+import GeneralSettingsModal from "../components/admin/GeneralSettingsModal";
 import "../styles/administration.css";
 
 // ============================================================
@@ -35,6 +38,8 @@ import "../styles/administration.css";
 
 const EMPTY_USER_FORM = {
   name: "",
+  username: "",
+  password: "",
   function: "",
   roles: [],
   email: "",
@@ -91,9 +96,40 @@ export default function Administration() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
 
+  // Fenêtre des paramètres système : "settings", "audit", "security" ou null.
+  const [adminPanel, setAdminPanel] = useState(null);
+
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [form, setForm] = useState(EMPTY_USER_FORM);
+
+  // Nom d'utilisateur proposé par le serveur pendant la saisie du nom
+  // (nomenclature : initiale(s) du prénom + nom), tant qu'il n'a pas été retouché.
+  const [usernameEdited, setUsernameEdited] = useState(false);
+
+  useEffect(() => {
+    if (!showUserModal || usernameEdited || form.name.trim().split(/\s+/).length < 2) {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      api
+        .get("/administration/users/nom-utilisateur/", {
+          params: { name: form.name, exclude: selectedUser?.id },
+        })
+        .then(({ data }) => setForm((previous) => ({ ...previous, username: data.username })))
+        .catch(() => {});
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [form.name, showUserModal, usernameEdited, selectedUser]);
+
+  const copyUsername = async () => {
+    try {
+      await navigator.clipboard.writeText(form.username);
+      alert(`Nom d'utilisateur copié : ${form.username}`);
+    } catch {
+      alert(`Nom d'utilisateur : ${form.username}`);
+    }
+  };
 
   const [documentForm, setDocumentForm] = useState({
     name: "",
@@ -201,7 +237,9 @@ export default function Administration() {
       } else {
         const { data } = await api.post("/administration/users/", form);
         alert(
-          `Utilisateur créé avec succès.\n\nIdentifiant : ${data.username}\nMot de passe provisoire : ${data.temporaryPassword}\n\nCommuniquez-le à la personne : il ne sera plus affiché.`
+          data.temporaryPassword
+            ? `Utilisateur créé avec succès.\n\nNom d'utilisateur : ${data.username}\nMot de passe provisoire : ${data.temporaryPassword}\n\nCommuniquez-les à la personne : le mot de passe ne sera plus affiché.`
+            : `Utilisateur créé avec succès.\n\nNom d'utilisateur : ${data.username}`
         );
       }
     } catch (error) {
@@ -224,8 +262,11 @@ export default function Administration() {
   const handleEditUser = (user) => {
     setSelectedUser(user);
 
+    setUsernameEdited(true);
     setForm({
       name: user.name,
+      username: user.username || "",
+      password: "",
       function: user.function,
       roles: [...user.roles],
       email: user.email || "",
@@ -292,6 +333,7 @@ export default function Administration() {
   // ============================================================
 
   const openNewUser = () => {
+    setUsernameEdited(false);
     setSelectedUser(null);
     setForm(EMPTY_USER_FORM);
     setShowRoleDropdown(false);
@@ -615,7 +657,7 @@ export default function Administration() {
             <button
               type="button"
               className="system-setting-card"
-              onClick={() => alert("Paramètres généraux")}
+              onClick={() => setAdminPanel("settings")}
             >
               <div className="system-setting-icon blue">
                 <Settings size={21} />
@@ -632,7 +674,7 @@ export default function Administration() {
             <button
               type="button"
               className="system-setting-card"
-              onClick={() => alert("Paramètres de sauvegarde")}
+              onClick={() => alert("Sauvegarde : elle se configure sur le serveur (sauvegarde PostgreSQL planifiée avec pg_dump). Aucune sauvegarde ne peut être lancée depuis le navigateur.")}
             >
               <div className="system-setting-icon green">
                 <Database size={21} />
@@ -649,7 +691,7 @@ export default function Administration() {
             <button
               type="button"
               className="system-setting-card"
-              onClick={() => alert("Paramètres de sécurité")}
+              onClick={() => setAdminPanel("security")}
             >
               <div className="system-setting-icon purple">
                 <LockKeyhole size={21} />
@@ -666,7 +708,7 @@ export default function Administration() {
             <button
               type="button"
               className="system-setting-card"
-              onClick={() => alert("Journal d'audit")}
+              onClick={() => setAdminPanel("audit")}
             >
               <div className="system-setting-icon orange">
                 <ClipboardList size={21} />
@@ -814,6 +856,43 @@ export default function Administration() {
                     onChange={handleUserChange}
                     required
                   />
+                </div>
+
+                {/* NOM D'UTILISATEUR */}
+
+                <div className="form-group">
+                  <label htmlFor="username">
+                    Nom d'utilisateur
+                  </label>
+                  <span className="username-hint">
+                    Nom d'utilisateur — n'oubliez pas de le copier
+                  </span>
+                  <div className="username-field">
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      autoComplete="off"
+                      placeholder="Généré à partir du nom"
+                      value={form.username}
+                      onChange={(event) => {
+                        setUsernameEdited(true);
+                        setForm((previous) => ({
+                          ...previous,
+                          username: event.target.value.toLowerCase().replace(/\s+/g, ""),
+                        }));
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="username-copy"
+                      onClick={copyUsername}
+                      disabled={!form.username}
+                      title="Copier le nom d'utilisateur"
+                    >
+                      <Copy size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* FONCTION */}
@@ -1003,24 +1082,30 @@ export default function Administration() {
 
                 {/* MOT DE PASSE */}
 
-                {!selectedUser && (
-                  <div className="form-group">
-                    <label htmlFor="password">
-                      Mot de passe
-                    </label>
+                <div className="form-group">
+                  <label htmlFor="password">
+                    {selectedUser ? "Nouveau mot de passe" : "Mot de passe"}
+                  </label>
 
-                    <div className="password-input">
-                      <KeyRound size={16} />
+                  <div className="password-input">
+                    <KeyRound size={16} />
 
-                      <input
-                        id="password"
-                        type="password"
-                        placeholder="Mot de passe initial"
-                        required
-                      />
-                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder={
+                        selectedUser
+                          ? "Laisser vide pour ne pas le changer"
+                          : "Mot de passe initial"
+                      }
+                      value={form.password}
+                      onChange={handleUserChange}
+                      required={!selectedUser}
+                    />
                   </div>
-                )}
+                </div>
               </div>
 
               {/* ACTIONS */}
@@ -1056,6 +1141,17 @@ export default function Administration() {
       {/* ======================================================
           MODALE DOCUMENT
       ====================================================== */}
+
+      {adminPanel === "settings" && (
+        <GeneralSettingsModal onClose={() => setAdminPanel(null)} />
+      )}
+
+      {(adminPanel === "audit" || adminPanel === "security") && (
+        <AuditLogModal
+          failuresOnly={adminPanel === "security"}
+          onClose={() => setAdminPanel(null)}
+        />
+      )}
 
       {showDocumentModal && (
         <div

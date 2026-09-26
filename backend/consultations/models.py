@@ -25,4 +25,6 @@ class Consultation(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        verbose_name = "consultation"
+        verbose_name_plural = "consultations"
         ordering = ["-date_time"]

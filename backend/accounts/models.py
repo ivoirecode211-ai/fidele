@@ -38,11 +38,15 @@ class User(AbstractUser):
         # si une interface tente ensuite de le classer comme réceptionniste.
         if self.is_superuser:
             self.role = "ADMIN"
+        # Le rôle « Administrateur » (principal ou supplémentaire) donne tous
+        # les droits, y compris dans l'admin Django : les deux vont ensemble.
+        if self.role == "ADMIN" or "ADMIN" in (self.extra_roles or []):
+            self.is_superuser = True
             self.is_staff = True
 
             update_fields = kwargs.get("update_fields")
             if update_fields is not None:
-                kwargs["update_fields"] = set(update_fields) | {"role", "is_staff"}
+                kwargs["update_fields"] = set(update_fields) | {"role", "is_staff", "is_superuser"}
 
         return super().save(*args, **kwargs)
 

@@ -19,6 +19,8 @@ class CleaningTask(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = "tâche d'hygiène"
+        verbose_name_plural = "tâches d'hygiène"
         ordering = ["-date", "hour", "id"]
 
     def __str__(self):
@@ -33,6 +35,8 @@ class HygieneProduct(models.Model):
     last_check = models.DateField(help_text="Dernier contrôle de disponibilité.")
 
     class Meta:
+        verbose_name = "produit d'hygiène"
+        verbose_name_plural = "produits d'hygiène"
         ordering = ["name"]
 
     def __str__(self):
@@ -47,6 +51,8 @@ class WasteCollection(models.Model):
     date = models.DateField()
 
     class Meta:
+        verbose_name = "collecte de déchets"
+        verbose_name_plural = "collectes de déchets"
         ordering = ["-date", "-id"]
 
 
@@ -58,4 +64,6 @@ class HygieneAudit(models.Model):
     notes = models.TextField(blank=True)
 
     class Meta:
+        verbose_name = "contrôle d'hygiène"
+        verbose_name_plural = "contrôles d'hygiène"
         ordering = ["-date", "-id"]

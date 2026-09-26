@@ -30,6 +30,8 @@ class Patient(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = "patient"
+        verbose_name_plural = "patients"
         ordering = ["last_name", "first_names"]
 
     def __str__(self):

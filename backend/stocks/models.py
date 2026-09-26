@@ -17,6 +17,8 @@ class Product(models.Model):
     threshold = models.PositiveIntegerField(default=0)
 
     class Meta:
+        verbose_name = "produit"
+        verbose_name_plural = "produits"
         ordering = ["id"]
 
     def __str__(self):
@@ -31,6 +33,8 @@ class Supplier(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name = "fournisseur"
+        verbose_name_plural = "fournisseurs"
         ordering = ["id"]
 
     def __str__(self):
@@ -59,6 +63,8 @@ class Movement(models.Model):
     )
 
     class Meta:
+        verbose_name = "mouvement de stock"
+        verbose_name_plural = "mouvements de stock"
         ordering = ["-created_at", "-id"]
 
     def __str__(self):

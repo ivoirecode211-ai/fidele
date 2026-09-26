@@ -2,6 +2,10 @@ from django.db import models
 from patients.models import Patient
 
 class Room(models.Model):
+    class Meta:
+        verbose_name = "chambre"
+        verbose_name_plural = "chambres"
+
     name = models.CharField(max_length=100)
     department = models.CharField(max_length=120)
     type = models.CharField(max_length=40, default="Standard")
@@ -9,6 +13,10 @@ class Room(models.Model):
         return self.name
 
 class Bed(models.Model):
+    class Meta:
+        verbose_name = "lit"
+        verbose_name_plural = "lits"
+
     STATUS = [
         ("AVAILABLE", "Disponible"),
         ("OCCUPIED", "Occupé"),
@@ -22,6 +30,10 @@ class Bed(models.Model):
         return f"{self.room.name} — Lit {self.number}"
 
 class Hospitalization(models.Model):
+    class Meta:
+        verbose_name = "séjour"
+        verbose_name_plural = "séjours"
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="hospitalizations")
     bed = models.ForeignKey(Bed, on_delete=models.PROTECT, related_name="hospitalizations")
     admission_date = models.DateTimeField()

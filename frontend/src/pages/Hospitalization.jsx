@@ -228,38 +228,21 @@ const Hospitalization = () => {
 
 
     // --------------------------------------------------------
-    // RECHERCHE DE LA CHAMBRE
+    // CHAMBRE : existante ou nouvelle (créée par le serveur)
     // --------------------------------------------------------
-
     const room =
       rooms.find(
         (item) =>
-          item.number === roomNumber
+          item.number.toLowerCase() ===
+          roomNumber.toLowerCase()
       );
-
-
-    if (!room) {
-
-      alert(
-        "La chambre sélectionnée n'existe pas."
-      );
-
-      return;
-    }
-
-
-    // --------------------------------------------------------
-    // LISTE DES LITS EXISTANTS
-    // --------------------------------------------------------
 
     const existingBeds =
-      room.beds || [];
-
+      room?.beds || [];
 
     // --------------------------------------------------------
     // VÉRIFICATION DU DOUBLON
     // --------------------------------------------------------
-
     const bedAlreadyExists =
       existingBeds.some(
         (bed) =>
@@ -267,16 +250,12 @@ const Hospitalization = () => {
           bedNumber.toLowerCase()
       );
 
-
     if (bedAlreadyExists) {
-
       alert(
-        `Le lit ${bedNumber} existe déjà dans la chambre ${roomNumber}.`
+        `Le lit ${bedNumber} existe déjà dans la chambre ${room.number}.`
       );
-
       return;
     }
-
 
     // --------------------------------------------------------
     // AJOUT DU LIT
@@ -1167,33 +1146,29 @@ const Hospitalization = () => {
                 </label>
 
 
-                <select
+                <input
+                  type="text"
+                  list="hospitalization-rooms"
+                  placeholder="Ex : A-101"
                   value={newBedRoom}
                   onChange={(e) =>
                     setNewBedRoom(
                       e.target.value
                     )
                   }
-                >
+                />
 
-                  <option value="">
-                    Sélectionner une chambre
-                  </option>
-
-
+                {/* Suggestions : une chambre inconnue est créée */}
+                <datalist id="hospitalization-rooms">
                   {rooms.map((room) => (
-
                     <option
                       key={room.id}
                       value={room.number}
                     >
-                      {room.number} —{" "}
                       {room.service}
                     </option>
-
                   ))}
-
-                </select>
+                </datalist>
 
               </div>
 

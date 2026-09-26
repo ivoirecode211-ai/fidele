@@ -6,9 +6,17 @@ from rest_framework.views import APIView
 
 from parcours.permissions import RoleAccess
 
-from .models import AdminDocument
-from .serializers import AdminDocumentSerializer, AdminUserInputSerializer, AdminUserSerializer
-from .services import ROLE_LABELS, deactivate_user, role_distribution, save_user
+from django.db.models import Q
+
+from .models import AdminDocument, AuditLog, GeneralSettings
+from .serializers import (
+    AdminDocumentSerializer,
+    AdminUserInputSerializer,
+    AdminUserSerializer,
+    AuditLogSerializer,
+    GeneralSettingsSerializer,
+)
+from .services import ROLE_LABELS, deactivate_user, role_distribution, save_user, suggest_username
 
 User = get_user_model()
 
@@ -58,6 +66,9 @@ class UserView(APIView):
         user = get_object_or_404(User, pk=pk)
         serializer = AdminUserInputSerializer(user, data=request.data)
         serializer.is_valid(raise_exception=True)
+        if user.pk == request.user.pk and "Administrateur" not in serializer.validated_data["roles"]:
+            return Response({"roles": "Vous ne pouvez pas retirer votre propre rôle d'Administrateur."},
+                            status=status.HTTP_400_BAD_REQUEST)
         user, _ = save_user(data=serializer.validated_data, user=user)
         return Response(AdminUserSerializer(user).data)
 
@@ -79,3 +90,58 @@ class DocumentsView(APIView):
         serializer.is_valid(raise_exception=True)
         document = serializer.save(created_by=request.user)
         return Response(AdminDocumentSerializer(document).data, status=status.HTTP_201_CREATED)
+
+
+class GeneralSettingsView(APIView):
+    """« Paramètres généraux » : lecture pour tous les connectés, modification par l'Admin."""
+
+    def get_permissions(self):
+        from rest_framework.permissions import IsAuthenticated
+
+        return [IsAuthenticated()] if self.request.method == "GET" else [AdministrationAccess()]
+
+    def get(self, request):
+        return Response(GeneralSettingsSerializer(GeneralSettings.load()).data)
+
+    def put(self, request):
+        settings_row = GeneralSettings.load()
+        serializer = GeneralSettingsSerializer(settings_row, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(updated_by=request.user)
+        return Response(serializer.data)
+
+
+class AuditLogView(APIView):
+    """Journal d'audit, du plus récent au plus ancien (200 lignes maximum)."""
+    permission_classes = [AdministrationAccess]
+
+    def get(self, request):
+        logs = AuditLog.objects.select_related("user")
+        search = request.query_params.get("q", "").strip()
+        if search:
+            logs = logs.filter(
+                Q(username__icontains=search) | Q(user__last_name__icontains=search)
+                | Q(user__first_name__icontains=search) | Q(action__icontains=search)
+                | Q(description__icontains=search) | Q(ip_address__icontains=search) | Q(path__icontains=search)
+            )
+        module = request.query_params.get("module")
+        if module:
+            logs = logs.filter(module=module)
+        if request.query_params.get("failures") == "1":
+            logs = logs.filter(success=False)
+        return Response({
+            "modules": sorted(AuditLog.objects.values_list("module", flat=True).distinct()),
+            "logs": AuditLogSerializer(logs[:200], many=True).data,
+        })
+
+
+class UsernameSuggestionView(APIView):
+    """Nom d'utilisateur proposé pendant la saisie du nom (nomenclature de la clinique)."""
+    permission_classes = [AdministrationAccess]
+
+    def get(self, request):
+        exclude = request.query_params.get("exclude")
+        return Response({
+            "username": suggest_username(request.query_params.get("name", ""),
+                                         exclude_pk=int(exclude) if exclude and exclude.isdigit() else None),
+        })

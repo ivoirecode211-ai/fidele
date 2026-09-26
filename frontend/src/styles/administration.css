@@ -1229,3 +1229,191 @@
   background: #cbd5e1;
   border-radius: 10px;
 }
+
+/* ============================================================
+   PARAMÈTRES GÉNÉRAUX ET JOURNAL D'AUDIT
+   ============================================================ */
+
+.admin-panel-loading {
+  padding: 24px;
+  color: var(--ink-faint);
+}
+
+.admin-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+}
+
+.administration-modal.audit-modal {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: none;
+}
+
+.audit-toolbar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px 0;
+}
+
+.audit-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--ink-faint);
+}
+
+.audit-search input {
+  flex: 1;
+  height: 40px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+}
+
+.audit-toolbar select {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+}
+
+.audit-table-wrapper {
+  max-height: 52vh;
+  overflow: auto;
+  margin: 16px 24px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.audit-table th {
+  position: sticky;
+  top: 0;
+  padding: 10px 12px;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.audit-table td {
+  padding: 10px 12px;
+  border-top: 1px solid var(--surface-100);
+  color: var(--ink-muted);
+  vertical-align: top;
+}
+
+.audit-table tbody tr {
+  cursor: pointer;
+}
+
+.audit-table tbody tr:hover,
+.audit-table tbody tr.selected {
+  background: var(--primary-50);
+}
+
+.audit-ip {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: nowrap;
+}
+
+.audit-empty {
+  padding: 28px !important;
+  text-align: center;
+}
+
+.audit-status {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.audit-status.ok {
+  background: var(--green-soft);
+  color: var(--green-soft-text);
+}
+
+.audit-status.ko {
+  background: var(--danger-soft);
+  color: var(--danger-soft-text);
+}
+
+.audit-details {
+  display: grid;
+  gap: 4px;
+  margin: 12px 24px 24px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-50);
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.audit-details code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .admin-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-toolbar {
+    flex-direction: column;
+  }
+}
+
+
+/* Nom d'utilisateur généré : à copier pour la personne */
+.username-hint {
+  display: block;
+  margin: -2px 0 6px;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.username-field {
+  display: flex;
+  gap: 8px;
+}
+
+.username-field input {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.username-copy {
+  width: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--primary-200);
+  border-radius: 10px;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  cursor: pointer;
+}
+
+.username-copy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -17,6 +17,8 @@ class MedicalService(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name = "service médical"
+        verbose_name_plural = "services médicaux"
         ordering = ["id"]
         constraints = [models.CheckConstraint(condition=Q(price__gte=0), name="parcours_service_price")]
 
@@ -33,6 +35,8 @@ class InsuranceCompany(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name = "assurance"
+        verbose_name_plural = "assurances"
         ordering = ["id"]
         constraints = [
             models.CheckConstraint(condition=Q(coverage__gte=0, coverage__lte=100), name="parcours_insurance_coverage")
@@ -66,6 +70,8 @@ class Admission(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
+        verbose_name = "passage en caisse"
+        verbose_name_plural = "passages en caisse"
         ordering = ["created_at", "id"]
         constraints = [models.CheckConstraint(condition=Q(cost__gte=0), name="parcours_admission_cost")]
 
@@ -91,4 +97,6 @@ class VitalSigns(models.Model):
     recorded_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
+        verbose_name = "prise de constantes"
+        verbose_name_plural = "prises de constantes"
         ordering = ["-recorded_at", "-id"]

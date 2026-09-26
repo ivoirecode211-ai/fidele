@@ -21,4 +21,6 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = "rendez-vous"
+        verbose_name_plural = "rendez-vous"
         ordering = ["date_time"]

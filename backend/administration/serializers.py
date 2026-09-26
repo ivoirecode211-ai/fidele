@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import AdminDocument
+from .models import AdminDocument, AuditLog, GeneralSettings
 from .services import ROLE_CODES, ROLE_LABELS, display_name, format_connection
 
 User = get_user_model()
@@ -18,7 +18,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "name", "function", "roles", "status", "connection", "email", "phone"]
+        fields = ["id", "username", "name", "function", "roles", "status", "connection", "email", "phone"]
 
     def get_name(self, obj):
         return display_name(obj)
@@ -44,6 +44,28 @@ class AdminUserInputSerializer(serializers.Serializer):
     roles = serializers.ListField(child=serializers.ChoiceField(choices=list(ROLE_CODES)), min_length=1)
     email = serializers.EmailField(required=False, allow_blank=True, default="")
     phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    username = serializers.RegexField(
+        r"^[a-z0-9._-]{3,150}$", required=False, allow_blank=True, default="",
+        error_messages={"invalid": "Nom d'utilisateur : minuscules, chiffres, point, tiret ou soulignement (3 caractères minimum)."},
+    )
+    password = serializers.CharField(required=False, allow_blank=True, default="", write_only=True, trim_whitespace=False)
+
+    def validate_username(self, value):
+        value = value.strip().lower()
+        if value:
+            others = User.objects.filter(username__iexact=value)
+            if self.instance is not None:
+                others = others.exclude(pk=self.instance.pk)
+            if others.exists():
+                raise serializers.ValidationError("Ce nom d'utilisateur est déjà pris.")
+        return value
+
+    def validate_password(self, value):
+        if value:
+            from django.contrib.auth.password_validation import validate_password
+
+            validate_password(value, user=self.instance)
+        return value
 
     def validate_name(self, value):
         if len(value.split()) < 2:
@@ -74,3 +96,27 @@ class AdminDocumentSerializer(serializers.ModelSerializer):
 
     def get_date(self, obj):
         return timezone.localtime(obj.created_at).strftime("%d/%m/%Y")
+
+
+class GeneralSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GeneralSettings
+        fields = ["name", "slogan", "address", "phone", "email", "currency", "license_number", "opening_hours"]
+
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    date = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AuditLog
+        fields = ["id", "date", "user", "action", "module", "description", "method", "path", "status_code",
+                  "success", "ip_address", "user_agent", "duration_ms", "details"]
+
+    def get_date(self, obj):
+        return timezone.localtime(obj.created_at).strftime("%d/%m/%Y %H:%M:%S")
+
+    def get_user(self, obj):
+        if obj.user:
+            return display_name(obj.user)
+        return obj.username or "Anonyme"
