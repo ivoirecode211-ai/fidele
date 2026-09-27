@@ -1,48 +1,14 @@
-import { useEffect, useState } from "react";
-import api from "../../../services/api";
-
 /*
- * Options statiques (`field.options`, liste de paires
- * [valeur, libellé]) OU chargées depuis l'API (`field.optionsSource`,
- * chemin relatif — ex. "/auth/users/?role=DOCTOR"). Un
- * `field.optionsMap` optionnel transforme chaque élément de la
- * réponse en paire [valeur, libellé] ; par défaut on suppose des
- * objets utilisateur (id + nom).
+ * Liste déroulante.
+ *
+ * `field.options` est soit une liste de paires [valeur, libellé],
+ * soit une fonction (values) => paires — ce qui permet à une liste
+ * de dépendre d'une réponse précédente, par exemple une commune
+ * qui dépend de sa ville.
  */
-
-function defaultOptionsMap(item) {
-  const name = [item.first_name, item.last_name].filter(Boolean).join(" ");
-  return [item.id, name || item.username];
-}
-
-export default function SelectField({ field, value, error, onChange }) {
-  const [remoteOptions, setRemoteOptions] = useState(null);
-  const [loadError, setLoadError] = useState(false);
-
-  useEffect(() => {
-    if (!field.optionsSource) return;
-
-    let cancelled = false;
-
-    api
-      .get(field.optionsSource)
-      .then((res) => {
-        if (cancelled) return;
-        const mapper = field.optionsMap || defaultOptionsMap;
-        setRemoteOptions(res.data.map(mapper));
-      })
-      .catch(() => {
-        if (!cancelled) setLoadError(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field.optionsSource]);
-
-  const options = field.optionsSource ? remoteOptions : field.options;
-  const loading = field.optionsSource && remoteOptions === null && !loadError;
+export default function SelectField({ field, value, values, error, onChange }) {
+  const options = typeof field.options === "function" ? field.options(values || {}) : (field.options || []);
+  const vide = options.length === 0;
 
   return (
     <label className={`field ${error ? "field-error" : ""}`}>
@@ -54,26 +20,17 @@ export default function SelectField({ field, value, error, onChange }) {
       <select
         name={field.id}
         value={value ?? ""}
-        disabled={loading}
+        disabled={vide}
         onChange={(event) => onChange(field.id, event.target.value)}
       >
-        <option value="" disabled>
-          {loading ? "Chargement…" : "Sélectionner…"}
-        </option>
+        <option value="">{vide ? (field.emptyText || "Aucun choix disponible") : (field.placeholder || "Sélectionner…")}</option>
 
-        {(options || []).map(([optionValue, optionLabel]) => (
-          <option key={optionValue} value={optionValue}>
-            {optionLabel}
-          </option>
+        {options.map(([valeur, libelle]) => (
+          <option key={valeur} value={valeur}>{libelle}</option>
         ))}
       </select>
 
-      {loadError && (
-        <span className="field-error-message">
-          Impossible de charger les options. Réessayez.
-        </span>
-      )}
-
+      {field.helpText && !error && <small className="field-help">{field.helpText}</small>}
       {error && <span className="field-error-message">{error}</span>}
     </label>
   );

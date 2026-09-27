@@ -31,6 +31,8 @@ def birth_date_from_age(age):
 
 
 def age_from_birth_date(birth_date):
+    if birth_date is None:
+        return None
     today = timezone.localdate()
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
@@ -45,13 +47,16 @@ def open_admission(*, patient, data, user):
         raise Duplicate(duplicate)
     insurance = data.get("assuranceId")
     coverage = insurance.coverage if insurance else Decimal("0")
-    price = service.price
+    quantity = int(data.get("quantite") or 1)
+    price = service.price * quantity
     cost = (price - price * coverage / Decimal("100")).quantize(Decimal("0.01"))
     admission = Admission.objects.create(
         patient=patient,
         service=service,
         service_name=service.name,
         service_price=price,
+        quantity=quantity,
+        notes=data.get("notes", "").strip(),
         insurance=insurance,
         insurance_name=insurance.name if insurance else "",
         insurance_number=data.get("insuranceNumber", "").strip() if insurance else "",

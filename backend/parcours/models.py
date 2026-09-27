@@ -10,8 +10,22 @@ from django.db.models import Q
 from django.utils import timezone
 
 
+class Department(models.Model):
+    """Service de destination (Pédiatrie, Imagerie…) : regroupe les prestations à l'accueil."""
+    name = models.CharField(max_length=120, unique=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "service de destination"
+        verbose_name_plural = "services de destination"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class MedicalService(models.Model):
-    """Service médical proposé à la caisse (select « Service » du formulaire)."""
+    """Prestation proposée à la caisse (select « Service » du formulaire)."""
     CATEGORIES = [("CONSULTATION", "Consultation"), ("SOIN", "Soin"), ("EXAMEN", "Examen")]
     # Consultations et soins passent par l'infirmerie ; un examen, non.
     PARCOURS_SOINS = ("CONSULTATION", "SOIN")
@@ -19,6 +33,8 @@ class MedicalService(models.Model):
     name = models.CharField(max_length=120, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     category = models.CharField("catégorie", max_length=20, choices=CATEGORIES, default="CONSULTATION")
+    department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.PROTECT,
+                                   related_name="services", verbose_name="service de destination")
     active = models.BooleanField(default=True)
 
     class Meta:
@@ -108,7 +124,10 @@ class Admission(models.Model):
     patient = models.ForeignKey("patients.Patient", on_delete=models.PROTECT, related_name="admissions")
     service = models.ForeignKey(MedicalService, on_delete=models.PROTECT)
     service_name = models.CharField(max_length=120)
+    # Montant brut (tarif × quantité), avant la part de l'assurance.
     service_price = models.DecimalField(max_digits=12, decimal_places=2)
+    quantity = models.PositiveSmallIntegerField("quantité", default=1)
+    notes = models.TextField("observations", blank=True)
     insurance = models.ForeignKey(InsuranceCompany, null=True, blank=True, on_delete=models.PROTECT)
     insurance_name = models.CharField(max_length=120, blank=True)
     insurance_number = models.CharField(max_length=120, blank=True)

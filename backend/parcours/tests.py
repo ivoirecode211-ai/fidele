@@ -433,3 +433,73 @@ class CaisseTests(APITestCase):
         first = self.client.post(url).data
         self.assertEqual((first["duplicata"], first["aPayer"], first["etablissement"]["nom"]), (False, 10000.0, "MA SANTÉ"))
         self.assertTrue(self.client.post(url).data["duplicata"])
+
+
+class AccueilTests(APITestCase):
+    """API du module Accueil & Caisse : dossier, fiche, règlement, bilan, régie."""
+
+    def setUp(self):
+        self.caissier = User.objects.create_user(username="caisse", password="x", role="RECEPTION")
+        self.regisseur = User.objects.create_user(username="regie", password="x", role="REGISSEUR")
+        self.client.force_authenticate(self.caissier)
+        self.refs = self.client.get("/api/accueil/referentiels/").data
+        self.patient = self.client.post("/api/accueil/patients/", {
+            "last_name": "kone", "first_names": "Aminata", "birth_date": None, "sex": "F",
+            "phone": "0700000000", "city": "Abidjan", "locality": "Cocody",
+            "assurance": InsuranceCompany.objects.get(name="MUGEFCI").pk, "numero_assurance": "M-1",
+        }, format="json").data
+
+    def fiche(self, prestation="Médecine générale", quantite=1):
+        service = MedicalService.objects.get(name=prestation)
+        return self.client.post("/api/accueil/fiches/", {
+            "patient": self.patient["id"], "service": service.department_id,
+            "prestation": service.pk, "quantite": quantite, "notes": "",
+        }, format="json")
+
+    def test_referentiels_group_prestations_by_service(self):
+        imagerie = next(s for s in self.refs["services"] if s["name"] == "Imagerie médicale")
+        noms = {p["name"] for p in self.refs["prestations"] if p["service"] == imagerie["id"]}
+        self.assertEqual(noms, {"Échographie", "Radiographie"})
+        self.assertEqual(self.refs["etablissement"]["nom"], "MA SANTÉ")
+
+    def test_patient_without_birth_date_and_insured_fiche(self):
+        self.assertEqual((self.patient["nom_complet"], self.patient["birth_date"]), ("KONE Aminata", None))
+        self.assertEqual((self.patient["assurance_nom"], self.patient["taux_assurance"]), ("MUGEFCI", "30.00"))
+        fiche = self.fiche(quantite=2).data
+        self.assertEqual((fiche["prix_unitaire"], fiche["montant_total"], fiche["montant_assurance"], fiche["montant_patient"]),
+                         ("10000.00", "20000.00", "6000.00", "14000.00"))
+        self.assertEqual((fiche["statut"], fiche["service_nom"]), ("en_attente", "Médecine générale"))
+        found = self.client.get("/api/accueil/patients/", {"q": "amin"}).data
+        self.assertEqual((found["total"], found["resultats"][0]["patient_number"]), (1, self.patient["patient_number"]))
+
+    def test_same_service_within_15_days_is_a_duplicate(self):
+        first = self.fiche().data
+        again = self.fiche("Consultation spécialisée")  # même service de destination
+        self.assertEqual(again.status_code, 409)
+        self.assertEqual((again.data["fiche_existante"]["reference"], again.data["delai_jours"]), (first["reference"], 15))
+        self.assertEqual(self.fiche("Pédiatrie").status_code, 201)
+
+    def test_pay_then_close_and_regie_validates(self):
+        fiche = self.fiche().data
+        self.assertIn("fermée", self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/").data["detail"])
+        self.client.post("/api/accueil/session/")
+        paid = self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/").data
+        self.assertEqual((paid["statut"], paid["statut_display"]), ("paye", "Payé"))
+        bilan = self.client.get("/api/accueil/bilan/").data
+        self.assertEqual((bilan["caissier"], bilan["regisseur"], len(bilan["operations"])), (True, False, 1))
+        self.assertEqual(bilan["bilan_periode"]["encaisse"], "7000.00")
+        closed = self.client.patch("/api/accueil/session/", {"montant_compte": "7000", "justificatif": ""}, format="json").data
+        self.assertEqual((closed["statut"], closed["ecart"]), ("en_attente", "0.00"))
+
+        self.client.force_authenticate(self.regisseur)
+        regie = self.client.get("/api/accueil/bilan/").data
+        self.assertEqual((regie["caissier"], regie["regisseur"], len(regie["clotures_a_valider"])), (False, True, 1))
+        valid = self.client.post(f"/api/accueil/sessions/{closed['id']}/valider/", {"montant_recu": "7000", "note": ""}, format="json")
+        self.assertEqual(valid.data["statut"], "validee")
+        cancelled = self.client.post(f"/api/accueil/fiches/{fiche['id']}/annuler/", {"motif": "Erreur de saisie"}, format="json").data
+        self.assertEqual(cancelled["motif_annulation"], "Erreur de saisie")
+        self.assertEqual(self.client.get("/api/accueil/bilan/").data["totaux"]["tickets_annules"], 1)
+
+    def test_cashier_cannot_cancel(self):
+        fiche = self.fiche().data
+        self.assertEqual(self.client.post(f"/api/accueil/fiches/{fiche['id']}/annuler/", {"motif": "Erreur"}, format="json").status_code, 403)

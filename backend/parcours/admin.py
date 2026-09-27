@@ -1,12 +1,20 @@
 from django.contrib import admin
 
-from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
+from .models import Admission, Department, InsuranceCompany, MedicalService, VitalSigns
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ["name", "active"]
+    list_editable = ["active"]
+    search_fields = ["name"]
 
 
 @admin.register(MedicalService)
 class MedicalServiceAdmin(admin.ModelAdmin):
-    list_display = ["name", "price", "active"]
-    list_editable = ["price", "active"]
+    list_display = ["name", "department", "category", "price", "active"]
+    list_editable = ["department", "category", "price", "active"]
+    list_filter = ["department", "category", "active"]
     search_fields = ["name"]
 
 

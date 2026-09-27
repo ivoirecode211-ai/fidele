@@ -1,47 +1,45 @@
+import BirthDateField from "./fields/BirthDateField";
 import InputField from "./fields/InputField";
-import TextAreaField from "./fields/TextAreaField";
-import SelectField from "./fields/SelectField";
 import RadioField from "./fields/RadioField";
+import SelectField from "./fields/SelectField";
 import SwitchField from "./fields/SwitchField";
+import TextAreaField from "./fields/TextAreaField";
 
-const TEXT_LIKE = ["text", "tel", "email", "number", "date"];
+const COMME_UN_INPUT = ["text", "tel", "email", "number", "date"];
 
 /*
  * ============================================================
- * DISPATCH SUR field.type
+ * AIGUILLAGE SUR field.type
  * ============================================================
- * Le seul endroit du moteur qui connaît la liste des types de
- * champs supportés. Ajouter un type = ajouter un cas ici, sans
- * toucher au reste du moteur (FormEngine, validation...).
+ * Seul endroit du moteur qui connaît la liste des types de
+ * champs. Ajouter un type = ajouter un cas ici, sans toucher
+ * au reste (StepModal, validation, conditions).
+ *
+ * `values` est transmis aux champs qui en ont besoin : il
+ * permet à une liste déroulante de dépendre d'une réponse
+ * précédente (une commune dépend de sa ville).
  * ============================================================
  */
-export default function DynamicField({ field, value, error, onChange }) {
-  if (TEXT_LIKE.includes(field.type)) {
-    return (
-      <InputField field={field} value={value} error={error} onChange={onChange} />
-    );
+export default function DynamicField({ field, value, values, error, onChange }) {
+  if (COMME_UN_INPUT.includes(field.type)) {
+    return <InputField field={field} value={value} error={error} onChange={onChange} />;
   }
 
   switch (field.type) {
+    case "birthdate":
+      return <BirthDateField field={field} value={value} error={error} onChange={onChange} />;
+
     case "textarea":
-      return (
-        <TextAreaField field={field} value={value} error={error} onChange={onChange} />
-      );
+      return <TextAreaField field={field} value={value} error={error} onChange={onChange} />;
 
     case "select":
-      return (
-        <SelectField field={field} value={value} error={error} onChange={onChange} />
-      );
+      return <SelectField field={field} value={value} values={values} error={error} onChange={onChange} />;
 
     case "radio":
-      return (
-        <RadioField field={field} value={value} error={error} onChange={onChange} />
-      );
+      return <RadioField field={field} value={value} error={error} onChange={onChange} />;
 
     case "switch":
-      return (
-        <SwitchField field={field} value={value} error={error} onChange={onChange} />
-      );
+      return <SwitchField field={field} value={value} error={error} onChange={onChange} />;
 
     default:
       return (

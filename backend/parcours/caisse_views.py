@@ -90,7 +90,7 @@ class PatientSearchView(APIView):
                 "prenom": p.first_names,
                 "sexe": {"F": "Féminin", "M": "Masculin"}.get(p.sex, ""),
                 "age": age_from_birth_date(p.birth_date),
-                "dateNaissance": p.birth_date.isoformat(),
+                "dateNaissance": p.birth_date.isoformat() if p.birth_date else None,
                 "telephone": p.phone,
                 "parentContact": p.emergency_phone,
                 "quartier": p.locality,

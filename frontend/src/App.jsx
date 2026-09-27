@@ -79,7 +79,7 @@ import Direction from "./pages/Direction";
    MODULE CAISSE
    ============================================================ */
 
-import Caisse from "./pages/Caisse";
+import Caisse from "./accueil/Caisse";
 
 
 /* ============================================================

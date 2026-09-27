@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/forms/", include("formengine.urls")),
     path("api/cashdesk/", include("cashdesk.urls")),
     path("api/parcours/", include("parcours.urls")),
+    path("api/accueil/", include("parcours.accueil_urls")),
     path("api/administration/", include("administration.urls")),
     path("api/maintenance/", include("maintenance.urls")),
     path("api/hygiene/", include("hygiene.urls")),
