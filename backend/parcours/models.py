@@ -147,6 +147,8 @@ class Admission(models.Model):
     reference = models.CharField("n° de ticket", max_length=30, unique=True, null=True, blank=True)
     payment_status = models.CharField("paiement", max_length=20, choices=PAYMENT_STATUSES, default=UNPAID)
     paid_at = models.DateTimeField(null=True, blank=True)
+    # Espèces remises par le patient : la monnaie rendue s'en déduit.
+    amount_received = models.DecimalField("montant reçu", max_digits=12, decimal_places=2, null=True, blank=True)
     session = models.ForeignKey(CashSession, null=True, blank=True, on_delete=models.PROTECT, related_name="admissions")
     # Corbeille : un ticket annulé n'est jamais effacé ; il sort des comptes.
     cancelled_at = models.DateTimeField(null=True, blank=True)

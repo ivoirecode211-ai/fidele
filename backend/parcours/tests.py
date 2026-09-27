@@ -483,8 +483,12 @@ class AccueilTests(APITestCase):
         fiche = self.fiche().data
         self.assertIn("fermée", self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/").data["detail"])
         self.client.post("/api/accueil/session/")
-        paid = self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/").data
+        short = self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/", {"montant_recu": "5000"}, format="json")
+        self.assertIn("inférieur", short.data["detail"])
+        paid = self.client.post(f"/api/accueil/fiches/{fiche['id']}/valider/", {"montant_recu": "10000"}, format="json").data
         self.assertEqual((paid["statut"], paid["statut_display"]), ("paye", "Payé"))
+        self.assertEqual((paid["montant_recu"], paid["monnaie_rendue"], paid["patient_sexe"]), ("10000.00", "3000.00", "F"))
+        self.assertTrue(paid["valide_par_nom"])
         bilan = self.client.get("/api/accueil/bilan/").data
         self.assertEqual((bilan["caissier"], bilan["regisseur"], len(bilan["operations"])), (True, False, 1))
         self.assertEqual(bilan["bilan_periode"]["encaisse"], "7000.00")

@@ -1,9 +1,11 @@
-import { CalendarDays, Heart, LogOut } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 import "../styles/Caisse.css";
 
-import { useAuth } from "../context/AuthContext";
-import LienTableau from "./LienTableau";
+import Logo from "./Logo";
+import NotificationBell from "./NotificationBell";
+import SidebarFooter from "./SidebarFooter";
+import UserBadge from "./UserBadge";
 
 /*
  * ============================================================
@@ -26,14 +28,13 @@ import LienTableau from "./LienTableau";
  */
 
 export default function Coquille({ ecrans = [], ecran, onEcran, titre, sous, actions, apres, children }) {
-  const { user, logout } = useAuth();
   const courant = ecrans.find((e) => e.id === ecran);
 
   return (
     <div className="caisse-page">
       <aside className="caisse-sidebar">
         <div className="caisse-brand">
-          <div className="brand-icon" aria-hidden="true"><Heart size={22} strokeWidth={2.4} /></div>
+          <div className="brand-icon" aria-hidden="true"><Logo size={30} inverted /></div>
           <div className="brand-text"><span>MA</span> <strong>SANTÉ</strong></div>
         </div>
 
@@ -45,19 +46,9 @@ export default function Coquille({ ecrans = [], ecran, onEcran, titre, sous, act
               {compte > 0 && <b className="caisse-nav-compte">{compte}</b>}
             </button>
           ))}
-          <div className="caisse-nav-divider" />
-          <LienTableau className="caisse-nav-item" />
-          <button type="button" className="caisse-nav-item" onClick={logout}>
-            <LogOut size={18} strokeWidth={2} /><span>Se déconnecter</span>
-          </button>
         </nav>
 
-        <div className="caisse-sidebar-footer">
-          {user && <div>
-            <strong>{user.first_name ? `${user.first_name} ${user.last_name}` : user.username}</strong>
-            <small>{user.role_label || user.role}</small>
-          </div>}
-        </div>
+        <SidebarFooter />
       </aside>
 
       <main className="caisse-content">
@@ -74,6 +65,10 @@ export default function Coquille({ ecrans = [], ecran, onEcran, titre, sous, act
               {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             </span>
             {actions}
+            <div className="ms-header-tools">
+              <NotificationBell />
+              <UserBadge />
+            </div>
           </div>
         </header>
 

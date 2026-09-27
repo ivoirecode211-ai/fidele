@@ -137,9 +137,9 @@ export default function Caisse() {
   }
 
   /* Régler une fiche, d'où qu'on la lance : popup de création ou liste. */
-  async function payerFiche(fiche) {
+  async function payerFiche(fiche, montantRecu) {
     try {
-      const reglee = await accueil.post(`fiches/${fiche.id}/valider`, {});
+      const reglee = await accueil.post(`fiches/${fiche.id}/valider`, { montant_recu: montantRecu });
       rafraichir();
       return reglee;
     } catch (e) {
@@ -180,8 +180,8 @@ export default function Caisse() {
                 fiche={fiche}
                 session={session}
                 onFermer={() => { fermer(); setEcran("paiements"); }}
-                onPayer={async (f) => {
-                  const reglee = await payerFiche(f);
+                onPayer={async (f, montantRecu) => {
+                  const reglee = await payerFiche(f, montantRecu);
                   fermer();
                   setRecu({ fiche: reglee, duplicata: false });
                 }}
@@ -196,7 +196,6 @@ export default function Caisse() {
           fiche={recu.fiche}
           duplicata={recu.duplicata}
           etablissement={refs.etablissement}
-          caissier={user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username}
           onClose={() => setRecu(null)}
         />
       )}
@@ -236,11 +235,13 @@ export default function Caisse() {
 function Confirmation({ patient, fiche, session, onPayer, onFermer }) {
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState("");
+  const [recu, setRecu] = useState(String(Number(fiche.montant_patient)));
   const aRegler = Number(fiche.montant_patient) > 0;
+  const insuffisant = aRegler && !(Number(recu) >= Number(fiche.montant_patient));
 
   async function payer() {
     setOccupe(true); setErreur("");
-    try { await onPayer(fiche); }
+    try { await onPayer(fiche, aRegler ? recu : undefined); }
     catch (e) { setErreur(e.message); setOccupe(false); }
   }
 
@@ -265,6 +266,7 @@ function Confirmation({ patient, fiche, session, onPayer, onFermer }) {
           )}
         </dl>
         <p className="total">À payer <strong>{argent(fiche.montant_patient)}</strong></p>
+        {aRegler && session && <MontantRecu aPayer={fiche.montant_patient} valeur={recu} onChange={setRecu} />}
 
         {erreur && <p className="bandeau erreur" role="alert">{erreur}</p>}
         {!session && aRegler && (
@@ -278,11 +280,32 @@ function Confirmation({ patient, fiche, session, onPayer, onFermer }) {
         <button type="button" className="secondary-button" onClick={onFermer} disabled={occupe}>
           Régler plus tard
         </button>
-        <button type="button" className="primary-button" onClick={payer} disabled={occupe || (aRegler && !session)}>
+        <button type="button" className="primary-button" onClick={payer} disabled={occupe || (aRegler && (!session || insuffisant))}>
           <BadgeCheck size={16} strokeWidth={2} />
           {occupe ? "Enregistrement…" : aRegler ? "Payer maintenant" : "Valider la prise en charge"}
         </button>
       </footer>
+    </>
+  );
+}
+
+/* ============================================================
+   MONTANT REÇU — les espèces remises, et la monnaie à rendre
+   ============================================================ */
+
+function MontantRecu({ aPayer, valeur, onChange }) {
+  const rendu = Number(valeur) - Number(aPayer);
+  return (
+    <>
+      <label className="field" style={{ marginTop: 18 }}>
+        <span>Montant reçu<span className="required">*</span></span>
+        <input type="number" min={0} step="1" value={valeur} onChange={(e) => onChange(e.target.value)} />
+      </label>
+      {valeur !== "" && !Number.isNaN(rendu) && (
+        <p className={`ecart ${rendu < 0 ? "manque" : "juste"}`}>
+          {rendu < 0 ? `Il manque ${argent(-rendu)}.` : `Monnaie à rendre : ${argent(rendu)}`}
+        </p>
+      )}
     </>
   );
 }
@@ -444,7 +467,7 @@ function EcranPaiements({ version, session, rafraichir, onRecu, onBilan }) {
   async function valider(fiche) {
     setOccupe(true); setErreur("");
     try {
-      const reglee = await accueil.post(`fiches/${fiche.id}/valider`, {});
+      const reglee = await accueil.post(`fiches/${fiche.id}/valider`, { montant_recu: fiche.recu });
       setAValider(null);
       onRecu({ fiche: reglee, duplicata: false });
       rafraichir();
@@ -491,7 +514,7 @@ function EcranPaiements({ version, session, rafraichir, onRecu, onBilan }) {
                       <td><strong>{argent(f.montant_patient)}</strong></td>
                       <td>
                         {session
-                          ? <button type="button" className="primary-button" onClick={() => setAValider(f)}>Payer</button>
+                          ? <button type="button" className="primary-button" onClick={() => setAValider({ ...f, recu: String(Number(f.montant_patient)) })}>Payer</button>
                           : <span className="note">Caisse fermée</span>}
                       </td>
                     </tr>
@@ -515,10 +538,15 @@ function EcranPaiements({ version, session, rafraichir, onRecu, onBilan }) {
                 <div><dt>Part assurance</dt><dd>− {argent(aValider.montant_assurance)}</dd></div>
               </dl>
               <p className="total">À payer <strong>{argent(aValider.montant_patient)}</strong></p>
+              {Number(aValider.montant_patient) > 0 && (
+                <MontantRecu aPayer={aValider.montant_patient} valeur={aValider.recu}
+                  onChange={(recu) => setAValider({ ...aValider, recu })} />
+              )}
             </div>
             <footer className="pop-pied">
               <button type="button" className="secondary-button" onClick={() => setAValider(null)} disabled={occupe}>Annuler</button>
-              <button type="button" className="primary-button" onClick={() => valider(aValider)} disabled={occupe}>
+              <button type="button" className="primary-button" onClick={() => valider(aValider)}
+                disabled={occupe || (Number(aValider.montant_patient) > 0 && !(Number(aValider.recu) >= Number(aValider.montant_patient)))}>
                 <BadgeCheck size={16} strokeWidth={2} />{occupe ? "Enregistrement…" : "Confirmer"}
               </button>
             </footer>

@@ -114,8 +114,10 @@ def validate_session(*, session, regisseur, received, note=""):
 # ------------------------------------------------------------------ tickets
 
 @transaction.atomic
-def pay(*, admission, user):
-    """Encaisse un ticket dans la session ouverte du caissier."""
+def pay(*, admission, user, received=None):
+    """Encaisse un ticket dans la session ouverte du caissier.
+
+    `received` : espèces remises par le patient (par défaut, le montant exact)."""
     session = current_session(user)
     if session is None:
         raise CaisseError("Votre caisse est fermée. Ouvrez-la avant d'encaisser.")
@@ -124,10 +126,14 @@ def pay(*, admission, user):
         raise CaisseError("Ce ticket a été annulé : il ne peut plus être encaissé.")
     if admission.payment_status != Admission.UNPAID:
         raise CaisseError("Ce ticket est déjà réglé.")
+    received = admission.cost if received in (None, "") else Decimal(str(received))
+    if received < admission.cost:
+        raise CaisseError("Le montant reçu est inférieur au montant à payer.")
     admission.payment_status = Admission.PAID
     admission.paid_at = timezone.now()
     admission.session = session
-    admission.save(update_fields=["payment_status", "paid_at", "session"])
+    admission.amount_received = received
+    admission.save(update_fields=["payment_status", "paid_at", "session", "amount_received"])
     return admission
 
 

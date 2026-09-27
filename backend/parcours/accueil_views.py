@@ -144,6 +144,13 @@ def fiche_data(admission):
         "annulee_par_nom": nom(admission.cancelled_by),
         "motif_annulation": admission.cancel_reason,
         "creee_par_nom": nom(admission.created_by),
+        # Ticket : identité du patient et règlement.
+        "patient_naissance": patient.birth_date.isoformat() if patient.birth_date else None,
+        "patient_sexe": patient.sex,
+        "valide_par_nom": nom(admission.session.cashier) if admission.session_id else "",
+        "valide_le": admission.paid_at.isoformat() if admission.paid_at else None,
+        "montant_recu": None if admission.amount_received is None else montant(admission.amount_received),
+        "monnaie_rendue": None if admission.amount_received is None else montant(admission.amount_received - admission.cost),
     }
 
 
@@ -171,7 +178,7 @@ def session_data(session):
     }
 
 
-FICHES = Admission.objects.select_related("patient", "service__department", "created_by", "cancelled_by")
+FICHES = Admission.objects.select_related("patient", "service__department", "created_by", "cancelled_by", "session__cashier")
 SESSIONS = CashSession.objects.select_related("cashier", "validated_by")
 
 
@@ -347,8 +354,8 @@ class FicheValiderView(APIView):
                     admission.paid_at = timezone.now()
                     admission.save(update_fields=["session", "paid_at"])
             else:
-                caisse.pay(admission=admission, user=request.user)
-        except caisse.CaisseError as error:
+                caisse.pay(admission=admission, user=request.user, received=request.data.get("montant_recu"))
+        except (caisse.CaisseError, ArithmeticError) as error:
             return refus(error)
         return Response(fiche_data(FICHES.get(pk=pk)))
 
