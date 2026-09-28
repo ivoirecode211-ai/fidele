@@ -7,7 +7,7 @@ from .serializers import PatientSerializer
 
 class PatientAccess(BasePermission):
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and (request.user.is_superuser or request.user.role_codes & {
+        return bool(request.user.is_authenticated and (request.user.has_role("ADMIN") or request.user.role_codes & {
             "ADMIN", "DIRECTOR", "RECEPTION", "ACCOUNTING", "DOCTOR", "NURSE", "LAB", "PHARMACY"}))
 
 

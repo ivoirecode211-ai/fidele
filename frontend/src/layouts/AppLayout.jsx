@@ -1,6 +1,6 @@
 
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
+import { Clock3, Menu, UserCheck, X } from "lucide-react";
 import { useState } from "react";
 import Logo from "../components/Logo";
 import SidebarFooter from "../components/SidebarFooter";
@@ -33,9 +33,26 @@ const MODULE_HEADERS = {
   "/settings": ["Paramètres", "Module prévu dans l'architecture MA SANTÉ"],
 };
 
+// Sous-modules affichés dans la barre latérale ; le premier est l'écran d'arrivée.
+// La page lit le sous-module actif dans l'adresse (?vue=…).
+export const MODULE_VIEWS = {
+  "/nursing": [
+    { id: "attente", label: "Patients en attente", icon: Clock3 },
+    { id: "recus", label: "Patients reçus", icon: UserCheck },
+  ],
+};
+
+export function useModuleView(pathname) {
+  const [params] = useSearchParams();
+  const views = MODULE_VIEWS[pathname] || [];
+  return views.find((view) => view.id === params.get("vue")) || views[0];
+}
+
 export default function AppLayout() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const views = MODULE_VIEWS[pathname] || [];
+  const currentView = useModuleView(pathname);
   const [title, subtitle] = MODULE_HEADERS[pathname] || ["MA SANTÉ", "Clinique & Gestion Hospitalière"];
 
   return (
@@ -75,6 +92,23 @@ export default function AppLayout() {
             <X size={20} />
           </button>
         </div>
+
+        {views.length > 0 && (
+          <nav className="nav-list" aria-label="Sous-modules">
+            {views.map(({ id, label, icon: Icon }) => (
+              <Link
+                key={id}
+                to={`${pathname}?vue=${id}`}
+                className={`nav-item ${currentView?.id === id ? "active" : ""}`}
+                aria-current={currentView?.id === id ? "page" : undefined}
+                onClick={() => setOpen(false)}
+              >
+                <Icon size={19} strokeWidth={2} />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <SidebarFooter />
       </aside>

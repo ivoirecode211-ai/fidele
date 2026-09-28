@@ -4,11 +4,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from parcours.permissions import RoleAccess
-
 from django.db.models import Q
 
-from .models import AdminDocument, AuditLog, GeneralSettings
+from accounts.tenancy import hospital_of
+from parcours.permissions import RoleAccess
+
+from .models import AdminDocument, AuditLog
 from .serializers import (
     AdminDocumentSerializer,
     AdminUserInputSerializer,
@@ -30,7 +31,7 @@ class OverviewView(APIView):
     permission_classes = [AdministrationAccess]
 
     def get(self, request):
-        users = User.objects.order_by("-is_active", "last_name", "first_name")
+        users = User.objects.filter(hospital=hospital_of(request.user)).order_by("-is_active", "last_name", "first_name")
         active = [user for user in users if user.is_active]
         documents = AdminDocument.objects.all()
         return Response({
@@ -52,7 +53,7 @@ class UsersView(APIView):
     def post(self, request):
         serializer = AdminUserInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user, password = save_user(data=serializer.validated_data)
+        user, password = save_user(data=serializer.validated_data, hospital=hospital_of(request.user))
         return Response(
             {**AdminUserSerializer(user).data, "temporaryPassword": password, "username": user.username},
             status=status.HTTP_201_CREATED,
@@ -63,7 +64,7 @@ class UserView(APIView):
     permission_classes = [AdministrationAccess]
 
     def put(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
+        user = get_object_or_404(User, pk=pk, hospital=hospital_of(request.user))
         serializer = AdminUserInputSerializer(user, data=request.data)
         serializer.is_valid(raise_exception=True)
         if user.pk == request.user.pk and "Administrateur" not in serializer.validated_data["roles"]:
@@ -74,7 +75,7 @@ class UserView(APIView):
 
     def delete(self, request, pk):
         """« Supprimer » désactive le compte : l'historique reste rattaché."""
-        user = get_object_or_404(User, pk=pk)
+        user = get_object_or_404(User, pk=pk, hospital=hospital_of(request.user))
         try:
             deactivate_user(user=user, actor=request.user)
         except ValueError as error:
@@ -101,11 +102,10 @@ class GeneralSettingsView(APIView):
         return [IsAuthenticated()] if self.request.method == "GET" else [AdministrationAccess()]
 
     def get(self, request):
-        return Response(GeneralSettingsSerializer(GeneralSettings.load()).data)
+        return Response(GeneralSettingsSerializer(hospital_of(request.user)).data)
 
     def put(self, request):
-        settings_row = GeneralSettings.load()
-        serializer = GeneralSettingsSerializer(settings_row, data=request.data)
+        serializer = GeneralSettingsSerializer(hospital_of(request.user), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(updated_by=request.user)
         return Response(serializer.data)
@@ -116,7 +116,7 @@ class AuditLogView(APIView):
     permission_classes = [AdministrationAccess]
 
     def get(self, request):
-        logs = AuditLog.objects.select_related("user")
+        logs = AuditLog.objects.select_related("user").filter(user__hospital=hospital_of(request.user))
         search = request.query_params.get("q", "").strip()
         if search:
             logs = logs.filter(
@@ -130,7 +130,8 @@ class AuditLogView(APIView):
         if request.query_params.get("failures") == "1":
             logs = logs.filter(success=False)
         return Response({
-            "modules": sorted(AuditLog.objects.values_list("module", flat=True).distinct()),
+            "modules": sorted(AuditLog.objects.filter(user__hospital=hospital_of(request.user))
+                              .values_list("module", flat=True).distinct()),
             "logs": AuditLogSerializer(logs[:200], many=True).data,
         })
 

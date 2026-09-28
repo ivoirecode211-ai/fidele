@@ -1,13 +1,17 @@
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
+from accounts.models import Hospital
+
 User = get_user_model()
 BASE = "/api/administration"
 
 
 class AdministrationTests(APITestCase):
     def setUp(self):
-        self.admin = User.objects.create_user(username="admin", password="x", role="ADMIN", first_name="Awa", last_name="Kone")
+        # L'administrateur d'un hôpital (le premier, créé par les migrations).
+        self.admin = User.objects.create_user(username="admin", password="x", role="ADMIN", first_name="Awa", last_name="Kone",
+                                              hospital=Hospital.objects.first())
         self.client.force_authenticate(self.admin)
 
     def form(self, **overrides):
@@ -42,7 +46,10 @@ class AdministrationTests(APITestCase):
 
     def test_admin_role_grants_and_removal_revokes_full_rights(self):
         pk = self.client.post(f"{BASE}/users/", self.form(roles=["Administrateur"]), format="json").data["id"]
-        self.assertTrue(User.objects.get(pk=pk).is_superuser)
+        created = User.objects.get(pk=pk)
+        # Administrateur de son hôpital : tous les rôles, mais jamais la plateforme.
+        self.assertEqual((created.hospital, created.is_superuser, created.is_platform), (self.admin.hospital, False, False))
+        self.assertTrue(created.has_role("PHARMACY"))
         self.client.put(f"{BASE}/users/{pk}/", self.form(roles=["Médecin"]), format="json")
         user = User.objects.get(pk=pk)
         self.assertEqual((user.role, user.is_superuser, user.is_staff), ("DOCTOR", False, False))
@@ -79,7 +86,8 @@ from .models import AuditLog  # noqa: E402
 class AuditAndSettingsTests(APITestCase):
     def setUp(self):
         self.admin = User.objects.create_user(username="admin2", email="admin2@masante.local", password="Secret@2026",
-                                              role="ADMIN", first_name="Awa", last_name="Kone")
+                                              role="ADMIN", first_name="Awa", last_name="Kone",
+                                              hospital=Hospital.objects.first())
 
     def test_logins_are_journaled_with_ip_and_without_password(self):
         self.client.post("/api/auth/login/", {"username": "admin2@masante.local", "password": "mauvais"}, format="json",
@@ -107,7 +115,12 @@ class AuditAndSettingsTests(APITestCase):
         payload = {"name": "Clinique MA SANTÉ Cocody", "slogan": "Santé – Proximité – Confiance", "address": "Cocody, Abidjan",
                    "phone": "27 22 00 00 00", "email": "contact@masante.ci", "currency": "FCFA",
                    "license_number": "AGR-2026-01", "opening_hours": "24h/24"}
-        self.assertEqual(self.client.put(f"{BASE}/parametres/", payload, format="json").data["address"], "Cocody, Abidjan")
+        payload.update({"city": "Abidjan", "district": "Cocody", "ticket_copies": 2, "ticket_validity_days": 14,
+                        "ticket_note": "Merci de votre confiance.", "ticket_exclusions": "Laboratoire", "code": "ZZZ"})
+        saved = self.client.put(f"{BASE}/parametres/", payload, format="json").data
+        self.assertEqual((saved["address"], saved["ticket_copies"], saved["ticket_validity_days"]), ("Cocody, Abidjan", 2, 14))
+        self.assertEqual(saved["code"], "MAS")  # le code ne change pas : il termine les numéros déjà émis
+        self.assertEqual(self.client.put(f"{BASE}/parametres/", {**payload, "ticket_copies": 9}, format="json").status_code, 400)
         nurse = User.objects.create_user(username="n", password="x", role="NURSE")
         self.client.force_authenticate(nurse)
         self.assertEqual(self.client.get(f"{BASE}/parametres/").data["name"], "Clinique MA SANTÉ Cocody")

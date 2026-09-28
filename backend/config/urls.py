@@ -9,6 +9,7 @@ admin.site.index_title = "Gestion de la clinique"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("accounts.urls")),
+    path("api/plateforme/", include("accounts.platform_urls")),
     path("api/patients/", include("patients.urls")),
     path("api/appointments/", include("appointments.urls")),
     path("api/consultations/", include("consultations.urls")),

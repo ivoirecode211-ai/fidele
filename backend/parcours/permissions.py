@@ -12,7 +12,7 @@ class RoleAccess(BasePermission):
         user = request.user
         if not (user and user.is_authenticated):
             return False
-        if user.is_superuser:
+        if user.is_superuser or "ADMIN" in user.role_codes:
             return True
         allowed = self.roles if request.method in SAFE_METHODS or self.write_roles is None else self.write_roles
         return bool(user.role_codes & allowed)

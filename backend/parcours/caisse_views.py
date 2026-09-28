@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from administration.models import GeneralSettings
+from accounts.tenancy import hospital_of
 from patients.models import Patient
 
 from . import caisse
@@ -65,6 +65,10 @@ def serialize_session(session):
     }
 
 
+def own_admissions(user):
+    return Admission.objects.of_hospital(hospital_of(user))
+
+
 def admission_row(admission):
     return CaissePatientSerializer(admission).data
 
@@ -79,7 +83,7 @@ class PatientSearchView(APIView):
         term = request.query_params.get("q", "").strip()
         if len(term) < 2:
             return Response([])
-        patients = Patient.objects.filter(
+        patients = Patient.objects.filter(hospital=hospital_of(request.user)).filter(
             Q(last_name__icontains=term) | Q(first_names__icontains=term)
             | Q(patient_number__icontains=term) | Q(phone__icontains=term)
         ).order_by("last_name", "first_names")[:15]
@@ -108,7 +112,7 @@ class PayView(APIView):
 
     def post(self, request, pk):
         try:
-            admission = caisse.pay(admission=get_object_or_404(Admission, pk=pk), user=request.user)
+            admission = caisse.pay(admission=get_object_or_404(own_admissions(request.user), pk=pk), user=request.user)
         except caisse.CaisseError as error:
             return refused(error)
         return Response(admission_row(admission))
@@ -120,7 +124,7 @@ class CancelView(APIView):
 
     def post(self, request, pk):
         try:
-            admission = caisse.cancel(admission=get_object_or_404(Admission, pk=pk), user=request.user,
+            admission = caisse.cancel(admission=get_object_or_404(own_admissions(request.user), pk=pk), user=request.user,
                                       reason=request.data.get("motif", ""))
         except caisse.CaisseError as error:
             return refused(error)
@@ -132,9 +136,9 @@ class TicketView(APIView):
     permission_classes = [CaisseAccess]
 
     def post(self, request, pk):
-        admission = get_object_or_404(Admission.objects.select_related("patient", "created_by", "session__cashier"), pk=pk)
+        admission = get_object_or_404(own_admissions(request.user).select_related("patient", "created_by", "session__cashier"), pk=pk)
         Admission.objects.filter(pk=pk).update(printed_count=admission.printed_count + 1)
-        settings_row = GeneralSettings.load()
+        settings_row = hospital_of(request.user)
         patient = admission.patient
         return Response({
             "etablissement": {
@@ -208,8 +212,8 @@ class RegieView(APIView):
 
     def get(self, request):
         start, end = parse_period(request)
-        sessions = CashSession.objects.select_related("cashier", "validated_by")
-        tickets = Admission.objects.select_related("patient", "service").filter(created_at__date__range=(start, end))
+        sessions = CashSession.objects.filter(hospital=hospital_of(request.user)).select_related("cashier", "validated_by")
+        tickets = own_admissions(request.user).select_related("patient", "service").filter(created_at__date__range=(start, end))
         live = tickets.filter(cancelled_at__isnull=True)
         cancelled = tickets.filter(cancelled_at__isnull=False)
         total = lambda qs, field: money(qs.aggregate(t=Sum(field))["t"] or 0)  # noqa: E731
@@ -240,7 +244,7 @@ class RegieSessionView(APIView):
     permission_classes = [RegieAccess]
 
     def post(self, request, pk, action):
-        session = get_object_or_404(CashSession, pk=pk)
+        session = get_object_or_404(CashSession, pk=pk, hospital=hospital_of(request.user))
         try:
             if action == "cloturer":
                 session = caisse.close_session(session=session, actor=request.user,

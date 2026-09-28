@@ -26,15 +26,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserSerializer(serializers.ModelSerializer):
     role_label = serializers.CharField(source="get_role_display", read_only=True)
     roles = serializers.SerializerMethodField()
+    hospital = serializers.SerializerMethodField()
+    is_platform = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
         fields = [
             "id", "username", "email", "first_name", "last_name",
             "role", "role_label", "roles", "is_superuser", "is_staff",
-            "phone", "department",
+            "phone", "department", "hospital", "is_platform",
         ]
         read_only_fields = ["is_superuser", "is_staff"]
+
+    def get_hospital(self, obj):
+        hospital = obj.hospital
+        return {"id": hospital.pk, "name": hospital.name, "code": hospital.code} if hospital else None
 
     def get_roles(self, obj):
         """Rôle principal en tête, puis les rôles supplémentaires."""

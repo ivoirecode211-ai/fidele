@@ -56,7 +56,9 @@ from parcours.tests import ParcoursBase
 class AgendaTests(ParcoursBase):
     def payload(self, **overrides):
         day = (_tz.localdate() + _td(days=3)).isoformat()
-        data = {"patientId": "PAT-001", "date": day, "time": "09:30", "motif": "Contrôle"}
+        from patients.models import Patient
+
+        data = {"patientId": Patient.objects.get().patient_number, "date": day, "time": "09:30", "motif": "Contrôle"}
         data.update(overrides)
         return data
 

@@ -25,7 +25,7 @@ from .presenters import bill_data, session_data, actor_name, payment_data
 
 class CashAccess(BasePermission):
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and (request.user.is_superuser or request.user.role_codes & services.CASHIERS))
+        return bool(request.user.is_authenticated and (request.user.has_role("ADMIN") or request.user.role_codes & services.CASHIERS))
 
 
 class CashView(APIView):

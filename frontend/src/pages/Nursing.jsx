@@ -23,6 +23,7 @@ import {
   Wind,
 } from "lucide-react";
 
+import { useModuleView } from "../layouts/AppLayout";
 import api from "../services/api";
 
 import "../styles/nursing.css";
@@ -495,24 +496,40 @@ export default function Nursing() {
 
   /*
    * ==========================================================
+   * SOUS-MODULES : patients en attente de constantes (écran
+   * d'arrivée) et patients reçus, dont les constantes sont prises.
+   * ==========================================================
+   */
+
+  const vue = useModuleView("/nursing");
+
+  const vuePatients = useMemo(
+    () => patients.filter((patient) =>
+      vue.id === "recus" ? patient.sentToConsultation : !patient.sentToConsultation
+    ),
+    [patients, vue.id]
+  );
+
+  /*
+   * ==========================================================
    * STATISTIQUES
    * ==========================================================
    */
 
   const abnormalPatients = useMemo(() => {
-    return patients.filter(hasAbnormalVitals);
-  }, [patients]);
+    return vuePatients.filter(hasAbnormalVitals);
+  }, [vuePatients]);
 
   const urgentPatients = useMemo(() => {
-    return patients.filter(
+    return vuePatients.filter(
       (patient) =>
         patient.status === "urgent" ||
         patient.statut === "urgent"
     );
-  }, [patients]);
+  }, [vuePatients]);
 
   const surveillancePatients = useMemo(() => {
-    return patients.filter((patient) => {
+    return vuePatients.filter((patient) => {
       const abnormal = hasAbnormalVitals(patient);
 
       return (
@@ -521,7 +538,7 @@ export default function Nursing() {
         patient.statut === "surveillance"
       );
     });
-  }, [patients]);
+  }, [vuePatients]);
 
   /*
    * ==========================================================
@@ -533,7 +550,7 @@ export default function Nursing() {
     const term =
       searchTerm.trim().toLowerCase();
 
-    return patients.filter((patient) => {
+    return vuePatients.filter((patient) => {
       const fullName =
         `${patient.prenom || ""} ${
           patient.nom || ""
@@ -577,7 +594,7 @@ export default function Nursing() {
       );
     });
   }, [
-    patients,
+    vuePatients,
     searchTerm,
     patientFilter,
   ]);
@@ -851,7 +868,7 @@ export default function Nursing() {
             </span>
 
             <strong>
-              {patients.length}
+              {vuePatients.length}
             </strong>
           </div>
 
@@ -1002,7 +1019,7 @@ export default function Nursing() {
 
           <div>
             <h2>
-              Patients
+              {vue.label}
             </h2>
 
             <p>
@@ -1019,7 +1036,7 @@ export default function Nursing() {
 
         </div>
 
-        {patients.length === 0 ? (
+        {vuePatients.length === 0 ? (
           <div className="nursing-empty-state">
 
             <div className="nursing-empty-icon">
@@ -1027,13 +1044,15 @@ export default function Nursing() {
             </div>
 
             <h3>
-              Aucun patient disponible
+              {vue.id === "recus"
+                ? "Aucun patient reçu"
+                : "Aucun patient en attente"}
             </h3>
 
             <p>
-              Les patients enregistrés dans
-              le module Caisse apparaîtront
-              automatiquement ici.
+              {vue.id === "recus"
+                ? "Les patients dont vous avez pris les constantes apparaîtront ici."
+                : "Les patients payés à la caisse apparaîtront automatiquement ici."}
             </p>
 
             <button

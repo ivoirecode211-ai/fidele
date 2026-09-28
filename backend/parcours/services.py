@@ -1,24 +1,35 @@
 import re
+import secrets
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+from accounts.tenancy import hospital_of
 from patients.models import Patient
 
 from .models import Admission, VitalSigns
 
-SHORT_NUMBER = re.compile(r"^PAT-(\d+)$")
+# Ni I, ni O, ni 0, ni 1 : un numéro se lit au téléphone et se recopie à la main.
+ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
 
-def next_patient_number():
-    """PAT-001, PAT-002… : format attendu par la Caisse (numero = partie après « PAT- »)."""
-    numbers = [
-        int(match.group(1))
-        for value in Patient.objects.filter(patient_number__regex=r"^PAT-[0-9]+$").values_list("patient_number", flat=True)
-        if (match := SHORT_NUMBER.match(value))
-    ]
-    return f"PAT-{max(numbers, default=0) + 1:03d}"
+def next_patient_number(hospital):
+    """P + année sur 2 chiffres + 3 caractères mêlant lettres et chiffres + code de l'hôpital.
+
+    Exemple : P25F46TSB. Le tirage est aléatoire ; l'unicité reste garantie par
+    la contrainte en base, ceci lui évite seulement de rejeter l'enregistrement.
+    """
+    prefix, suffix = f"P{timezone.localdate():%y}", hospital.code
+    for _ in range(200):
+        middle = [secrets.choice(ALPHABET) for _ in range(3)]
+        # Un vrai mélange : au moins une lettre et au moins un chiffre.
+        if not any(c.isdigit() for c in middle) or not any(c.isalpha() for c in middle):
+            continue
+        number = f"{prefix}{''.join(middle)}{suffix}"
+        if not Patient.objects.filter(patient_number=number).exists():
+            return number
+    raise IntegrityError("Impossible de générer un numéro de dossier libre pour cette année.")
 
 
 def birth_date_from_age(age):
@@ -83,11 +94,13 @@ def register_patient(*, data, user):
                 existing.save(update_fields=["insurance", "insurance_number"])
             return open_admission(patient=existing, data=data, user=user)
 
+    hospital = hospital_of(user)
     for _ in range(5):
-        number = next_patient_number()
+        number = next_patient_number(hospital)
         try:
             with transaction.atomic():
                 patient = Patient.objects.create(
+                    hospital=hospital,
                     patient_number=number,
                     last_name=data["nom"].strip().upper(),
                     first_names=data["prenom"].strip(),
@@ -246,11 +259,16 @@ def notifications_for(user):
     from django.db.models import Q
     from prescriptions.models import Prescription
 
+    if user.is_platform:
+        # La plateforme n'a pas de patients : rien ne l'attend dans un hôpital.
+        return {"count": 0, "items": []}
     sees_all = user.has_role("ADMIN", "DIRECTOR")
+    hospital = hospital_of(user)
+    admissions = Admission.objects.of_hospital(hospital)
     items = []
 
     if sees_all or user.has_role("NURSE"):
-        waiting = Admission.objects.parcours_soins().filter(sent_to_consultation_at__isnull=True).count()
+        waiting = admissions.parcours_soins().filter(sent_to_consultation_at__isnull=True).count()
         items.append({
             "id": "vitals",
             "count": waiting,
@@ -259,7 +277,7 @@ def notifications_for(user):
         })
 
     if sees_all or user.has_role("DOCTOR"):
-        queue = Admission.objects.filter(sent_to_consultation_at__isnull=False).exclude(statut="Terminée")
+        queue = admissions.filter(sent_to_consultation_at__isnull=False).exclude(statut="Terminée")
         if not sees_all:
             queue = queue.filter(
                 Q(consultation__isnull=True) | Q(consultation__doctor=user)
@@ -272,7 +290,7 @@ def notifications_for(user):
         })
 
     if sees_all or user.has_role("PHARMACY"):
-        prescriptions = Prescription.objects.filter(consultation__isnull=False)
+        prescriptions = Prescription.objects.filter(consultation__admission__patient__hospital=hospital)
         items.append({
             "id": "to-prepare",
             "count": prescriptions.filter(status="TO_PREPARE").count(),

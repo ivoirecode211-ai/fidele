@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import AdminDocument, AuditLog, GeneralSettings
+from accounts.models import Hospital
+
+from .models import AdminDocument, AuditLog
 from .services import ROLE_CODES, ROLE_LABELS, display_name, format_connection
 
 User = get_user_model()
@@ -99,9 +101,15 @@ class AdminDocumentSerializer(serializers.ModelSerializer):
 
 
 class GeneralSettingsSerializer(serializers.ModelSerializer):
+    """« Paramètres généraux » : l'hôpital de l'utilisateur, complété par son administrateur."""
+
     class Meta:
-        model = GeneralSettings
-        fields = ["name", "slogan", "address", "phone", "email", "currency", "license_number", "opening_hours"]
+        model = Hospital
+        fields = ["name", "code", "slogan", "address", "city", "district", "phone", "email", "currency",
+                  "license_number", "opening_hours", "ticket_copies", "ticket_validity_days",
+                  "ticket_note", "ticket_exclusions"]
+        # Le code termine les numéros de dossier déjà émis : il ne change plus.
+        read_only_fields = ["code"]
 
 
 class AuditLogSerializer(serializers.ModelSerializer):

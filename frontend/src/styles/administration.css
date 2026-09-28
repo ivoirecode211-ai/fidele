@@ -1245,6 +1245,30 @@
   gap: 4px 16px;
 }
 
+.admin-settings-section {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+
+.admin-settings-section legend {
+  margin-bottom: 10px;
+  padding: 0;
+  color: var(--primary-700);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.admin-settings-help {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
 .administration-modal.audit-modal {
   width: min(1100px, calc(100vw - 32px));
   max-width: none;

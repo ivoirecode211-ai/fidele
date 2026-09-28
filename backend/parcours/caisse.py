@@ -18,7 +18,12 @@ from .models import Admission, CashSession
 
 REGISSEURS = {"ADMIN", "REGISSEUR"}
 # Même patient, même prestation dans ce délai : presque toujours une double saisie.
+# Chaque hôpital règle le sien (« validité d'un reçu ») ; celui-ci sert par défaut.
 DUPLICATE_WINDOW = timedelta(days=15)
+
+
+def validity_days(hospital):
+    return hospital.ticket_validity_days if hospital else DUPLICATE_WINDOW.days
 
 
 class CaisseError(Exception):
@@ -40,8 +45,9 @@ def ticket_reference(admission):
 
 
 def recent_duplicate(patient, service):
+    since = timezone.now() - timedelta(days=validity_days(patient.hospital))
     return (Admission.objects.actives()
-            .filter(patient=patient, service=service, created_at__gte=timezone.now() - DUPLICATE_WINDOW)
+            .filter(patient=patient, service=service, created_at__gte=since)
             .order_by("-created_at").first())
 
 
@@ -59,7 +65,9 @@ def expected_amount(session):
 
 
 def open_session(user):
-    return current_session(user) or CashSession.objects.create(cashier=user)
+    from accounts.tenancy import hospital_of
+
+    return current_session(user) or CashSession.objects.create(cashier=user, hospital=hospital_of(user))
 
 
 @transaction.atomic

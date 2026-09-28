@@ -10,6 +10,8 @@ from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
 
 User = get_user_model()
 URL = "/api/parcours/caisse/patients/"
+# P + année sur 2 chiffres + 3 caractères (lettres et chiffres) + code de l'hôpital (MAS par défaut).
+NUMERO = r"^P\d{2}(?=[A-Z2-9]*\d)(?=[A-Z2-9]*[A-Z])[A-Z2-9]{3}MAS$"
 
 
 def form(**overrides):
@@ -48,7 +50,7 @@ class CaissePatientTests(APITestCase):
     def test_create_patient_without_insurance(self):
         response = self.client.post(URL, form(), format="json")
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(response.data["id"], "PAT-001")
+        self.assertRegex(response.data["id"], NUMERO)
         self.assertEqual(response.data["patient"], "TRAORE Awa")
         self.assertEqual(response.data["sexe"], "Féminin")
         self.assertEqual(response.data["age"], 32)
@@ -76,11 +78,13 @@ class CaissePatientTests(APITestCase):
         self.assertEqual(self.client.post(URL, form(assurance="Oui", assuranceId=cnps.pk), format="json").status_code, 400)
         self.assertFalse(Patient.objects.exists())
 
-    def test_numbers_follow_existing_short_numbers(self):
-        Patient.objects.create(patient_number="PAT-20260922-ABC", last_name="X", first_names="Y", birth_date="1990-01-01", sex="M")
-        self.client.post(URL, form(), format="json")
-        response = self.client.post(URL, form(nom="kone", prenom="Ibrahim", sexe="Masculin"), format="json")
-        self.assertEqual(response.data["id"], "PAT-002")
+    def test_patient_number_follows_the_nomenclature(self):
+        first = self.client.post(URL, form(), format="json").data["id"]
+        second = self.client.post(URL, form(nom="kone", prenom="Ibrahim", sexe="Masculin"), format="json").data["id"]
+        self.assertRegex(first, NUMERO)
+        self.assertRegex(second, NUMERO)
+        self.assertTrue(first.startswith(f"P{timezone.localdate():%y}"))
+        self.assertNotEqual(first, second)
 
     def test_future_birth_date_rejected(self):
         tomorrow = (timezone.localdate() + timedelta(days=1)).isoformat()
@@ -118,7 +122,8 @@ class NursingTests(APITestCase):
 
     def test_list_exposes_names_expected_by_nursing_page(self):
         patient = self.client.get("/api/parcours/soins/patients/").data[0]
-        self.assertEqual((patient["id"], patient["numero"]), ("PAT-001", "001"))
+        self.assertRegex(patient["id"], NUMERO)
+        self.assertEqual(patient["numero"], patient["id"])
         self.assertEqual((patient["nom"], patient["prenom"], patient["sexe"]), ("TRAORE", "Awa", "F"))
         self.assertEqual(patient["telephoneParents"], "0500000000")
         self.assertFalse(patient["sentToConsultation"])
@@ -268,7 +273,8 @@ class ParcoursCompletTests(ParcoursBase):
     def test_accounting_sees_caisse_payments(self):
         self.as_user(self.comptable)
         payment = self.client.get("/api/parcours/comptabilite/paiements/").data[0]
-        self.assertEqual((payment["patient"], payment["patientId"]), ("TRAORE Awa", "PAT-001"))
+        self.assertEqual(payment["patient"], "TRAORE Awa")
+        self.assertRegex(payment["patientId"], NUMERO)
         self.assertEqual((payment["totalAmount"], payment["patientAmount"], payment["insuranceAmount"]), (10000, 8000, 2000))
         self.assertEqual((payment["cashier"], payment["service"], payment["insuranceName"]), ("Koffi Armel", "Médecine générale", "CNPS"))
 

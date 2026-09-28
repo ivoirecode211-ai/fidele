@@ -20,32 +20,6 @@ class AdminDocument(models.Model):
         return self.name
 
 
-class GeneralSettings(models.Model):
-    """Paramètres généraux de l'établissement (une seule ligne)."""
-    name = models.CharField("nom de l'établissement", max_length=160, default="MA SANTÉ")
-    slogan = models.CharField(max_length=160, default="Santé – Proximité – Confiance", blank=True)
-    address = models.CharField("adresse", max_length=250, blank=True)
-    phone = models.CharField("téléphone", max_length=50, blank=True)
-    email = models.EmailField("e-mail", blank=True)
-    currency = models.CharField("devise", max_length=10, default="FCFA")
-    license_number = models.CharField("numéro d'agrément", max_length=80, blank=True)
-    opening_hours = models.CharField("horaires d'ouverture", max_length=160, default="24h/24 – 7j/7", blank=True)
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "paramètres généraux"
-        verbose_name_plural = "paramètres généraux"
-
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def load(cls):
-        settings_row, _ = cls.objects.get_or_create(pk=1)
-        return settings_row
-
-
 class AuditLog(models.Model):
     """Journal d'audit : qui a fait quoi, quand, depuis où."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

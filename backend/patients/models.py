@@ -6,6 +6,9 @@ class Patient(models.Model):
         ("A+", "A+"), ("A-", "A-"), ("B+", "B+"), ("B-", "B-"),
         ("AB+", "AB+"), ("AB-", "AB-"), ("O+", "O+"), ("O-", "O-"),
     ]
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="patients", verbose_name="hôpital")
+    # P + année sur 2 chiffres + 3 caractères + code de l'hôpital : P25F46TSB.
     patient_number = models.CharField(max_length=30, unique=True)
     last_name = models.CharField(max_length=120)
     first_names = models.CharField(max_length=180)

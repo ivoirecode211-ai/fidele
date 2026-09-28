@@ -80,6 +80,7 @@ import Direction from "./pages/Direction";
    ============================================================ */
 
 import Caisse from "./accueil/Caisse";
+import Hopitaux from "./pages/Hopitaux";
 
 
 /* ============================================================
@@ -323,6 +324,16 @@ export default function App() {
         element={
           <Protected>
             <Stocks />
+          </Protected>
+        }
+      />
+
+      {/* Plateforme : création des hôpitaux et de leur administrateur. */}
+      <Route
+        path="/hopitaux"
+        element={
+          <Protected>
+            <Hopitaux />
           </Protected>
         }
       />

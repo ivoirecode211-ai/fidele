@@ -4,7 +4,7 @@ Les noms de champs sont ceux des écrans de l'accueil : patients, fiches de
 paiement, sessions et bilan. Une « fiche » est un passage en caisse
 (Admission) ; les règles restent celles de caisse.py.
 """
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
@@ -16,7 +16,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from administration.models import GeneralSettings
+from accounts.tenancy import hospital_of
 from patients.models import Patient
 
 from . import caisse
@@ -70,12 +70,15 @@ def montant(valeur):
 
 # ------------------------------------------------------------------ sérialisation
 
-def etablissement():
-    row = GeneralSettings.load()
+def etablissement(user):
+    """Ce qui s'imprime sur le ticket, tel que l'administrateur de l'hôpital l'a réglé."""
+    row = hospital_of(user)
     return {
-        "id": row.pk, "nom": row.name, "code": "", "adresse": row.address, "ville": "",
-        "telephone": row.phone, "email": row.email, "devise": row.currency,
-        "mentions_legales": f"Agrément n° {row.license_number}" if row.license_number else "",
+        "id": row.pk, "nom": row.name, "code": row.code, "adresse": row.address, "ville": row.city,
+        "quartier": row.district, "telephone": row.phone, "email": row.email, "devise": row.currency,
+        "agrement": row.license_number, "mentions_legales": row.ticket_note,
+        "souches": row.ticket_copies, "validite_jours": row.ticket_validity_days,
+        "exclusions": row.ticket_exclusions,
     }
 
 
@@ -190,7 +193,7 @@ class ReferentielsView(APIView):
     def get(self, request):
         prestations = MedicalService.objects.filter(active=True).select_related("department")
         return Response({
-            "etablissement": etablissement(),
+            "etablissement": etablissement(request.user),
             "services": [{"id": d.pk, "name": d.name, "active": d.active}
                          for d in Department.objects.filter(active=True)],
             "prestations": [
@@ -234,17 +237,17 @@ class PatientEcriture(serializers.Serializer):
         return attrs
 
 
-def creer_patient(data):
+def creer_patient(data, hospital):
     assurance = data.pop("assurance", None)
     numero = data.pop("numero_assurance", "").strip()
     data["last_name"] = data["last_name"].strip().upper()
     data["insurance"] = assurance.name if assurance else ""
     data["insurance_number"] = numero if assurance else ""
     for _ in range(5):
-        number = next_patient_number()
+        number = next_patient_number(hospital)
         try:
             with transaction.atomic():
-                return Patient.objects.create(patient_number=number, **data)
+                return Patient.objects.create(hospital=hospital, patient_number=number, **data)
         except IntegrityError:
             # Deux agents ont obtenu le même numéro : on recalcule.
             if not Patient.objects.filter(patient_number=number).exists():
@@ -258,7 +261,7 @@ class PatientsView(APIView):
     LIMITE = 10
 
     def get(self, request):
-        qs = Patient.objects.order_by("-created_at")
+        qs = Patient.objects.filter(hospital=hospital_of(request.user)).order_by("-created_at")
         recherche = request.query_params.get("q", "").strip()
         if recherche:
             qs = qs.filter(Q(last_name__icontains=recherche) | Q(first_names__icontains=recherche)
@@ -272,7 +275,7 @@ class PatientsView(APIView):
     def post(self, request):
         serializer = PatientEcriture(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(patient_data(creer_patient(dict(serializer.validated_data))),
+        return Response(patient_data(creer_patient(dict(serializer.validated_data), hospital_of(request.user))),
                         status=status.HTTP_201_CREATED)
 
 
@@ -288,9 +291,9 @@ class FicheEcriture(serializers.Serializer):
 
 def fiche_recente(patient, department):
     """Même patient, même service, moins de quinze jours : presque toujours un doublon."""
+    since = timezone.now() - timedelta(days=caisse.validity_days(patient.hospital))
     return (FICHES.actives()
-            .filter(patient=patient, service__department=department,
-                    created_at__gte=timezone.now() - caisse.DUPLICATE_WINDOW)
+            .filter(patient=patient, service__department=department, created_at__gte=since)
             .order_by("-created_at").first())
 
 
@@ -299,7 +302,8 @@ class FichesView(APIView):
 
     def get(self, request):
         params = request.query_params
-        qs = FICHES.filter(cancelled_at__isnull=params.get("corbeille") != "1").order_by("-created_at")
+        qs = (FICHES.of_hospital(hospital_of(request.user))
+              .filter(cancelled_at__isnull=params.get("corbeille") != "1").order_by("-created_at"))
         if params.get("statut"):
             qs = qs.filter(payment_status=params["statut"])
         if params.get("patient"):
@@ -311,14 +315,17 @@ class FichesView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         patient, prestation = data["patient"], data["prestation"]
+        if patient.hospital_id != hospital_of(request.user).pk:
+            return refus("Ce patient appartient à un autre hôpital.", status.HTTP_404_NOT_FOUND)
         department = data.get("service") or prestation.department
+        delai = caisse.validity_days(patient.hospital)
 
         existante = fiche_recente(patient, department) if department else None
         if existante:
             return Response({
                 "detail": "Une fiche existe déjà pour ce patient dans ce service.",
                 "fiche_existante": fiche_data(existante),
-                "delai_jours": caisse.DUPLICATE_WINDOW.days,
+                "delai_jours": delai,
             }, status=status.HTTP_409_CONFLICT)
 
         try:
@@ -326,7 +333,7 @@ class FichesView(APIView):
         except caisse.Duplicate as doublon:
             return Response({
                 "detail": str(doublon), "fiche_existante": fiche_data(doublon.admission),
-                "delai_jours": caisse.DUPLICATE_WINDOW.days,
+                "delai_jours": delai,
             }, status=status.HTTP_409_CONFLICT)
         return Response(fiche_data(FICHES.get(pk=admission.pk)), status=status.HTTP_201_CREATED)
 
@@ -343,7 +350,7 @@ class FicheValiderView(APIView):
     permission_classes = [AccesCaisse]
 
     def post(self, request, pk):
-        admission = get_object_or_404(Admission, pk=pk)
+        admission = get_object_or_404(Admission.objects.of_hospital(hospital_of(request.user)), pk=pk)
         try:
             if admission.payment_status == Admission.INSURED and not admission.cancelled_at:
                 session = caisse.current_session(request.user)
@@ -365,7 +372,8 @@ class FicheAnnulerView(APIView):
 
     def post(self, request, pk):
         try:
-            caisse.cancel(admission=get_object_or_404(Admission, pk=pk), user=request.user,
+            caisse.cancel(admission=get_object_or_404(Admission.objects.of_hospital(hospital_of(request.user)), pk=pk),
+                          user=request.user,
                           reason=request.data.get("motif", ""))
         except caisse.CaisseError as error:
             return refus(error)
@@ -404,7 +412,7 @@ class SessionRegieView(APIView):
     def post(self, request, pk, action):
         if action not in ("cloturer", "valider"):
             return refus("Action inconnue.", status.HTTP_404_NOT_FOUND)
-        session = get_object_or_404(CashSession, pk=pk)
+        session = get_object_or_404(CashSession, pk=pk, hospital=hospital_of(request.user))
         try:
             if action == "cloturer":
                 session = caisse.close_session(session=session, actor=request.user,
@@ -458,17 +466,20 @@ class BilanView(APIView):
             "caissier": caissier, "regisseur": regisseur,
             "responsable": request.user.has_role("ADMIN", "DIRECTOR", "REGISSEUR", "ACCOUNTING"),
             "periode": {"du": str(du), "au": str(au)},
-            "etablissement": etablissement(),
+            "etablissement": etablissement(request.user),
         }
+        hospital = hospital_of(request.user)
+        fiches = FICHES.of_hospital(hospital)
+        sessions = SESSIONS.filter(hospital=hospital)
 
         if caissier:
             courante = caisse.current_session(request.user)
-            miennes = SESSIONS.filter(cashier=request.user)
+            miennes = sessions.filter(cashier=request.user)
             sur_periode = miennes.filter(session_date__range=(du, au))
-            fiches_periode = FICHES.filter(session__in=sur_periode)
+            fiches_periode = fiches.filter(session__in=sur_periode)
             donnees.update({
                 "session": session_data(courante) if courante else None,
-                "operations": [fiche_data(a) for a in FICHES.actives().filter(session=courante)] if courante else [],
+                "operations": [fiche_data(a) for a in fiches.actives().filter(session=courante)] if courante else [],
                 "mes_sessions": [session_data(s) for s in miennes[:20]],
                 "bilan_periode": {
                     **totaux(fiches_periode, sur_periode),
@@ -478,19 +489,19 @@ class BilanView(APIView):
             })
 
         if regisseur:
-            sur_periode = SESSIONS.filter(session_date__range=(du, au))
-            fiches_periode = FICHES.filter(created_at__date__range=(du, au))
+            sur_periode = sessions.filter(session_date__range=(du, au))
+            fiches_periode = fiches.filter(created_at__date__range=(du, au))
             par_caissier = (sur_periode.values("cashier__username", "cashier__first_name", "cashier__last_name")
                             .annotate(nb=Count("id"), attendu=Sum("expected"), compte=Sum("counted"), ecart=Sum("gap"))
                             .order_by("-attendu"))
             donnees.update({
-                "clotures_a_valider": [session_data(s) for s in SESSIONS.filter(status=CashSession.PENDING)],
-                "caisses_ouvertes": [session_data(s) for s in SESSIONS.filter(status=CashSession.OPEN)],
+                "clotures_a_valider": [session_data(s) for s in sessions.filter(status=CashSession.PENDING)],
+                "caisses_ouvertes": [session_data(s) for s in sessions.filter(status=CashSession.OPEN)],
                 "toutes_sessions": [session_data(s) for s in sur_periode[:100]],
                 "toutes_fiches": [fiche_data(a) for a in
                                   fiches_periode.filter(cancelled_at__isnull=True).order_by("-created_at")[:200]],
                 "corbeille": [fiche_data(a) for a in
-                              FICHES.filter(cancelled_at__isnull=False).order_by("-cancelled_at")[:100]],
+                              fiches.filter(cancelled_at__isnull=False).order_by("-cancelled_at")[:100]],
                 "totaux": totaux(fiches_periode, sur_periode),
                 "totaux_par_caissier": [
                     {

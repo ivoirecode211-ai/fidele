@@ -1,6 +1,11 @@
 from django.core.management.base import BaseCommand
-from accounts.models import User
+from accounts.models import Hospital, User
+from accounts.tenancy import code_candidates
 
+# Compte de la plateforme : crée les hôpitaux et leurs administrateurs (aucun hôpital).
+PLATFORM = ("plateforme", "plateforme@masante.local", "Plateforme", "MA SANTÉ", "ADMIN", "Plateforme@2026!")
+
+# Comptes de l'hôpital de démonstration (« admin » en est l'administrateur).
 USERS = [
     ("admin", "admin@masante.local", "Admin", "MA SANTÉ", "ADMIN", "Admin@2026!"),
     ("directeur", "directeur@masante.local", "Directeur", "Clinique", "DIRECTOR", "Directeur@2026!"),
@@ -20,7 +25,9 @@ class Command(BaseCommand):
     help = "Crée les utilisateurs par défaut de MA SANTÉ."
 
     def handle(self, *args, **kwargs):
-        for username, email, first, last, role, password in USERS:
+        hospital = Hospital.objects.order_by("pk").first() or Hospital.objects.create(
+            name="MA SANTÉ", code=code_candidates("MA SANTÉ")[0])
+        for username, email, first, last, role, password in [PLATFORM, *USERS]:
             user, created = User.objects.get_or_create(
                 username=username,
                 defaults={
@@ -35,6 +42,7 @@ class Command(BaseCommand):
             user.first_name = first
             user.last_name = last
             user.role = role
+            user.hospital = None if username == PLATFORM[0] else hospital
             user.set_password(password)
             user.save()
             self.stdout.write(self.style.SUCCESS(

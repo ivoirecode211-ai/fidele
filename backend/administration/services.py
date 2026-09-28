@@ -101,8 +101,10 @@ def suggest_username(full_name, exclude_pk=None):
 
 
 @transaction.atomic
-def save_user(*, data, user=None):
-    """Crée ou modifie un compte. Renvoie (utilisateur, mot_de_passe_provisoire | None)."""
+def save_user(*, data, user=None, hospital=None):
+    """Crée ou modifie un compte. Renvoie (utilisateur, mot_de_passe_provisoire | None).
+
+    Un nouveau compte est rattaché à `hospital` (celui de l'administrateur qui le crée)."""
     codes = [ROLE_CODES[label] for label in data["roles"]]
     first_name, last_name = split_name(data["name"])
     password = None
@@ -110,7 +112,7 @@ def save_user(*, data, user=None):
     # Sans nom d'utilisateur saisi : on garde l'actuel, ou on applique la nomenclature.
     username = data.get("username") or (user.username if user else suggest_username(data["name"]))
     if user is None:
-        user = User()
+        user = User(hospital=hospital)
         if not data.get("password"):
             password = temporary_password()
             user.set_password(password)

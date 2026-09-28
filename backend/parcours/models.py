@@ -72,6 +72,8 @@ class CashSession(models.Model):
     OPEN, PENDING, VALIDATED = "ouverte", "en_attente", "validee"
     STATUSES = [(OPEN, "Ouverte"), (PENDING, "En attente de validation"), (VALIDATED, "Validée")]
 
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="cash_sessions", verbose_name="hôpital")
     cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="cash_sessions_parcours")
     opened_at = models.DateTimeField(default=timezone.now)
     session_date = models.DateField(default=timezone.localdate)
@@ -102,6 +104,10 @@ class CashSession(models.Model):
 
 
 class AdmissionQuerySet(models.QuerySet):
+    def of_hospital(self, hospital):
+        """Passages des patients d'un seul hôpital (multitenant)."""
+        return self.filter(patient__hospital=hospital)
+
     def actives(self):
         """Hors tickets annulés."""
         return self.filter(cancelled_at__isnull=True)

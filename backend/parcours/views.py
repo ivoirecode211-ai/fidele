@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.tenancy import hospital_of
+
 from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
 from prescriptions.models import Prescription
 
@@ -49,7 +51,9 @@ class CaissePatientsView(generics.ListAPIView):
     """Liste des passages en caisse (GET) et enregistrement d'un nouveau patient (POST)."""
     permission_classes = [CaisseAccess]
     serializer_class = CaissePatientSerializer
-    queryset = Admission.objects.select_related("patient", "service")
+
+    def get_queryset(self):
+        return Admission.objects.of_hospital(hospital_of(self.request.user)).select_related("patient", "service")
 
     def post(self, request):
         serializer = CaissePatientInputSerializer(data=request.data)
@@ -65,8 +69,8 @@ class CaissePatientsView(generics.ListAPIView):
         return Response(CaissePatientSerializer(admission).data, status=status.HTTP_201_CREATED)
 
 
-def nursing_queryset():
-    return Admission.objects.parcours_soins().select_related("patient").prefetch_related(
+def nursing_queryset(user):
+    return Admission.objects.of_hospital(hospital_of(user)).parcours_soins().select_related("patient").prefetch_related(
         Prefetch("vitals", queryset=VitalSigns.objects.order_by("-recorded_at", "-id"))
     )
 
@@ -77,7 +81,7 @@ class NursingPatientsView(generics.ListAPIView):
     serializer_class = NursingPatientSerializer
 
     def get_queryset(self):
-        return nursing_queryset()
+        return nursing_queryset(self.request.user)
 
 
 class NursingVitalsView(APIView):
@@ -85,11 +89,12 @@ class NursingVitalsView(APIView):
     permission_classes = [NursingAccess]
 
     def post(self, request, pk):
-        admission = get_object_or_404(Admission, pk=pk)
+        admission = get_object_or_404(nursing_queryset(request.user), pk=pk)
         serializer = VitalsInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         record_vitals(admission=admission, fields=serializer.to_model_fields(), user=request.user)
-        return Response(NursingPatientSerializer(nursing_queryset().get(pk=pk)).data, status=status.HTTP_201_CREATED)
+        return Response(NursingPatientSerializer(nursing_queryset(request.user).get(pk=pk)).data,
+                        status=status.HTTP_201_CREATED)
 
 
 def workflow_response(action):
@@ -101,7 +106,7 @@ def workflow_response(action):
 
 
 def consultation_queryset(user):
-    queryset = nursing_queryset().filter(sent_to_consultation_at__isnull=False).select_related(
+    queryset = nursing_queryset(user).filter(sent_to_consultation_at__isnull=False).select_related(
         "consultation__doctor"
     ).order_by("sent_to_consultation_at", "id")
     if user.has_role("ADMIN", "DIRECTOR"):
@@ -124,7 +129,7 @@ class ConsultationStartView(APIView):
     permission_classes = [ConsultationAccess]
 
     def post(self, request, pk):
-        admission = get_object_or_404(Admission, pk=pk)
+        admission = get_object_or_404(Admission.objects.of_hospital(hospital_of(request.user)), pk=pk)
 
         def action():
             start_consultation(admission=admission, user=request.user)
@@ -138,7 +143,7 @@ class ConsultationValidateView(APIView):
     permission_classes = [ConsultationAccess]
 
     def post(self, request, pk):
-        admission = get_object_or_404(Admission, pk=pk)
+        admission = get_object_or_404(Admission.objects.of_hospital(hospital_of(request.user)), pk=pk)
         serializer = ConsultationInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -149,32 +154,32 @@ class ConsultationValidateView(APIView):
         return workflow_response(action)
 
 
-def prescription_queryset():
-    return Prescription.objects.filter(consultation__isnull=False).select_related(
+def prescription_queryset(user):
+    return Prescription.objects.filter(consultation__admission__patient__hospital=hospital_of(user)).select_related(
         "patient", "doctor", "consultation", "served_by"
     ).prefetch_related("items").order_by("-id")
 
 
-def prescription_from_code(code):
-    return get_object_or_404(prescription_queryset(), pk=int(code))
+def prescription_from_code(code, user):
+    return get_object_or_404(prescription_queryset(user), pk=int(code))
 
 
 class PharmacyPrescriptionsView(APIView):
     permission_classes = [PharmacyAccess]
 
     def get(self, request):
-        return Response(PharmacyPrescriptionSerializer(prescription_queryset(), many=True).data)
+        return Response(PharmacyPrescriptionSerializer(prescription_queryset(request.user), many=True).data)
 
 
 class PharmacyPrepareView(APIView):
     permission_classes = [PharmacyAccess]
 
     def post(self, request, code):
-        prescription = prescription_from_code(code)
+        prescription = prescription_from_code(code, request.user)
 
         def action():
             prepare_prescription(prescription=prescription, user=request.user)
-            return Response(PharmacyPrescriptionSerializer(prescription_from_code(code)).data)
+            return Response(PharmacyPrescriptionSerializer(prescription_from_code(code, request.user)).data)
 
         return workflow_response(action)
 
@@ -183,11 +188,11 @@ class PharmacyServeView(APIView):
     permission_classes = [PharmacyAccess]
 
     def post(self, request, code):
-        prescription = prescription_from_code(code)
+        prescription = prescription_from_code(code, request.user)
 
         def action():
             serve_prescription(prescription=prescription, user=request.user)
-            return Response(PharmacyPrescriptionSerializer(prescription_from_code(code)).data)
+            return Response(PharmacyPrescriptionSerializer(prescription_from_code(code, request.user)).data)
 
         return workflow_response(action)
 
@@ -196,7 +201,7 @@ class PharmacyHistoryView(APIView):
     permission_classes = [PharmacyAccess]
 
     def get(self, request):
-        served = prescription_queryset().filter(status="SERVED").order_by("-served_at", "-id")
+        served = prescription_queryset(request.user).filter(status="SERVED").order_by("-served_at", "-id")
         return Response(dispensing_history(served))
 
 
@@ -205,7 +210,7 @@ class PaymentsView(APIView):
     permission_classes = [AccountingAccess]
 
     def get(self, request):
-        admissions = Admission.objects.encaissees().select_related("patient", "created_by").order_by("-created_at", "-id")
+        admissions = Admission.objects.of_hospital(hospital_of(request.user)).encaissees().select_related("patient", "created_by").order_by("-created_at", "-id")
         return Response(PaymentSerializer(admissions, many=True).data)
 
 

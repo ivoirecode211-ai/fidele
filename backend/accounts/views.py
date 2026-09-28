@@ -19,7 +19,9 @@ class UserListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = User.objects.all().order_by("last_name", "first_name")
+        from .tenancy import hospital_of
+
+        qs = User.objects.filter(hospital=hospital_of(self.request.user)).order_by("last_name", "first_name")
         role = self.request.query_params.get("role")
         if role:
             qs = qs.filter(role=role)

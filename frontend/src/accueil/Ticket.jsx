@@ -23,10 +23,10 @@ import { A5_PORTRAIT, imprimer } from "./impression";
  * ============================================================
  */
 
+// Valeurs par défaut ; chaque hôpital règle les siennes dans Administration → Paramètres.
 const EXEMPLAIRES = 3;
-
-// Même délai que la détection des doublons côté serveur.
 const VALIDITE_JOURS = 15;
+const EXCLUSIONS = "Laboratoire – Échographie – Hospitalisation";
 
 const horodatage = (valeur) =>
   valeur ? new Date(valeur).toLocaleString("fr-FR", {
@@ -79,7 +79,9 @@ function Souche({ fiche, maison, duplicata }) {
           <Logo size={34} />
           <div>
             <strong>{maison.nom || "—"}</strong>
-            {maison.adresse && <span>{maison.adresse}</span>}
+            {(maison.adresse || maison.quartier || maison.ville) && (
+              <span>{[maison.adresse, maison.quartier, maison.ville].filter(Boolean).join(", ")}</span>
+            )}
             {maison.email && <span>{maison.email}</span>}
             {maison.telephone && <span>{maison.telephone}</span>}
           </div>
@@ -142,7 +144,9 @@ function Souche({ fiche, maison, duplicata }) {
       </div>
 
       <p className="souche-mention">
-        *** Ticket de consultation valable pour {VALIDITE_JOURS} jour(s). Exclusions (Laboratoire – Échographie – Hospitalisation) ***
+        *** Ticket de consultation valable pour {maison.validite_jours || VALIDITE_JOURS} jour(s).
+        {" "}Exclusions ({maison.exclusions ?? EXCLUSIONS}) ***
+        {maison.mentions_legales && <><br />{maison.mentions_legales}</>}
       </p>
     </article>
   );
@@ -176,7 +180,7 @@ export default function Ticket({ fiche, etablissement, onClose, duplicata = fals
         <header className="pop-tete no-print">
           <div>
             <h2>Paiement enregistré</h2>
-            <p>L'impression s'ouvre automatiquement — trois exemplaires sur une feuille A5.</p>
+            <p>L'impression s'ouvre automatiquement — {maison.souches || EXEMPLAIRES} exemplaire(s) sur une feuille A5.</p>
           </div>
           <button type="button" className="pop-fermer" onClick={onClose} aria-label="Fermer">
             <X size={18} strokeWidth={2} />
@@ -186,7 +190,7 @@ export default function Ticket({ fiche, etablissement, onClose, duplicata = fals
         <div className="pop-corps">
           {/* Une seule bande à l'écran : les trois ne servent qu'à l'impression. */}
           <div className="ticket" id="ticket">
-            {Array.from({ length: EXEMPLAIRES }, (_, i) => (
+            {Array.from({ length: maison.souches || EXEMPLAIRES }, (_, i) => (
               <Souche key={i} fiche={fiche} maison={maison} duplicata={duplicata} />
             ))}
           </div>

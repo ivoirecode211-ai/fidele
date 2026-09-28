@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Archive,
   Bot,
+  Hospital,
   ChevronRight,
   ChevronDown,
   LayoutGrid,
@@ -50,6 +51,7 @@ const ALL_MODULES = [
   { id: "administration", name: "Administration", description: "Gérer les utilisateurs, les rôles et les paramètres système", path: "/administration", icon: ShieldCheck, color: "indigo" },
   { id: "hygiene", name: "Hygiène et sécurité", description: "Suivre les contrôles d'hygiène et la sécurité sanitaire", path: "/hygiene", icon: ShieldCheck, color: "green" },
   { id: "archives", name: "Archives", description: "Consulter et gérer les dossiers archivés", path: "/archives", icon: Archive, color: "blue-light" },
+  { id: "hopitaux", name: "Hôpital", description: "Créer les hôpitaux clients et leur administrateur", path: "/hopitaux", icon: Hospital, color: "blue" },
   { id: "ia", name: "Intelligence Artificielle", description: "Assistance intelligente pour l'analyse des informations et l'aide à la décision", path: "/ia", icon: Bot, color: "indigo" },
 ];
 
@@ -109,17 +111,24 @@ export default function Modules() {
     // Rôle principal + rôles supplémentaires attribués dans l'Administration.
     const roles = [userRole, ...(user.roles || []).map(normalizeRole)];
 
+    // La plateforme n'a qu'un module : la création des hôpitaux.
+    if (user.is_platform) {
+      return ALL_MODULES.filter((module) => module.id === "hopitaux");
+    }
+
+    const hospitalModules = ALL_MODULES.filter((module) => module.id !== "hopitaux");
+
     if (user.is_superuser || roles.some((role) => ["ADMIN", "ADMINISTRATOR", "ADMINISTRATEUR"].includes(role))) {
-      return ALL_MODULES;
+      return hospitalModules;
     }
 
     if (Array.isArray(user.modules)) {
-      return ALL_MODULES.filter((module) => user.modules.includes(module.id));
+      return hospitalModules.filter((module) => user.modules.includes(module.id));
     }
 
     const roleModules = new Set(roles.flatMap((role) => DEFAULT_ROLE_MODULES[role] || []));
 
-    return ALL_MODULES.filter((module) => roleModules.has(module.id));
+    return hospitalModules.filter((module) => roleModules.has(module.id));
   }, [user, userRole]);
 
   const filteredModules = useMemo(() => {
@@ -147,7 +156,9 @@ export default function Modules() {
 
             <div>
               <div className="modules-brand-title">MA SANTÉ</div>
-              <div className="modules-brand-subtitle">Clinique & Gestion Hospitalière</div>
+              <div className="modules-brand-subtitle">
+                {user?.hospital?.name || (user?.is_platform ? "Plateforme multi-hôpitaux" : "Clinique & Gestion Hospitalière")}
+              </div>
             </div>
           </div>
 
@@ -166,8 +177,8 @@ export default function Modules() {
                   {user?.first_name || user?.username || "Utilisateur"} {user?.last_name || ""}
                 </strong>
                 <small>
-                  {user?.is_superuser
-                    ? "Super administrateur"
+                  {user?.is_platform
+                    ? "Plateforme"
                     : user?.role_label || user?.role || "Utilisateur"}
                 </small>
               </div>
