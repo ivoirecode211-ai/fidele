@@ -18,6 +18,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
+  Plus,
+  Grid2X2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -439,6 +441,19 @@ export default function PatientSpace() {
 
         <aside className="patient-space-sidebar">
 
+          {/* IDENTITÉ MA SANTÉ */}
+          <div className="patient-sidebar-brand">
+            <div className="patient-sidebar-brand-icon">
+              <Plus size={34} strokeWidth={5} />
+            </div>
+
+            <div className="patient-sidebar-brand-text">
+              <strong>MA SANTÉ</strong>
+              <span>Clinique &amp; Gestion<br />Hospitalière</span>
+            </div>
+          </div>
+
+          {/* ONGLETS DU PATIENT */}
           <nav className="patient-space-menu">
 
             <button
@@ -517,6 +532,31 @@ export default function PatientSpace() {
             </button>
 
           </nav>
+
+          {/* ACTIONS EN BAS DE LA BARRE */}
+          <div className="patient-sidebar-bottom">
+
+            <button
+              type="button"
+              className="patient-sidebar-action"
+              onClick={() => navigate("/modules")}
+              title="Retour aux modules"
+            >
+              <Grid2X2 size={20} />
+              <span>Retour aux modules</span>
+            </button>
+
+            <button
+              type="button"
+              className="patient-sidebar-action patient-sidebar-logout"
+              onClick={handleLogout}
+              title="Déconnexion"
+            >
+              <LogOut size={20} />
+              <span>Déconnexion</span>
+            </button>
+
+          </div>
 
         </aside>
 

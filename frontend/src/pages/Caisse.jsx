@@ -4,11 +4,14 @@ import {
   ChartLine,
   Home,
   Plus,
+  Printer,
   Search,
   ShieldCheck,
   UserRound,
   X,
 } from "lucide-react";
+import jsPDF from "jspdf";
+
 import api from "../services/api";
 import Logo from "../components/Logo";
 import SidebarFooter from "../components/SidebarFooter";
@@ -39,6 +42,7 @@ import "../styles/Caisse.css";
  * - Page locale des assurances configurées
  * - Transmission automatique du patient aux Soins infirmiers
  *   et à la Comptabilité (via l'API)
+ * - Impression PDF en 3 exemplaires sur une page A4
  *
  * IMPORTANT :
  * Le médecin / "Affecté à" n'est plus sélectionné depuis
@@ -62,25 +66,20 @@ const ICONS = {
   plus: Plus,
   arrow: ArrowRight,
   close: X,
+  printer: Printer,
 };
 
 function Icon({ name, size = 20 }) {
   const LucideIcon = ICONS[name];
 
   return LucideIcon ? (
-    <LucideIcon size={size} strokeWidth={2} aria-hidden="true" />
+    <LucideIcon
+      size={size}
+      strokeWidth={2}
+      aria-hidden="true"
+    />
   ) : null;
 }
-
-
-/*
- * ============================================================
- * SERVICES, ASSURANCES ET PATIENTS
- * ============================================================
- *
- * Servis par l'API (/api/parcours/) : le catalogue, l'identifiant
- * patient et le coût sont déterminés par le backend.
- */
 
 
 /*
@@ -175,15 +174,30 @@ export default function Caisse() {
   const [insuranceConfiguration, setInsuranceConfiguration] =
     useState([]);
 
+
+  /*
+   * ==========================================================
+   * CHARGEMENT DES DONNÉES
+   * ==========================================================
+   */
+
   useEffect(() => {
     Promise.all([
       api.get("/parcours/catalogue/"),
       api.get("/parcours/caisse/patients/"),
     ])
       .then(([catalogue, caissePatients]) => {
-        setServicesConfiguration(catalogue.data.services);
-        setInsuranceConfiguration(catalogue.data.insurances);
-        setPatients(caissePatients.data);
+        setServicesConfiguration(
+          catalogue.data.services
+        );
+
+        setInsuranceConfiguration(
+          catalogue.data.insurances
+        );
+
+        setPatients(
+          caissePatients.data
+        );
       })
       .catch((error) => {
         console.error(
@@ -210,9 +224,6 @@ export default function Caisse() {
    * ==========================================================
    * DONNÉES FORMULAIRE
    * ==========================================================
-   *
-   * IMPORTANT :
-   * Le champ "doctor" a été supprimé.
    */
 
   const [formData, setFormData] =
@@ -362,6 +373,7 @@ export default function Caisse() {
       1
     );
 
+
   const getPatientDate = (patient) => {
 
     if (!patient.dateEnregistrement) {
@@ -498,9 +510,7 @@ export default function Caisse() {
       setFormData(
         (currentForm) => ({
           ...currentForm,
-
           age: value,
-
           dateNaissance,
         })
       );
@@ -669,26 +679,32 @@ export default function Caisse() {
 
     /*
      * ENREGISTREMENT
-     *
-     * Le backend attribue l'identifiant et calcule le coût
-     * à partir du catalogue.
      */
 
     let newPatient;
 
     try {
-      const response = await api.post(
-        "/parcours/caisse/patients/",
-        formData
-      );
 
-      newPatient = response.data;
+      const response =
+        await api.post(
+          "/parcours/caisse/patients/",
+          formData
+        );
+
+      newPatient =
+        response.data;
+
     } catch (error) {
-      const errors = error.response?.data;
+
+      const errors =
+        error.response?.data;
 
       alert(
-        errors && typeof errors === "object"
-          ? Object.values(errors).flat().join("\n")
+        errors &&
+        typeof errors === "object"
+          ? Object.values(errors)
+              .flat()
+              .join("\n")
           : "Impossible d'enregistrer le patient. Veuillez réessayer."
       );
 
@@ -753,6 +769,784 @@ export default function Caisse() {
     ).format(
       Number(amount || 0)
     );
+  };
+
+
+  /*
+   * ==========================================================
+   * IMPRESSION PDF PATIENT
+   * ==========================================================
+   *
+   * Génère :
+   *
+   * - Une page A4
+   * - 3 exemplaires identiques
+   * - Le patient sélectionné uniquement
+   *
+   * Aucun autre patient n'est imprimé.
+   * ==========================================================
+   */
+
+  const handlePrintPatient = (
+    patient
+  ) => {
+
+    try {
+
+      const pdf =
+        new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
+
+
+      /*
+       * ======================================================
+       * DIMENSIONS PAGE A4
+       * ======================================================
+       */
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+
+      const margin = 10;
+
+      const cardWidth =
+        pageWidth -
+        margin * 2;
+
+      const cardHeight = 86;
+
+      const gap = 9;
+
+      const startY = 8;
+
+
+      /*
+       * ======================================================
+       * INFORMATIONS PATIENT
+       * ======================================================
+       */
+
+      const patientName =
+        patient.patient ||
+        `${patient.nom || ""} ${patient.prenom || ""}`.trim() ||
+        "--";
+
+
+      const sexe =
+        patient.sexe ||
+        "--";
+
+
+      const age =
+        patient.age !== undefined &&
+        patient.age !== null &&
+        patient.age !== ""
+          ? `${patient.age} ans`
+          : "--";
+
+
+      const dateNaissance =
+        patient.dateNaissance ||
+        patient.date_naissance ||
+        "";
+
+
+      const service =
+        patient.service ||
+        "--";
+
+
+      const telephone =
+        patient.telephone ||
+        "--";
+
+
+      const parentContact =
+        patient.parentContact ||
+        "--";
+
+
+      const quartier =
+        patient.quartier ||
+        "--";
+
+
+      const assurance =
+        patient.insurance === "Oui"
+          ? patient.insuranceName ||
+            "Oui"
+          : "Non";
+
+
+      const insuranceNumber =
+        patient.insurance === "Oui" &&
+        patient.insuranceNumber
+          ? patient.insuranceNumber
+          : "--";
+
+
+      const cost =
+        formatMoney(
+          patient.cost
+        );
+
+
+      const dateEnregistrement =
+        formatDate(
+          patient.dateEnregistrement
+        );
+
+
+      /*
+       * ======================================================
+       * FONCTION DE NETTOYAGE DU TEXTE
+       * ======================================================
+       */
+
+      const cleanText = (
+        value
+      ) => {
+
+        if (
+          value === null ||
+          value === undefined ||
+          value === ""
+        ) {
+          return "--";
+        }
+
+        return String(value);
+      };
+
+
+      /*
+       * ======================================================
+       * DESSIN D'UN EXEMPLAIRE
+       * ======================================================
+       */
+
+      const drawPatientCopy = (
+        y,
+        copyNumber
+      ) => {
+
+        /*
+         * ----------------------------------------------------
+         * CADRE
+         * ----------------------------------------------------
+         */
+
+        pdf.setDrawColor(
+          210,
+          218,
+          225
+        );
+
+        pdf.setFillColor(
+          255,
+          255,
+          255
+        );
+
+        pdf.roundedRect(
+          margin,
+          y,
+          cardWidth,
+          cardHeight,
+          3,
+          3,
+          "FD"
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * BANDEAU SUPÉRIEUR
+         * ----------------------------------------------------
+         */
+
+        pdf.setFillColor(
+          22,
+          113,
+          183
+        );
+
+        pdf.roundedRect(
+          margin,
+          y,
+          cardWidth,
+          17,
+          3,
+          3,
+          "F"
+        );
+
+        pdf.rect(
+          margin,
+          y + 10,
+          cardWidth,
+          7,
+          "F"
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * NOM CLINIQUE
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          255,
+          255,
+          255
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.setFontSize(
+          13
+        );
+
+        pdf.text(
+          "MA SANTÉ - CLINIQUE",
+          margin + 6,
+          y + 7
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * TITRE
+         * ----------------------------------------------------
+         */
+
+        pdf.setFontSize(
+          8.5
+        );
+
+        pdf.text(
+          "FICHE PATIENT / CAISSE",
+          margin + 6,
+          y + 13
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * NUMÉRO EXEMPLAIRE
+         * ----------------------------------------------------
+         */
+
+        pdf.setFontSize(
+          8
+        );
+
+        pdf.text(
+          `Exemplaire ${copyNumber}/3`,
+          pageWidth -
+            margin -
+            6,
+          y + 10,
+          {
+            align: "right",
+          }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * IDENTIFIANT
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          31,
+          41,
+          55
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.setFontSize(
+          9
+        );
+
+        pdf.text(
+          `N° patient : ${cleanText(patient.id)}`,
+          margin + 6,
+          y + 24
+        );
+
+
+        pdf.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        pdf.text(
+          `Date : ${dateEnregistrement}`,
+          pageWidth -
+            margin -
+            6,
+          y + 24,
+          {
+            align: "right",
+          }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * DATE DE NAISSANCE
+         * ----------------------------------------------------
+         */
+
+        if (dateNaissance) {
+
+          pdf.setFontSize(
+            7.5
+          );
+
+          pdf.setTextColor(
+            107,
+            114,
+            128
+          );
+
+          pdf.text(
+            `Né(e) le : ${formatDate(dateNaissance)}`,
+            margin + 6,
+            y + 29
+          );
+
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * SÉPARATEUR
+         * ----------------------------------------------------
+         */
+
+        pdf.setDrawColor(
+          225,
+          230,
+          235
+        );
+
+        pdf.line(
+          margin + 6,
+          y + 31,
+          pageWidth -
+            margin -
+            6,
+          y + 31
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * POSITIONS
+         * ----------------------------------------------------
+         */
+
+        const leftX =
+          margin + 6;
+
+        const rightX =
+          margin + 108;
+
+        const row1 =
+          y + 40;
+
+        const row2 =
+          y + 50;
+
+        const row3 =
+          y + 60;
+
+        const row4 =
+          y + 70;
+
+
+        /*
+         * ----------------------------------------------------
+         * LABELS COLONNE GAUCHE
+         * ----------------------------------------------------
+         */
+
+        pdf.setFontSize(
+          7.5
+        );
+
+        pdf.setTextColor(
+          107,
+          114,
+          128
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        pdf.text(
+          "Patient",
+          leftX,
+          row1
+        );
+
+        pdf.text(
+          "Sexe",
+          leftX,
+          row2
+        );
+
+        pdf.text(
+          "Service",
+          leftX,
+          row3
+        );
+
+        pdf.text(
+          "Téléphone",
+          leftX,
+          row4
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * VALEURS COLONNE GAUCHE
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          31,
+          41,
+          55
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.setFontSize(
+          8
+        );
+
+        pdf.text(
+          cleanText(patientName),
+          leftX + 28,
+          row1
+        );
+
+        pdf.text(
+          cleanText(sexe),
+          leftX + 28,
+          row2
+        );
+
+        pdf.text(
+          cleanText(service),
+          leftX + 28,
+          row3
+        );
+
+        pdf.text(
+          cleanText(telephone),
+          leftX + 28,
+          row4
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * LABELS COLONNE DROITE
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          107,
+          114,
+          128
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        pdf.text(
+          "Âge",
+          rightX,
+          row1
+        );
+
+        pdf.text(
+          "Parent",
+          rightX,
+          row2
+        );
+
+        pdf.text(
+          "Quartier",
+          rightX,
+          row3
+        );
+
+        pdf.text(
+          "Assurance",
+          rightX,
+          row4
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * VALEURS COLONNE DROITE
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          31,
+          41,
+          55
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.text(
+          cleanText(age),
+          rightX + 27,
+          row1
+        );
+
+        pdf.text(
+          cleanText(parentContact),
+          rightX + 27,
+          row2
+        );
+
+        pdf.text(
+          cleanText(quartier),
+          rightX + 27,
+          row3
+        );
+
+        pdf.text(
+          cleanText(assurance),
+          rightX + 27,
+          row4
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * LIGNE BASSE
+         * ----------------------------------------------------
+         */
+
+        pdf.setDrawColor(
+          225,
+          230,
+          235
+        );
+
+        pdf.line(
+          margin + 6,
+          y + 76,
+          pageWidth -
+            margin -
+            6,
+          y + 76
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * NUMÉRO ASSURANCE
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          107,
+          114,
+          128
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        pdf.setFontSize(
+          7.5
+        );
+
+        pdf.text(
+          `N° assurance : ${cleanText(insuranceNumber)}`,
+          leftX,
+          y + 82
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * MONTANT
+         * ----------------------------------------------------
+         */
+
+        pdf.setTextColor(
+          22,
+          163,
+          74
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.setFontSize(
+          9
+        );
+
+        pdf.text(
+          `À PAYER : ${cost} FCFA`,
+          pageWidth -
+            margin -
+            6,
+          y + 82,
+          {
+            align: "right",
+          }
+        );
+      };
+
+
+      /*
+       * ======================================================
+       * LES 3 EXEMPLAIRES
+       * ======================================================
+       */
+
+      drawPatientCopy(
+        startY,
+        1
+      );
+
+      drawPatientCopy(
+        startY +
+          cardHeight +
+          gap,
+        2
+      );
+
+      drawPatientCopy(
+        startY +
+          (cardHeight + gap) * 2,
+        3
+      );
+
+
+      /*
+       * ======================================================
+       * LIGNES DE DÉCOUPE
+       * ======================================================
+       *
+       * Elles permettent de séparer visuellement les trois
+       * exemplaires lors de l'impression.
+       */
+
+      pdf.setDrawColor(
+        180,
+        190,
+        200
+      );
+
+      pdf.setLineDashPattern(
+        [2, 2],
+        0
+      );
+
+      pdf.line(
+        margin,
+        startY +
+          cardHeight +
+          gap / 2,
+        pageWidth -
+          margin,
+        startY +
+          cardHeight +
+          gap / 2
+      );
+
+      pdf.line(
+        margin,
+        startY +
+          (cardHeight + gap) * 2 -
+          gap / 2,
+        pageWidth -
+          margin,
+        startY +
+          (cardHeight + gap) * 2 -
+          gap / 2
+      );
+
+      pdf.setLineDashPattern(
+        [],
+        0
+      );
+
+
+      /*
+       * ======================================================
+       * NOM DU FICHIER
+       * ======================================================
+       */
+
+      const safeName =
+        patientName
+          .replace(
+            /[^a-zA-Z0-9À-ÿ_-]/g,
+            "_"
+          )
+          .replace(
+            /_+/g,
+            "_"
+          );
+
+
+      pdf.save(
+        `Patient_${patient.id || safeName}_3_exemplaires.pdf`
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erreur lors de la génération du PDF :",
+        error
+      );
+
+      alert(
+        "Impossible de générer le PDF du patient."
+      );
+    }
   };
 
 
@@ -1293,6 +2087,8 @@ export default function Caisse() {
             />
 
           </div>
+
+
           <button
             type="button"
             className="new-patient-btn"
@@ -1334,6 +2130,7 @@ export default function Caisse() {
                   <th>
                     Patient
                   </th>
+
                   <th>
                     Sexe
                   </th>
@@ -1363,6 +2160,7 @@ export default function Caisse() {
                   </th>
 
                   <th>
+                    Actions
                   </th>
 
                 </tr>
@@ -1384,9 +2182,13 @@ export default function Caisse() {
                       <td>
                         {item.id}
                       </td>
+
+
                       <td className="patient-name">
                         {item.patient}
                       </td>
+
+
                       <td>
 
                         <span
@@ -1421,16 +2223,20 @@ export default function Caisse() {
                           "--"}
                       </td>
 
+
                       <td>
                         {item.parentContact ||
                           "--"}
                       </td>
+
+
                       <td>
                         {formatMoney(
                           item.cost
                         )}{" "}
                         FCFA
                       </td>
+
 
                       <td>
 
@@ -1451,20 +2257,43 @@ export default function Caisse() {
                       </td>
 
 
+                      {/* ACTIONS */}
+
                       <td>
 
-                        <button
-                          type="button"
-                          className="row-action"
-                          aria-label={`Ouvrir ${item.patient}`}
-                        >
+                        <div className="patient-actions">
 
-                          <Icon
-                            name="arrow"
-                            size={17}
-                          />
+                          {/* IMPRIMER */}
 
-                        </button>
+                          <button
+                            type="button"
+                            className="print-patient-btn"
+                            onClick={() =>
+                              handlePrintPatient(
+                                item
+                              )
+                            }
+                            aria-label={`Imprimer les informations de ${item.patient}`}
+                            title={`Imprimer ${item.patient}`}
+                          >
+
+                            <Icon
+                              name="printer"
+                              size={16}
+                            />
+
+                            <span>
+                              IMPRIMER
+                            </span>
+
+                          </button>
+
+
+                          {/* ACTION EXISTANTE */}
+
+                          
+
+                        </div>
 
                       </td>
 
@@ -1472,6 +2301,8 @@ export default function Caisse() {
 
                   )
                 )}
+
+
                 {filteredPatients.length ===
                   0 && (
 
@@ -1519,7 +2350,10 @@ export default function Caisse() {
         <div className="caisse-brand">
 
           <div className="brand-icon">
-            <Logo size={30} inverted />
+            <Logo
+              size={30}
+              inverted
+            />
           </div>
 
           <div className="brand-text">
@@ -1639,8 +2473,11 @@ export default function Caisse() {
 
 
           <div className="ms-header-tools">
+
             <NotificationBell />
+
             <UserBadge />
+
           </div>
 
         </header>

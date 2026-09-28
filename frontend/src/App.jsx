@@ -339,8 +339,23 @@ export default function App() {
         }
       />
 
-      <Route path="/patient-space" element={<PatientSpace />} />
-      <Route path="/ged" element={<GED />} />
+      <Route
+  path="/patient-space"
+  element={
+    <Protected>
+      <PatientSpace />
+    </Protected>
+  }
+/>
+
+<Route
+  path="/ged"
+  element={
+    <Protected>
+      <GED />
+    </Protected>
+  }
+/>
 
       {/* ======================================================
           PAGE PRINCIPALE DES MODULES

@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+/*
+ * ============================================================
+ * MA SANTÉ — GED
+ * Gestion Électronique des Documents
+ * ============================================================
+ */
+
+import React, { useEffect, useMemo, useState } from "react";
+
 import {
   Archive,
   Bell,
-  CalendarDays,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -16,8 +23,8 @@ import {
   FileText,
   Folder,
   FolderOpen,
-  Home,
   MoreVertical,
+  Plus,
   RefreshCw,
   Search,
   Settings,
@@ -26,129 +33,137 @@ import {
   Trash2,
   Upload,
   UserRound,
+  Users,
   X,
+  Grid2X2,
+  LogOut,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/GED.css";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
-/* =========================================================
+/* ============================================================
    DONNÉES DE DÉMONSTRATION
-   ========================================================= */
+   ============================================================ */
 
 const DEMO_PATIENTS = [
   {
-    id: "patient-001",
+    id: 1,
+    patient_id: "PAT-0001",
     first_name: "Jean",
     last_name: "KOUADIO",
+    name: "Jean KOUADIO",
   },
   {
-    id: "patient-002",
+    id: 2,
+    patient_id: "PAT-0002",
     first_name: "Marie",
     last_name: "YAO",
+    name: "Marie YAO",
   },
   {
-    id: "patient-003",
+    id: 3,
+    patient_id: "PAT-0003",
     first_name: "Paul",
     last_name: "KOFFI",
+    name: "Paul KOFFI",
   },
 ];
 
 const DEMO_DOCUMENTS = [
   {
-    id: "demo-001",
-    title: "Dossier médical — KOUADIO Jean",
-    name: "dossier-medical-kouadio-jean.pdf",
+    id: 1,
+    title: "Dossier médical — Jean KOUADIO",
+    name: "dossier-medical-jean-kouadio.pdf",
     document_type: "Dossier médical",
-    patient_name: "KOUADIO Jean",
-    patient_id: "patient-001",
-    description:
-      "Dossier médical de consultation et suivi du patient.",
-    tags: "dossier médical, consultation, suivi",
-    created_at: "2026-09-24T09:30:00",
-    file_size: 2457600,
+    patient_name: "Jean KOUADIO",
+    patient_id: "PAT-0001",
+    description: "Dossier médical du patient Jean KOUADIO.",
+    tags: ["patient", "médical"],
+    created_at: "2026-09-27T09:30:00",
+    file_size: "2.4 MB",
     file_url: "",
     folder: "Dossiers médicaux",
     favorite: true,
     archived: false,
     is_demo: true,
   },
-
   {
-    id: "demo-002",
-    title: "Compte rendu de consultation — 24/09/2026",
-    name: "compte-rendu-consultation-24092026.pdf",
+    id: 2,
+    title: "Rapport de consultation — Marie YAO",
+    name: "rapport-consultation-marie-yao.pdf",
     document_type: "Consultation",
-    patient_name: "YAO Marie",
-    patient_id: "patient-002",
-    description:
-      "Compte rendu de consultation médicale du 24 septembre 2026.",
-    tags: "consultation, compte rendu, 2026",
-    created_at: "2026-09-24T14:15:00",
-    file_size: 874496,
+    patient_name: "Marie YAO",
+    patient_id: "PAT-0002",
+    description: "Rapport de consultation médicale.",
+    tags: ["consultation"],
+    created_at: "2026-09-26T14:15:00",
+    file_size: "850 KB",
     file_url: "",
     folder: "Consultations",
     favorite: false,
     archived: false,
     is_demo: true,
   },
-
   {
-    id: "demo-003",
-    title: "Ordonnance — KOFFI Paul",
-    name: "ordonnance-koffi-paul.pdf",
+    id: 3,
+    title: "Ordonnance — Paul KOFFI",
+    name: "ordonnance-paul-koffi.pdf",
     document_type: "Ordonnance",
-    patient_name: "KOFFI Paul",
-    patient_id: "patient-003",
+    patient_name: "Paul KOFFI",
+    patient_id: "PAT-0003",
     description: "Ordonnance médicale du patient.",
-    tags: "ordonnance, traitement, pharmacie",
-    created_at: "2026-09-22T10:20:00",
-    file_size: 532480,
+    tags: ["pharmacie", "ordonnance"],
+    created_at: "2026-09-25T10:00:00",
+    file_size: "420 KB",
     file_url: "",
     folder: "Ordonnances",
     favorite: true,
     archived: false,
     is_demo: true,
   },
-
   {
-    id: "demo-004",
-    title: "Résultat laboratoire — Analyse sanguine",
-    name: "resultat-laboratoire-sanguin.pdf",
+    id: 4,
+    title: "Résultat laboratoire — Jean KOUADIO",
+    name: "resultat-laboratoire-jean-kouadio.pdf",
     document_type: "Résultat laboratoire",
-    patient_name: "KOUADIO Jean",
-    patient_id: "patient-001",
-    description: "Résultats des analyses biologiques.",
-    tags: "laboratoire, analyse, sang",
-    created_at: "2026-09-20T08:10:00",
-    file_size: 1249280,
+    patient_name: "Jean KOUADIO",
+    patient_id: "PAT-0001",
+    description: "Résultats des examens de laboratoire.",
+    tags: ["laboratoire", "résultat"],
+    created_at: "2026-09-24T16:20:00",
+    file_size: "1.1 MB",
     file_url: "",
     folder: "Laboratoire",
     favorite: false,
     archived: false,
     is_demo: true,
   },
-
   {
-    id: "demo-005",
-    title: "Facture consultation septembre",
-    name: "facture-consultation-septembre.pdf",
+    id: 5,
+    title: "Facture — Marie YAO",
+    name: "facture-marie-yao.pdf",
     document_type: "Facture",
-    patient_name: "YAO Marie",
-    patient_id: "patient-002",
-    description: "Facture relative aux soins du mois de septembre.",
-    tags: "facture, septembre, paiement",
-    created_at: "2026-09-18T16:45:00",
-    file_size: 654336,
+    patient_name: "Marie YAO",
+    patient_id: "PAT-0002",
+    description: "Facture des prestations médicales.",
+    tags: ["finance", "facture"],
+    created_at: "2026-09-23T11:45:00",
+    file_size: "390 KB",
     file_url: "",
     folder: "Factures",
     favorite: false,
-    archived: false,
+    archived: true,
     is_demo: true,
   },
 ];
+
+/* ============================================================
+   TYPES DE DOCUMENTS
+   ============================================================ */
 
 const DOCUMENT_TYPES = [
   "Tous les documents",
@@ -162,23 +177,37 @@ const DOCUMENT_TYPES = [
   "Autre",
 ];
 
-/* =========================================================
-   UTILITAIRES
-   ========================================================= */
+/* ============================================================
+   OUTILS
+   ============================================================ */
 
-function getFileIcon(fileName = "") {
-  const extension = fileName.split(".").pop()?.toLowerCase();
+function getFileIcon(document) {
+  const type = String(document?.document_type || "").toLowerCase();
+  const name = String(document?.name || "").toLowerCase();
 
   if (
-    ["jpg", "jpeg", "png", "gif", "webp"].includes(extension)
+    type.includes("image") ||
+    type.includes("radiologie") ||
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(name)
   ) {
     return FileImage;
   }
 
-  if (extension === "pdf") return FileText;
-
-  if (["zip", "rar", "7z"].includes(extension)) {
+  if (
+    type.includes("archive") ||
+    /\.(zip|rar|7z)$/i.test(name)
+  ) {
     return FileArchive;
+  }
+
+  if (
+    type.includes("pdf") ||
+    /\.pdf$/i.test(name) ||
+    type.includes("consultation") ||
+    type.includes("ordonnance") ||
+    type.includes("médical")
+  ) {
+    return FileText;
   }
 
   return File;
@@ -189,240 +218,152 @@ function getDocumentName(document) {
     document?.title ||
     document?.name ||
     document?.filename ||
-    document?.file_name ||
-    "Document sans titre"
+    "Document sans nom"
   );
 }
 
 function getDocumentType(document) {
-  return (
-    document?.document_type ||
-    document?.type ||
-    "Autre"
-  );
+  return document?.document_type || document?.type || "Autre";
 }
 
 function getDocumentDate(document) {
-  return (
-    document?.created_at ||
-    document?.date ||
-    document?.updated_at
-  );
+  const date = document?.created_at || document?.date;
+
+  if (!date) return "—";
+
+  const parsed = new Date(date);
+
+  if (Number.isNaN(parsed.getTime())) return "—";
+
+  return parsed.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }
 
 function getPatientName(document) {
   return (
     document?.patient_name ||
-    document?.patient_full_name ||
-    document?.patient ||
+    document?.patient?.name ||
+    document?.patient?.full_name ||
     "Non associé"
   );
 }
 
-/* =========================================================
-   COMPOSANT PRINCIPAL
-   ========================================================= */
+/* ============================================================
+   COMPOSANT GED
+   ============================================================ */
 
 export default function GED() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
-  const fileInputRef = useRef(null);
-
-  /* =========================
-     ÉTAT GÉNÉRAL
-     ========================= */
+  /* ==========================================================
+     ÉTATS
+     ========================================================== */
 
   const [activeTab, setActiveTab] = useState("ged");
 
-  const [documents, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState(DEMO_DOCUMENTS);
   const [trashDocuments, setTrashDocuments] = useState([]);
+  const [patients, setPatients] = useState(DEMO_PATIENTS);
 
-  const [patients, setPatients] = useState(
-    DEMO_PATIENTS
-  );
-
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  /* =========================
-     RECHERCHE / FILTRES
-     ========================= */
-
   const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("Tous les documents");
+  const [patientFilter, setPatientFilter] = useState("Tous les patients");
+  const [folderFilter, setFolderFilter] = useState("Tous les dossiers");
+  const [sortOrder, setSortOrder] = useState("recent");
 
-  const [selectedType, setSelectedType] =
-    useState("Tous les documents");
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
-  const [selectedPatient, setSelectedPatient] =
-    useState("");
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const [selectedFolder, setSelectedFolder] =
-    useState("Tous les documents");
-
-  const [sortBy, setSortBy] = useState("recent");
-
-  /* =========================
-     SÉLECTION
-     ========================= */
-
-  const [selectedDocument, setSelectedDocument] =
-    useState(null);
-
-  const [selectedIds, setSelectedIds] =
-    useState([]);
-
-  /* =========================
-     MODALES
-     ========================= */
-
-  const [showUploadModal, setShowUploadModal] =
-    useState(false);
-
-  const [showPreviewModal, setShowPreviewModal] =
-    useState(false);
-
-  const [showNotifications, setShowNotifications] =
-    useState(false);
-
-  /* =========================
-     FORMULAIRE UPLOAD
-     ========================= */
-
-  const [form, setForm] = useState({
+  const [uploadForm, setUploadForm] = useState({
     title: "",
-    document_type: "Autre",
-    patient: "",
+    document_type: "Dossier médical",
+    patient_id: "",
     description: "",
     tags: "",
+    folder: "Dossiers médicaux",
     file: null,
   });
 
-  /* =========================
-     FORMULAIRE INDEXATION
-     ========================= */
-
   const [indexForm, setIndexForm] = useState({
-    document_type: "",
-    patient: "",
+    title: "",
+    document_type: "Dossier médical",
+    patient_id: "",
+    folder: "",
     tags: "",
     description: "",
   });
 
   const [error, setError] = useState("");
 
-  /* =========================================================
+  /* ==========================================================
      TOKEN
-     ========================================================= */
+     ========================================================== */
 
-  const token = useMemo(
-    () =>
+  const getToken = () => {
+    return (
       localStorage.getItem("access_token") ||
       localStorage.getItem("access") ||
-      localStorage.getItem("token"),
-    []
-  );
+      localStorage.getItem("token") ||
+      ""
+    );
+  };
 
-  const headers = useMemo(
-    () => ({
-      ...(token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : {}),
-    }),
-    [token]
-  );
+  const getHeaders = () => {
+    const token = getToken();
 
-  /* =========================================================
-     FORMATAGE
-     ========================================================= */
+    return token
+      ? {
+          Authorization: `Bearer ${token}`,
+        }
+      : {};
+  };
 
-  function formatDate(value) {
-    if (!value) return "—";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  }
-
-  function formatDateTime(value) {
-    if (!value) return "—";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    return `${date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    })} ${date.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`;
-  }
-
-  function formatFileSize(bytes) {
-    if (!bytes) return "—";
-
-    if (bytes < 1024) {
-      return `${bytes} o`;
-    }
-
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(1)} Ko`;
-    }
-
-    return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
-  }
-
-  /* =========================================================
+  /* ==========================================================
      CHARGEMENT API
-     ========================================================= */
+     ========================================================== */
+
+  useEffect(() => {
+    loadDocuments();
+    loadPatients();
+  }, []);
 
   async function loadDocuments() {
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
 
-      const response = await fetch(
-        `${API_BASE_URL}/ged/documents/`,
-        {
-          headers,
-        }
-      );
+    try {
+      const response = await fetch(`${API_BASE_URL}/ged/documents/`, {
+        headers: {
+          ...getHeaders(),
+        },
+      });
 
       if (!response.ok) {
-        throw new Error();
+        throw new Error("API GED indisponible");
       }
 
       const data = await response.json();
 
-      const apiDocuments = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
-        : data?.results || [];
+        : data.results || data.documents || [];
 
-      setDocuments(
-        apiDocuments.length
-          ? apiDocuments
-          : DEMO_DOCUMENTS
-      );
+      if (list.length > 0) {
+        setDocuments(list);
+      }
     } catch {
       setDocuments(DEMO_DOCUMENTS);
-
-      setError(
-        "Mode démonstration : les données de test sont affichées car l'API GED n'est pas disponible."
-      );
     } finally {
       setLoading(false);
     }
@@ -430,375 +371,478 @@ export default function GED() {
 
   async function loadPatients() {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/patients/`,
-        {
-          headers,
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/patients/`, {
+        headers: {
+          ...getHeaders(),
+        },
+      });
 
       if (!response.ok) {
-        return;
+        throw new Error("Patients indisponibles");
       }
 
       const data = await response.json();
 
-      const apiPatients = Array.isArray(data)
+      const list = Array.isArray(data)
         ? data
-        : data?.results || [];
+        : data.results || data.patients || [];
 
-      if (apiPatients.length) {
-        setPatients(apiPatients);
+      if (list.length > 0) {
+        setPatients(list);
       }
     } catch {
       setPatients(DEMO_PATIENTS);
     }
   }
 
-  useEffect(() => {
-    loadDocuments();
-    loadPatients();
-  }, []);
+  /* ==========================================================
+     NAVIGATION
+     ========================================================== */
 
-  /* =========================================================
-     FILTRAGE + TRI
-     ========================================================= */
+  function changeTab(tab) {
+    setActiveTab(tab);
+    setSelectedIds([]);
+
+    if (
+      tab === "ged" ||
+      tab === "documents" ||
+      tab === "search"
+    ) {
+      setFolderFilter("Tous les dossiers");
+    }
+  }
+
+  function goToModules() {
+    navigate("/modules");
+  }
+
+  function goToPatientSpace() {
+    navigate("/patient-space");
+  }
+
+  function handleLogout() {
+    logout();
+
+    navigate("/login", {
+      replace: true,
+    });
+  }
+
+  /* ==========================================================
+     FILTRES
+     ========================================================== */
 
   const filteredDocuments = useMemo(() => {
-    const value = search.trim().toLowerCase();
+    let result = [...documents];
 
-    let result = documents.filter((document) => {
-      const matchesSearch =
-        !value ||
-        getDocumentName(document)
-          .toLowerCase()
-          .includes(value) ||
-        getPatientName(document)
-          .toLowerCase()
-          .includes(value) ||
-        String(document.description || "")
-          .toLowerCase()
-          .includes(value) ||
-        String(document.tags || "")
-          .toLowerCase()
-          .includes(value);
+    if (activeTab === "trash") {
+      return [...trashDocuments];
+    }
 
-      const matchesType =
-        selectedType === "Tous les documents" ||
-        getDocumentType(document) === selectedType;
-
-      const matchesPatient =
-        !selectedPatient ||
-        String(
-          document.patient_id ||
-            document.patient
-        ) === String(selectedPatient);
-
-      const matchesFolder =
-        selectedFolder === "Tous les documents" ||
-        document.folder === selectedFolder;
-
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesPatient &&
-        matchesFolder &&
-        !document.archived
-      );
-    });
-
-    /* Onglet favoris */
     if (activeTab === "favorites") {
-      result = result.filter(
-        (document) => document.favorite
-      );
+      result = result.filter((doc) => doc.favorite);
     }
 
-    /* Onglet récents */
     if (activeTab === "recent") {
-      result = [...result].sort(
-        (a, b) =>
-          new Date(getDocumentDate(b)) -
-          new Date(getDocumentDate(a))
+      result = result.filter((doc) => {
+        if (!doc.created_at) return false;
+
+        const date = new Date(doc.created_at);
+        const limit = new Date();
+
+        limit.setDate(limit.getDate() - 30);
+
+        return date >= limit;
+      });
+    }
+
+    if (typeFilter !== "Tous les documents") {
+      result = result.filter(
+        (doc) => getDocumentType(doc) === typeFilter
       );
     }
 
-    /* Tri utilisateur */
-    if (sortBy === "recent") {
-      result = [...result].sort(
-        (a, b) =>
-          new Date(getDocumentDate(b)) -
-          new Date(getDocumentDate(a))
+    if (patientFilter !== "Tous les patients") {
+      result = result.filter(
+        (doc) => getPatientName(doc) === patientFilter
       );
     }
 
-    if (sortBy === "old") {
-      result = [...result].sort(
-        (a, b) =>
-          new Date(getDocumentDate(a)) -
-          new Date(getDocumentDate(b))
+    if (folderFilter !== "Tous les dossiers") {
+      result = result.filter(
+        (doc) => doc.folder === folderFilter
       );
     }
 
-    if (sortBy === "name") {
-      result = [...result].sort((a, b) =>
-        getDocumentName(a).localeCompare(
-          getDocumentName(b),
-          "fr"
-        )
-      );
+    const keyword = search.trim().toLowerCase();
+
+    if (keyword) {
+      result = result.filter((doc) => {
+        const content = [
+          getDocumentName(doc),
+          getDocumentType(doc),
+          getPatientName(doc),
+          doc.description,
+          ...(Array.isArray(doc.tags) ? doc.tags : []),
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return content.includes(keyword);
+      });
     }
+
+    result.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+
+      return sortOrder === "old"
+        ? dateA - dateB
+        : dateB - dateA;
+    });
 
     return result;
   }, [
     documents,
-    search,
-    selectedType,
-    selectedPatient,
-    selectedFolder,
-    sortBy,
+    trashDocuments,
     activeTab,
+    search,
+    typeFilter,
+    patientFilter,
+    folderFilter,
+    sortOrder,
   ]);
 
-  /* =========================================================
-     DOSSIERS
-     ========================================================= */
-
-  const folderGroups = [
-    {
-      label: "Administration",
-      count: documents.filter(
-        (d) => d.folder === "Courriers"
-      ).length,
-      children: [
-        "Courriers",
-        "Décisions",
-        "Notes de service",
-        "Budgets",
-      ],
-    },
-    {
-      label: "Dossiers patients",
-      count: documents.filter(
-        (d) =>
-          [
-            "Dossiers médicaux",
-            "Consultations",
-            "Ordonnances",
-          ].includes(d.folder)
-      ).length,
-      children: [
-        "Dossiers médicaux",
-        "Consultations",
-        "Ordonnances",
-      ],
-    },
-    {
-      label: "Résultats",
-      count: documents.filter(
-        (d) =>
-          ["Laboratoire", "Radiologie"].includes(
-            d.folder
-          )
-      ).length,
-      children: ["Laboratoire", "Radiologie"],
-    },
-    {
-      label: "Finances",
-      count: documents.filter(
-        (d) =>
-          [
-            "Factures",
-            "Paiements",
-            "Rapports financiers",
-          ].includes(d.folder)
-      ).length,
-      children: [
-        "Factures",
-        "Paiements",
-        "Rapports financiers",
-      ],
-    },
-  ];
-
-  /* =========================================================
+  /* ==========================================================
      STATISTIQUES
-     ========================================================= */
+     ========================================================== */
 
-  const totalDocuments = documents.length;
+  const stats = useMemo(() => {
+    return {
+      total: documents.length,
+      favorites: documents.filter((doc) => doc.favorite).length,
+      archived: documents.filter((doc) => doc.archived).length,
+      pdf: documents.filter((doc) =>
+        String(doc.name || "").toLowerCase().endsWith(".pdf")
+      ).length,
+    };
+  }, [documents]);
 
-  const favoriteDocuments = documents.filter(
-    (document) => document.favorite
-  ).length;
+  /* ==========================================================
+     SÉLECTION
+     ========================================================== */
 
-  const archivedDocuments = documents.filter(
-    (document) => document.archived
-  ).length;
-
-  const pdfDocuments = documents.filter((document) =>
-    getDocumentName(document)
-      .toLowerCase()
-      .endsWith(".pdf")
-  ).length;
-
-  /* =========================================================
-     FORMULAIRES
-     ========================================================= */
-
-  function handleFormChange(event) {
-    const { name, value } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  }
-
-  function handleFileChange(event) {
-    const file =
-      event.target.files?.[0] || null;
-
-    setForm((previous) => ({
-      ...previous,
-      file,
-      title:
-        previous.title ||
-        file?.name?.replace(/\.[^/.]+$/, "") ||
-        "",
-    }));
-  }
-
-  /* =========================================================
-     SÉLECTION DOCUMENT
-     ========================================================= */
-
-  function selectDocument(document) {
-    setSelectedDocument(document);
-
-    setIndexForm({
-      document_type:
-        getDocumentType(document),
-      patient:
-        document?.patient_id ||
-        document?.patient ||
-        "",
-      tags: document?.tags || "",
-      description:
-        document?.description || "",
-    });
-  }
-
-  function toggleDocumentSelection(id) {
+  function toggleSelect(id) {
     setSelectedIds((previous) =>
       previous.includes(id)
-        ? previous.filter(
-            (item) => item !== id
-          )
+        ? previous.filter((item) => item !== id)
         : [...previous, id]
     );
   }
 
   function toggleSelectAll() {
     if (
-      selectedIds.length ===
-      filteredDocuments.length
+      selectedIds.length === filteredDocuments.length &&
+      filteredDocuments.length > 0
     ) {
       setSelectedIds([]);
-    } else {
-      setSelectedIds(
-        filteredDocuments.map(
-          (document) => document.id
-        )
-      );
+      return;
     }
+
+    setSelectedIds(filteredDocuments.map((doc) => doc.id));
   }
 
-  /* =========================================================
-     UPLOAD
-     ========================================================= */
+  /* ==========================================================
+     APERÇU
+     ========================================================== */
 
-  function openUploadModal() {
-    setForm({
-      title: "",
-      document_type: "Autre",
-      patient: "",
-      description: "",
-      tags: "",
-      file: null,
+  function previewDocument(document) {
+    setSelectedDocument(document);
+
+    setIndexForm({
+      title: getDocumentName(document),
+      document_type: getDocumentType(document),
+      patient_id: document.patient_id || "",
+      folder: document.folder || "",
+      tags: Array.isArray(document.tags)
+        ? document.tags.join(", ")
+        : document.tags || "",
+      description: document.description || "",
     });
 
-    setShowUploadModal(true);
+    setShowPreviewModal(true);
   }
 
-  function closeUploadModal() {
-    if (!uploading) {
-      setShowUploadModal(false);
+  /* ==========================================================
+     TÉLÉCHARGEMENT
+     ========================================================== */
+
+  function downloadDocument(document) {
+    if (document.file_url) {
+      window.open(document.file_url, "_blank");
+      return;
     }
+
+    setError(
+      "Ce document de démonstration ne possède pas encore de fichier réel."
+    );
+
+    setTimeout(() => setError(""), 3500);
+  }
+
+  /* ==========================================================
+     SUPPRESSION
+     ========================================================== */
+
+  async function deleteDocument(document) {
+    const confirmed = window.confirm(
+      `Voulez-vous placer "${getDocumentName(
+        document
+      )}" dans la corbeille ?`
+    );
+
+    if (!confirmed) return;
+
+    if (!document.is_demo) {
+      try {
+        await fetch(
+          `${API_BASE_URL}/ged/documents/${document.id}/`,
+          {
+            method: "DELETE",
+            headers: {
+              ...getHeaders(),
+            },
+          }
+        );
+      } catch {
+        setError("Impossible de supprimer le document.");
+        return;
+      }
+    }
+
+    setDocuments((previous) =>
+      previous.filter((doc) => doc.id !== document.id)
+    );
+
+    setTrashDocuments((previous) => [
+      ...previous,
+      {
+        ...document,
+        archived: true,
+      },
+    ]);
+
+    setSelectedIds((previous) =>
+      previous.filter((id) => id !== document.id)
+    );
+  }
+
+  /* ==========================================================
+     RESTAURATION
+     ========================================================== */
+
+  function restoreDocument(document) {
+    setTrashDocuments((previous) =>
+      previous.filter((doc) => doc.id !== document.id)
+    );
+
+    setDocuments((previous) => [
+      ...previous,
+      {
+        ...document,
+        archived: false,
+      },
+    ]);
+  }
+
+  /* ==========================================================
+     FAVORIS
+     ========================================================== */
+
+  function toggleFavorite(document) {
+    setDocuments((previous) =>
+      previous.map((doc) =>
+        doc.id === document.id
+          ? {
+              ...doc,
+              favorite: !doc.favorite,
+            }
+          : doc
+      )
+    );
+  }
+
+  /* ==========================================================
+     RESET
+     ========================================================== */
+
+  function resetFilters() {
+    setSearch("");
+    setTypeFilter("Tous les documents");
+    setPatientFilter("Tous les patients");
+    setFolderFilter("Tous les dossiers");
+    setSortOrder("recent");
+  }
+
+  /* ==========================================================
+     UPLOAD
+     ========================================================== */
+
+  function handleUploadChange(event) {
+    const { name, value, files } = event.target;
+
+    if (name === "file") {
+      setUploadForm((previous) => ({
+        ...previous,
+        file: files?.[0] || null,
+      }));
+
+      return;
+    }
+
+    setUploadForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   }
 
   async function handleUpload(event) {
     event.preventDefault();
 
-    if (!form.file) {
-      setError(
-        "Veuillez sélectionner un document."
-      );
+    if (!uploadForm.title.trim()) {
+      setError("Veuillez renseigner le titre du document.");
       return;
     }
 
+    setUploading(true);
+    setError("");
+
     try {
-      setUploading(true);
-      setError("");
+      if (uploadForm.file) {
+        const formData = new FormData();
 
-      const formData = new FormData();
-
-      formData.append(
-        "title",
-        form.title || form.file.name
-      );
-
-      formData.append(
-        "document_type",
-        form.document_type
-      );
-
-      if (form.patient) {
+        formData.append("title", uploadForm.title);
         formData.append(
-          "patient",
-          form.patient
+          "document_type",
+          uploadForm.document_type
         );
-      }
+        formData.append(
+          "description",
+          uploadForm.description
+        );
+        formData.append("folder", uploadForm.folder);
+        formData.append("file", uploadForm.file);
 
-      formData.append(
-        "description",
-        form.description
-      );
-
-      formData.append(
-        "tags",
-        form.tags
-      );
-
-      formData.append(
-        "file",
-        form.file
-      );
-
-      const response = await fetch(
-        `${API_BASE_URL}/ged/documents/`,
-        {
-          method: "POST",
-          headers,
-          body: formData,
+        if (uploadForm.patient_id) {
+          formData.append(
+            "patient_id",
+            uploadForm.patient_id
+          );
         }
-      );
 
-      if (!response.ok) {
-        throw new Error();
+        if (uploadForm.tags) {
+          formData.append("tags", uploadForm.tags);
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/ged/documents/`,
+          {
+            method: "POST",
+            headers: {
+              ...getHeaders(),
+            },
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Upload API échoué");
+        }
+
+        const data = await response.json();
+
+        setDocuments((previous) => [
+          data,
+          ...previous,
+        ]);
+      } else {
+        const newDocument = {
+          id: Date.now(),
+          title: uploadForm.title,
+          name: "document.pdf",
+          document_type: uploadForm.document_type,
+          patient_name:
+            patients.find(
+              (patient) =>
+                String(patient.id) ===
+                String(uploadForm.patient_id)
+            )?.name || "Non associé",
+          patient_id: uploadForm.patient_id,
+          description: uploadForm.description,
+          tags: uploadForm.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+          created_at: new Date().toISOString(),
+          file_size: "0 KB",
+          file_url: "",
+          folder: uploadForm.folder,
+          favorite: false,
+          archived: false,
+          is_demo: true,
+        };
+
+        setDocuments((previous) => [
+          newDocument,
+          ...previous,
+        ]);
       }
 
-      const newDocument =
-        await response.json();
+      setShowUploadModal(false);
+
+      setUploadForm({
+        title: "",
+        document_type: "Dossier médical",
+        patient_id: "",
+        description: "",
+        tags: "",
+        folder: "Dossiers médicaux",
+        file: null,
+      });
+    } catch {
+      const newDocument = {
+        id: Date.now(),
+        title: uploadForm.title,
+        name:
+          uploadForm.file?.name ||
+          "nouveau-document.pdf",
+        document_type: uploadForm.document_type,
+        patient_name:
+          patients.find(
+            (patient) =>
+              String(patient.id) ===
+              String(uploadForm.patient_id)
+          )?.name || "Non associé",
+        patient_id: uploadForm.patient_id,
+        description: uploadForm.description,
+        tags: uploadForm.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        created_at: new Date().toISOString(),
+        file_size: uploadForm.file
+          ? `${(
+              uploadForm.file.size /
+              1024 /
+              1024
+            ).toFixed(2)} MB`
+          : "0 KB",
+        file_url: "",
+        folder: uploadForm.folder,
+        favorite: false,
+        archived: false,
+        is_demo: true,
+      };
 
       setDocuments((previous) => [
         newDocument,
@@ -807,408 +851,191 @@ export default function GED() {
 
       setShowUploadModal(false);
 
-      selectDocument(newDocument);
-    } catch {
-      /*
-       * Mode démo :
-       * si l'API n'est pas disponible,
-       * le document est ajouté localement.
-       */
-
-      const demoDocument = {
-        id: `local-${Date.now()}`,
-        title:
-          form.title ||
-          form.file.name,
-        name: form.file.name,
-        document_type:
-          form.document_type,
-        patient_id:
-          form.patient || "",
-        patient_name:
-          patients.find(
-            (patient) =>
-              String(patient.id) ===
-              String(form.patient)
-          )
-            ? `${patients.find(
-                (patient) =>
-                  String(patient.id) ===
-                  String(form.patient)
-              ).first_name} ${
-                patients.find(
-                  (patient) =>
-                    String(patient.id) ===
-                    String(form.patient)
-                ).last_name
-              }`
-            : "Non associé",
-        description:
-          form.description,
-        tags: form.tags,
-        created_at:
-          new Date().toISOString(),
-        file_size:
-          form.file.size,
-        file_url:
-          URL.createObjectURL(form.file),
+      setUploadForm({
+        title: "",
+        document_type: "Dossier médical",
+        patient_id: "",
+        description: "",
+        tags: "",
         folder: "Dossiers médicaux",
-        favorite: false,
-        archived: false,
-        is_demo: true,
-      };
-
-      setDocuments((previous) => [
-        demoDocument,
-        ...previous,
-      ]);
-
-      setShowUploadModal(false);
-
-      selectDocument(demoDocument);
-
-      setError(
-        "Document ajouté en mode démonstration. Il sera réellement envoyé lorsque l'API GED sera disponible."
-      );
+        file: null,
+      });
     } finally {
       setUploading(false);
     }
   }
 
-  /* =========================================================
-     PRÉVISUALISATION
-     ========================================================= */
-
-  function openPreview(document) {
-    setSelectedDocument(document);
-    setShowPreviewModal(true);
-  }
-
-  function closePreview() {
-    setShowPreviewModal(false);
-  }
-
-  /* =========================================================
-     TÉLÉCHARGEMENT
-     ========================================================= */
-
-  function downloadDocument(document) {
-    const url =
-      document?.file_url ||
-      document?.file ||
-      document?.url;
-
-    if (!url) {
-      setError(
-        "Aucun fichier disponible pour ce document de démonstration."
-      );
-      return;
-    }
-
-    const link =
-      window.document.createElement("a");
-
-    link.href = url;
-    link.target = "_blank";
-    link.rel =
-      "noopener noreferrer";
-
-    link.click();
-  }
-
-  /* =========================================================
-     SUPPRESSION
-     ========================================================= */
-
-  async function deleteDocument(document) {
-    const confirmed =
-      window.confirm(
-        `Voulez-vous déplacer "${getDocumentName(
-          document
-        )}" vers la corbeille ?`
-      );
-
-    if (!confirmed) return;
-
-    try {
-      if (!document.is_demo) {
-        const response = await fetch(
-          `${API_BASE_URL}/ged/documents/${document.id}/`,
-          {
-            method: "DELETE",
-            headers,
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error();
-        }
-      }
-
-      setDocuments((previous) =>
-        previous.filter(
-          (item) =>
-            item.id !== document.id
-        )
-      );
-
-      setTrashDocuments((previous) => [
-        {
-          ...document,
-          deleted_at:
-            new Date().toISOString(),
-        },
-        ...previous,
-      ]);
-
-      if (
-        selectedDocument?.id ===
-        document.id
-      ) {
-        setSelectedDocument(null);
-      }
-    } catch {
-      setError(
-        "Impossible de supprimer ce document."
-      );
-    }
-  }
-
-  /* =========================================================
-     RESTAURATION
-     ========================================================= */
-
-  function restoreDocument(document) {
-    setTrashDocuments((previous) =>
-      previous.filter(
-        (item) =>
-          item.id !== document.id
-      )
-    );
-
-    setDocuments((previous) => [
-      {
-        ...document,
-        archived: false,
-      },
-      ...previous,
-    ]);
-
-    setActiveTab("trash");
-  }
-
-  /* =========================================================
-     FAVORIS
-     ========================================================= */
-
-  function toggleFavorite(document) {
-    setDocuments((previous) =>
-      previous.map((item) =>
-        item.id === document.id
-          ? {
-              ...item,
-              favorite: !item.favorite,
-            }
-          : item
-      )
-    );
-  }
-
-  /* =========================================================
+  /* ==========================================================
      INDEXATION
-     ========================================================= */
+     ========================================================== */
 
-  async function saveIndexation() {
-    if (!selectedDocument) {
-      return;
-    }
+  function saveIndexation(event) {
+    event.preventDefault();
 
-    const updatedDocument = {
-      ...selectedDocument,
-      document_type:
-        indexForm.document_type,
-      patient_id:
-        indexForm.patient,
-      tags: indexForm.tags,
-      description:
-        indexForm.description,
-    };
-
-    /*
-     * Mise à jour locale immédiate.
-     * Ici on pourra ensuite brancher PATCH/PUT.
-     */
+    if (!selectedDocument) return;
 
     setDocuments((previous) =>
-      previous.map((item) =>
-        item.id ===
-        selectedDocument.id
-          ? updatedDocument
-          : item
+      previous.map((doc) =>
+        doc.id === selectedDocument.id
+          ? {
+              ...doc,
+              title: indexForm.title,
+              document_type: indexForm.document_type,
+              patient_id: indexForm.patient_id,
+              folder: indexForm.folder,
+              tags: indexForm.tags
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter(Boolean),
+              description: indexForm.description,
+              patient_name:
+                patients.find(
+                  (patient) =>
+                    String(patient.id) ===
+                    String(indexForm.patient_id)
+                )?.name || getPatientName(doc),
+            }
+          : doc
       )
     );
 
-    setSelectedDocument(
-      updatedDocument
-    );
-
-    setError(
-      "Indexation enregistrée en mode démonstration."
+    setSelectedDocument((previous) =>
+      previous
+        ? {
+            ...previous,
+            title: indexForm.title,
+            document_type: indexForm.document_type,
+            patient_id: indexForm.patient_id,
+            folder: indexForm.folder,
+            tags: indexForm.tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+            description: indexForm.description,
+          }
+        : previous
     );
   }
 
-  /* =========================================================
-     RESET FILTRES
-     ========================================================= */
-
-  function resetFilters() {
-    setSearch("");
-    setSelectedType(
-      "Tous les documents"
-    );
-    setSelectedPatient("");
-    setSelectedFolder(
-      "Tous les documents"
-    );
-    setSortBy("recent");
-  }
-
-  /* =========================================================
-     CHANGEMENT ONGLET
-     ========================================================= */
-
-  function changeTab(tab) {
-    setActiveTab(tab);
-
-    if (
-      tab === "search" ||
-      tab === "ged" ||
-      tab === "documents"
-    ) {
-      setSelectedFolder(
-        "Tous les documents"
-      );
-    }
-  }
-
-  /* =========================================================
-     RENDU : SIDEBAR
-     ========================================================= */
+  /* ==========================================================
+     SIDEBAR — MÊME STRUCTURE QUE PATIENTSPACE
+     ========================================================== */
 
   function renderSidebar() {
     return (
-      <aside className="ged-sidebar">
-        <div className="ged-sidebar-brand">
-          <div className="ged-brand-logo">
-            <FolderOpen size={28} />
+      <aside
+        className={`ged-sidebar ${
+          !sidebarOpen ? "ged-sidebar-hidden" : ""
+        }`}
+      >
+        {/* ==================================================
+            IDENTITÉ MA SANTÉ
+        ================================================== */}
+
+        <div className="patient-sidebar-brand ged-patient-sidebar-brand">
+          <div className="patient-sidebar-brand-icon">
+            <Plus size={34} strokeWidth={5} />
           </div>
 
-          <div>
-            <strong>GED</strong>
+          <div className="patient-sidebar-brand-text">
+            <strong>MA SANTÉ</strong>
 
             <span>
-              Gestion Électronique
+              Clinique &amp; Gestion
               <br />
-              des Documents
+              Hospitalière
             </span>
           </div>
         </div>
 
-        <nav className="ged-sidebar-nav">
+        {/* ==================================================
+            MENU GED
+        ================================================== */}
+
+        <nav className="patient-space-menu ged-patient-space-menu">
 
           <button
             type="button"
-            className={`ged-nav-item ${
+            className={`${
               activeTab === "dashboard"
                 ? "active"
                 : ""
             }`}
-            onClick={() =>
-              changeTab("dashboard")
-            }
+            onClick={() => changeTab("dashboard")}
           >
-            <Home size={20} />
+            <FolderOpen size={19} />
             <span>Tableau de bord</span>
           </button>
 
           <button
             type="button"
-            className={`ged-nav-item ${
-              activeTab === "ged"
-                ? "active"
-                : ""
-            }`}
-            onClick={() =>
-              changeTab("ged")
-            }
-          >
-            <FolderOpen size={20} />
-            <span>GED</span>
-          </button>
-
-          <button
-            type="button"
-            className={`ged-nav-item ${
+            className={`${
+              activeTab === "ged" ||
               activeTab === "documents"
                 ? "active"
                 : ""
             }`}
-            onClick={() =>
-              changeTab("documents")
-            }
+            onClick={() => changeTab("ged")}
           >
-            <FileText size={20} />
+            <FileText size={19} />
             <span>Mes documents</span>
           </button>
 
           <button
             type="button"
-            className={`ged-nav-item ${
+            className={`${
               activeTab === "search"
                 ? "active"
                 : ""
             }`}
-            onClick={() =>
-              changeTab("search")
-            }
+            onClick={() => changeTab("search")}
           >
-            <Search size={20} />
+            <Search size={19} />
             <span>Recherche</span>
           </button>
 
           <button
             type="button"
-            className={`ged-nav-item ${
+            className={`${
               activeTab === "indexation"
                 ? "active"
                 : ""
             }`}
-            onClick={() =>
-              changeTab("indexation")
-            }
+            onClick={() => changeTab("indexation")}
           >
-            <Tag size={20} />
+            <Tag size={19} />
             <span>Indexation</span>
           </button>
 
           <button
             type="button"
-            className={`ged-nav-item ${
+            className={`${
+              activeTab === "favorites"
+                ? "active"
+                : ""
+            }`}
+            onClick={() => changeTab("favorites")}
+          >
+            <Star size={19} />
+            <span>Mes favoris</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${
               activeTab === "trash"
                 ? "active"
                 : ""
             }`}
-            onClick={() =>
-              changeTab("trash")
-            }
+            onClick={() => changeTab("trash")}
           >
-            <Trash2 size={20} />
+            <Trash2 size={19} />
             <span>Corbeille</span>
           </button>
 
           <button
             type="button"
-            className={`ged-nav-item ${
+            className={`${
               activeTab === "administration"
                 ? "active"
                 : ""
@@ -1217,35 +1044,65 @@ export default function GED() {
               changeTab("administration")
             }
           >
-            <Settings size={20} />
+            <Settings size={19} />
             <span>Administration</span>
           </button>
+
         </nav>
 
-        <div className="ged-sidebar-footer">
-          <FileText size={28} />
+        {/* ==================================================
+            ACTIONS EN BAS
+        ================================================== */}
 
-          <p>
-            Un document bien indexé,
-            c’est une information facile
-            à retrouver !
-          </p>
+        <div className="patient-sidebar-bottom ged-patient-sidebar-bottom">
+
+          <button
+            type="button"
+            className="patient-sidebar-action"
+            onClick={goToModules}
+            title="Retour aux modules"
+          >
+            <Grid2X2 size={20} />
+            <span>Retour aux modules</span>
+          </button>
+
+          <button
+            type="button"
+            className="patient-sidebar-action patient-sidebar-logout"
+            onClick={handleLogout}
+            title="Déconnexion"
+          >
+            <LogOut size={20} />
+            <span>Déconnexion</span>
+          </button>
+
         </div>
       </aside>
     );
   }
 
-  /* =========================================================
-     RENDU : TOPBAR
-     ========================================================= */
+  /* ==========================================================
+     TOPBAR
+     ========================================================== */
 
   function renderTopbar() {
+    const userName =
+      user?.name ||
+      user?.username ||
+      user?.first_name ||
+      "Utilisateur";
+
     return (
       <header className="ged-topbar">
         <button
           className="ged-menu-button"
           type="button"
-          aria-label="Menu"
+          onClick={() =>
+            setSidebarOpen(
+              (previous) => !previous
+            )
+          }
+          aria-label="Afficher ou masquer le menu"
         >
           <span />
           <span />
@@ -1254,117 +1111,67 @@ export default function GED() {
 
         <div className="ged-topbar-actions">
 
-          <button
-            className="ged-icon-button notification"
-            type="button"
-            onClick={() =>
-              setShowNotifications(
-                (previous) =>
-                  !previous
-              )
-            }
-          >
-            <Bell size={20} />
-            <span>3</span>
-          </button>
+          <div className="ged-notification-wrapper">
+
+            <button
+              className="ged-icon-button notification"
+              type="button"
+              onClick={() =>
+                setShowNotifications(
+                  (previous) => !previous
+                )
+              }
+              title="Notifications"
+            >
+              <Bell size={19} />
+              <span>3</span>
+            </button>
+
+            {showNotifications && (
+              <div className="ged-notification-panel">
+                <strong>Notifications</strong>
+
+                <p>
+                  3 nouvelles informations sont
+                  disponibles.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowNotifications(false)
+                  }
+                >
+                  Fermer
+                </button>
+              </div>
+            )}
+
+          </div>
 
           <div className="ged-account">
 
             <div className="ged-avatar">
-              <UserRound size={19} />
+              <UserRound size={18} />
             </div>
 
             <div>
-              <strong>
-                {user?.first_name ||
-                  user?.username ||
-                  "Utilisateur"}{" "}
-                {user?.last_name || ""}
-              </strong>
-
-              <span>
-                {user?.role_label ||
-                  user?.role ||
-                  "Utilisateur"}
-              </span>
+              <strong>{userName}</strong>
+              <span>Utilisateur connecté</span>
             </div>
 
-            <ChevronDown size={17} />
+            <ChevronDown size={16} />
 
           </div>
 
         </div>
-
-        {showNotifications && (
-          <div
-            style={{
-              position: "absolute",
-              right: 30,
-              top: 58,
-              zIndex: 50,
-              width: 280,
-              background: "#fff",
-              border: "1px solid #dce5ef",
-              borderRadius: 8,
-              boxShadow:
-                "0 15px 40px rgba(20,40,70,.15)",
-              padding: 15,
-            }}
-          >
-            <strong
-              style={{
-                color: "#102746",
-                fontSize: 13,
-              }}
-            >
-              Notifications
-            </strong>
-
-            <div
-              style={{
-                marginTop: 12,
-                padding: 10,
-                background: "#f5faff",
-                borderRadius: 6,
-                fontSize: 11,
-              }}
-            >
-              Nouveau document ajouté.
-            </div>
-
-            <div
-              style={{
-                marginTop: 7,
-                padding: 10,
-                background: "#f5faff",
-                borderRadius: 6,
-                fontSize: 11,
-              }}
-            >
-              Indexation à compléter.
-            </div>
-
-            <div
-              style={{
-                marginTop: 7,
-                padding: 10,
-                background: "#f5faff",
-                borderRadius: 6,
-                fontSize: 11,
-              }}
-            >
-              2 documents nécessitent
-              votre attention.
-            </div>
-          </div>
-        )}
       </header>
     );
   }
 
-  /* =========================================================
+  /* ==========================================================
      TITRE
-     ========================================================= */
+     ========================================================== */
 
   function getPageTitle() {
     switch (activeTab) {
@@ -1372,15 +1179,16 @@ export default function GED() {
         return {
           title: "Tableau de bord GED",
           description:
-            "Vue globale de votre gestion documentaire.",
-          icon: Home,
+            "Vue générale de vos documents et activités.",
+          icon: FolderOpen,
         };
 
       case "documents":
+      case "ged":
         return {
-          title: "Mes documents",
+          title: "Gestion des documents",
           description:
-            "Consultez et gérez vos documents.",
+            "Centralisez, consultez et gérez vos documents.",
           icon: FileText,
         };
 
@@ -1388,7 +1196,7 @@ export default function GED() {
         return {
           title: "Recherche documentaire",
           description:
-            "Recherchez rapidement dans vos documents.",
+            "Retrouvez rapidement un document dans la GED.",
           icon: Search,
         };
 
@@ -1396,15 +1204,23 @@ export default function GED() {
         return {
           title: "Indexation",
           description:
-            "Classez et enrichissez les métadonnées de vos documents.",
+            "Classez et renseignez les informations des documents.",
           icon: Tag,
+        };
+
+      case "favorites":
+        return {
+          title: "Mes favoris",
+          description:
+            "Retrouvez rapidement vos documents favoris.",
+          icon: Star,
         };
 
       case "trash":
         return {
           title: "Corbeille",
           description:
-            "Consultez les documents supprimés.",
+            "Consultez et restaurez les documents supprimés.",
           icon: Trash2,
         };
 
@@ -1412,311 +1228,124 @@ export default function GED() {
         return {
           title: "Administration GED",
           description:
-            "Configuration et statistiques du système documentaire.",
+            "Paramètres et informations du système documentaire.",
           icon: Settings,
         };
 
       default:
         return {
-          title:
-            "Gestion Électronique des Documents (GED)",
+          title: "Gestion Électronique des Documents",
           description:
-            "Stockez, organisez et retrouvez facilement vos documents.",
+            "Centralisez vos documents médicaux et administratifs.",
           icon: FolderOpen,
         };
     }
   }
 
-  /* =========================================================
-     TABLEAU DE BORD
-     ========================================================= */
+  /* ==========================================================
+     DOSSIERS
+     ========================================================== */
 
-  function renderDashboard() {
+  function renderFolderPanel() {
+    const folderGroups = [
+      {
+        name: "Administration",
+        children: [
+          "Courriers",
+          "Décisions",
+          "Notes de service",
+          "Budgets",
+        ],
+      },
+      {
+        name: "Dossiers patients",
+        children: [
+          "Dossiers médicaux",
+          "Consultations",
+          "Ordonnances",
+        ],
+      },
+      {
+        name: "Résultats",
+        children: [
+          "Laboratoire",
+          "Radiologie",
+        ],
+      },
+      {
+        name: "Finances",
+        children: [
+          "Factures",
+          "Paiements",
+          "Rapports financiers",
+        ],
+      },
+    ];
+
     return (
-      <div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(4, 1fr)",
-            gap: 14,
-            marginBottom: 18,
-          }}
-        >
-
-          {[
-            {
-              label: "Documents",
-              value: totalDocuments,
-              icon: FileText,
-            },
-            {
-              label: "Favoris",
-              value: favoriteDocuments,
-              icon: Star,
-            },
-            {
-              label: "PDF",
-              value: pdfDocuments,
-              icon: FileText,
-            },
-            {
-              label: "Corbeille",
-              value:
-                trashDocuments.length,
-              icon: Trash2,
-            },
-          ].map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <div
-                key={item.label}
-                className="ged-panel"
-                style={{
-                  padding: 20,
-                }}
-              >
-                <Icon
-                  size={24}
-                  color="#0877ed"
-                />
-
-                <div
-                  style={{
-                    marginTop: 12,
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: "#102746",
-                  }}
-                >
-                  {item.value}
-                </div>
-
-                <div
-                  style={{
-                    marginTop: 4,
-                    color: "#6f7f95",
-                    fontSize: 11,
-                  }}
-                >
-                  {item.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div
-          className="ged-panel"
-          style={{
-            padding: 20,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              alignItems: "center",
-              marginBottom: 15,
-            }}
-          >
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 15,
-                color: "#102746",
-              }}
-            >
-              Documents récents
-            </h2>
-
-            <button
-              type="button"
-              className="ged-upload-button"
-              onClick={() =>
-                changeTab("documents")
-              }
-            >
-              Voir tous les documents
-            </button>
-          </div>
-
-          {documents
-            .slice(0, 5)
-            .map((document) => (
-              <div
-                key={document.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px 0",
-                  borderBottom:
-                    "1px solid #edf1f5",
-                }}
-              >
-                <div className="ged-file-icon">
-                  <FileText size={20} />
-                </div>
-
-                <div
-                  style={{
-                    flex: 1,
-                  }}
-                >
-                  <strong
-                    style={{
-                      display: "block",
-                      fontSize: 11,
-                      color: "#223b5c",
-                    }}
-                  >
-                    {getDocumentName(
-                      document
-                    )}
-                  </strong>
-
-                  <span
-                    style={{
-                      display: "block",
-                      marginTop: 4,
-                      fontSize: 9,
-                      color: "#8997a8",
-                    }}
-                  >
-                    {formatDateTime(
-                      getDocumentDate(
-                        document
-                      )
-                    )}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  className="ged-row-actions"
-                  onClick={() => {
-                    selectDocument(
-                      document
-                    );
-                    openPreview(
-                      document
-                    );
-                  }}
-                >
-                  <Eye size={16} />
-                </button>
-              </div>
-            ))}
-        </div>
-      </div>
-    );
-  }
-
-  /* =========================================================
-     ARBORESCENCE
-     ========================================================= */
-
-  function renderFolders() {
-    return (
-      <section className="ged-folder-panel ged-panel">
+      <aside className="ged-folder-panel ged-panel">
 
         <div className="ged-panel-heading">
-          <h2>
-            Arborescence des dossiers
-          </h2>
+          <h2>Explorateur</h2>
         </div>
 
         <button
-          type="button"
           className={`ged-folder-root ${
-            selectedFolder ===
-            "Tous les documents"
+            folderFilter === "Tous les dossiers"
               ? "selected"
               : ""
           }`}
           onClick={() =>
-            setSelectedFolder(
-              "Tous les documents"
-            )
+            setFolderFilter("Tous les dossiers")
           }
+          type="button"
         >
-          <ChevronDown size={16} />
-          <Folder size={18} />
-
-          <span>
-            Tous les documents
-          </span>
-
-          <b>
-            {documents.length}
-          </b>
+          <FolderOpen size={16} />
+          <span>Tous les documents</span>
+          <b>{documents.length}</b>
         </button>
 
         <div className="ged-folder-tree">
 
-          {folderGroups.map(
-            (group) => (
-              <div
-                className="ged-folder-group"
-                key={group.label}
+          {folderGroups.map((group) => (
+            <div
+              className="ged-folder-group"
+              key={group.name}
+            >
+
+              <button
+                className="ged-folder-row"
+                type="button"
               >
-                <button
-                  type="button"
-                  className="ged-folder-row"
-                >
-                  <ChevronDown
-                    size={15}
-                  />
+                <ChevronDown size={14} />
+                <Folder size={15} />
+                <span>{group.name}</span>
+              </button>
 
-                  <Folder
-                    size={18}
-                  />
+              <div className="ged-folder-children">
 
-                  <span>
-                    {group.label}
-                  </span>
+                {group.children.map((child) => (
+                  <button
+                    className={`ged-folder-child ${
+                      folderFilter === child
+                        ? "selected"
+                        : ""
+                    }`}
+                    key={child}
+                    type="button"
+                    onClick={() =>
+                      setFolderFilter(child)
+                    }
+                  >
+                    <Folder size={13} />
+                    <span>{child}</span>
+                  </button>
+                ))}
 
-                  <b>
-                    {group.count}
-                  </b>
-                </button>
-
-                <div className="ged-folder-children">
-                  {group.children.map(
-                    (child) => (
-                      <button
-                        type="button"
-                        className={`ged-folder-child ${
-                          selectedFolder ===
-                          child
-                            ? "selected"
-                            : ""
-                        }`}
-                        key={child}
-                        onClick={() =>
-                          setSelectedFolder(
-                            child
-                          )
-                        }
-                      >
-                        <Folder
-                          size={16}
-                        />
-
-                        <span>
-                          {child}
-                        </span>
-                      </button>
-                    )
-                  )}
-                </div>
               </div>
-            )
-          )}
+
+            </div>
+          ))}
 
         </div>
 
@@ -1727,32 +1356,11 @@ export default function GED() {
           <button
             type="button"
             onClick={() =>
-              changeTab(
-                "favorites"
-              )
+              changeTab("favorites")
             }
           >
-            <Star size={17} />
-            <span>
-              Mes favoris
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedType(
-                "Tous les documents"
-              );
-              setSelectedFolder(
-                "Tous les documents"
-              );
-            }}
-          >
-            <Folder size={16} />
-            <span>
-              Documents importants
-            </span>
+            <Star size={14} />
+            Favoris
           </button>
 
           <button
@@ -1761,20 +1369,31 @@ export default function GED() {
               changeTab("recent")
             }
           >
-            <Clock3 size={16} />
-            <span>
-              Récents
-            </span>
+            <Clock3 size={14} />
+            Documents récents
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setFolderFilter(
+                "Tous les dossiers"
+              )
+            }
+          >
+            <Archive size={14} />
+            Documents archivés
           </button>
 
         </div>
-      </section>
+
+      </aside>
     );
   }
 
-  /* =========================================================
-     TABLE DOCUMENTS
-     ========================================================= */
+  /* ==========================================================
+     TABLEAU DES DOCUMENTS
+     ========================================================== */
 
   function renderDocumentTable() {
     if (loading) {
@@ -1788,32 +1407,27 @@ export default function GED() {
       );
     }
 
-    if (!filteredDocuments.length) {
+    if (filteredDocuments.length === 0) {
       return (
         <div className="ged-empty">
 
           <div className="ged-empty-icon">
-            <FolderOpen size={42} />
+            <FileText size={31} />
           </div>
 
-          <h3>
-            Aucun document
-          </h3>
+          <h3>Aucun document trouvé</h3>
 
           <p>
-            Aucun document ne correspond
-            aux critères actuels.
+            Aucun document ne correspond aux
+            critères sélectionnés.
           </p>
 
           <button
             type="button"
-            onClick={() => {
-              resetFilters();
-              openUploadModal();
-            }}
+            onClick={resetFilters}
           >
-            <Upload size={17} />
-            Ajouter un document
+            <RefreshCw size={14} />
+            Réinitialiser
           </button>
 
         </div>
@@ -1821,79 +1435,52 @@ export default function GED() {
     }
 
     return (
-      <table className="ged-table">
+      <div className="ged-table-wrapper">
 
-        <thead>
-          <tr>
+        <table className="ged-table">
 
-            <th>
-              <input
-                type="checkbox"
-                checked={
-                  filteredDocuments.length >
-                    0 &&
-                  selectedIds.length ===
-                    filteredDocuments.length
-                }
-                onChange={
-                  toggleSelectAll
-                }
-                aria-label="Tout sélectionner"
-              />
-            </th>
+          <thead>
+            <tr>
 
-            <th>
-              Nom du document
-            </th>
+              <th>
+                <input
+                  type="checkbox"
+                  checked={
+                    selectedIds.length ===
+                      filteredDocuments.length &&
+                    filteredDocuments.length > 0
+                  }
+                  onChange={toggleSelectAll}
+                />
+              </th>
 
-            <th>Type</th>
+              <th>DOCUMENT</th>
+              <th>TYPE</th>
+              <th>PATIENT</th>
+              <th>DATE</th>
+              <th>TAILLE</th>
+              <th>ACTIONS</th>
 
-            <th>
-              Date d’ajout
-            </th>
+            </tr>
+          </thead>
 
-            <th>
-              Taille
-            </th>
+          <tbody>
 
-            <th />
-          </tr>
-        </thead>
-
-        <tbody>
-
-          {filteredDocuments.map(
-            (document) => {
-
-              const Icon =
-                getFileIcon(
-                  document.file_name ||
-                    document.filename ||
-                    document.file ||
-                    document.name
-                );
-
-              const isSelected =
-                selectedDocument?.id ===
-                document.id;
-
-              const checked =
-                selectedIds.includes(
-                  document.id
-                );
+            {filteredDocuments.map((document) => {
+              const FileIcon =
+                getFileIcon(document);
 
               return (
                 <tr
                   key={document.id}
                   className={
-                    isSelected
+                    selectedDocument?.id ===
+                    document.id
                       ? "selected-row"
                       : ""
                   }
                   onClick={() =>
-                    selectDocument(
-                      document
-                    )
+                    setSelectedDocument(document)
                   }
                 >
 
@@ -1904,45 +1491,46 @@ export default function GED() {
                   >
                     <input
                       type="checkbox"
-                      checked={checked}
+                      checked={selectedIds.includes(
+                        document.id
+                      )}
                       onChange={() =>
-                        toggleDocumentSelection(
+                        toggleSelect(
                           document.id
-                        )
-                      }
-                      aria-label={
-                        getDocumentName(
-                          document
                         )
                       }
                     />
                   </td>
 
                   <td>
+
                     <div className="ged-document-cell">
 
                       <div className="ged-file-icon">
-                        <Icon size={21} />
+                        <FileIcon size={17} />
                       </div>
 
                       <div>
 
-                        <strong>
+                        <strong
+                          title={getDocumentName(
+                            document
+                          )}
+                        >
                           {getDocumentName(
                             document
                           )}
                         </strong>
 
                         <span>
-                          <Folder size={12} />
-                          {getPatientName(
-                            document
-                          )}
+                          {document.name ||
+                            "Document numérique"}
                         </span>
 
                       </div>
 
                     </div>
+
                   </td>
 
                   <td>
@@ -1954,59 +1542,38 @@ export default function GED() {
                   </td>
 
                   <td>
-                    <span className="ged-date-cell">
-                      {formatDateTime(
-                        getDocumentDate(
-                          document
-                        )
-                      )}
-                    </span>
+                    {getPatientName(document)}
                   </td>
 
-                  <td>
-                    {formatFileSize(
-                      document.file_size ||
-                        document.size
+                  <td className="ged-date-cell">
+                    {getDocumentDate(
+                      document
                     )}
                   </td>
 
-                  <td
-                    onClick={(event) =>
-                      event.stopPropagation()
-                    }
-                  >
+                  <td>
+                    {document.file_size || "—"}
+                  </td>
 
-                    <div className="ged-row-actions">
+                  <td>
+
+                    <div
+                      className="ged-row-actions"
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                    >
 
                       <button
                         type="button"
-                        title="Favori"
+                        title="Voir"
                         onClick={() =>
-                          toggleFavorite(
+                          previewDocument(
                             document
                           )
                         }
                       >
-                        <Star
-                          size={16}
-                          fill={
-                            document.favorite
-                              ? "#f2b01e"
-                              : "none"
-                          }
-                        />
-                      </button>
-
-                      <button
-                        type="button"
-                        title="Consulter"
-                        onClick={() =>
-                          openPreview(
-                            document
-                          )
-                        }
-                      >
-                        <Eye size={16} />
+                        <Eye size={15} />
                       </button>
 
                       <button
@@ -2018,33 +1585,44 @@ export default function GED() {
                           )
                         }
                       >
-                        <Download
-                          size={16}
-                        />
+                        <Download size={15} />
                       </button>
 
                       <button
                         type="button"
-                        title="Supprimer"
+                        title="Favori"
+                        onClick={() =>
+                          toggleFavorite(
+                            document
+                          )
+                        }
+                        className={
+                          document.favorite
+                            ? "favorite-active"
+                            : ""
+                        }
+                      >
+                        <Star size={15} />
+                      </button>
+
+                      <button
+                        type="button"
                         className="danger"
+                        title="Corbeille"
                         onClick={() =>
                           deleteDocument(
                             document
                           )
                         }
                       >
-                        <Trash2
-                          size={16}
-                        />
+                        <Trash2 size={15} />
                       </button>
 
                       <button
                         type="button"
-                        title="Plus d'actions"
+                        title="Plus"
                       >
-                        <MoreVertical
-                          size={17}
-                        />
+                        <MoreVertical size={15} />
                       </button>
 
                     </div>
@@ -2053,553 +1631,514 @@ export default function GED() {
 
                 </tr>
               );
-            }
-          )}
+            })}
 
-        </tbody>
-      </table>
+          </tbody>
+
+        </table>
+
+        <div className="ged-pagination">
+
+          <button type="button">
+            <ChevronLeft size={14} />
+          </button>
+
+          <button
+            type="button"
+            className="active"
+          >
+            1
+          </button>
+
+          <button type="button">
+            2
+          </button>
+
+          <button type="button">
+            3
+          </button>
+
+          <button type="button">
+            <ChevronRight size={14} />
+          </button>
+
+          <span className="ged-pagination-count">
+            {filteredDocuments.length} document(s)
+          </span>
+
+        </div>
+
+      </div>
     );
   }
 
-  /* =========================================================
-     INDEXATION
-     ========================================================= */
+  /* ==========================================================
+     RECHERCHE / FILTRES
+     ========================================================== */
+
+  function renderFilters() {
+    return (
+      <>
+        <div className="ged-search-row">
+
+          <div className="ged-main-search">
+
+            <Search size={16} />
+
+            <input
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Rechercher un document, patient, type..."
+            />
+
+            {search && (
+              <button
+                type="button"
+                onClick={() =>
+                  setSearch("")
+                }
+                title="Effacer"
+              >
+                <X size={15} />
+              </button>
+            )}
+
+            <button type="button">
+              Rechercher
+            </button>
+
+          </div>
+
+        </div>
+
+        <div className="ged-filter-row">
+
+          <label>
+
+            <span>
+              Type de document
+            </span>
+
+            <div className="ged-select">
+
+              <select
+                value={typeFilter}
+                onChange={(event) =>
+                  setTypeFilter(
+                    event.target.value
+                  )
+                }
+              >
+                {DOCUMENT_TYPES.map(
+                  (type) => (
+                    <option
+                      key={type}
+                      value={type}
+                    >
+                      {type}
+                    </option>
+                  )
+                )}
+              </select>
+
+              <ChevronDown size={14} />
+
+            </div>
+
+          </label>
+
+          <label>
+
+            <span>Patient</span>
+
+            <div className="ged-select">
+
+              <select
+                value={patientFilter}
+                onChange={(event) =>
+                  setPatientFilter(
+                    event.target.value
+                  )
+                }
+              >
+
+                <option value="Tous les patients">
+                  Tous les patients
+                </option>
+
+                {patients.map(
+                  (patient) => (
+                    <option
+                      key={patient.id}
+                      value={
+                        patient.name ||
+                        `${patient.first_name || ""} ${
+                          patient.last_name || ""
+                        }`.trim()
+                      }
+                    >
+                      {patient.name ||
+                        `${patient.first_name || ""} ${
+                          patient.last_name || ""
+                        }`.trim()}
+                    </option>
+                  )
+                )}
+
+              </select>
+
+              <ChevronDown size={14} />
+
+            </div>
+
+          </label>
+
+          <label>
+
+            <span>Tri</span>
+
+            <div className="ged-select">
+
+              <select
+                value={sortOrder}
+                onChange={(event) =>
+                  setSortOrder(
+                    event.target.value
+                  )
+                }
+              >
+
+                <option value="recent">
+                  Plus récents
+                </option>
+
+                <option value="old">
+                  Plus anciens
+                </option>
+
+              </select>
+
+              <ChevronDown size={14} />
+
+            </div>
+
+          </label>
+
+        </div>
+      </>
+    );
+  }
+
+  /* ==========================================================
+     PANEL INDEXATION
+     ========================================================== */
 
   function renderIndexPanel() {
+    if (!selectedDocument) {
+      return (
+        <aside className="ged-index-panel ged-panel">
+
+          <div className="ged-index-heading">
+            <h2>Indexation</h2>
+            <span>GED</span>
+          </div>
+
+          <div className="ged-index-empty">
+
+            <div>
+              <Tag size={29} />
+            </div>
+
+            <h3>
+              Aucun document sélectionné
+            </h3>
+
+            <p>
+              Sélectionnez un document dans
+              la liste pour afficher ses
+              informations et effectuer son
+              indexation.
+            </p>
+
+          </div>
+
+        </aside>
+      );
+    }
+
     return (
       <aside className="ged-index-panel ged-panel">
 
         <div className="ged-index-heading">
 
-          <h2>
-            Indexation du document
-          </h2>
+          <h2>Indexation</h2>
 
-          <span>
-            GED
-          </span>
+          <span>DOCUMENT</span>
 
         </div>
 
-        {selectedDocument ? (
-          <>
-            <div className="ged-selected-file">
+        <div className="ged-selected-file">
 
-              <div className="ged-selected-file-icon">
-                <FileText size={25} />
-              </div>
+          <div className="ged-selected-file-icon">
+            <FileText size={20} />
+          </div>
 
-              <div>
+          <div>
 
-                <strong>
-                  {getDocumentName(
-                    selectedDocument
-                  )}
-                </strong>
+            <strong>
+              {getDocumentName(
+                selectedDocument
+              )}
+            </strong>
 
-                <span>
-                  {formatFileSize(
-                    selectedDocument.file_size ||
-                      selectedDocument.size
-                  )}{" "}
-                  ·{" "}
-                  {formatDateTime(
-                    getDocumentDate(
-                      selectedDocument
-                    )
-                  )}
-                </span>
-
-              </div>
-
-            </div>
-
-            <div className="ged-index-form">
-
-              <label>
-                <span>
-                  Type de document{" "}
-                  <b>*</b>
-                </span>
-
-                <div className="ged-index-select">
-
-                  <select
-                    value={
-                      indexForm.document_type
-                    }
-                    onChange={(event) =>
-                      setIndexForm(
-                        (previous) => ({
-                          ...previous,
-                          document_type:
-                            event.target
-                              .value,
-                        })
-                      )
-                    }
-                  >
-                    {DOCUMENT_TYPES.filter(
-                      (type) =>
-                        type !==
-                        "Tous les documents"
-                    ).map(
-                      (type) => (
-                        <option
-                          key={type}
-                          value={type}
-                        >
-                          {type}
-                        </option>
-                      )
-                    )}
-                  </select>
-
-                  <ChevronDown size={16} />
-
-                </div>
-              </label>
-
-              <label>
-
-                <span>
-                  Patient associé
-                </span>
-
-                <div className="ged-index-select">
-
-                  <select
-                    value={
-                      indexForm.patient
-                    }
-                    onChange={(event) =>
-                      setIndexForm(
-                        (previous) => ({
-                          ...previous,
-                          patient:
-                            event.target
-                              .value,
-                        })
-                      )
-                    }
-                  >
-                    <option value="">
-                      Aucun patient
-                    </option>
-
-                    {patients.map(
-                      (patient) => (
-                        <option
-                          key={patient.id}
-                          value={patient.id}
-                        >
-                          {patient.first_name ||
-                            patient.prenom ||
-                            ""}{" "}
-                          {patient.last_name ||
-                            patient.nom ||
-                            ""}
-                        </option>
-                      )
-                    )}
-
-                  </select>
-
-                  <ChevronDown size={16} />
-
-                </div>
-              </label>
-
-              <label>
-
-                <span>
-                  Date du document
-                </span>
-
-                <div className="ged-index-input icon-input">
-
-                  <input
-                    type="text"
-                    value={formatDate(
-                      getDocumentDate(
-                        selectedDocument
-                      )
-                    )}
-                    readOnly
-                  />
-
-                  <CalendarDays size={16} />
-
-                </div>
-
-              </label>
-
-              <label>
-
-                <span>
-                  Mots-clés
-                </span>
-
-                <input
-                  className="ged-index-input"
-                  value={
-                    indexForm.tags
-                  }
-                  onChange={(event) =>
-                    setIndexForm(
-                      (previous) => ({
-                        ...previous,
-                        tags: event.target
-                          .value,
-                      })
-                    )
-                  }
-                  placeholder="courrier, administration, 2026"
-                />
-
-              </label>
-
-              <label>
-
-                <span>
-                  Description
-                </span>
-
-                <textarea
-                  className="ged-index-input ged-index-textarea"
-                  value={
-                    indexForm.description
-                  }
-                  onChange={(event) =>
-                    setIndexForm(
-                      (previous) => ({
-                        ...previous,
-                        description:
-                          event.target
-                            .value,
-                      })
-                    )
-                  }
-                  rows={4}
-                  placeholder="Description du document..."
-                />
-
-              </label>
-
-            </div>
-
-            <div className="ged-index-actions">
-
-              <button
-                type="button"
-                className="ged-reset-button"
-                onClick={() =>
-                  selectDocument(
-                    selectedDocument
-                  )
-                }
-              >
-                Réinitialiser
-              </button>
-
-              <button
-                type="button"
-                className="ged-save-button"
-                onClick={
-                  saveIndexation
-                }
-              >
-                Enregistrer
-              </button>
-
-            </div>
-          </>
-        ) : (
-
-          <div className="ged-index-empty">
-
-            <div>
-              <Tag size={32} />
-            </div>
-
-            <h3>
-              Sélectionnez un document
-            </h3>
-
-            <p>
-              Cliquez sur un document
-              dans la liste pour afficher
-              et compléter ses métadonnées
-              d’indexation.
-            </p>
+            <span>
+              {selectedDocument.file_size ||
+                "Taille inconnue"}
+            </span>
 
           </div>
 
-        )}
+        </div>
+
+        <form
+          className="ged-index-form"
+          onSubmit={saveIndexation}
+        >
+
+          <label>
+
+            <span>
+              Titre <b>*</b>
+            </span>
+
+            <input
+              className="ged-index-input"
+              value={indexForm.title}
+              onChange={(event) =>
+                setIndexForm(
+                  (previous) => ({
+                    ...previous,
+                    title:
+                      event.target.value,
+                  })
+                )
+              }
+            />
+
+          </label>
+
+          <label>
+
+            <span>
+              Type de document
+            </span>
+
+            <div className="ged-index-select">
+
+              <select
+                value={
+                  indexForm.document_type
+                }
+                onChange={(event) =>
+                  setIndexForm(
+                    (previous) => ({
+                      ...previous,
+                      document_type:
+                        event.target.value,
+                    })
+                  )
+                }
+              >
+
+                {DOCUMENT_TYPES
+                  .filter(
+                    (type) =>
+                      type !==
+                      "Tous les documents"
+                  )
+                  .map((type) => (
+                    <option
+                      key={type}
+                      value={type}
+                    >
+                      {type}
+                    </option>
+                  ))}
+
+              </select>
+
+              <ChevronDown size={14} />
+
+            </div>
+
+          </label>
+
+          <label>
+
+            <span>
+              Patient associé
+            </span>
+
+            <div className="ged-index-select">
+
+              <select
+                value={
+                  indexForm.patient_id
+                }
+                onChange={(event) =>
+                  setIndexForm(
+                    (previous) => ({
+                      ...previous,
+                      patient_id:
+                        event.target.value,
+                    })
+                  )
+                }
+              >
+
+                <option value="">
+                  Aucun patient
+                </option>
+
+                {patients.map(
+                  (patient) => (
+                    <option
+                      key={patient.id}
+                      value={patient.id}
+                    >
+                      {patient.name ||
+                        `${patient.first_name || ""} ${
+                          patient.last_name || ""
+                        }`.trim()}
+                    </option>
+                  )
+                )}
+
+              </select>
+
+              <ChevronDown size={14} />
+
+            </div>
+
+          </label>
+
+          <label>
+
+            <span>Dossier</span>
+
+            <input
+              className="ged-index-input"
+              value={indexForm.folder}
+              onChange={(event) =>
+                setIndexForm(
+                  (previous) => ({
+                    ...previous,
+                    folder:
+                      event.target.value,
+                  })
+                )
+              }
+              placeholder="Ex : Dossiers médicaux"
+            />
+
+          </label>
+
+          <label>
+
+            <span>Tags</span>
+
+            <div className="icon-input ged-index-input">
+
+              <input
+                value={indexForm.tags}
+                onChange={(event) =>
+                  setIndexForm(
+                    (previous) => ({
+                      ...previous,
+                      tags:
+                        event.target.value,
+                    })
+                  )
+                }
+                placeholder="patient, médical..."
+              />
+
+              <Tag size={14} />
+
+            </div>
+
+          </label>
+
+          <label>
+
+            <span>Description</span>
+
+            <textarea
+              className="ged-index-input ged-index-textarea"
+              rows="4"
+              value={
+                indexForm.description
+              }
+              onChange={(event) =>
+                setIndexForm(
+                  (previous) => ({
+                    ...previous,
+                    description:
+                      event.target.value,
+                  })
+                )
+              }
+            />
+
+          </label>
+
+          <div className="ged-index-actions">
+
+            <button
+              type="button"
+              className="ged-reset-button"
+              onClick={() =>
+                setSelectedDocument(null)
+              }
+            >
+              Annuler
+            </button>
+
+            <button
+              type="submit"
+              className="ged-save-button"
+            >
+              <Check size={15} />
+              Enregistrer
+            </button>
+
+          </div>
+
+        </form>
 
       </aside>
     );
   }
 
-  /* =========================================================
-     WORKSPACE PRINCIPAL
-     ========================================================= */
+  /* ==========================================================
+     WORKSPACE
+     ========================================================== */
 
   function renderWorkspace() {
     return (
       <div className="ged-workspace">
 
-        {renderFolders()}
+        {renderFolderPanel()}
 
         <section className="ged-document-panel ged-panel">
 
-          <div className="ged-search-row">
+          {renderFilters()}
 
-            <div className="ged-main-search">
-
-              <Search size={19} />
-
-              <input
-                value={search}
-                onChange={(event) =>
-                  setSearch(
-                    event.target.value
-                  )
-                }
-                placeholder="Rechercher un document, un mot-clé..."
-              />
-
-              {search && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSearch("")
-                  }
-                >
-                  <X size={16} />
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {}}
-              >
-                Rechercher
-              </button>
-
-            </div>
-
-          </div>
-
-          <div className="ged-filter-row">
-
-            <label>
-
-              <span>
-                Type
-              </span>
-
-              <div className="ged-select">
-
-                <select
-                  value={
-                    selectedType
-                  }
-                  onChange={(event) =>
-                    setSelectedType(
-                      event.target
-                        .value
-                    )
-                  }
-                >
-
-                  {DOCUMENT_TYPES.map(
-                    (type) => (
-                      <option
-                        key={type}
-                        value={type}
-                      >
-                        {type ===
-                        "Tous les documents"
-                          ? "Tous"
-                          : type}
-                      </option>
-                    )
-                  )}
-
-                </select>
-
-                <ChevronDown
-                  size={16}
-                />
-
-              </div>
-
-            </label>
-
-            <label>
-
-              <span>
-                Patient
-              </span>
-
-              <div className="ged-select">
-
-                <select
-                  value={
-                    selectedPatient
-                  }
-                  onChange={(event) =>
-                    setSelectedPatient(
-                      event.target
-                        .value
-                    )
-                  }
-                >
-
-                  <option value="">
-                    Tous les patients
-                  </option>
-
-                  {patients.map(
-                    (patient) => (
-                      <option
-                        key={patient.id}
-                        value={
-                          patient.id
-                        }
-                      >
-                        {patient.first_name ||
-                          patient.prenom ||
-                          ""}{" "}
-                        {patient.last_name ||
-                          patient.nom ||
-                          ""}
-                      </option>
-                    )
-                  )}
-
-                </select>
-
-                <ChevronDown
-                  size={16}
-                />
-
-              </div>
-
-            </label>
-
-            <label>
-
-              <span>
-                Trier par
-              </span>
-
-              <div className="ged-select">
-
-                <select
-                  value={sortBy}
-                  onChange={(event) =>
-                    setSortBy(
-                      event.target
-                        .value
-                    )
-                  }
-                >
-                  <option value="recent">
-                    Plus récents
-                  </option>
-
-                  <option value="old">
-                    Plus anciens
-                  </option>
-
-                  <option value="name">
-                    Nom du document
-                  </option>
-                </select>
-
-                <ChevronDown
-                  size={16}
-                />
-
-              </div>
-
-            </label>
-
-          </div>
-
-          {selectedIds.length >
-            0 && (
-            <div
-              style={{
-                margin:
-                  "0 14px 10px",
-                padding:
-                  "8px 10px",
-                background:
-                  "#eaf4ff",
-                borderRadius: 5,
-                color:
-                  "#0877ed",
-                fontSize: 10,
-                fontWeight: 700,
-              }}
-            >
-              {selectedIds.length}{" "}
-              document(s)
-              sélectionné(s)
-            </div>
-          )}
-
-          <div className="ged-table-wrapper">
-            {renderDocumentTable()}
-          </div>
-
-          <div className="ged-pagination">
-
-            <button
-              type="button"
-              disabled
-            >
-              <ChevronLeft
-                size={16}
-              />
-            </button>
-
-            <button
-              type="button"
-              className="active"
-            >
-              1
-            </button>
-
-            <button type="button">
-              2
-            </button>
-
-            <button type="button">
-              3
-            </button>
-
-            <span>
-              ...
-            </span>
-
-            <button type="button">
-              <ChevronRight
-                size={16}
-              />
-            </button>
-
-            <span className="ged-pagination-count">
-              1–
-              {filteredDocuments.length}{" "}
-              sur{" "}
-              {totalDocuments}
-            </span>
-
-          </div>
+          {renderDocumentTable()}
 
         </section>
 
@@ -2609,328 +2148,783 @@ export default function GED() {
     );
   }
 
-  /* =========================================================
+  /* ==========================================================
+     DASHBOARD
+     ========================================================== */
+
+  function renderDashboard() {
+    return (
+      <div className="ged-dashboard">
+
+        <div className="ged-stats-grid">
+
+          <div className="ged-stat-card">
+            <div>
+              <span>Total documents</span>
+              <strong>{stats.total}</strong>
+            </div>
+
+            <div className="ged-stat-icon">
+              <FileText size={22} />
+            </div>
+          </div>
+
+          <div className="ged-stat-card">
+            <div>
+              <span>Documents favoris</span>
+              <strong>{stats.favorites}</strong>
+            </div>
+
+            <div className="ged-stat-icon">
+              <Star size={22} />
+            </div>
+          </div>
+
+          <div className="ged-stat-card">
+            <div>
+              <span>Documents archivés</span>
+              <strong>{stats.archived}</strong>
+            </div>
+
+            <div className="ged-stat-icon">
+              <Archive size={22} />
+            </div>
+          </div>
+
+          <div className="ged-stat-card">
+            <div>
+              <span>Documents PDF</span>
+              <strong>{stats.pdf}</strong>
+            </div>
+
+            <div className="ged-stat-icon">
+              <File size={22} />
+            </div>
+          </div>
+
+        </div>
+
+        <div className="ged-dashboard-card ged-panel">
+
+          <div className="ged-dashboard-card-header">
+
+            <div>
+              <h2>
+                Documents récents
+              </h2>
+
+              <p>
+                Les derniers documents ajoutés
+                à la GED.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                changeTab("ged")
+              }
+            >
+              Voir tous les documents
+            </button>
+
+          </div>
+
+          <div className="ged-recent-list">
+
+            {documents
+              .slice(0, 5)
+              .map((document) => {
+
+                const FileIcon =
+                  getFileIcon(document);
+
+                return (
+                  <button
+                    type="button"
+                    className="ged-recent-item"
+                    key={document.id}
+                    onClick={() =>
+                      previewDocument(
+                        document
+                      )
+                    }
+                  >
+
+                    <div className="ged-file-icon">
+                      <FileIcon size={17} />
+                    </div>
+
+                    <div>
+
+                      <strong>
+                        {getDocumentName(
+                          document
+                        )}
+                      </strong>
+
+                      <span>
+                        {getPatientName(
+                          document
+                        )}{" "}
+                        •{" "}
+                        {getDocumentDate(
+                          document
+                        )}
+                      </span>
+
+                    </div>
+
+                    <Eye size={16} />
+
+                  </button>
+                );
+              })}
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  /* ==========================================================
      CORBEILLE
-     ========================================================= */
+     ========================================================== */
 
   function renderTrash() {
     return (
-      <div className="ged-panel">
+      <div className="ged-panel ged-special-panel">
 
-        <div
-          className="ged-panel-heading"
-        >
-          <h2>
-            Documents supprimés
-          </h2>
+        <div className="ged-special-header">
+
+          <div>
+            <h2>
+              Documents supprimés
+            </h2>
+
+            <p>
+              Les documents déplacés dans la
+              corbeille peuvent être restaurés.
+            </p>
+          </div>
+
+          <Trash2 size={28} />
+
         </div>
 
-        {trashDocuments.length ===
-        0 ? (
+        {trashDocuments.length === 0 ? (
+
           <div className="ged-empty">
+
             <div className="ged-empty-icon">
-              <Trash2 size={42} />
+              <Trash2 size={30} />
             </div>
 
             <h3>
-              Corbeille vide
+              La corbeille est vide
             </h3>
 
             <p>
-              Aucun document n'a été
-              supprimé.
+              Aucun document n'est actuellement
+              dans la corbeille.
             </p>
+
           </div>
+
         ) : (
-          <div
-            style={{
-              padding: 15,
-            }}
-          >
+
+          <div className="ged-trash-list">
+
             {trashDocuments.map(
               (document) => (
                 <div
+                  className="ged-trash-item"
                   key={document.id}
-                  style={{
-                    display: "flex",
-                    alignItems:
-                      "center",
-                    gap: 12,
-                    padding: 12,
-                    borderBottom:
-                      "1px solid #edf1f5",
-                  }}
                 >
 
-                  <FileText
-                    size={25}
-                    color="#0877ed"
-                  />
+                  <FileText size={21} />
 
-                  <div
-                    style={{
-                      flex: 1,
-                    }}
-                  >
-                    <strong
-                      style={{
-                        display:
-                          "block",
-                        fontSize: 11,
-                      }}
-                    >
+                  <div>
+
+                    <strong>
                       {getDocumentName(
                         document
                       )}
                     </strong>
 
-                    <span
-                      style={{
-                        display:
-                          "block",
-                        marginTop: 4,
-                        color:
-                          "#8997a8",
-                        fontSize: 9,
-                      }}
-                    >
-                      Supprimé le{" "}
-                      {formatDateTime(
-                        document.deleted_at
+                    <span>
+                      {getDocumentDate(
+                        document
                       )}
                     </span>
+
                   </div>
 
                   <button
                     type="button"
-                    className="ged-save-button"
                     onClick={() =>
                       restoreDocument(
                         document
                       )
                     }
                   >
-                    <RefreshCw
-                      size={15}
-                    />
+                    <RefreshCw size={15} />
                     Restaurer
                   </button>
 
                 </div>
               )
             )}
+
           </div>
+
         )}
 
       </div>
     );
   }
 
-  /* =========================================================
+  /* ==========================================================
      ADMINISTRATION
-     ========================================================= */
+     ========================================================== */
 
   function renderAdministration() {
     return (
-      <div
-        style={{
-          display: "grid",
-          gap: 15,
-        }}
-      >
+      <div className="ged-admin-grid">
 
-        <div className="ged-panel">
-          <div className="ged-panel-heading">
-            <h2>
-              Statistiques GED
-            </h2>
-          </div>
+        <div className="ged-admin-card ged-panel">
 
-          <div
-            style={{
-              padding: 20,
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(3, 1fr)",
-              gap: 15,
-            }}
-          >
+          <Settings size={27} />
 
-            <div>
-              <strong
-                style={{
-                  fontSize: 25,
-                  color:
-                    "#102746",
-                }}
-              >
-                {totalDocuments}
-              </strong>
+          <h2>
+            Configuration GED
+          </h2>
 
-              <p
-                style={{
-                  fontSize: 11,
-                  color:
-                    "#6f7f95",
-                }}
-              >
-                Documents
-              </p>
-            </div>
+          <p>
+            Gestion des paramètres généraux
+            de la Gestion Électronique des
+            Documents.
+          </p>
 
-            <div>
-              <strong
-                style={{
-                  fontSize: 25,
-                  color:
-                    "#0877ed",
-                }}
-              >
-                {favoriteDocuments}
-              </strong>
+          <button type="button">
+            Paramètres
+          </button>
 
-              <p
-                style={{
-                  fontSize: 11,
-                  color:
-                    "#6f7f95",
-                }}
-              >
-                Favoris
-              </p>
-            </div>
-
-            <div>
-              <strong
-                style={{
-                  fontSize: 25,
-                  color:
-                    "#1aa46f",
-                }}
-              >
-                {archivedDocuments}
-              </strong>
-
-              <p
-                style={{
-                  fontSize: 11,
-                  color:
-                    "#6f7f95",
-                }}
-              >
-                Archivés
-              </p>
-            </div>
-
-          </div>
         </div>
 
-        <div className="ged-panel">
+        <div className="ged-admin-card ged-panel">
 
-          <div className="ged-panel-heading">
-            <h2>
-              Configuration
-            </h2>
-          </div>
+          <Users size={27} />
 
-          <div
-            style={{
-              padding: 20,
-              display: "grid",
-              gap: 12,
-            }}
-          >
+          <h2>
+            Utilisateurs
+          </h2>
 
-            <label
-              style={{
-                display:
-                  "flex",
-                justifyContent:
-                  "space-between",
-                alignItems:
-                  "center",
-                fontSize: 11,
-              }}
-            >
-              <span>
-                Indexation obligatoire
-              </span>
+          <p>
+            Gestion des droits d'accès aux
+            documents et aux fonctions de la GED.
+          </p>
 
-              <input
-                type="checkbox"
-                defaultChecked
-              />
-            </label>
+          <button type="button">
+            Gérer les utilisateurs
+          </button>
 
-            <label
-              style={{
-                display:
-                  "flex",
-                justifyContent:
-                  "space-between",
-                alignItems:
-                  "center",
-                fontSize: 11,
-              }}
-            >
-              <span>
-                Conservation automatique
-              </span>
+        </div>
 
-              <input
-                type="checkbox"
-                defaultChecked
-              />
-            </label>
+        <div className="ged-admin-card ged-panel">
 
-            <label
-              style={{
-                display:
-                  "flex",
-                justifyContent:
-                  "space-between",
-                alignItems:
-                  "center",
-                fontSize: 11,
-              }}
-            >
-              <span>
-                Notifications GED
-              </span>
+          <Archive size={27} />
 
-              <input
-                type="checkbox"
-                defaultChecked
-              />
-            </label>
+          <h2>
+            Archivage
+          </h2>
 
-          </div>
+          <p>
+            Paramétrage des règles d'archivage
+            et de conservation des documents.
+          </p>
+
+          <button type="button">
+            Configurer
+          </button>
+
         </div>
 
       </div>
     );
   }
 
-  /* =========================================================
-     TITRE PRINCIPAL
-     ========================================================= */
+  /* ==========================================================
+     MODALE UPLOAD
+     ========================================================== */
 
-  const pageInfo =
-    getPageTitle();
+  function renderUploadModal() {
+    if (!showUploadModal) return null;
 
-  const PageIcon =
-    pageInfo.icon;
+    return (
+      <div
+        className="ged-modal-overlay"
+        onMouseDown={() =>
+          !uploading &&
+          setShowUploadModal(false)
+        }
+      >
 
-  /* =========================================================
-     RENDU FINAL
-     ========================================================= */
+        <div
+          className="ged-modal"
+          onMouseDown={(event) =>
+            event.stopPropagation()
+          }
+        >
+
+          <div className="ged-modal-header">
+
+            <div>
+
+              <span>
+                NOUVEAU DOCUMENT
+              </span>
+
+              <h2>
+                Ajouter un document
+              </h2>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                !uploading &&
+                setShowUploadModal(false)
+              }
+            >
+              <X size={18} />
+            </button>
+
+          </div>
+
+          <form
+            className="ged-form"
+            onSubmit={handleUpload}
+          >
+
+            <div className="ged-form-group">
+
+              <label>
+                Titre du document *
+              </label>
+
+              <input
+                name="title"
+                value={uploadForm.title}
+                onChange={handleUploadChange}
+                placeholder="Ex : Dossier médical Jean KOUADIO"
+                required
+              />
+
+            </div>
+
+            <div className="ged-form-grid">
+
+              <div className="ged-form-group">
+
+                <label>
+                  Type de document
+                </label>
+
+                <select
+                  name="document_type"
+                  value={
+                    uploadForm.document_type
+                  }
+                  onChange={
+                    handleUploadChange
+                  }
+                >
+
+                  {DOCUMENT_TYPES
+                    .filter(
+                      (type) =>
+                        type !==
+                        "Tous les documents"
+                    )
+                    .map((type) => (
+                      <option
+                        key={type}
+                        value={type}
+                      >
+                        {type}
+                      </option>
+                    ))}
+
+                </select>
+
+              </div>
+
+              <div className="ged-form-group">
+
+                <label>
+                  Patient associé
+                </label>
+
+                <select
+                  name="patient_id"
+                  value={
+                    uploadForm.patient_id
+                  }
+                  onChange={
+                    handleUploadChange
+                  }
+                >
+
+                  <option value="">
+                    Aucun patient
+                  </option>
+
+                  {patients.map(
+                    (patient) => (
+                      <option
+                        key={patient.id}
+                        value={patient.id}
+                      >
+                        {patient.name ||
+                          `${patient.first_name || ""} ${
+                            patient.last_name || ""
+                          }`.trim()}
+                      </option>
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+            </div>
+
+            <div className="ged-form-grid">
+
+              <div className="ged-form-group">
+
+                <label>Dossier</label>
+
+                <input
+                  name="folder"
+                  value={
+                    uploadForm.folder
+                  }
+                  onChange={
+                    handleUploadChange
+                  }
+                  placeholder="Dossiers médicaux"
+                />
+
+              </div>
+
+              <div className="ged-form-group">
+
+                <label>Tags</label>
+
+                <input
+                  name="tags"
+                  value={uploadForm.tags}
+                  onChange={
+                    handleUploadChange
+                  }
+                  placeholder="patient, médical..."
+                />
+
+              </div>
+
+            </div>
+
+            <div className="ged-form-group">
+
+              <label>
+                Fichier
+              </label>
+
+              <label className="ged-file-input">
+
+                <Upload size={24} />
+
+                <div>
+
+                  <strong>
+                    {uploadForm.file
+                      ? uploadForm.file.name
+                      : "Sélectionner un fichier"}
+                  </strong>
+
+                  <span>
+                    PDF, Word, image,
+                    document administratif...
+                  </span>
+
+                </div>
+
+                <input
+                  type="file"
+                  name="file"
+                  onChange={
+                    handleUploadChange
+                  }
+                  hidden
+                />
+
+              </label>
+
+            </div>
+
+            <div className="ged-form-group">
+
+              <label>
+                Description
+              </label>
+
+              <textarea
+                name="description"
+                rows="4"
+                value={
+                  uploadForm.description
+                }
+                onChange={
+                  handleUploadChange
+                }
+                placeholder="Description du document..."
+              />
+
+            </div>
+
+            <div className="ged-modal-actions">
+
+              <button
+                type="button"
+                className="ged-cancel-button"
+                onClick={() =>
+                  setShowUploadModal(false)
+                }
+                disabled={uploading}
+              >
+                Annuler
+              </button>
+
+              <button
+                type="submit"
+                className="ged-submit-button"
+                disabled={uploading}
+              >
+
+                {uploading ? (
+                  <>
+                    <RefreshCw
+                      size={15}
+                      className="ged-spin-icon"
+                    />
+                    Enregistrement...
+                  </>
+                ) : (
+                  <>
+                    <Upload size={15} />
+                    Ajouter le document
+                  </>
+                )}
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  /* ==========================================================
+     MODALE APERÇU
+     ========================================================== */
+
+  function renderPreviewModal() {
+    if (
+      !showPreviewModal ||
+      !selectedDocument
+    ) {
+      return null;
+    }
+
+    const FileIcon =
+      getFileIcon(selectedDocument);
+
+    return (
+      <div
+        className="ged-modal-overlay"
+        onMouseDown={() =>
+          setShowPreviewModal(false)
+        }
+      >
+
+        <div
+          className="ged-preview-modal"
+          onMouseDown={(event) =>
+            event.stopPropagation()
+          }
+        >
+
+          <div className="ged-modal-header">
+
+            <div>
+
+              <span>
+                APERÇU DU DOCUMENT
+              </span>
+
+              <h2>
+                Informations
+              </h2>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowPreviewModal(false)
+              }
+            >
+              <X size={18} />
+            </button>
+
+          </div>
+
+          <div className="ged-preview-content">
+
+            <div className="ged-preview-icon">
+              <FileIcon size={38} />
+            </div>
+
+            <h3>
+              {getDocumentName(
+                selectedDocument
+              )}
+            </h3>
+
+            <p>
+              {selectedDocument.description ||
+                "Aucune description disponible pour ce document."}
+            </p>
+
+            <div className="ged-preview-information">
+
+              <div>
+                <span>Type</span>
+                <strong>
+                  {getDocumentType(
+                    selectedDocument
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Patient</span>
+                <strong>
+                  {getPatientName(
+                    selectedDocument
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Date</span>
+                <strong>
+                  {getDocumentDate(
+                    selectedDocument
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Taille</span>
+                <strong>
+                  {selectedDocument.file_size ||
+                    "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Dossier</span>
+                <strong>
+                  {selectedDocument.folder ||
+                    "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Favori</span>
+                <strong>
+                  {selectedDocument.favorite
+                    ? "Oui"
+                    : "Non"}
+                </strong>
+              </div>
+
+            </div>
+
+            <div className="ged-preview-actions">
+
+              <button
+                type="button"
+                className="ged-cancel-button"
+                onClick={() =>
+                  setShowPreviewModal(false)
+                }
+              >
+                Fermer
+              </button>
+
+              <button
+                type="button"
+                className="ged-submit-button"
+                onClick={() =>
+                  downloadDocument(
+                    selectedDocument
+                  )
+                }
+              >
+                <Download size={15} />
+                Télécharger
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  /* ==========================================================
+     RENDU PRINCIPAL
+     ========================================================== */
+
+  const pageInfo = getPageTitle();
+  const PageIcon = pageInfo.icon;
 
   return (
     <div className="ged-page">
 
       {renderSidebar()}
 
-      <div className="ged-main">
+      <div
+        className={`ged-main ${
+          !sidebarOpen
+            ? "ged-main-expanded"
+            : ""
+        }`}
+      >
 
         {renderTopbar()}
 
@@ -2941,10 +2935,11 @@ export default function GED() {
             <div className="ged-title-left">
 
               <div className="ged-title-icon">
-                <PageIcon size={30} />
+                <PageIcon size={28} />
               </div>
 
               <div>
+
                 <h1>
                   {pageInfo.title}
                 </h1>
@@ -2952,24 +2947,32 @@ export default function GED() {
                 <p>
                   {pageInfo.description}
                 </p>
+
               </div>
 
             </div>
 
-            <button
-              type="button"
-              className="ged-upload-button"
-              onClick={
-                openUploadModal
-              }
-            >
-              <Upload size={18} />
-              Ajouter un document
-            </button>
+            {(activeTab === "ged" ||
+              activeTab === "documents" ||
+              activeTab === "dashboard") && (
+
+              <button
+                type="button"
+                className="ged-upload-button"
+                onClick={() =>
+                  setShowUploadModal(true)
+                }
+              >
+                <Upload size={17} />
+                Ajouter un document
+              </button>
+
+            )}
 
           </div>
 
           {error && (
+
             <div className="ged-alert">
 
               <span>
@@ -2982,576 +2985,38 @@ export default function GED() {
                   setError("")
                 }
               >
-                <X size={17} />
+                <X size={15} />
               </button>
 
             </div>
+
           )}
 
-          {/* ===============================
-              TABLEAU DE BORD
-              =============================== */}
-
-          {activeTab ===
-            "dashboard" &&
+          {activeTab === "dashboard" &&
             renderDashboard()}
 
-          {/* ===============================
-              GED / DOCUMENTS / RECHERCHE
-              =============================== */}
-
           {(activeTab === "ged" ||
-            activeTab ===
-              "documents" ||
-            activeTab ===
-              "search" ||
-            activeTab ===
-              "favorites" ||
-            activeTab ===
-              "recent") &&
+            activeTab === "documents" ||
+            activeTab === "search" ||
+            activeTab === "favorites" ||
+            activeTab === "recent") &&
             renderWorkspace()}
 
-          {/* ===============================
-              INDEXATION
-              =============================== */}
+          {activeTab === "indexation" &&
+            renderWorkspace()}
 
-          {activeTab ===
-            "indexation" && (
-            <div
-              style={{
-                maxWidth: 700,
-              }}
-            >
-              {selectedDocument ? (
-                renderIndexPanel()
-              ) : (
-                <div className="ged-panel">
-                  <div className="ged-index-empty">
-                    <div>
-                      <Tag size={32} />
-                    </div>
-
-                    <h3>
-                      Sélectionnez un document
-                    </h3>
-
-                    <p>
-                      Rendez-vous dans
-                      « Mes documents »
-                      puis cliquez sur un
-                      document pour
-                      l'indexer.
-                    </p>
-
-                    <button
-                      type="button"
-                      className="ged-upload-button"
-                      style={{
-                        marginTop: 15,
-                      }}
-                      onClick={() =>
-                        changeTab(
-                          "documents"
-                        )
-                      }
-                    >
-                      <FileText
-                        size={16}
-                      />
-                      Ouvrir mes documents
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ===============================
-              CORBEILLE
-              =============================== */}
-
-          {activeTab ===
-            "trash" &&
+          {activeTab === "trash" &&
             renderTrash()}
 
-          {/* ===============================
-              ADMINISTRATION
-              =============================== */}
-
-          {activeTab ===
-            "administration" &&
+          {activeTab === "administration" &&
             renderAdministration()}
 
         </main>
+
       </div>
 
-      {/* =====================================================
-          MODALE AJOUT
-          ===================================================== */}
-
-      {showUploadModal && (
-        <div
-          className="ged-modal-overlay"
-          onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-              closeUploadModal();
-            }
-          }}
-        >
-
-          <div className="ged-modal">
-
-            <div className="ged-modal-header">
-
-              <div>
-                <span>
-                  GED
-                </span>
-
-                <h2>
-                  Ajouter un document
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={
-                  closeUploadModal
-                }
-                disabled={
-                  uploading
-                }
-              >
-                <X size={20} />
-              </button>
-
-            </div>
-
-            <form
-              className="ged-form"
-              onSubmit={
-                handleUpload
-              }
-            >
-
-              <div className="ged-form-group">
-
-                <label>
-                  Document
-                </label>
-
-                <div
-                  className="ged-file-input"
-                  onClick={() =>
-                    fileInputRef.current?.click()
-                  }
-                >
-
-                  <Upload
-                    size={24}
-                  />
-
-                  <div>
-
-                    <strong>
-                      {form.file
-                        ? form.file.name
-                        : "Sélectionner un fichier"}
-                    </strong>
-
-                    <span>
-                      Cliquez pour
-                      choisir le document
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <input
-                  ref={
-                    fileInputRef
-                  }
-                  type="file"
-                  onChange={
-                    handleFileChange
-                  }
-                  hidden
-                />
-
-              </div>
-
-              <div className="ged-form-grid">
-
-                <div className="ged-form-group">
-
-                  <label htmlFor="ged-title">
-                    Titre du document
-                  </label>
-
-                  <input
-                    id="ged-title"
-                    name="title"
-                    type="text"
-                    value={
-                      form.title
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    placeholder="Ex. Compte rendu consultation"
-                    required
-                  />
-
-                </div>
-
-                <div className="ged-form-group">
-
-                  <label htmlFor="ged-type">
-                    Type de document
-                  </label>
-
-                  <select
-                    id="ged-type"
-                    name="document_type"
-                    value={
-                      form.document_type
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                  >
-                    {DOCUMENT_TYPES.filter(
-                      (type) =>
-                        type !==
-                        "Tous les documents"
-                    ).map(
-                      (type) => (
-                        <option
-                          key={type}
-                          value={type}
-                        >
-                          {type}
-                        </option>
-                      )
-                    )}
-                  </select>
-
-                </div>
-
-              </div>
-
-              <div className="ged-form-group">
-
-                <label htmlFor="ged-patient">
-                  Patient
-                </label>
-
-                <select
-                  id="ged-patient"
-                  name="patient"
-                  value={
-                    form.patient
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                >
-
-                  <option value="">
-                    Aucun patient associé
-                  </option>
-
-                  {patients.map(
-                    (patient) => (
-                      <option
-                        key={
-                          patient.id
-                        }
-                        value={
-                          patient.id
-                        }
-                      >
-                        {patient.first_name ||
-                          patient.prenom ||
-                          ""}{" "}
-                        {patient.last_name ||
-                          patient.nom ||
-                          ""}
-                      </option>
-                    )
-                  )}
-
-                </select>
-
-              </div>
-
-              <div className="ged-form-group">
-
-                <label htmlFor="ged-description">
-                  Description
-                </label>
-
-                <textarea
-                  id="ged-description"
-                  name="description"
-                  value={
-                    form.description
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  rows="4"
-                  placeholder="Description..."
-                />
-
-              </div>
-
-              <div className="ged-form-group">
-
-                <label htmlFor="ged-tags">
-                  Mots-clés / indexation
-                </label>
-
-                <input
-                  id="ged-tags"
-                  name="tags"
-                  type="text"
-                  value={
-                    form.tags
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  placeholder="Ex. consultation, cardiologie, 2026"
-                />
-
-              </div>
-
-              <div className="ged-modal-actions">
-
-                <button
-                  type="button"
-                  className="ged-cancel-button"
-                  onClick={
-                    closeUploadModal
-                  }
-                  disabled={
-                    uploading
-                  }
-                >
-                  Annuler
-                </button>
-
-                <button
-                  type="submit"
-                  className="ged-submit-button"
-                  disabled={
-                    uploading
-                  }
-                >
-
-                  <Upload
-                    size={17}
-                  />
-
-                  {uploading
-                    ? "Enregistrement..."
-                    : "Indexer le document"}
-
-                </button>
-
-              </div>
-
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================
-          MODALE PRÉVISUALISATION
-          ===================================================== */}
-
-      {showPreviewModal &&
-        selectedDocument && (
-          <div
-            className="ged-modal-overlay"
-            onMouseDown={(
-              event
-            ) => {
-              if (
-                event.target ===
-                event.currentTarget
-              ) {
-                closePreview();
-              }
-            }}
-          >
-
-            <div className="ged-preview-modal">
-
-              <div className="ged-modal-header">
-
-                <div>
-
-                  <span>
-                    DOCUMENT
-                  </span>
-
-                  <h2>
-                    {getDocumentName(
-                      selectedDocument
-                    )}
-                  </h2>
-
-                </div>
-
-                <button
-                  type="button"
-                  onClick={
-                    closePreview
-                  }
-                >
-                  <X size={20} />
-                </button>
-
-              </div>
-
-              <div className="ged-preview-content">
-
-                <div className="ged-preview-icon">
-                  <FileText
-                    size={50}
-                  />
-                </div>
-
-                <h3>
-                  {getDocumentName(
-                    selectedDocument
-                  )}
-                </h3>
-
-                <p>
-                  {selectedDocument.description ||
-                    "Aucune description disponible."}
-                </p>
-
-                <div className="ged-preview-information">
-
-                  <div>
-                    <span>
-                      Patient
-                    </span>
-
-                    <strong>
-                      {getPatientName(
-                        selectedDocument
-                      )}
-                    </strong>
-                  </div>
-
-                  <div>
-                    <span>
-                      Type
-                    </span>
-
-                    <strong>
-                      {getDocumentType(
-                        selectedDocument
-                      )}
-                    </strong>
-                  </div>
-
-                  <div>
-                    <span>
-                      Date
-                    </span>
-
-                    <strong>
-                      {formatDate(
-                        getDocumentDate(
-                          selectedDocument
-                        )
-                      )}
-                    </strong>
-                  </div>
-
-                </div>
-
-                <div
-                  style={{
-                    marginTop: 15,
-                    padding: 12,
-                    border:
-                      "1px solid #dce5ef",
-                    borderRadius: 6,
-                    textAlign:
-                      "left",
-                    background:
-                      "#f9fbfd",
-                  }}
-                >
-                  <strong
-                    style={{
-                      fontSize: 10,
-                      color:
-                        "#102746",
-                    }}
-                  >
-                    Mots-clés
-                  </strong>
-
-                  <p
-                    style={{
-                      margin:
-                        "6px 0 0",
-                      fontSize: 10,
-                      color:
-                        "#6f7f95",
-                    }}
-                  >
-                    {selectedDocument.tags ||
-                      "Aucun mot-clé"}
-                  </p>
-                </div>
-
-              </div>
-
-              <div className="ged-preview-actions">
-
-                <button
-                  type="button"
-                  className="ged-cancel-button"
-                  onClick={
-                    closePreview
-                  }
-                >
-                  Fermer
-                </button>
-
-                <button
-                  type="button"
-                  className="ged-submit-button"
-                  onClick={() =>
-                    downloadDocument(
-                      selectedDocument
-                    )
-                  }
-                >
-                  <Download
-                    size={17}
-                  />
-                  Télécharger
-                </button>
-
-              </div>
-
-            </div>
-          </div>
-        )}
+      {renderUploadModal()}
+      {renderPreviewModal()}
 
     </div>
   );
