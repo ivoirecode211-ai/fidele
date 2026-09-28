@@ -162,8 +162,8 @@ export default function Caisse() {
       {/* Un seul popup, du premier champ jusqu'à la confirmation. */}
       {popup && (
         <StepModal
-          config={configDossier({ ...refs, patientExistant: !!popup.patient })}
-          initialValues={{ quantite: 1, __patient_existant__: !!popup.patient }}
+          config={configDossier({ ...refs, patientExistant: !!popup.patient, patient: popup.patient })}
+          initialValues={{ quantite: 1, assure: false, __patient_existant__: !!popup.patient }}
           onClose={() => setPopup(null)}
           onSubmit={enregistrer}
           renderSuccess={({ patient, fiche, doublon }, fermer) =>

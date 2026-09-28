@@ -45,109 +45,121 @@ const communesDe = (values) => {
 /* ------------------------------------------------------------
    DOSSIER PATIENT + FICHE DE PAIEMENT
    ------------------------------------------------------------
-   Un seul parcours, du premier champ jusqu'à l'envoi en caisse.
-   L'utilisateur ne quitte jamais le popup.
+   Deux étapes, du premier champ jusqu'à l'envoi en caisse :
 
-   Quand on part d'un patient déjà enregistré, les quatre
-   premières étapes disparaissent d'elles-mêmes : c'est la
-   condition `visibleIf` qui les retire du parcours.
+     Patient      qui il est, comment le joindre, son assurance
+     Prestation   ce qu'il vient faire, et ce qu'il paiera
+
+   La personne à prévenir, facultative, se déplie à la demande.
+   Quand on part d'un patient déjà enregistré, l'étape Patient
+   disparaît d'elle-même (`visibleIf`) : il ne reste que la
+   prestation.
+
+   Largeurs : `span` sur 12 colonnes à l'écran large,
+   `spanMobile` sur 2 colonnes au téléphone.
    ------------------------------------------------------------ */
-export function configDossier({ assurances, services, prestations, patientExistant = false }) {
+
+const argent = (valeur) => `${Math.round(Number(valeur) || 0).toLocaleString("fr-FR")} FCFA`;
+
+export function configDossier({ assurances, services, prestations, patientExistant = false, patient = null }) {
   const nouveauPatient = { field: "__patient_existant__", operator: "falsy" };
+  const assure = { field: "assure", operator: "truthy" };
+  const contact = { field: "__contact__", operator: "truthy" };
+
+  /* Taux de prise en charge : celui du dossier existant, ou celui choisi à l'étape Patient. */
+  const tauxAssurance = (values) => {
+    if (patient) return Number(patient.taux_assurance) || 0;
+    if (!values.assure) return 0;
+    const organisme = assurances.find((a) => String(a.id) === String(values.assurance));
+    return Number(organisme?.rate) || 0;
+  };
 
   return {
     title: patientExistant ? "Nouvelle fiche de paiement" : "Enregistrer un patient",
     submitLabel: "Envoyer en caisse",
     steps: [
       {
-        id: "identite",
-        title: "Identité",
-        description: "Seuls le nom et les prénoms sont indispensables. Le reste peut être complété plus tard.",
+        id: "patient",
+        title: "Patient",
         visibleIf: nouveauPatient,
         fields: [
-          { id: "last_name", type: "text", label: "Nom", required: true, placeholder: "KONE" },
-          { id: "first_names", type: "text", label: "Prénoms", required: true, placeholder: "Aminata" },
+          { id: "last_name", type: "text", label: "Nom", required: true, placeholder: "KONE", span: 6 },
+          { id: "first_names", type: "text", label: "Prénoms", required: true, placeholder: "Aminata", span: 6 },
+          { id: "birth_date", type: "birthdate", label: "Date de naissance ou âge", span: 6 },
           {
-            id: "birth_date", type: "birthdate", label: "Date de naissance ou âge", large: true,
-            helpText: "Renseignez ce que le patient connaît : la date, ou simplement son âge.",
-          },
-          {
-            id: "sex", type: "radio", label: "Sexe", required: true,
+            id: "sex", type: "radio", label: "Sexe", required: true, span: 6,
             options: [["M", "Masculin"], ["F", "Féminin"], ["O", "Autre"]],
           },
-        ],
-      },
-      {
-        id: "coordonnees",
-        title: "Coordonnées",
-        description: "Un numéro de téléphone permet de joindre le patient ou son accompagnant.",
-        visibleIf: nouveauPatient,
-        fields: [
+
+          { id: "__coordonnees__", type: "section", label: "Coordonnées" },
           {
-            id: "phone", type: "tel", label: "Téléphone", required: true, placeholder: "07 00 00 00 00",
+            id: "phone", type: "tel", label: "Téléphone", required: true, placeholder: "07 00 00 00 00", span: 4,
             requiredMessage: "Veuillez renseigner le numéro de téléphone.",
           },
-          { id: "city", type: "select", label: "Ville ou commune", options: VILLES, placeholder: "Sélectionner la ville" },
+          { id: "city", type: "select", label: "Ville", options: VILLES, placeholder: "Choisir", span: 4, spanMobile: 1 },
           {
-            id: "locality", type: "select", label: "Commune ou localité", options: communesDe,
-            placeholder: "Sélectionner la commune", emptyText: "Choisissez d'abord une ville",
+            id: "locality", type: "select", label: "Commune", options: communesDe, span: 4, spanMobile: 1,
+            placeholder: "Choisir", emptyText: "D'abord la ville",
           },
-          { id: "address", type: "text", label: "Domicile", large: true, placeholder: "Quartier, repère…" },
-          { id: "profession", type: "text", label: "Profession" },
-        ],
-      },
-      {
-        id: "urgence",
-        title: "Personne à prévenir",
-        description: "Facultatif. À renseigner si le patient a communiqué un contact d'urgence.",
-        visibleIf: nouveauPatient,
-        fields: [
-          { id: "emergency_contact", type: "text", label: "Nom et prénoms du contact" },
-          { id: "emergency_phone", type: "tel", label: "Téléphone du contact" },
-          { id: "emergency_relationship", type: "text", label: "Lien avec le patient" },
-        ],
-      },
-      {
-        id: "assurance",
-        title: "Assurance",
-        description: "Si le patient est assuré, la part prise en charge sera calculée automatiquement.",
-        visibleIf: nouveauPatient,
-        fields: [
-          { id: "assure", type: "switch", label: "Le patient est-il assuré ?" },
+          { id: "address", type: "text", label: "Domicile", placeholder: "Quartier, repère…", span: 8 },
+          { id: "profession", type: "text", label: "Profession", span: 4 },
+
+          { id: "__assurance__", type: "section", label: "Assurance" },
+          { id: "assure", type: "switch", label: "Assuré ?", span: 3 },
           {
-            id: "assurance", type: "select", label: "Organisme", required: true,
-            visibleIf: { field: "assure", operator: "truthy" },
-            options: assurances.map((a) => [String(a.id), `${a.name} (${a.rate} %)`]),
+            id: "assurance", type: "select", label: "Organisme", required: true, span: 5, visibleIf: assure,
+            options: assurances.map((a) => [String(a.id), `${a.name} (${Number(a.rate)} %)`]),
           },
           {
-            id: "numero_assurance", type: "text", label: "Numéro d'assuré", required: true,
+            id: "numero_assurance", type: "text", label: "N° d'assuré", required: true, span: 4, visibleIf: assure,
             placeholder: "ASSUR-12345",
-            visibleIf: { field: "assure", operator: "truthy" },
           },
+
+          { id: "__contact__", type: "disclosure", label: "Personne à prévenir", hint: "Facultatif" },
+          { id: "emergency_contact", type: "text", label: "Nom et prénoms", span: 5, visibleIf: contact },
+          { id: "emergency_phone", type: "tel", label: "Téléphone", span: 4, spanMobile: 1, visibleIf: contact },
+          { id: "emergency_relationship", type: "text", label: "Lien", placeholder: "Mère, conjoint…", span: 3, spanMobile: 1, visibleIf: contact },
         ],
       },
       {
         id: "prestation",
         title: "Prestation",
-        description: "La fiche part en caisse. Le patient sera enregistré dès qu'elle sera réglée.",
+        description: patient
+          ? `${patient.nom_complet} · ${patient.patient_number}${patient.a_assurance ? ` · ${patient.assurance_nom} (${Number(patient.taux_assurance)} %)` : ""}`
+          : "",
         fields: [
           {
-            id: "service", type: "select", label: "Service de destination", required: true,
+            id: "service", type: "select", label: "Service de destination", required: true, span: 6,
             options: services.map((s) => [String(s.id), s.name]),
           },
           {
-            id: "prestation", type: "select", label: "Prestation", required: true,
+            id: "prestation", type: "select", label: "Prestation", required: true, span: 6,
             options: (values) => prestations
               .filter((p) => !values.service || String(p.service) === String(values.service))
-              .map((p) => [String(p.id), `${p.name} — ${Number(p.price).toLocaleString("fr-FR")} FCFA`]),
-            emptyText: "Aucune prestation pour ce service",
+              .map((p) => [String(p.id), `${p.name} — ${argent(p.price)}`]),
+            emptyText: "D'abord le service",
           },
           {
-            id: "quantite", type: "number", label: "Quantité", required: true,
-            validate: { min: 1, max: 50, message: "La quantité doit être comprise entre 1 et 50." },
+            id: "quantite", type: "number", label: "Quantité", required: true, span: 3, spanMobile: 1,
+            validate: { min: 1, max: 50, message: "Entre 1 et 50." },
           },
-          { id: "notes", type: "textarea", label: "Observations", large: true },
+          { id: "notes", type: "text", label: "Observations", placeholder: "Facultatif", span: 9, spanMobile: 2 },
         ],
+        /* Ce que le patient paiera, calculé pendant la saisie. */
+        summary: (values) => {
+          const choisie = prestations.find((p) => String(p.id) === String(values.prestation));
+          if (!choisie) return null;
+          const brut = Number(choisie.price) * (Number(values.quantite) || 1);
+          const taux = tauxAssurance(values);
+          const prise = (brut * taux) / 100;
+          return {
+            lignes: [
+              ["Tarif", argent(brut)],
+              ...(taux ? [[`Prise en charge (${taux} %)`, `− ${argent(prise)}`]] : []),
+            ],
+            total: ["À payer", argent(brut - prise)],
+          };
+        },
       },
     ],
   };

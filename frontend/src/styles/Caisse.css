@@ -2025,3 +2025,174 @@ a.caisse-nav-item { font: inherit; }
   font-size: 13px;
   text-align: center;
 }
+
+
+/* ============================================================
+   FORMULAIRE CONDENSÉ — ENREGISTREMENT EN DEUX ÉTAPES
+   ============================================================
+   Mobile d'abord : une grille de 2 colonnes sur téléphone,
+   12 à partir de 720 px. Chaque champ déclare sa largeur
+   (--span / --span-m) dans accueil/configs.js.
+   Des champs plus bas (46 px), des intertitres discrets et un
+   groupe facultatif replié tiennent l'identité, les
+   coordonnées et l'assurance sur un seul écran.
+   ============================================================ */
+
+.pop-corps .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 12px;
+  align-items: start;
+}
+
+.pop-corps .form-grid > .champ { grid-column: span var(--span-m, 2); min-width: 0; }
+.pop-corps .form-grid > .champ-section,
+.pop-corps .form-grid > .champ-disclosure { grid-column: 1 / -1; }
+
+@media (min-width: 720px) {
+  .pop-corps .form-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px 14px; }
+  .pop-corps .form-grid > .champ { grid-column: span var(--span, 6); }
+}
+
+/* Des champs plus compacts : on voit tout l'écran d'un coup. */
+.pop-corps .field { gap: 6px; }
+.pop-corps .field > span { font-size: 13.5px; font-weight: 650; }
+.pop-corps .field input,
+.pop-corps .field select,
+.pop-corps .champ-naissance input { height: 46px; font-size: 14.5px; }
+.pop-corps .field input::placeholder { color: var(--ink-faint); opacity: .7; font-weight: 500; }
+.pop-corps .field input:hover,
+.pop-corps .field select:hover { border-color: var(--primary-200); }
+
+/* Intertitre : un filet et un mot, rien de plus. */
+.pop-section {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.pop-section h3 { margin: 0; color: var(--primary-700); font-size: 14px; font-weight: 750; }
+.pop-section span { color: var(--ink-faint); font-size: 12.5px; }
+
+/* Groupe facultatif : une ligne cliquable, fermée par défaut. */
+.pop-deplier {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 18px 0 2px;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: none;
+  color: var(--primary-700);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+.pop-deplier small { color: var(--ink-faint); font-size: 12.5px; font-weight: 500; }
+.pop-deplier svg { margin-left: auto; color: var(--ink-faint); transition: transform .2s cubic-bezier(.16, 1, .3, 1); }
+.pop-deplier.ouvert svg { transform: rotate(180deg); }
+.pop-deplier:hover svg { color: var(--primary); }
+.pop-deplier:focus-visible { outline: 2px solid var(--primary-300); outline-offset: 4px; border-radius: 4px; }
+
+/* Les champs qui apparaissent (groupe déplié, assurance) glissent en place. */
+.pop-corps .form-grid > .champ { animation: champ-arrivee .22s cubic-bezier(.16, 1, .3, 1); }
+@keyframes champ-arrivee { from { opacity: 0; transform: translateY(-4px); } }
+
+/* Sexe : un contrôle segmenté, à la hauteur d'un champ. */
+.pop-corps .champ-radio .field-radio-group {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+}
+.pop-corps .champ-radio .field-radio-option {
+  justify-content: center;
+  height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  transition: background .15s ease, color .15s ease;
+}
+.pop-corps .champ-radio .field-radio-option:hover { color: var(--primary-700); }
+.pop-corps .champ-radio .field-radio-option:has(input:checked) {
+  background: white;
+  color: var(--primary-700);
+  box-shadow: 0 1px 3px rgba(8, 35, 58, .14);
+}
+.pop-corps .champ-radio .field-radio-option:has(input:focus-visible) { outline: 2px solid var(--primary-300); outline-offset: 1px; }
+/* Le bouton radio natif reste pour le clavier et les lecteurs d'écran, pas pour l'œil. */
+.pop-corps .champ-radio .field-radio-option input { position: absolute; opacity: 0; pointer-events: none; }
+.pop-corps .field-error .field-radio-group { border-color: var(--danger); }
+
+/* Oui / Non : même hauteur que les champs voisins. */
+.pop-corps .champ-switch .field-switch { display: grid; grid-template-columns: 1fr 1fr; width: 100%; border: 1px solid var(--border); background: var(--surface-50); }
+.pop-corps .champ-switch .field-switch button { min-width: 0; height: 36px; padding: 0 12px; }
+
+/* Date de naissance et âge : deux cases de même largeur. */
+.champ-naissance-paire { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 8px; }
+.champ-naissance-paire label:last-of-type { flex: none; }
+.champ-naissance-paire small { font-size: 11.5px; }
+.champ-naissance-ou { padding-bottom: 14px; font-size: 12.5px; }
+.pop-corps .champ-naissance input { padding: 0 10px; }
+
+/* Récapitulatif : ce que le patient paiera, lu d'un coup d'œil. */
+.pop-resume {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  border-radius: var(--radius-xl);
+  background: var(--primary-50);
+  animation: champ-arrivee .22s cubic-bezier(.16, 1, .3, 1);
+}
+.pop-resume > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.pop-resume dt { color: var(--ink-muted); font-size: 13.5px; font-weight: 600; }
+.pop-resume dd { margin: 0; color: var(--ink); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pop-resume-total { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--primary-100); }
+.pop-resume-total dt { color: var(--primary-800); font-weight: 750; }
+.pop-resume-total dd { color: var(--primary-800); font-size: 22px; font-weight: 800; }
+
+/* Deux ou trois étapes tiennent sur une ligne, même au téléphone. */
+@media (max-width: 860px) {
+  .pop-etapes.courtes ol { display: flex; }
+  .pop-etapes.courtes .pop-compact { display: none; }
+}
+.pop-etapes.courtes { padding-top: 12px; padding-bottom: 12px; }
+
+.pop-intro:empty { display: none; }
+
+@media (max-width: 560px) {
+  .pop-corps { padding-top: 18px; padding-bottom: 18px; }
+  .pop-pied { flex-direction: row; }
+  .pop-pied .secondary-button { flex: 0 0 auto; width: auto; }
+  .pop-pied .primary-button { flex: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-corps .form-grid > .champ, .pop-resume { animation: none; }
+}
+
+/* Messages d'erreur : rouges, sous le champ concerné. */
+.pop-corps .field > .field-error-message { color: var(--danger); font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+.pop-corps .field-error input,
+.pop-corps .field-error select { border-color: var(--danger); }
+
+/* Naissance : les deux cases portent leur propre libellé, alignés sur ceux des champs voisins. */
+.pop-corps .champ-birthdate .champ-naissance > span:first-child { display: none; }
+.pop-corps .champ-naissance-paire small { color: var(--ink); font-size: 13.5px; font-weight: 650; }
+.pop-corps .champ-naissance-paire label { gap: 6px; }
+
+.pop-deplier > span { font-weight: 750; }
