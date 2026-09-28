@@ -60,6 +60,9 @@ import Modules from "./pages/Modules";
 
 import Dashboard from "./pages/Dashboard";
 
+import PatientSpace from "./pages/PatientSpace";
+import GED from "./pages/GED";
+
 
 /* ============================================================
    MODULE DIRECTION
@@ -347,6 +350,8 @@ export default function App() {
         }
       />
 
+      <Route path="/patient-space" element={<PatientSpace />} />
+      <Route path="/ged" element={<GED />} />
 
       {/* ======================================================
           PAGE PRINCIPALE DES MODULES
