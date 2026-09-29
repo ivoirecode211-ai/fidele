@@ -2196,3 +2196,5 @@ a.caisse-nav-item { font: inherit; }
 .pop-corps .champ-naissance-paire label { gap: 6px; }
 
 .pop-deplier > span { font-weight: 750; }
+.ligne-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.ligne-actions a { display: inline-flex; align-items: center; text-decoration: none; }

@@ -430,7 +430,12 @@ function EcranAccueil({ version, onNouveau, onFiche }) {
                     <td><strong>{p.nom_complet}</strong><small>{p.sex === "F" ? "Féminin" : p.sex === "M" ? "Masculin" : "Autre"}{p.birth_date ? ` · ${p.birth_date}` : ""}</small></td>
                     <td>{p.phone || "—"}</td>
                     <td>{p.a_assurance ? `${p.assurance_nom} (${p.taux_assurance} %)` : "Non assuré"}</td>
-                    <td><button type="button" className="secondary-button" onClick={() => onFiche(p)}>Nouvelle fiche</button></td>
+                    <td>
+                      <div className="ligne-actions">
+                        <a className="secondary-button" href={`/dossiers/${p.id}`}>Dossier</a>
+                        <button type="button" className="secondary-button" onClick={() => onFiche(p)}>Nouvelle fiche</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

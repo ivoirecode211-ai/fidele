@@ -24,6 +24,7 @@ import {
   Bot,
   Hospital,
   QrCode,
+  FolderHeart,
   ChevronRight,
   ChevronDown,
   LayoutGrid,
@@ -246,6 +247,19 @@ const ALL_MODULES = [
   },
 
   // ============================================================
+  // DOSSIER PATIENT : tout ce que les modules savent d'un patient
+  // ============================================================
+  {
+    id: "dossiers",
+    name: "Dossier patient",
+    description:
+      "Retrouver un patient et tout son parcours : caisse, soins, consultations, ordonnances, analyses, séjours",
+    path: "/dossiers",
+    icon: FolderHeart,
+    color: "blue",
+  },
+
+  // ============================================================
   // QR CODE ÉQUIPEMENTS : identifier chaque appareil, voir sa maintenance
   // ============================================================
   {
@@ -281,6 +295,7 @@ const DEFAULT_ROLE_MODULES = {
   ADMIN: ALL_MODULES.map((module) => module.id),
 
   DIRECTOR: [
+    "dossiers",
     "patients",
     "appointments",
     "consultations",
@@ -303,6 +318,7 @@ const DEFAULT_ROLE_MODULES = {
   ],
 
   DOCTOR: [
+    "dossiers",
     "appointments",
     "consultations",
     "hospitalization",
@@ -315,6 +331,7 @@ const DEFAULT_ROLE_MODULES = {
   ],
 
   NURSE: [
+    "dossiers",
     "appointments",
     "hospitalization",
     "nursing",
@@ -322,22 +339,26 @@ const DEFAULT_ROLE_MODULES = {
   ],
 
   RECEPTION: [
+    "dossiers",
     "patients",
     "appointments",
     "patient-space",
   ],
 
   LAB: [
+    "dossiers",
     "laboratory",
     "ged",
   ],
 
   PHARMACY: [
+    "dossiers",
     "pharmacy",
     "stocks",
   ],
 
   ACCOUNTING: [
+    "dossiers",
     "patients",
     "accounting",
     "reports",
@@ -360,6 +381,7 @@ const DEFAULT_ROLE_MODULES = {
 
   // Reçoit les fonds des caisses, valide les clôtures, annule les tickets.
   REGISSEUR: [
+    "dossiers",
     "patients",
     "accounting",
     "reports",

@@ -62,6 +62,7 @@ import Modules from "./pages/Modules";
 import Dashboard from "./pages/Dashboard";
 
 import EspacePatientsPersonnel from "./patient/Personnel";
+import Dossiers from "./dossier/Dossiers";
 import ConnexionPatient from "./patient/Connexion";
 import EspacePatient from "./patient/Espace";
 import GED from "./pages/GED";
@@ -364,6 +365,9 @@ export default function App() {
 
       {/* Espace patients : côté personnel (accès, messages) et côté patient (code patient + PIN). */}
       <Route path="/patient-space" element={<Protected><EspacePatientsPersonnel /></Protected>} />
+      {/* Dossier patient : tout ce que les modules savent d'un patient. */}
+      <Route path="/dossiers" element={<Protected><Dossiers /></Protected>} />
+      <Route path="/dossiers/:id" element={<Protected><Dossiers /></Protected>} />
       <Route path="/patient" element={<ConnexionPatient />} />
       <Route path="/patient/espace" element={<EspacePatient />} />
       <Route path="/ged" element={<GED />} />

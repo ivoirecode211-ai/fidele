@@ -1,0 +1,111 @@
+/* ============================================================
+   DOSSIER PATIENT
+   ============================================================
+   Coquille et blocs de la Caisse (Caisse.css) ; ici, le bandeau
+   d'identité, la chronologie et les fiches de chaque section.
+   Palette : src/styles/variables.css (source unique).
+   ============================================================ */
+
+.ds-retour { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+
+/* Résultats de recherche */
+.ds-resultats { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ds-resultats button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ds-resultats button:hover { border-color: var(--primary-200); box-shadow: 0 8px 20px -16px rgba(8, 35, 58, .4); }
+.ds-resultats button > div { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.ds-resultats strong { font-size: 15px; }
+.ds-resultats span:not(.ds-avatar):not(.ds-puce-alerte) { color: var(--ink-muted); font-size: 13px; }
+.ds-resultats code { color: var(--primary-700); font-size: 13px; font-weight: 800; letter-spacing: .4px; }
+.ds-puce-alerte { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--danger-soft); color: var(--danger); }
+
+.ds-avatar { display: grid; flex-shrink: 0; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--primary-50); color: var(--primary-700); font-size: 14px; font-weight: 800; text-transform: uppercase; }
+.ds-avatar.grand { width: 56px; height: 56px; font-size: 19px; }
+
+/* Bandeau du patient, en tête de chaque section */
+.ds-bandeau {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 18px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: white;
+}
+.ds-bandeau-identite { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ds-bandeau h2 { margin: 0; color: var(--ink); font-size: 20px; font-weight: 800; }
+.ds-bandeau p { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 0; color: var(--ink-muted); font-size: 13.5px; }
+.ds-bandeau code { color: var(--primary-700); font-weight: 800; letter-spacing: .4px; }
+.ds-bandeau-alertes { display: flex; flex-wrap: wrap; gap: 8px; grid-column: 1 / -1; }
+.ds-bandeau-alertes:empty { display: none; }
+.ds-alerte, .ds-groupe, .ds-hospit { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.ds-alerte { background: var(--danger-soft); color: var(--danger-soft-text); }
+.ds-groupe { background: var(--primary-50); color: var(--primary-800); }
+.ds-hospit { background: var(--warning-soft); color: var(--warning-soft-text); }
+.ds-modifier { display: inline-flex; align-items: center; gap: 6px; grid-column: 2; grid-row: 1; }
+
+@media (max-width: 720px) {
+  .ds-bandeau { grid-template-columns: minmax(0, 1fr); }
+  .ds-modifier { grid-column: 1; grid-row: auto; justify-self: start; }
+}
+
+.ds-chiffres { margin-bottom: 20px; }
+
+/* Chronologie */
+.ds-chrono { margin: 0; padding: 0; list-style: none; }
+.ds-chrono li { position: relative; display: flex; gap: 14px; padding: 0 0 18px; }
+.ds-chrono li::before { content: ""; position: absolute; top: 32px; bottom: 0; left: 15px; width: 2px; background: var(--surface-200); }
+.ds-chrono li:last-child::before { display: none; }
+.ds-chrono-icone { display: grid; flex-shrink: 0; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary-50); color: var(--primary-700); }
+.ds-chrono .soins .ds-chrono-icone { background: var(--green-soft); color: var(--green-soft-text); }
+.ds-chrono .pharmacie .ds-chrono-icone, .ds-chrono .labo .ds-chrono-icone { background: var(--surface-100); color: var(--ink-muted); }
+.ds-chrono .hospit .ds-chrono-icone { background: var(--warning-soft); color: var(--warning-soft-text); }
+.ds-chrono li > div { min-width: 0; padding-top: 5px; }
+.ds-chrono strong { color: var(--ink); font-size: 14.5px; }
+.ds-chrono p { margin: 3px 0 0; color: var(--ink); font-size: 14px; line-height: 1.45; }
+.ds-chrono small { display: block; margin-top: 3px; color: var(--ink-faint); font-size: 12.5px; }
+
+.ds-liens { color: var(--ink-muted); font-size: 13.5px; }
+.ds-liens button { padding: 0; border: 0; background: none; color: var(--primary-700); font: inherit; font-weight: 700; cursor: pointer; }
+
+/* Champs en lecture */
+.ds-champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px 22px; margin: 0; }
+.ds-champs dt { color: var(--ink-faint); font-size: 12.5px; font-weight: 650; }
+.ds-champs dd { margin: 3px 0 0; color: var(--ink); font-size: 14.5px; font-weight: 600; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
+.ds-antecedents { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; }
+.ds-antecedents span { padding: 5px 10px; border-radius: 999px; background: var(--surface-100); color: var(--ink); font-size: 13px; font-weight: 600; }
+
+/* Fiches (consultations, ordonnances, analyses) */
+.ds-carte { margin-bottom: 14px; }
+.ds-carte-tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); color: var(--ink-muted); font-size: 13.5px; }
+.ds-carte-tete strong { color: var(--ink); font-size: 15px; }
+.ds-carte-tete .etat { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; font-size: 12px; }
+.ds-carte .vide { margin: 0; }
+.ds-medicaments { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ds-medicaments li { display: grid; gap: 2px; padding: 10px 12px; border-radius: var(--radius-lg); background: var(--surface-50); }
+.ds-medicaments strong { font-size: 14.5px; }
+.ds-medicaments span { color: var(--ink-muted); font-size: 13px; }
+.ds-note { margin: 12px 0 0; color: var(--ink-muted); font-size: 13.5px; }
+.ds-avenir { display: block; color: var(--primary-700); font-weight: 700; }
+.etat.critique { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
+
+/* Formulaire de modification */
+.ds-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.ds-form .field.large { grid-column: 1 / -1; }
+.ds-form .field > span { font-size: 13.5px; font-weight: 650; }
+.ds-form .field input, .ds-form .field select { height: 46px; font-size: 14.5px; }

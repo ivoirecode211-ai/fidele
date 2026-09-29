@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "stocks",
     "rh",
     "portail",
+    "dossier",
 ]
 
 MIDDLEWARE = [
