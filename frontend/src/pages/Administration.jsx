@@ -1,4 +1,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import Prestations from "../administration/Prestations";
+import { useModuleView } from "../layouts/AppLayout";
+import { LISTE_SPECIALITES } from "../catalogue/specialites";
 import {
   Users,
   UserRound,
@@ -42,6 +45,7 @@ const EMPTY_USER_FORM = {
   password: "",
   function: "",
   roles: [],
+  specialites: [],
   email: "",
   phone: "",
 };
@@ -60,7 +64,13 @@ const ROLE_COLORS = {
 // COMPOSANT
 // ============================================================
 
-export default function Administration() {
+/* Deux sous-modules dans la barre latérale : les comptes, et le catalogue de la caisse. */
+export default function AdministrationModule() {
+  const vue = useModuleView("/administration");
+  return vue?.id === "prestations" ? <Prestations /> : <Administration />;
+}
+
+function Administration() {
   const [overview, setOverview] = useState({
     stats: { activeUsers: 0, roles: 0, documents: 0 },
     users: [],
@@ -269,6 +279,7 @@ export default function Administration() {
       password: "",
       function: user.function,
       roles: [...user.roles],
+      specialites: [...(user.specialites || [])],
       email: user.email || "",
       phone: user.phone || "",
     });
@@ -1043,6 +1054,32 @@ export default function Administration() {
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* ==================================================
+                    SPÉCIALITÉS — les formulaires et la file d'attente
+                    du praticien dans le module Consultation. Aucune :
+                    médecine générale.
+                ================================================== */}
+
+                <div className="form-group">
+                  <label>Spécialités exercées</label>
+                  <div className="specialites-grille">
+                    {LISTE_SPECIALITES.map(([code, nom]) => {
+                      const coche = form.specialites.includes(code);
+                      return (
+                        <button key={code} type="button" role="checkbox" aria-checked={coche}
+                          className={`spe-case ${coche ? "cochee" : ""}`}
+                          onClick={() => setForm((f) => ({
+                            ...f,
+                            specialites: coche ? f.specialites.filter((c) => c !== code) : [...f.specialites, code],
+                          }))}>
+                          <span className="spe-coche">{coche && <Check size={12} strokeWidth={3} />}</span>
+                          {nom}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

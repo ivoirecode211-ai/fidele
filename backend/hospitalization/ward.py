@@ -134,6 +134,32 @@ class StayInputSerializer(serializers.Serializer):
         return attrs
 
 
+class BedTaken(Exception):
+    """Le lit a été pris entre la validation et l'enregistrement."""
+
+
+def open_stay(*, data, user, service=None):
+    """Crée le séjour et occupe le lit ; `data` vient de StayInputSerializer."""
+    bed = Bed.objects.select_for_update().get(pk=data["bed"].pk)
+    if bed.status == "OCCUPIED":
+        raise BedTaken("Ce lit vient d'être occupé.")
+    admission = data["admissionId"]
+    consultation = getattr(admission, "consultation", None)
+    stay = Hospitalization.objects.create(
+        patient=admission.patient,
+        bed=bed,
+        admission=admission,
+        admission_date=timezone.make_aware(datetime.combine(data["dateAdmission"], time(hour=12))),
+        planned_discharge=data["dateSortie"],
+        service=service or admission.service_name,
+        doctor=consultation.doctor if consultation else user,
+        reason=(consultation.diagnosis if consultation else "") or admission.motif,
+    )
+    bed.status = "OCCUPIED"
+    bed.save(update_fields=["status"])
+    return stay
+
+
 class StaysView(APIView):
     permission_classes = [WardAccess]
 
@@ -141,24 +167,10 @@ class StaysView(APIView):
     def post(self, request):
         serializer = StayInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        bed = Bed.objects.select_for_update().get(pk=data["bed"].pk)
-        if bed.status == "OCCUPIED":
-            return Response({"lit": "Ce lit vient d'être occupé."}, status=status.HTTP_409_CONFLICT)
-        admission = data["admissionId"]
-        consultation = getattr(admission, "consultation", None)
-        stay = Hospitalization.objects.create(
-            patient=admission.patient,
-            bed=bed,
-            admission=admission,
-            admission_date=timezone.make_aware(datetime.combine(data["dateAdmission"], time(hour=12))),
-            planned_discharge=data["dateSortie"],
-            service=admission.service_name,
-            doctor=consultation.doctor if consultation else request.user,
-            reason=(consultation.diagnosis if consultation else "") or admission.motif,
-        )
-        bed.status = "OCCUPIED"
-        bed.save(update_fields=["status"])
+        try:
+            stay = open_stay(data=serializer.validated_data, user=request.user)
+        except BedTaken as taken:
+            return Response({"lit": str(taken)}, status=status.HTTP_409_CONFLICT)
         return Response(serialize_stay(stays().get(pk=stay.pk)), status=status.HTTP_201_CREATED)
 
 

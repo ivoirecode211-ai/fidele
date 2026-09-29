@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "laboratory",
     "stocks",
     "rh",
+    "ged",
     "portail",
     "dossier",
 ]
@@ -134,3 +135,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API de gestion de clinique",
     "VERSION": "1.0.0",
 }
+
+
+# Fichiers déposés (GED). Jamais servis tels quels : ils passent par l'API, qui vérifie les droits.
+MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR / "media"))
+MEDIA_URL = "/media/"
+# Un scan va jusqu'à 25 Mo : au-delà de 5 Mo, Django l'écrit sur disque plutôt qu'en mémoire.
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

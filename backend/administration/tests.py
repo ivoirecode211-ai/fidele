@@ -37,6 +37,16 @@ class AdministrationTests(APITestCase):
         self.assertEqual(self.client.get("/api/parcours/pharmacie/ordonnances/").status_code, 200)
         self.assertEqual(self.client.get("/api/parcours/soins/patients/").status_code, 403)
 
+    def test_specialites_attribuees_et_conservees(self):
+        pk = self.client.post(f"{BASE}/users/", self.form(roles=["Médecin"]), format="json").data["id"]
+        reponse = self.client.put(f"{BASE}/users/{pk}/", {**self.form(roles=["Médecin"]), "specialites": ["pediatrie", "cpn"]}, format="json")
+        self.assertEqual(reponse.data["specialites"], ["pediatrie", "cpn"])
+        # Un formulaire qui n'envoie pas les spécialités ne les efface pas.
+        self.client.put(f"{BASE}/users/{pk}/", self.form(roles=["Médecin"]), format="json")
+        self.assertEqual(User.objects.get(pk=pk).specialites, ["pediatrie", "cpn"])
+        refus = self.client.put(f"{BASE}/users/{pk}/", {**self.form(roles=["Médecin"]), "specialites": ["inconnue"]}, format="json")
+        self.assertEqual(refus.status_code, 400)
+
     def test_update_and_deactivate_user(self):
         pk = self.client.post(f"{BASE}/users/", self.form(), format="json").data["id"]
         response = self.client.put(f"{BASE}/users/{pk}/", self.form(roles=["Infirmier/infirmière"]), format="json")
@@ -197,3 +207,59 @@ class UsernameNomenclatureTests(APITestCase):
         self.assertEqual(weak.status_code, 400)
         taken = self.client.put(f"{BASE}/users/{pk}/", {**base, "name": "YAO Claude", "username": "kadmin", "password": ""}, format="json")
         self.assertEqual(taken.status_code, 400)
+
+
+class PrestationsTests(APITestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(username="adm", password="x", role="ADMIN")
+        self.client.force_authenticate(self.admin)
+
+    def test_creer_modifier_desactiver(self):
+        cree = self.client.post(f"{BASE}/prestations/", {"nom": "Consultation dentaire test", "prix": "7 500",
+                                                           "categorie": "CONSULTATION", "service": "Cabinet dentaire",
+                                                           "specialite": "dentaire"}, format="json")
+        self.assertEqual(cree.status_code, 201, cree.data)
+        self.assertEqual((cree.data["prix"], cree.data["specialiteNom"], cree.data["service"]), (7500, "Cabinet dentaire", "Cabinet dentaire"))
+        modifie = self.client.put(f"{BASE}/prestations/{cree.data['id']}/", {**cree.data, "prix": 8000, "active": False}, format="json")
+        self.assertEqual((modifie.data["prix"], modifie.data["active"]), (8000, False))
+        liste = self.client.get(f"{BASE}/prestations/").data
+        self.assertIn("dentaire", [s["code"] for s in liste["specialites"]])
+
+    def test_refus_lisibles_et_acces(self):
+        refus = self.client.post(f"{BASE}/prestations/", {"nom": "", "prix": "-5"}, format="json")
+        self.assertEqual(set(refus.data), {"nom", "prix"})
+        self.client.force_authenticate(User.objects.create_user(username="doc", password="x", role="DOCTOR"))
+        self.assertEqual(self.client.get(f"{BASE}/prestations/").status_code, 403)
+
+
+class CatalogueParHopitalTests(APITestCase):
+    """Chaque hôpital reçoit sa copie du catalogue modèle et la modifie sans toucher aux autres."""
+
+    def test_nouvel_hopital_recoit_sa_copie_et_ses_prix(self):
+        from parcours.catalogue_modele import CATALOGUE_MODELE
+        from parcours.models import MedicalService
+
+        mas = Hospital.objects.get(code="MAS")
+        autre = Hospital.objects.create(name="Clinique Autre", code="CLA")
+        self.assertEqual(MedicalService.objects.filter(hospital=autre).count(), len(CATALOGUE_MODELE))
+        admin_autre = User.objects.create_user(username="adm_cla", password="x", role="ADMIN", hospital=autre)
+        self.client.force_authenticate(admin_autre)
+        mg = next(p for p in self.client.get(f"{BASE}/prestations/").data["prestations"] if p["nom"] == "Médecine générale")
+        self.client.put(f"{BASE}/prestations/{mg['id']}/", {**mg, "prix": 3000}, format="json")
+        self.assertEqual(MedicalService.objects.get(hospital=autre, name="Médecine générale").price, 3000)
+        self.assertEqual(MedicalService.objects.get(hospital=mas, name="Médecine générale").price, 10000)
+        # La prestation de MAS n'existe pas pour l'administrateur de l'autre hôpital.
+        mas_mg = MedicalService.objects.get(hospital=mas, name="Médecine générale")
+        self.assertEqual(self.client.put(f"{BASE}/prestations/{mas_mg.pk}/", {**mg, "prix": 1}, format="json").status_code, 404)
+
+    def test_la_caisse_refuse_la_prestation_d_un_autre_hopital(self):
+        from parcours.models import MedicalService
+        from parcours.tests import URL, form
+
+        autre = Hospital.objects.create(name="Clinique Autre", code="CLA")
+        caissier = User.objects.create_user(username="caisse_mas", password="x", role="RECEPTION")
+        self.client.force_authenticate(caissier)
+        etrangere = MedicalService.objects.get(hospital=autre, name="Médecine générale")
+        reponse = self.client.post(URL, form(service=etrangere.pk), format="json")
+        self.assertEqual(reponse.status_code, 400)
+        self.assertIn("service", reponse.data)

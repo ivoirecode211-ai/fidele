@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import prestations, views
 
 urlpatterns = [
     path("overview/", views.OverviewView.as_view()),
@@ -10,4 +10,6 @@ urlpatterns = [
     path("documents/", views.DocumentsView.as_view()),
     path("parametres/", views.GeneralSettingsView.as_view()),
     path("audit/", views.AuditLogView.as_view()),
+    path("prestations/", prestations.PrestationsView.as_view()),
+    path("prestations/<int:pk>/", prestations.PrestationView.as_view()),
 ]

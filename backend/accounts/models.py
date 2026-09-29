@@ -74,6 +74,9 @@ class User(AbstractUser):
     job_title = models.CharField(max_length=120, blank=True)
     # Rôles supplémentaires : ils s'ajoutent au rôle principal pour les accès.
     extra_roles = models.JSONField(default=list, blank=True)
+    # Spécialités exercées (codes de consultations/specialites.py) : le rôle donne les droits,
+    # les spécialités donnent les formulaires et la file d'attente. Vide : médecine générale.
+    specialites = models.JSONField(default=list, blank=True)
     # Hôpital de rattachement. Sans hôpital : compte de la plateforme (création des hôpitaux).
     hospital = models.ForeignKey(Hospital, null=True, blank=True, on_delete=models.PROTECT,
                                  related_name="users", verbose_name="hôpital")

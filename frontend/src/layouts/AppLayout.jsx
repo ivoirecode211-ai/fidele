@@ -1,6 +1,6 @@
 
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
-import { Clock3, Menu, UserCheck, X } from "lucide-react";
+import { Clock3, Menu, Tags, UserCheck, Users, X } from "lucide-react";
 import { useState } from "react";
 import Logo from "../components/Logo";
 import SidebarFooter from "../components/SidebarFooter";
@@ -36,6 +36,10 @@ const MODULE_HEADERS = {
 // Sous-modules affichés dans la barre latérale ; le premier est l'écran d'arrivée.
 // La page lit le sous-module actif dans l'adresse (?vue=…).
 export const MODULE_VIEWS = {
+  "/administration": [
+    { id: "utilisateurs", label: "Utilisateurs", icon: Users },
+    { id: "prestations", label: "Prestations et tarifs", icon: Tags },
+  ],
   "/nursing": [
     { id: "attente", label: "Patients en attente", icon: Clock3 },
     { id: "recus", label: "Patients reçus", icon: UserCheck },

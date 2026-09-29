@@ -16,6 +16,10 @@ export default function InputField({ field, value, error, onChange }) {
         name={field.id}
         value={value ?? ""}
         placeholder={field.placeholder}
+        min={field.min}
+        max={field.max}
+        step={field.step}
+        inputMode={field.type === "number" ? "decimal" : undefined}
         onChange={(event) => onChange(field.id, event.target.value)}
       />
 

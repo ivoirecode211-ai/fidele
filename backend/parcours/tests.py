@@ -17,7 +17,7 @@ NUMERO = r"^P\d{2}(?=[A-Z2-9]*\d)(?=[A-Z2-9]*[A-Z])[A-Z2-9]{3}MAS$"
 def form(**overrides):
     data = {
         "nom": "traore", "prenom": "Awa", "sexe": "Féminin", "age": "32", "dateNaissance": "",
-        "service": MedicalService.objects.get(name="Médecine générale").pk, "telephone": "0700000000",
+        "service": MedicalService.objects.get(name="Médecine générale", hospital__code="MAS").pk, "telephone": "0700000000",
         "parentContact": "0500000000", "assurance": "Non", "assuranceId": "", "insuranceNumber": "",
         "quartier": "Cocody",
     }

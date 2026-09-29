@@ -28,6 +28,9 @@ class Patient(models.Model):
     blood_group = models.CharField(max_length=3, choices=BLOOD_CHOICES, blank=True)
     history = models.TextField(blank=True)
     allergies = models.TextField(blank=True)
+    # Antécédents et mode de vie, saisis une fois en consultation puis repris à
+    # chaque visite : { "hta": bool, "diabete": bool, "medicaux": str, ... }.
+    antecedents = models.JSONField(default=dict, blank=True)
     insurance = models.CharField(max_length=180, blank=True)
     insurance_number = models.CharField(max_length=120, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -127,6 +127,8 @@ def save_user(*, data, user=None, hospital=None):
     user.phone = data.get("phone", "")
     user.role = codes[0]
     user.extra_roles = [code for code in codes[1:] if code != codes[0]]
+    if "specialites" in data:
+        user.specialites = list(dict.fromkeys(data["specialites"]))
     if "ADMIN" not in codes:
         # Sans le rôle Administrateur, plus de droits d'administration.
         user.is_superuser = False

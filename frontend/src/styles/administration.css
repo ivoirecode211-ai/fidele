@@ -1441,3 +1441,44 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Spécialités exercées : une grille de cases, pas une liste déroulante (on en coche souvent plusieurs). */
+.specialites-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 4px 10px;
+  max-height: 240px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.spe-case {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.spe-case:hover { background: var(--surface-50); }
+.spe-case.cochee { background: var(--primary-50); color: var(--primary-800); }
+.spe-coche { display: grid; place-items: center; flex: 0 0 auto; width: 18px; height: 18px; border: 1.5px solid #cbd5e1; border-radius: 5px; color: white; }
+.spe-case.cochee .spe-coche { border-color: var(--primary); background: var(--primary); }
+
+/* Prestations et tarifs */
+.presta-filtres { display: flex; gap: 12px; margin-bottom: 18px; }
+.presta-filtres .recherche { flex: 1; margin-bottom: 0; }
+.presta-filtres select { height: 52px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--surface-50); font: inherit; font-size: 15px; font-weight: 600; }
+.presta-prix { font-weight: 800; white-space: nowrap; }
+.presta-action { width: 1%; text-align: right; white-space: nowrap; }
+.presta-action .secondary-button { gap: 6px; }
+.presta-inactive td { color: var(--ink-muted); }
+.etat.presta-non { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
+@media (max-width: 640px) { .presta-filtres { flex-direction: column; } }

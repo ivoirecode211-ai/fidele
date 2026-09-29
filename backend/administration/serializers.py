@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from accounts.models import Hospital
+from consultations.specialites import SPECIALITES
 
 from .models import AdminDocument, AuditLog
 from .services import ROLE_CODES, ROLE_LABELS, display_name, format_connection
@@ -20,7 +21,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "name", "function", "roles", "status", "connection", "email", "phone"]
+        fields = ["id", "username", "name", "function", "roles", "specialites", "status", "connection", "email", "phone"]
 
     def get_name(self, obj):
         return display_name(obj)
@@ -44,6 +45,8 @@ class AdminUserInputSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=180)
     function = serializers.CharField(max_length=120, required=False, allow_blank=True, default="")
     roles = serializers.ListField(child=serializers.ChoiceField(choices=list(ROLE_CODES)), min_length=1)
+    # Codes de consultations/specialites.py : les formulaires et la file d'attente du praticien.
+    specialites = serializers.ListField(child=serializers.ChoiceField(choices=list(SPECIALITES)), required=False)
     email = serializers.EmailField(required=False, allow_blank=True, default="")
     phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
     username = serializers.RegexField(

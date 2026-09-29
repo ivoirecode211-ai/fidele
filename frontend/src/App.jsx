@@ -65,7 +65,8 @@ import EspacePatientsPersonnel from "./patient/Personnel";
 import Dossiers from "./dossier/Dossiers";
 import ConnexionPatient from "./patient/Connexion";
 import EspacePatient from "./patient/Espace";
-import GED from "./pages/GED";
+import Ged from "./ged/Ged";
+import Catalogue from "./catalogue/Catalogue";
 
 
 /* ============================================================
@@ -124,7 +125,7 @@ import Employees from "./pages/employees";
    MODULE CONSULTATIONS
    ============================================================ */
 
-import Consultations from "./pages/Consultations";
+import MedecineGenerale from "./medecine/MedecineGenerale";
 
 
 /* ============================================================
@@ -317,7 +318,7 @@ export default function App() {
         path="/consultations"
         element={
           <Protected>
-            <Consultations />
+            <MedecineGenerale />
           </Protected>
         }
       />
@@ -370,7 +371,9 @@ export default function App() {
       <Route path="/dossiers/:id" element={<Protected><Dossiers /></Protected>} />
       <Route path="/patient" element={<ConnexionPatient />} />
       <Route path="/patient/espace" element={<EspacePatient />} />
-      <Route path="/ged" element={<GED />} />
+      <Route path="/ged" element={<Protected><Ged /></Protected>} />
+      {/* Outil de développement : les formulaires des spécialités, sans patient (administrateur). */}
+      <Route path="/catalogue-formulaires" element={<Protected><Catalogue /></Protected>} />
 
       {/* ======================================================
           PAGE PRINCIPALE DES MODULES

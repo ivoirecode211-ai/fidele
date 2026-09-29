@@ -30,18 +30,26 @@ class MedicalService(models.Model):
     # Consultations et soins passent par l'infirmerie ; un examen, non.
     PARCOURS_SOINS = ("CONSULTATION", "SOIN")
 
-    name = models.CharField(max_length=120, unique=True)
+    # Chaque hôpital a son catalogue (copie du catalogue modèle à sa création) et ses tarifs.
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="prestations", verbose_name="hôpital")
+    name = models.CharField(max_length=120)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     category = models.CharField("catégorie", max_length=20, choices=CATEGORIES, default="CONSULTATION")
     department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name="services", verbose_name="service de destination")
+    # Formulaire ouvert en consultation (code de consultations/specialites.py). Vide : médecine générale.
+    specialite = models.CharField("spécialité", max_length=40, blank=True)
     active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "service médical"
         verbose_name_plural = "services médicaux"
         ordering = ["id"]
-        constraints = [models.CheckConstraint(condition=Q(price__gte=0), name="parcours_service_price")]
+        constraints = [
+            models.CheckConstraint(condition=Q(price__gte=0), name="parcours_service_price"),
+            models.UniqueConstraint(fields=["hospital", "name"], name="parcours_prestation_unique_par_hopital"),
+        ]
 
     def __str__(self):
         return self.name

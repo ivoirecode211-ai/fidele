@@ -42,14 +42,16 @@ def create_product(*, data, user):
 
 
 def dispense(*, prescription, user):
-    """Sorties de stock d'une ordonnance servie : une unité par médicament du catalogue."""
+    """Sorties de stock d'une ordonnance servie : la quantité prescrite de chaque médicament du catalogue."""
     patient = f"{prescription.patient.last_name} {prescription.patient.first_names}"
-    items = [item.medicine for item in prescription.items.all()]
     products = {p.name.lower().strip(): p for p in Product.objects.filter(category="Médicament")}
-    matched = [products[name.lower().strip()] for name in items if name.lower().strip() in products]
-    short = [p.name for p in matched if p.stock < 1]
+    matched = [
+        (products[item.medicine.lower().strip()], max(item.quantity, 1))
+        for item in prescription.items.all() if item.medicine.lower().strip() in products
+    ]
+    short = [product.name for product, quantity in matched if product.stock < quantity]
     if short:
         raise StockError(f"Stock insuffisant : {', '.join(short)}")
-    for product in matched:
-        record_movement(product=product, kind="Sortie", quantity=1, user=user, motif="Dispensation",
+    for product, quantity in matched:
+        record_movement(product=product, kind="Sortie", quantity=quantity, user=user, motif="Dispensation",
                         service="Pharmacie", patient=patient, prescription=prescription)

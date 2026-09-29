@@ -191,7 +191,7 @@ class ReferentielsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        prestations = MedicalService.objects.filter(active=True).select_related("department")
+        prestations = MedicalService.objects.filter(active=True, hospital=hospital_of(request.user)).select_related("department")
         return Response({
             "etablissement": etablissement(request.user),
             "services": [{"id": d.pk, "name": d.name, "active": d.active}
@@ -315,6 +315,8 @@ class FichesView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         patient, prestation = data["patient"], data["prestation"]
+        if prestation.hospital_id != hospital_of(request.user).pk:
+            return Response({"prestation": ["Prestation inconnue dans cet hôpital."]}, status=status.HTTP_400_BAD_REQUEST)
         if patient.hospital_id != hospital_of(request.user).pk:
             return refus("Ce patient appartient à un autre hôpital.", status.HTTP_404_NOT_FOUND)
         department = data.get("service") or prestation.department

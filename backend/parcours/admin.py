@@ -12,9 +12,9 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(MedicalService)
 class MedicalServiceAdmin(admin.ModelAdmin):
-    list_display = ["name", "department", "category", "price", "active"]
-    list_editable = ["department", "category", "price", "active"]
-    list_filter = ["department", "category", "active"]
+    list_display = ["name", "department", "category", "specialite", "price", "active"]
+    list_editable = ["department", "category", "specialite", "price", "active"]
+    list_filter = ["department", "category", "specialite", "active"]
     search_fields = ["name"]
 
 

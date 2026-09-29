@@ -75,6 +75,8 @@ def request_payload(request, body):
             return clean(json.loads(body or b"{}"))
         except (ValueError, UnicodeDecodeError):
             return {}
+    if request.content_type == "multipart/form-data":
+        return {}
     return clean(request.POST.dict()) if request.method == "POST" else {}
 
 
@@ -97,7 +99,10 @@ class AuditMiddleware:
         if request.method not in MUTATING or path.startswith(SKIPPED) or not (path.startswith("/api/") or path.startswith("/admin/")):
             return self.get_response(request)
 
-        body = request.body  # lu avant la vue, qui ne peut plus le relire ensuite
+        # Un envoi de fichier n'est pas lu d'avance : un scan dépasse vite la limite de
+        # lecture en mémoire de Django, et son contenu n'a rien à faire dans le journal.
+        fichier = request.content_type == "multipart/form-data"
+        body = b"" if fichier else request.body  # lu avant la vue, qui ne peut plus le relire ensuite
         started = time.monotonic()
         response = self.get_response(request)
         try:

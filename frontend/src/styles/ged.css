@@ -1,0 +1,167 @@
+/* ============================================================
+   GED — même charte que la Caisse (variables.css, Caisse.css).
+   Bleu pour tout, rouge pour supprimer et alerter.
+   ============================================================ */
+
+.ged-filtres { display: flex; gap: 12px; margin-bottom: 18px; }
+.ged-filtres .recherche { flex: 1; margin-bottom: 0; }
+.ged-select {
+  height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tableau .ged-origine { display: flex; align-items: center; gap: 5px; }
+.tableau td.ged-actions { width: 1%; white-space: nowrap; text-align: right; }
+.ged-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-muted);
+}
+.ged-icone:hover { border-color: var(--primary-200); background: var(--primary-50); color: var(--primary-700); }
+.ged-icone.danger:hover { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger); }
+.ged-icone:focus-visible { outline: 2px solid var(--primary-300); outline-offset: 1px; }
+
+/* Recherche d'une personne */
+.ged-recherche .recherche { margin-bottom: 10px; }
+.ged-resultats { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.ged-resultats button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: white;
+  font: inherit;
+  text-align: left;
+}
+.ged-resultats button:hover { border-color: var(--primary-300); background: var(--surface-50); }
+.ged-resultat-texte { display: grid; gap: 2px; min-width: 0; }
+.ged-resultat-texte strong { color: var(--ink); font-size: 15px; }
+.ged-resultat-texte small { color: var(--ink-muted); font-size: 13px; font-weight: 600; }
+
+.ged-pastille-sorte { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 10px; }
+.ged-pastille-sorte.patient { background: var(--primary-50); color: var(--primary-700); }
+.ged-pastille-sorte.archive { background: var(--surface-100); color: var(--ink-muted); }
+.ged-pastille-sorte.grande { width: 50px; height: 50px; border-radius: 14px; }
+
+/* Personne choisie */
+.ged-personne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-xl);
+  background: var(--primary-50);
+  color: var(--primary-800);
+}
+.ged-personne strong { color: var(--ink); }
+.ged-personne small { color: var(--ink-muted); font-weight: 600; }
+.ged-personne > div { display: grid; gap: 2px; }
+.ged-personne button { display: grid; place-items: center; margin-left: auto; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-muted); }
+.ged-personne button:hover { background: white; color: var(--danger); }
+.ged-personne.grande { padding: 15px 18px; font-size: 16px; }
+
+/* Dépôt */
+.ged-depot { display: grid; gap: 18px; }
+.ged-zone {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 30px 20px;
+  border: 2px dashed var(--primary-200);
+  border-radius: var(--radius-2xl);
+  background: var(--primary-50);
+  color: var(--primary-700);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.ged-zone strong { color: var(--ink); font-size: 16px; }
+.ged-zone small { color: var(--ink-muted); font-size: 13.5px; font-weight: 600; }
+.ged-zone:hover, .ged-zone.survol { border-color: var(--primary); background: white; }
+.ged-zone:focus-visible { outline: 2px solid var(--primary-300); outline-offset: 2px; }
+
+.ged-fichiers { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.ged-fichiers li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; }
+.ged-fichiers span { flex: 1; overflow: hidden; color: var(--ink); font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.ged-fichiers small { color: var(--ink-muted); font-weight: 600; }
+.ged-fichiers button { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 7px; background: transparent; color: var(--ink-muted); }
+.ged-fichiers button:hover { background: var(--danger-soft); color: var(--danger); }
+
+.ged-grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; }
+.ged-grille .large { grid-column: 1 / -1; }
+.ged-grille .field span small { color: var(--ink-muted); font-weight: 500; }
+.ged-boutons { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Numérisation */
+.ged-numerisation { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.ged-nouvelle { margin-top: 14px; gap: 6px; }
+.ged-scanner { width: 100%; min-height: 56px; gap: 8px; font-size: 15px; }
+.ged-inactif { opacity: .55; }
+
+/* Dossier patient */
+.ged-dossier { display: grid; gap: 0; }
+.ged-fiche { display: flex; align-items: center; gap: 14px; }
+.ged-fiche-texte { flex: 1; min-width: 0; }
+.ged-fiche-texte h2 { margin: 0; color: var(--ink); font-size: 21px; font-weight: 800; }
+.ged-fiche-texte p { margin: 3px 0 0; color: var(--ink-muted); font-size: 14.5px; font-weight: 600; }
+.ged-fiche .primary-button { gap: 6px; }
+.ged-fiche .sf-retour {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: white;
+  color: var(--ink-muted);
+}
+.ged-fiche .sf-retour:hover { border-color: var(--primary-300); color: var(--primary-700); }
+
+.ged-identites { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ged-identites li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-xl); color: var(--ink-muted); }
+.ged-identites span { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.ged-identites strong { color: var(--ink); }
+.ged-identites small { font-weight: 600; }
+.ged-identites .secondary-button { gap: 6px; }
+.ged-lier { margin-top: 14px; }
+
+.ged-frise { display: grid; gap: 22px; margin: 0; padding: 0; list-style: none; }
+.ged-frise h3 { margin: 0 0 10px; color: var(--primary-800); font-size: 15px; font-weight: 800; }
+.ged-frise ul { display: grid; gap: 0; margin: 0; padding: 0 0 0 16px; border-left: 2px solid var(--surface-200); list-style: none; }
+.ged-frise ul li { position: relative; display: flex; align-items: center; gap: 12px; padding: 9px 0 9px 12px; }
+.ged-frise ul li > div { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.ged-frise ul li strong { color: var(--ink); font-size: 15px; }
+.ged-frise ul li small { color: var(--ink-muted); font-size: 13px; font-weight: 600; }
+.ged-frise-icone { display: grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; margin-left: -34px; border: 2px solid white; border-radius: 50%; background: var(--surface-100); color: var(--ink-muted); }
+.ged-frise li.doc .ged-frise-icone { background: var(--primary); color: white; }
+.ged-frise li.consult .ged-frise-icone { background: var(--primary-100); color: var(--primary-800); }
+.ged-frise li.distant .ged-frise-icone { background: var(--surface-200); color: var(--ink); }
+
+@media (max-width: 900px) {
+  .ged-numerisation { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .ged-filtres { flex-direction: column; }
+  .ged-grille { grid-template-columns: minmax(0, 1fr); }
+  .ged-fiche { flex-wrap: wrap; }
+  .ged-fiche .primary-button { width: 100%; }
+  .ged-identites li { flex-wrap: wrap; }
+}

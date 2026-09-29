@@ -42,7 +42,8 @@ class CatalogueView(APIView):
 
     def get(self, request):
         return Response({
-            "services": MedicalServiceSerializer(MedicalService.objects.filter(active=True), many=True).data,
+            "services": MedicalServiceSerializer(
+                MedicalService.objects.filter(active=True, hospital=hospital_of(request.user)), many=True).data,
             "insurances": InsuranceCompanySerializer(InsuranceCompany.objects.filter(active=True), many=True).data,
         })
 
@@ -58,6 +59,9 @@ class CaissePatientsView(generics.ListAPIView):
     def post(self, request):
         serializer = CaissePatientInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # Chaque hôpital a son catalogue : une prestation d'un autre hôpital n'existe pas ici.
+        if serializer.validated_data["service"].hospital_id != hospital_of(request.user).pk:
+            return Response({"service": ["Prestation inconnue dans cet hôpital."]}, status=status.HTTP_400_BAD_REQUEST)
         from .caisse import Duplicate
 
         try:
