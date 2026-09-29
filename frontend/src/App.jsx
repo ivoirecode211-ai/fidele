@@ -125,7 +125,7 @@ import Employees from "./pages/employees";
    MODULE CONSULTATIONS
    ============================================================ */
 
-import MedecineGenerale from "./medecine/MedecineGenerale";
+import ModuleConsultation from "./medecine/ModuleConsultation";
 
 
 /* ============================================================
@@ -318,7 +318,7 @@ export default function App() {
         path="/consultations"
         element={
           <Protected>
-            <MedecineGenerale />
+            <ModuleConsultation />
           </Protected>
         }
       />

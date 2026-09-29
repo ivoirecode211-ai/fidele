@@ -1,6 +1,6 @@
 /*
  * ============================================================
- * CONSULTATION DE MÉDECINE GÉNÉRALE — CONFIGURATION
+ * CONSULTATION — CONFIGURATION (tronc commun + bloc de la spécialité)
  * ============================================================
  *
  * Tout le métier vit ici ; le moteur (src/forms/StepForm.jsx)

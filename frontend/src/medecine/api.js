@@ -1,7 +1,7 @@
 import api from "../services/api";
 import { messageErreur } from "../accueil/api";
 
-/* Client du module Médecine générale. Tout vit en base : le navigateur
+/* Client du module Consultation. Tout vit en base : le navigateur
    ne garde que la conversation avec l'assistant, le temps de la séance. */
 const medecine = {
   get: (chemin = "", params) => api.get(`/consultations/medecine/${chemin}`, { params }).then((r) => r.data),

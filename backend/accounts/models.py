@@ -57,6 +57,8 @@ class User(AbstractUser):
         ("DIRECTOR", "Directeur de clinique"),
         ("DOCTOR", "Médecin"),
         ("NURSE", "Infirmier/infirmière"),
+        # Prend seulement les constantes : ne voit que les Soins infirmiers.
+        ("AIDE_SOIGNANT", "Aide-soignant(e)"),
         ("RECEPTION", "Réceptionniste"),
         ("LAB", "Laborantin"),
         ("PHARMACY", "Pharmacien"),

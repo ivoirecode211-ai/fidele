@@ -12,7 +12,7 @@
 
 .nursing-page {
   min-height: 100%;
-  padding: 28px;
+  padding: 0 28px 28px;
   background: var(--bg);
   color: var(--text);
 }
@@ -112,65 +112,39 @@
 .nursing-alert-banner {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 22px;
-  padding: 16px 18px;
-  border: 1px solid #fcd34d;
-  border-radius: 13px;
-  background:
-    linear-gradient(
-      90deg,
-      var(--danger-soft),
-      var(--warning-soft)
-    );
-}
-
-.nursing-alert-icon {
-  width: 43px;
-  height: 43px;
-  min-width: 43px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 6px 6px 6px 12px;
+  border: 1px solid #f5c2c2;
   border-radius: 10px;
-  color: var(--warning);
-  background: var(--warning-soft);
-}
-
-.nursing-alert-content {
-  flex: 1;
-  min-width: 0;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .nursing-alert-banner strong {
-  display: block;
-  font-size: 15px;
-}
-
-.nursing-alert-banner span {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .nursing-alert-banner button {
-  min-height: 36px;
+  min-height: 30px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 11px;
-  border: 1px solid #fcd34d;
-  border-radius: 8px;
+  gap: 3px;
+  padding: 0 10px;
+  border: 1px solid #f5c2c2;
+  border-radius: 7px;
   background: white;
-  color: #b45309;
+  color: var(--danger);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .nursing-alert-banner button:hover {
-  background: #fff7ed;
+  background: #fff5f5;
 }
 
 
@@ -401,8 +375,8 @@
 .nursing-patient-card {
   display: grid;
   grid-template-columns:
-    minmax(220px, 1.15fr)
-    minmax(430px, 2fr)
+    minmax(190px, 1fr)
+    minmax(0, 2.4fr)
     auto;
 
   align-items: center;
@@ -501,29 +475,31 @@
    CONSTANTES - LIGNE
    ============================================================ */
 
+/* Les six constantes tiennent toujours sur une ligne : serrées sur un
+   13 pouces, elles grandissent avec la place disponible (requêtes de conteneur). */
 .nursing-vitals-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 7px;
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
   min-width: 0;
 }
 
 .nursing-vital-mini {
-  min-width: 82px;
-  display: inline-flex;
+  min-width: 0;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 9px;
+  gap: 5px;
+  padding: 6px 5px 6px 7px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 7px;
   background: var(--bg);
   color: var(--muted);
-  font-size: 11px;
   font-weight: 600;
 }
 
 .nursing-vital-mini > svg {
+  display: none;
   flex-shrink: 0;
   color: var(--primary);
 }
@@ -532,19 +508,73 @@
   min-width: 0;
 }
 
-.nursing-vital-mini span {
+.nursing-vital-mini span,
+.nursing-vital-mini strong {
   display: block;
-  color: var(--muted);
-  font-size: 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1.2;
 }
 
+.nursing-vital-mini span {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: -0.1px;
+}
+
 .nursing-vital-mini strong {
-  display: block;
   margin-top: 2px;
   color: var(--text);
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 12.5px;
+}
+
+@container (min-width: 600px) {
+  .nursing-vital-mini > svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@container (min-width: 760px) {
+  .nursing-vitals-row .nursing-vital-mini {
+    gap: 9px;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .nursing-vital-mini > svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nursing-vital-mini span {
+    font-size: 11px;
+  }
+
+  .nursing-vital-mini strong {
+    font-size: 16px;
+  }
+}
+
+@container (min-width: 950px) {
+  .nursing-vitals-row .nursing-vital-mini {
+    padding: 13px 15px;
+  }
+
+  .nursing-vital-mini > svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .nursing-vital-mini span {
+    font-size: 12px;
+  }
+
+  .nursing-vital-mini strong {
+    font-size: 19px;
+  }
 }
 
 
@@ -1375,15 +1405,7 @@
 
 @media (max-width: 1250px) {
   .nursing-patient-card {
-    grid-template-columns:
-      minmax(200px, 1fr)
-      minmax(350px, 1.7fr)
-      auto;
     gap: 14px;
-  }
-
-  .nursing-vital-mini {
-    min-width: 75px;
   }
 }
 
@@ -1498,14 +1520,8 @@
     justify-content: center;
   }
 
-  .nursing-alert-banner {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .nursing-alert-banner button {
-    width: 100%;
-    justify-content: center;
+  .nursing-alert-banner strong {
+    font-size: 12px;
   }
 
   .nursing-stats-grid {

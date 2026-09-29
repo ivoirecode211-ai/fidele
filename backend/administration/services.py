@@ -14,6 +14,7 @@ ROLE_CODES = {label: code for code, label in User.ROLE_CHOICES}
 ROLE_CLASSES = {
     "DOCTOR": "doctor",
     "NURSE": "nurse",
+    "AIDE_SOIGNANT": "nurse",
     "PHARMACY": "pharmacy",
     "RECEPTION": "secretary",
     "ACCOUNTING": "accounting",

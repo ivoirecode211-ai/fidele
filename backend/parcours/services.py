@@ -267,7 +267,7 @@ def notifications_for(user):
     admissions = Admission.objects.of_hospital(hospital)
     items = []
 
-    if sees_all or user.has_role("NURSE"):
+    if sees_all or user.has_role("NURSE", "AIDE_SOIGNANT"):
         waiting = admissions.parcours_soins().filter(sent_to_consultation_at__isnull=True).count()
         items.append({
             "id": "vitals",

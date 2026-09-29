@@ -4,7 +4,6 @@ import {
   Activity,
   AlertCircle,
   BedDouble,
-  Bell,
   CheckCircle2,
   ChevronRight,
   Clock3,
@@ -520,25 +519,6 @@ export default function Nursing() {
     return vuePatients.filter(hasAbnormalVitals);
   }, [vuePatients]);
 
-  const urgentPatients = useMemo(() => {
-    return vuePatients.filter(
-      (patient) =>
-        patient.status === "urgent" ||
-        patient.statut === "urgent"
-    );
-  }, [vuePatients]);
-
-  const surveillancePatients = useMemo(() => {
-    return vuePatients.filter((patient) => {
-      const abnormal = hasAbnormalVitals(patient);
-
-      return (
-        abnormal ||
-        patient.status === "surveillance" ||
-        patient.statut === "surveillance"
-      );
-    });
-  }, [vuePatients]);
 
   /*
    * ==========================================================
@@ -771,146 +751,21 @@ export default function Nursing() {
     <div className="nursing-page">
 
       {/* ======================================================
-          HEADER
-          ====================================================== */}
-
-      <div className="nursing-header">
-
-
-        <div className="nursing-header-actions">
-
-          <button
-            type="button"
-            className="nursing-refresh-button"
-            onClick={refreshPatients}
-          >
-            <RefreshCw size={17} />
-
-            Actualiser
-          </button>
-
-          <span className="nursing-last-refresh">
-            <Clock3 size={14} />
-
-            Mise à jour{" "}
-            {lastRefresh.toLocaleTimeString(
-              "fr-FR",
-              {
-                hour: "2-digit",
-                minute: "2-digit",
-              }
-            )}
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* ======================================================
           ALERTE
           ====================================================== */}
 
       {abnormalPatients.length > 0 && (
-        <div className="nursing-alert-banner">
-
-          <div className="nursing-alert-icon">
-            <AlertCircle size={22} />
-          </div>
-
-          <div className="nursing-alert-content">
-
-            <strong>
-              Constantes anormales détectées
-            </strong>
-
-            <span>
-              {abnormalPatients.length} patient
-              {abnormalPatients.length > 1
-                ? "s"
-                : ""}{" "}
-              nécessite
-              {abnormalPatients.length > 1
-                ? "nt"
-                : ""}{" "}
-              une surveillance.
-            </span>
-
-          </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              setPatientFilter("abnormal")
-            }
-          >
-            Voir les patients
-            <ChevronRight size={17} />
+        <div className="nursing-alert-banner" role="status">
+          <AlertCircle size={16} aria-hidden="true" />
+          <strong>
+            {abnormalPatients.length} patient{abnormalPatients.length > 1 ? "s" : ""} avec des constantes anormales
+          </strong>
+          <button type="button" onClick={() => setPatientFilter("abnormal")}>
+            Voir
+            <ChevronRight size={15} />
           </button>
-
         </div>
       )}
-
-      {/* ======================================================
-          STATISTIQUES
-          ====================================================== */}
-
-      <div className="nursing-stats-grid">
-
-        <div className="nursing-stat-card">
-
-          <div className="nursing-stat-icon nursing-stat-blue">
-            <Users size={22} />
-          </div>
-
-          <div>
-            <span>
-              Patients
-            </span>
-
-            <strong>
-              {vuePatients.length}
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="nursing-stat-card">
-
-          <div className="nursing-stat-icon nursing-stat-red">
-            <AlertCircle size={22} />
-          </div>
-
-          <div>
-            <span>
-              Constantes anormales
-            </span>
-
-            <strong>
-              {abnormalPatients.length}
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="nursing-stat-card">
-
-          <div className="nursing-stat-icon nursing-stat-orange">
-            <Bell size={22} />
-          </div>
-
-          <div>
-            <span>
-              À surveiller
-            </span>
-
-            <strong>
-              {surveillancePatients.length}
-            </strong>
-          </div>
-
-        </div>
-
-      </div>
 
       {/* ======================================================
           FILTRES
@@ -1006,6 +861,16 @@ export default function Nursing() {
           </button>
 
         </div>
+
+        <button
+          type="button"
+          className="nursing-refresh-button"
+          onClick={refreshPatients}
+          title={`Mise à jour ${lastRefresh.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`}
+        >
+          <RefreshCw size={17} />
+          Actualiser
+        </button>
 
       </div>
 

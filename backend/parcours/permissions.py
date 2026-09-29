@@ -23,7 +23,7 @@ class CaisseAccess(RoleAccess):
 
 
 class NursingAccess(RoleAccess):
-    roles = {"ADMIN", "DIRECTOR", "NURSE"}
+    roles = {"ADMIN", "DIRECTOR", "NURSE", "AIDE_SOIGNANT"}
 
 
 class ConsultationAccess(RoleAccess):

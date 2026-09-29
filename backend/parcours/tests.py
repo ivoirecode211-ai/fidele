@@ -159,6 +159,13 @@ class NursingTests(APITestCase):
         self.assertEqual(self.client.post(self.vitals_url, self.vitals(), format="json").status_code, 403)
         self.assertEqual(self.client.get("/api/parcours/soins/patients/").status_code, 403)
 
+    def test_aide_soignant_takes_vitals_and_nothing_else(self):
+        self.client.force_authenticate(User.objects.create_user(username="as", password="x", role="AIDE_SOIGNANT"))
+        self.assertEqual(self.client.get("/api/parcours/soins/patients/").status_code, 200)
+        self.assertEqual(self.client.post(self.vitals_url, self.vitals(), format="json").status_code, 201)
+        self.assertEqual(self.client.get("/api/consultations/medecine/").status_code, 403)
+        self.assertEqual(self.client.get("/api/hospitalization/service/").status_code, 403)
+
 
 class ParcoursBase(APITestCase):
     """Un patient enregistré à la caisse et les acteurs du parcours."""

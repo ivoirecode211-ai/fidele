@@ -18,7 +18,7 @@ import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } fro
 
 /*
  * ============================================================
- * MÉDECINE GÉNÉRALE
+ * CONSULTATION — toutes les spécialités ; le formulaire suit la prestation payée
  * ============================================================
  *
  * Le module suit la journée du médecin :
@@ -40,7 +40,7 @@ import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } fro
 
 const RAFRAICHISSEMENT = 30000;
 
-export default function MedecineGenerale() {
+export default function ModuleConsultation() {
   const [ecran, setEcran] = useState("attente");
   const [file, setFile] = useState(null);
   const [suivi, setSuivi] = useState(null);

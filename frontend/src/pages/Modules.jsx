@@ -72,9 +72,9 @@ const ALL_MODULES = [
 
   {
     id: "consultations",
-    name: "Consultation Médecine Générale",
+    name: "Consultation",
     description:
-      "Gérer les consultations médicales et les prescriptions",
+      "Consultations de toutes les spécialités et prescriptions",
     path: "/consultations",
     icon: Stethoscope,
     color: "purple",
@@ -338,6 +338,10 @@ const DEFAULT_ROLE_MODULES = {
     "laboratory",
   ],
 
+  AIDE_SOIGNANT: [
+    "nursing",
+  ],
+
   RECEPTION: [
     "dossiers",
     "patients",
@@ -482,6 +486,16 @@ export default function Modules() {
       ),
     [user]
   );
+
+
+  // L'aide-soignant ne prend que les constantes : il va droit aux Soins infirmiers.
+  useEffect(() => {
+    if (!user || userRole !== "AIDE_SOIGNANT") return;
+    const autres = (Array.isArray(user.roles) ? user.roles : [])
+      .map(normalizeRole)
+      .filter((role) => role && role !== "AIDE_SOIGNANT");
+    if (!autres.length) navigate("/nursing", { replace: true });
+  }, [user, userRole, navigate]);
 
 
   // ==========================================================
