@@ -289,6 +289,16 @@ def notifications_for(user):
             "link": "/consultations",
         })
 
+    if user.has_role("DOCTOR") and not user.is_superuser:
+        from portail.models import Message
+
+        items.append({
+            "id": "patient-messages",
+            "count": Message.objects.filter(conversation__doctor=user, from_patient=True, read_at__isnull=True).count(),
+            "label": "message(s) de patients non lu(s)",
+            "link": "/patient-space?vue=messages",
+        })
+
     if sees_all or user.has_role("PHARMACY"):
         prescriptions = Prescription.objects.filter(consultation__admission__patient__hospital=hospital)
         items.append({

@@ -5,3 +5,4 @@ django-cors-headers>=4.4,<5.0
 psycopg[binary]>=3.2,<4.0
 python-dotenv>=1.0,<2.0
 drf-spectacular>=0.28,<1.0
+pywebpush>=2.0

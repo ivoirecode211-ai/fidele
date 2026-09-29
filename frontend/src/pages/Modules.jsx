@@ -226,7 +226,7 @@ const ALL_MODULES = [
     id: "patient-space",
     name: "Espace patients",
     description:
-      "Permettre aux patients de consulter leurs informations médicales, constantes, consultations et ordonnances",
+      "Activer l'espace de chaque patient (dossier, médicaments, rendez-vous) et répondre à ses messages",
     path: "/patient-space",
     icon: UserRound,
     color: "blue-light",
@@ -299,6 +299,7 @@ const DEFAULT_ROLE_MODULES = {
     "ia",
     "ged",
     "equipements",
+    "patient-space",
   ],
 
   DOCTOR: [
@@ -318,7 +319,6 @@ const DEFAULT_ROLE_MODULES = {
     "hospitalization",
     "nursing",
     "laboratory",
-    "patient-space",
   ],
 
   RECEPTION: [
@@ -329,14 +329,12 @@ const DEFAULT_ROLE_MODULES = {
 
   LAB: [
     "laboratory",
-    "patient-space",
     "ged",
   ],
 
   PHARMACY: [
     "pharmacy",
     "stocks",
-    "patient-space",
   ],
 
   ACCOUNTING: [
@@ -367,16 +365,8 @@ const DEFAULT_ROLE_MODULES = {
     "reports",
   ],
 
-  // ============================================================
-  // RÔLE PATIENT
-  // ============================================================
-  //
-  // Ce rôle pourra être utilisé pour les comptes créés
-  // spécialement pour les patients.
-  //
-  PATIENT: [
-    "patient-space",
-  ],
+  // Les patients n'ont pas de compte du personnel : ils se connectent
+  // à leur propre espace, /patient, avec leur code patient et un PIN.
 };
 
 

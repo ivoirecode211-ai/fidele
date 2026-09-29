@@ -1,0 +1,92 @@
+/* ============================================================
+   ESPACE PATIENTS — CÔTÉ PERSONNEL
+   ============================================================
+   Coquille et blocs de la Caisse (Caisse.css) ; ici, la carte
+   d'accès imprimable et la messagerie du médecin.
+   ============================================================ */
+
+.pp-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.pp-actions .primary-button, .pp-actions .secondary-button { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.etat.critique { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
+
+/* ------------------------------------------------------------
+   CARTE D'ACCÈS — format A6 paysage à l'impression
+   ------------------------------------------------------------ */
+
+.pp-carte {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: white;
+  color: #0a1622;
+}
+.pp-carte header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--primary); }
+.pp-carte header strong { color: var(--primary-800); font-size: 15px; font-weight: 800; }
+.pp-carte header span { color: var(--primary-700); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.pp-carte-corps { display: flex; align-items: center; gap: 16px; margin: 14px 0 10px; }
+.pp-carte-qr { flex-shrink: 0; width: 120px; height: 120px; }
+.pp-carte-corps div { display: grid; gap: 1px; min-width: 0; }
+.pp-carte-corps span { color: #4a5a6a; font-size: 11px; font-weight: 600; }
+.pp-carte-corps strong { margin-bottom: 6px; font-size: 14px; overflow-wrap: anywhere; }
+.pp-carte-code { font-size: 18px !important; letter-spacing: 1.5px; }
+.pp-carte-pin { color: var(--primary-800); font-size: 24px !important; letter-spacing: 5px; font-variant-numeric: tabular-nums; }
+.pp-carte ol { margin: 0; padding-left: 18px; color: #334; font-size: 12px; line-height: 1.5; }
+
+@media print {
+  body:has(#carte-acces) .caisse-sidebar,
+  body:has(#carte-acces) .caisse-content { display: none !important; }
+  body:has(#carte-acces) .pop { position: static; padding: 0; background: none; backdrop-filter: none; }
+  body:has(#carte-acces) .pop-boite { max-width: none; max-height: none; border-radius: 0; box-shadow: none; }
+  body:has(#carte-acces) .pop-corps { padding: 0; overflow: visible; }
+  body:has(#carte-acces) .pp-carte { border: 1px dashed #9aa6b2; border-radius: 3mm; padding: 4mm 5mm; }
+  body:has(#carte-acces) .pp-carte-qr { width: 30mm; height: 30mm; }
+  body:has(#carte-acces) .pp-carte header { border-bottom-color: #1671b7; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ------------------------------------------------------------
+   MESSAGERIE DU MÉDECIN
+   ------------------------------------------------------------ */
+
+.pp-messagerie { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; min-height: 560px; padding: 0 !important; overflow: hidden; }
+@media (min-width: 900px) { .pp-messagerie { grid-template-columns: 320px minmax(0, 1fr); } }
+
+.pp-fils { border-right: 1px solid var(--border); background: var(--surface-50); }
+.pp-fils h2 { margin: 0; padding: 18px 18px 12px; font-size: 16px; font-weight: 800; }
+.pp-fils .vide { margin: 0 18px 18px; }
+.pp-fils ul { margin: 0; padding: 0 8px 8px; list-style: none; }
+.pp-fils button {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 11px 44px 11px 12px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pp-fils button:hover { background: white; }
+.pp-fils button.actif { background: white; box-shadow: inset 3px 0 0 var(--primary); }
+.pp-fils strong { font-size: 14.5px; }
+.pp-fils span { overflow: hidden; color: var(--ink-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.pp-fils small { color: var(--ink-faint); font-size: 11.5px; }
+.pp-fils b { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: white; font-size: 11px; font-weight: 800; }
+
+.pp-fil { display: flex; flex-direction: column; min-height: 520px; }
+.pp-fil > .vide { margin: auto; }
+.pp-fil-tete { display: flex; align-items: baseline; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.pp-fil-tete strong { font-size: 16px; }
+.pp-fil-tete code { color: var(--primary-700); font-size: 12.5px; font-weight: 800; }
+.pp-bulles { display: flex; flex: 1; flex-direction: column; gap: 8px; max-height: 460px; padding: 16px 18px; overflow-y: auto; }
+.pp-bulle { max-width: 78%; padding: 9px 12px 6px; border-radius: 16px; font-size: 14.5px; line-height: 1.45; }
+.pp-bulle p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pp-bulle span { display: block; margin-top: 3px; font-size: 11px; opacity: .7; text-align: right; }
+.pp-bulle.patient { align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 5px; background: var(--surface-50); }
+.pp-bulle.medecin { align-self: flex-end; border-bottom-right-radius: 5px; background: var(--primary); color: white; }
+.pp-saisie { display: flex; align-items: flex-end; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--border); }
+.pp-saisie textarea { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-xl); outline: none; background: var(--surface-50); color: var(--ink); font: inherit; font-size: 14.5px; resize: vertical; }
+.pp-saisie textarea:focus { border-color: var(--primary); background: white; }
+.pp-saisie .primary-button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }

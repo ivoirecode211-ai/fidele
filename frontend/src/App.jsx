@@ -61,7 +61,9 @@ import Modules from "./pages/Modules";
 
 import Dashboard from "./pages/Dashboard";
 
-import PatientSpace from "./pages/PatientSpace";
+import EspacePatientsPersonnel from "./patient/Personnel";
+import ConnexionPatient from "./patient/Connexion";
+import EspacePatient from "./patient/Espace";
 import GED from "./pages/GED";
 
 
@@ -360,7 +362,10 @@ export default function App() {
         }
       />
 
-      <Route path="/patient-space" element={<PatientSpace />} />
+      {/* Espace patients : côté personnel (accès, messages) et côté patient (code patient + PIN). */}
+      <Route path="/patient-space" element={<Protected><EspacePatientsPersonnel /></Protected>} />
+      <Route path="/patient" element={<ConnexionPatient />} />
+      <Route path="/patient/espace" element={<EspacePatient />} />
       <Route path="/ged" element={<GED />} />
 
       {/* ======================================================
