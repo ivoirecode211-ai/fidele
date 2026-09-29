@@ -248,7 +248,11 @@ def espace_patient(patient):
 
 
 def documents(patient):
-    """Documents de la GED rattachés au patient (si le module est installé)."""
+    """Documents de la GED rattachés au patient, directement ou par son identité d'archive.
+
+    Un document mis en corbeille (suppression logique) n'y figure jamais.
+    Le module GED est lu s'il est installé ; sinon, la section est vide.
+    """
     if not apps.is_installed("ged"):
         return []
     try:
@@ -258,14 +262,23 @@ def documents(patient):
     champs = {f.name for f in Document._meta.get_fields()}
     if "patient" not in champs:
         return []
-    ordre = "-date" if "date" in champs else "-pk"
+    from django.db.models import Q
+
+    filtre = Q(patient=patient)
+    if "identite" in champs:
+        filtre |= Q(identite__patient=patient)
+    qs = Document.objects.filter(filtre)
+    if "supprime_le" in champs:
+        qs = qs.filter(supprime_le__isnull=True)
+    ordre = [c for c in ("-date_document", "-created_at") if c.lstrip("-") in champs] or ["-pk"]
     rows = []
-    for d in Document.objects.filter(patient=patient).order_by(ordre)[:100]:
-        date = getattr(d, "date", None) or getattr(d, "created_at", None)
+    for d in qs.distinct().order_by(*ordre)[:100]:
+        date = getattr(d, "date_document", None) or getattr(d, "created_at", None)
+        type_ = d.get_type_display() if hasattr(d, "get_type_display") else str(getattr(d, "type", "") or "")
         rows.append({
             "id": d.pk,
-            "titre": getattr(d, "title", "") or getattr(d, "titre", "") or getattr(d, "name", "") or f"Document {d.pk}",
-            "type": str(getattr(d, "type", "") or getattr(d, "kind", "") or ""),
+            "titre": getattr(d, "titre", "") or getattr(d, "title", "") or f"Document {d.pk}",
+            "type": type_,
             "date": date.strftime("%d/%m/%Y") if date else "",
             "iso": iso(date),
         })
