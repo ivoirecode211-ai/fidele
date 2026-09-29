@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import "../styles/Login.css";
 
@@ -33,6 +33,7 @@ export default function Login() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
 
   /* ==========================================================
@@ -67,10 +68,13 @@ export default function Login() {
       await login(username, password);
 
       /*
-       * Après une connexion réussie,
-       * l'utilisateur est envoyé vers les modules.
+       * Après une connexion réussie, l'utilisateur est envoyé vers
+       * les modules, ou vers la page qu'il voulait ouvrir (la fiche
+       * d'un appareil scanné, par exemple). Seules les adresses
+       * internes sont suivies.
        */
-      navigate("/modules");
+      const next = params.get("next");
+      navigate(next && next.startsWith("/") && !next.startsWith("//") ? next : "/modules");
 
     } catch (err) {
 

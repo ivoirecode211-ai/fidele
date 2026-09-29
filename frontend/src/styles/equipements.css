@@ -1,0 +1,286 @@
+/* ============================================================
+   MODULE QR CODE ÉQUIPEMENTS
+   ============================================================
+   Reprend la coquille et les blocs de la Caisse (Caisse.css) ;
+   n'ajoute que ce qui est propre au parc, aux étiquettes, au
+   scanner et à la fiche ouverte au scan.
+   Palette : voir src/styles/variables.css (source unique).
+   ============================================================ */
+
+/* États propres aux appareils. */
+.etat.critique { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
+.etat.reforme { border-color: var(--border); background: var(--surface-100); color: var(--ink-faint); }
+
+.eq-alerte { display: block; margin-top: 4px; font-weight: 700; }
+.eq-alerte.critique { color: var(--danger); }
+.eq-alerte.attente { color: var(--warning-soft-text); }
+
+.eq-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.eq-actions .secondary-button { padding: 8px 10px; }
+
+/* Formulaire équipement : 12 colonnes, une seule sur téléphone. */
+.eq-grille { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
+.eq-intertitre {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--primary-700);
+  font-size: 14px;
+  font-weight: 750;
+}
+.eq-grille .field > span,
+.eq-pile .field > span { font-size: 13.5px; font-weight: 650; }
+.eq-grille .field input,
+.eq-grille .field select { height: 46px; font-size: 14.5px; }
+
+@media (max-width: 720px) {
+  .eq-grille { grid-template-columns: minmax(0, 1fr); }
+  .eq-grille > * { grid-column: 1 / -1 !important; }
+}
+
+.eq-pile { display: grid; gap: 14px; }
+.eq-deux { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.eq-pile .field input { height: 46px; }
+
+/* Choix segmenté (type, priorité). */
+.eq-segments {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+}
+.eq-segments button {
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.eq-segments button.actif { background: white; color: var(--primary-700); box-shadow: 0 1px 3px rgba(8, 35, 58, .14); }
+
+/* ------------------------------------------------------------
+   ÉTIQUETTE — 50 × 50 mm à l'impression
+   ------------------------------------------------------------ */
+
+.etiquette {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 170px;
+  padding: 12px 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: white;
+  color: #0a1622;
+  text-align: center;
+}
+.etiquette-qr { width: 118px; height: 118px; }
+.etiquette-code { margin-top: 4px; font-size: 15px; font-weight: 800; letter-spacing: .4px; font-variant-numeric: tabular-nums; }
+.etiquette-nom { max-width: 100%; overflow: hidden; font-size: 11.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.etiquette-hopital { max-width: 100%; overflow: hidden; color: #4a5a6a; font-size: 9.5px; text-overflow: ellipsis; white-space: nowrap; }
+
+.eq-apercu { display: grid; justify-items: center; gap: 14px; }
+.eq-apercu .etiquette { width: 220px; }
+.eq-apercu .etiquette-qr { width: 170px; height: 170px; }
+.eq-apercu .pop-intro { margin: 0; text-align: center; }
+
+.eq-tout { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 14px; color: var(--ink-muted); font-size: 13.5px; font-weight: 650; cursor: pointer; }
+.eq-tout input, .eq-carte input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+.eq-choix { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 14px; }
+.eq-carte {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.eq-carte input { position: absolute; top: 10px; left: 10px; }
+.eq-carte:hover { border-color: var(--primary-200); }
+.eq-carte.choisie { border-color: var(--primary); background: var(--primary-50); }
+.eq-carte .etiquette { width: 100%; max-width: 170px; }
+
+.planche-etiquettes { display: none; }
+
+@media print {
+  /* Une planche d'autocollants : blanche, sans le fond de l'application. */
+  body:has(.planche-etiquettes),
+  body:has(.planche-etiquettes) .caisse-page,
+  body:has(.planche-etiquettes) .caisse-content,
+  body:has(.planche-etiquettes) .caisse-main { background: white !important; }
+
+  body:has(.planche-etiquettes) .caisse-sidebar,
+  body:has(.planche-etiquettes) .caisse-header,
+  body:has(.planche-etiquettes) .caisse-main > .bloc > :not(.planche-etiquettes) { display: none !important; }
+  body:has(.planche-etiquettes) .caisse-main > .bloc { margin: 0; padding: 0; border: 0; box-shadow: none; }
+
+  .planche-etiquettes {
+    display: grid;
+    grid-template-columns: repeat(3, 50mm);
+    grid-auto-rows: 50mm;
+    gap: 6mm;
+    justify-content: center;
+  }
+  .planche-etiquettes .etiquette {
+    width: 50mm;
+    height: 50mm;
+    box-sizing: border-box;
+    padding: 3mm 2mm 2mm;
+    gap: 1mm;
+    border: 1px dashed #9aa6b2;
+    border-radius: 2mm;
+    break-inside: avoid;
+  }
+  .planche-etiquettes .etiquette-qr { width: 32mm; height: 32mm; }
+  .planche-etiquettes .etiquette-code { margin: 0; font-size: 10pt; }
+  .planche-etiquettes .etiquette-nom { font-size: 7pt; }
+  .planche-etiquettes .etiquette-hopital { font-size: 6pt; }
+}
+
+/* ------------------------------------------------------------
+   SCANNER
+   ------------------------------------------------------------ */
+
+.eq-video {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 4 / 3;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background: #0c1b2a;
+}
+.eq-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.eq-video.active video { opacity: 1; }
+.eq-video-repos { position: absolute; display: grid; justify-items: center; gap: 10px; color: #8fa6bd; font-size: 13.5px; font-weight: 600; }
+
+.eq-code { display: flex; align-items: flex-end; gap: 12px; max-width: 520px; margin: 22px auto 0; }
+.eq-code .field { flex: 1; }
+.eq-code .field input { height: 46px; text-transform: uppercase; }
+.eq-code .primary-button { height: 46px; }
+.eq-scanner .bandeau { max-width: 520px; margin: 16px auto 0; }
+
+@media (max-width: 560px) {
+  .eq-code { flex-direction: column; align-items: stretch; }
+}
+
+/* ------------------------------------------------------------
+   FICHE — ouverte au scan, pensée pour le téléphone
+   ------------------------------------------------------------ */
+
+.fiche-page {
+  min-height: 100vh;
+  background: var(--surface-100);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.fiche-page *, .fiche-page *::before, .fiche-page *::after { box-sizing: border-box; }
+.bandeau strong { white-space: nowrap; }
+
+.fiche-barre {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: white;
+}
+.fiche-barre strong { color: var(--primary-800); font-size: 15px; font-weight: 800; }
+.fiche-barre-droite { margin-left: auto; }
+.fiche-retour { display: grid; place-items: center; width: 38px; height: 38px; border-radius: var(--radius-lg); color: var(--ink); }
+.fiche-retour:hover { background: var(--surface-100); }
+
+@media (max-width: 560px) {
+  .fiche-barre-droite .ms-user-text { display: none; }
+}
+
+.fiche-contenu { display: grid; gap: 14px; max-width: 880px; margin: 0 auto; padding: 16px 16px 40px; }
+
+.fiche-identite, .fiche-bloc {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: white;
+}
+
+.fiche-titre code { color: var(--primary-700); font-size: 13px; font-weight: 800; letter-spacing: .4px; }
+.fiche-titre h1 { margin: 4px 0 2px; color: var(--ink); font-size: clamp(21px, 5vw, 27px); font-weight: 800; line-height: 1.2; text-wrap: balance; }
+.fiche-titre p { margin: 0; color: var(--ink-muted); font-size: 14px; }
+.fiche-etats { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.fiche-probleme { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-lg); background: var(--danger-soft); color: var(--danger-soft-text); font-size: 13.5px; font-weight: 600; }
+.fiche-probleme svg { flex-shrink: 0; margin-top: 2px; }
+.fiche-notes { margin: 14px 0 0; color: var(--ink-muted); font-size: 13.5px; line-height: 1.55; }
+
+.fiche-bloc h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; color: var(--primary-800); font-size: 15.5px; font-weight: 800; }
+
+.fiche-infos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; margin: 16px 0 0; }
+.fiche-bloc .fiche-infos { margin: 0; }
+.fiche-infos dt { display: flex; align-items: center; gap: 4px; color: var(--ink-faint); font-size: 12px; font-weight: 600; }
+.fiche-infos dd { margin: 3px 0 0; color: var(--ink); font-size: 14.5px; font-weight: 700; overflow-wrap: anywhere; }
+.fiche-infos dd .etat { margin-left: 6px; padding: 2px 8px; font-size: 11px; }
+
+@media (min-width: 720px) {
+  .fiche-infos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fiche-contenu { padding-top: 24px; }
+}
+
+.fiche-actions .primary-button { width: 100%; justify-content: center; }
+@media (min-width: 720px) { .fiche-actions .primary-button { width: auto; } }
+
+/* Historique : une ligne de temps, la plus récente en haut. */
+.fiche-historique { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.fiche-intervention { position: relative; padding: 0 0 18px 22px; border-left: 2px solid var(--surface-200); }
+.fiche-intervention:last-child { padding-bottom: 0; border-left-color: transparent; }
+.fiche-intervention::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 1px var(--surface-200);
+}
+.fiche-intervention.ouverte::before { background: var(--warning-soft-text); }
+.fiche-intervention-tete { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fiche-intervention-tete strong { margin-right: 4px; color: var(--ink); font-size: 14px; }
+.fiche-intervention-tete .etat { padding: 2px 9px; font-size: 11.5px; }
+.fiche-intervention p { margin: 8px 0 0; color: var(--ink); font-size: 14px; line-height: 1.5; }
+.fiche-intervention-qui { display: flex; align-items: center; gap: 6px; color: var(--ink-muted) !important; font-weight: 650; }
+.fiche-intervention .secondary-button { margin-top: 10px; }
+
+.fiche-compte-rendu { display: grid; gap: 8px; margin: 10px 0 0; padding: 12px 14px; border-radius: var(--radius-lg); background: var(--surface-50); }
+.fiche-compte-rendu > div:not(.fiche-compte-rendu-ligne) { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; }
+.fiche-compte-rendu dt { color: var(--ink-faint); font-size: 12.5px; font-weight: 650; }
+.fiche-compte-rendu dd { margin: 0; color: var(--ink); font-size: 13.5px; }
+.fiche-compte-rendu-ligne { display: flex; flex-wrap: wrap; gap: 6px 16px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--ink-muted); font-size: 12.5px; }
+
+.fiche-scans { margin: 0; color: var(--ink-faint); font-size: 12px; text-align: center; }
+
+.fiche-vide { display: grid; justify-items: center; gap: 10px; padding: 60px 20px; color: var(--ink-muted); text-align: center; }
+.fiche-vide svg { color: var(--danger); }
+.fiche-vide h1 { margin: 0; color: var(--ink); font-size: 22px; }
+.fiche-vide p { max-width: 380px; margin: 0 0 8px; line-height: 1.55; }
+.eq-erreur { margin: 0 0 16px; }

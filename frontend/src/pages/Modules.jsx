@@ -23,6 +23,7 @@ import {
   Archive,
   Bot,
   Hospital,
+  QrCode,
   ChevronRight,
   ChevronDown,
   LayoutGrid,
@@ -245,6 +246,19 @@ const ALL_MODULES = [
   },
 
   // ============================================================
+  // QR CODE ÉQUIPEMENTS : identifier chaque appareil, voir sa maintenance
+  // ============================================================
+  {
+    id: "equipements",
+    name: "QR Code équipements",
+    description:
+      "Étiqueter les appareils du centre et retrouver leur historique de maintenance en les scannant",
+    path: "/equipements",
+    icon: QrCode,
+    color: "blue",
+  },
+
+  // ============================================================
   // PLATEFORME : création des hôpitaux et de leur administrateur
   // ============================================================
   {
@@ -284,6 +298,7 @@ const DEFAULT_ROLE_MODULES = {
     "archives",
     "ia",
     "ged",
+    "equipements",
   ],
 
   DOCTOR: [
@@ -342,6 +357,7 @@ const DEFAULT_ROLE_MODULES = {
 
   MAINTENANCE: [
     "maintenance",
+    "equipements",
   ],
 
   // Reçoit les fonds des caisses, valide les clôtures, annule les tickets.

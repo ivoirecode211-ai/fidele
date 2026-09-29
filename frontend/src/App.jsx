@@ -29,7 +29,8 @@
 import {
   Routes,
   Route,
-  Navigate
+  Navigate,
+  useLocation
 } from "react-router-dom";
 
 
@@ -84,6 +85,8 @@ import Direction from "./pages/Direction";
 
 import Caisse from "./accueil/Caisse";
 import Hopitaux from "./pages/Hopitaux";
+import Equipements from "./equipements/Equipements";
+import FicheEquipement from "./equipements/FicheEquipement";
 
 
 /* ============================================================
@@ -240,10 +243,13 @@ import AppLayout from "./layouts/AppLayout";
 function Protected({ children }) {
 
   const { token } = useAuth();
+  const { pathname, search } = useLocation();
 
+  /* Après la connexion, on revient là où l'on voulait aller :
+     c'est ce qui permet d'ouvrir la fiche d'un appareil en scannant son étiquette. */
   return token
     ? children
-    : <Navigate to="/login" replace />;
+    : <Navigate to={`/login?next=${encodeURIComponent(pathname + search)}`} replace />;
 }
 
 
@@ -330,6 +336,10 @@ export default function App() {
           </Protected>
         }
       />
+
+      {/* QR Code équipements : le parc, et la fiche ouverte en scannant une étiquette. */}
+      <Route path="/equipements" element={<Protected><Equipements /></Protected>} />
+      <Route path="/equipement/:token" element={<Protected><FicheEquipement /></Protected>} />
 
       {/* Plateforme : création des hôpitaux et de leur administrateur. */}
       <Route
