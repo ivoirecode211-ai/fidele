@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 
 from accounts.tenancy import hospital_of
 
+from . import alertes
+
 from .models import Admission, InsuranceCompany, MedicalService, VitalSigns
 from prescriptions.models import Prescription
 
@@ -223,4 +225,31 @@ class NotificationsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response(notifications_for(request.user))
+        return Response(alertes.pour(request.user))
+
+
+class NotificationsVuesView(APIView):
+    """Clic sur la cloche : la pastille s'efface jusqu'à la prochaine nouveauté."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        return Response(alertes.marquer_vues(request.user))
+
+
+class NotificationsPushView(APIView):
+    """Abonnement du navigateur aux notifications push (application fermée)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"publicKey": alertes.cle_publique()})
+
+    def post(self, request):
+        if not alertes.abonner(request.user, request.data.get("subscription") or {}):
+            return Response({"detail": "Abonnement aux notifications invalide."}, status=status.HTTP_400_BAD_REQUEST)
+        # Ce qui attend déjà ne sonne pas une seconde fois : seul ce qui arrive ensuite partira.
+        alertes.alerter(request.user)
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        alertes.desabonner(request.user, request.data.get("endpoint", ""))
+        return Response(status=status.HTTP_204_NO_CONTENT)

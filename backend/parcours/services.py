@@ -277,11 +277,14 @@ def notifications_for(user):
         })
 
     if sees_all or user.has_role("DOCTOR"):
-        queue = admissions.filter(sent_to_consultation_at__isnull=False).exclude(statut="Terminée")
-        if not sees_all:
-            queue = queue.filter(
-                Q(consultation__isnull=True) | Q(consultation__doctor=user)
-            )
+        if sees_all:
+            queue = admissions.filter(sent_to_consultation_at__isnull=False)
+        else:
+            # La file du médecin : les patients de SES spécialités, et ceux qu'il a déjà pris.
+            from consultations.medecine import admissions_du_medecin
+
+            queue = admissions_du_medecin(user)
+        queue = queue.exclude(statut="Terminée").exclude(consultation__completed_at__isnull=False)
         items.append({
             "id": "consultations",
             "count": queue.count(),
@@ -296,7 +299,7 @@ def notifications_for(user):
             "id": "patient-messages",
             "count": Message.objects.filter(conversation__doctor=user, from_patient=True, read_at__isnull=True).count(),
             "label": "message(s) de patients non lu(s)",
-            "link": "/patient-space?vue=messages",
+            "link": "/consultations?vue=messages",
         })
 
     if sees_all or user.has_role("PHARMACY"):

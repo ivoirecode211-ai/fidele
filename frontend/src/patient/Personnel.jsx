@@ -168,7 +168,7 @@ function CarteAcces({ carte, hopital, onClose }) {
    MESSAGERIE DU MÉDECIN
    ============================================================ */
 
-function Messagerie() {
+export function Messagerie() {
   const [fils, setFils] = useState(null);
   const [choisi, setChoisi] = useState(null);
   const [version, setVersion] = useState(0);

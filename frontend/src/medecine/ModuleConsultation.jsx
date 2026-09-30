@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
-  BedDouble, CalendarDays, FlaskConical, Pill, Sparkles, UserCheck, Users,
+  BedDouble, CalendarDays, FlaskConical, MessageCircle, Pill, Sparkles, UserCheck, Users,
 } from "lucide-react";
 
 import "../styles/Caisse.css";
@@ -15,6 +16,7 @@ import Assistant from "./Assistant";
 import Consultation from "./Consultation";
 import { SignauxPatient, identite } from "./EntetePatient";
 import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } from "./Listes";
+import { Messagerie } from "../patient/Personnel";
 
 /*
  * ============================================================
@@ -30,6 +32,8 @@ import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } fro
  *   Examens                ce qui est parti au laboratoire, et revenu
  *   Rendez-vous            les contrôles fixés
  *   Hospitalisations       les séjours décidés
+ *   Messages               la boîte de réception du médecin : ses
+ *                          patients seulement (Espace patient)
  *   Assistant IA           la conversation, déjà engagée sur le
  *                          patient ouvert
  *
@@ -40,7 +44,10 @@ import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } fro
 
 const RAFRAICHISSEMENT = 30000;
 
+const ECRANS_IDS = ["attente", "consultes", "ordonnances", "examens", "rdv", "sejours", "messages"];
+
 export default function ModuleConsultation() {
+  const { search } = useLocation();
   const [ecran, setEcran] = useState("attente");
   const [file, setFile] = useState(null);
   const [suivi, setSuivi] = useState(null);
@@ -56,6 +63,12 @@ export default function ModuleConsultation() {
   const [question, setQuestion] = useState(null);
 
   const rafraichir = useCallback(() => setVersion((n) => n + 1), []);
+
+  /* Une notification peut ouvrir un écran précis : /consultations?vue=messages. */
+  useEffect(() => {
+    const vue = new URLSearchParams(search).get("vue");
+    if (ECRANS_IDS.includes(vue)) { setOuverte(null); setEcran(vue); }
+  }, [search]);
 
   useEffect(() => { medecine.get("references/").then(setRefs).catch(() => setRefs({})); }, []);
 
@@ -82,6 +95,7 @@ export default function ModuleConsultation() {
     { id: "examens", label: "Examens", icone: FlaskConical, titre: "Examens demandés", sous: "" },
     { id: "rdv", label: "Rendez-vous", icone: CalendarDays, titre: "Rendez-vous", sous: "" },
     { id: "sejours", label: "Hospitalisations", icone: BedDouble, titre: "Hospitalisations", sous: "" },
+    { id: "messages", label: "Messages", icone: MessageCircle, titre: "Messages des patients", sous: "" },
     { id: "assistant", label: "Assistant IA", icone: Sparkles, titre: "Assistant IA", sous: "" },
   ];
 
@@ -149,6 +163,7 @@ export default function ModuleConsultation() {
         {ecran === "examens" && suivi && <Examens lignes={suivi.examens} />}
         {ecran === "rdv" && suivi && <RendezVous lignes={suivi.rendezVous} />}
         {ecran === "sejours" && suivi && <Sejours lignes={suivi.sejours} />}
+        {ecran === "messages" && <Messagerie />}
       </>}
     </Coquille>
   );

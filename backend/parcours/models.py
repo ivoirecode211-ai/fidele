@@ -203,3 +203,28 @@ class VitalSigns(models.Model):
         verbose_name = "prise de constantes"
         verbose_name_plural = "prises de constantes"
         ordering = ["-recorded_at", "-id"]
+
+
+class EtatNotifications(models.Model):
+    """Ce que la personne a déjà vu (compteurs au dernier clic sur la cloche)
+    et ce qui lui a déjà été envoyé en push : seules les nouveautés sonnent."""
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="etat_notifications")
+    vues = models.JSONField(default=dict, blank=True)
+    envoyees = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = "état des notifications"
+        verbose_name_plural = "états des notifications"
+
+
+class AbonnementPush(models.Model):
+    """Un navigateur du personnel abonné aux notifications Web Push."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="abonnements_push")
+    endpoint = models.URLField(max_length=600, unique=True)
+    p256dh = models.CharField(max_length=200)
+    auth = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "abonnement push du personnel"
+        verbose_name_plural = "abonnements push du personnel"

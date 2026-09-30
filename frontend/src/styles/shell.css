@@ -603,3 +603,12 @@
     animation: none;
   }
 }
+
+/* Ce qui était nouveau à l'ouverture de la cloche. */
+.ms-bell-item.nouveau {
+  background: var(--primary-soft);
+}
+
+.ms-bell-item.nouveau .ms-bell-item-text strong {
+  color: var(--primary);
+}

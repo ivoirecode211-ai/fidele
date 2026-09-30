@@ -23,4 +23,6 @@ urlpatterns = [
     path("pharmacie/historique/", views.PharmacyHistoryView.as_view()),
     path("comptabilite/paiements/", views.PaymentsView.as_view()),
     path("notifications/", views.NotificationsView.as_view()),
+    path("notifications/vues/", views.NotificationsVuesView.as_view()),
+    path("notifications/push/", views.NotificationsPushView.as_view()),
 ]

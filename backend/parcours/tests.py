@@ -308,7 +308,7 @@ class NotificationsTests(ParcoursBase):
         self.assertEqual(data["count"], 1)
         self.assertEqual(data["items"][0]["link"], "/nursing")
         self.envoyer_en_consultation()
-        self.assertEqual(self.notifications(self.infirmier), {"count": 0, "items": []})
+        self.assertEqual(self.notifications(self.infirmier)["items"], [])
 
     def test_doctor_sees_queue_until_consultation_is_validated(self):
         self.assertEqual(self.notifications(self.medecin)["count"], 0)
@@ -331,7 +331,60 @@ class NotificationsTests(ParcoursBase):
         self.assertEqual(self.notifications(self.pharmacien)["count"], 0)
 
     def test_roles_without_pending_actions_get_nothing(self):
-        self.assertEqual(self.notifications(self.comptable), {"count": 0, "items": []})
+        self.assertEqual(self.notifications(self.comptable)["items"], [])
+
+
+class NotificationsNouveautesTests(ParcoursBase):
+    """La pastille compte les nouveautés : elle s'efface au clic et revient à la prochaine arrivée."""
+
+    def notifications(self, user):
+        self.as_user(user)
+        return self.client.get("/api/parcours/notifications/").data
+
+    def nouveau_patient(self):
+        self.as_user(self.caissier)
+        pk = self.client.post(URL, form(nom="yao", prenom="Paul", telephone="0700000001"), format="json").data["admissionId"]
+        encaisser(self.client, pk)
+
+    def test_badge_clears_on_click_and_comes_back_with_the_next_patient(self):
+        self.assertEqual(self.notifications(self.infirmier)["nouveaux"], 1)
+        vu = self.client.post("/api/parcours/notifications/vues/").data
+        self.assertEqual((vu["nouveaux"], vu["count"]), (0, 1))
+        self.assertEqual(self.notifications(self.infirmier)["nouveaux"], 0)
+        self.nouveau_patient()
+        data = self.notifications(self.infirmier)
+        self.assertEqual((data["nouveaux"], data["count"]), (1, 2))
+
+    def test_badge_is_personal(self):
+        self.as_user(self.infirmier)
+        self.client.post("/api/parcours/notifications/vues/")
+        autre = User.objects.create_user(username="inf2", password="x", role="NURSE")
+        self.assertEqual(self.notifications(autre)["nouveaux"], 1)
+
+    def test_doctor_is_only_told_about_his_specialties(self):
+        cardiologue = User.objects.create_user(username="cardio", password="x", role="DOCTOR", specialites=["cardiologie"])
+        self.envoyer_en_consultation()
+        self.assertEqual(self.notifications(self.medecin)["count"], 1)
+        self.assertEqual(self.notifications(cardiologue)["count"], 0)
+
+    def test_push_leaves_only_for_arrivals(self):
+        from unittest import mock
+
+        from parcours import alertes
+        from parcours.models import AbonnementPush
+
+        AbonnementPush.objects.create(user=self.infirmier, endpoint="https://push.example/1", p256dh="k", auth="a")
+        with mock.patch.object(alertes, "envoyer", return_value=1) as envoyer:
+            self.assertEqual(alertes.alerter_personnel(), 1)
+            self.assertEqual(alertes.alerter_personnel(), 0)
+            self.nouveau_patient()
+            self.assertEqual(alertes.alerter_personnel(), 1)
+        self.assertEqual(envoyer.call_args.kwargs["body"], "2 patient(s) en attente de constantes")
+        self.assertEqual({c.args[0] for c in envoyer.call_args_list}, {self.infirmier})
+
+    def test_subscription_requires_a_complete_browser_subscription(self):
+        self.as_user(self.medecin)
+        self.assertEqual(self.client.post("/api/parcours/notifications/push/", {"subscription": {"endpoint": "x"}}, format="json").status_code, 400)
 
 
 class NotificationsModulesTests(ParcoursBase):

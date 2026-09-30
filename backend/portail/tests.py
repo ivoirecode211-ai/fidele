@@ -184,3 +184,15 @@ class MessagerieTests(PortailBase):
         self.assertEqual(self.client.get(f"{BASE}/messages/").data[0]["unread"], 1)
         thread = self.client.get(f"{BASE}/messages/{self.medecin.pk}/").data
         self.assertEqual([m["fromPatient"] for m in thread["messages"]], [True, False])
+
+    @mock.patch("portail.push.send", return_value=0)
+    def test_each_doctor_has_his_own_inbox(self, send):
+        self.en_patient()
+        self.assertEqual(self.client.post(f"{BASE}/messages/{self.autre_medecin.pk}/", {"text": "Bonjour"}, format="json").status_code, 404)
+        self.client.post(f"{BASE}/messages/{self.medecin.pk}/", {"text": "Bonjour docteur"}, format="json")
+        self.client.credentials()
+
+        self.client.force_authenticate(self.autre_medecin)
+        self.assertEqual(self.client.get(f"{BASE}/medecin/messages/").data, [])
+        self.client.force_authenticate(self.medecin)
+        self.assertEqual(len(self.client.get(f"{BASE}/medecin/messages/").data), 1)
