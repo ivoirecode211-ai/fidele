@@ -217,7 +217,8 @@ class PharmacyReceiptView(APIView):
 
         prescription = prescription_from_code(code, request.user)
         patient = prescription.patient
-        catalogue = {p.name.lower().strip(): p for p in Product.objects.filter(category="Médicament")}
+        catalogue = {p.name.lower().strip(): p
+                     for p in Product.objects.filter(hospital=patient.hospital, category="Médicament")}
         lignes, total = [], 0
         for item in prescription.items.all():
             produit = catalogue.get(item.medicine.lower().strip())

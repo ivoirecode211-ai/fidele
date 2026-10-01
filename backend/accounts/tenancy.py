@@ -20,6 +20,11 @@ def hospital_of(user):
     return Hospital.objects.filter(active=True).order_by("pk").first()
 
 
+def premier_hopital_id():
+    """L'hôpital d'office d'un enregistrement créé sans hôpital (script, ancien code)."""
+    return Hospital.objects.filter(active=True).order_by("pk").values_list("pk", flat=True).first()
+
+
 def code_candidates(name):
     """Codes de 3 lettres possibles, du plus parlant au moins parlant."""
     plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().upper()

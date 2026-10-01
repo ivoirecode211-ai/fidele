@@ -60,12 +60,13 @@ def serialize_analysis(admission):
     }
 
 
-def worklist():
+def worklist(hospital):
+    """Demandes de l'hôpital seulement (multitenant)."""
     since = timezone.now() - timedelta(days=WORKLIST_DAYS)
     admissions = (
         Admission.objects.encaissees().filter(created_at__gte=since)
         | Admission.objects.filter(lab_request__isnull=False)
-    ).distinct().select_related("patient", "consultation__doctor", "lab_request").order_by("-created_at")
+    ).filter(patient__hospital=hospital).distinct().select_related("patient", "consultation__doctor", "lab_request").order_by("-created_at")
     return [serialize_analysis(admission) for admission in admissions]
 
 

@@ -5,9 +5,17 @@ from django.db import models
 CATEGORIES = [(c, c) for c in ("Médicament", "Consommable", "Laboratoire")]
 
 
+def premier_hopital_id():
+    from accounts.tenancy import premier_hopital_id as premier
+
+    return premier()
+
+
 class Product(models.Model):
-    """Produit du stock. La Pharmacie voit ceux de catégorie « Médicament »."""
-    name = models.CharField(max_length=150, unique=True)
+    """Produit du stock d'un hôpital. La Pharmacie voit ceux de catégorie « Médicament »."""
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="produits", verbose_name="hôpital")
+    name = models.CharField(max_length=150)
     category = models.CharField(max_length=30, choices=CATEGORIES)
     therapeutic_class = models.CharField(max_length=80, blank=True, help_text="Ex. Antalgique (Pharmacie).")
     reference = models.CharField(max_length=40, blank=True)
@@ -20,13 +28,22 @@ class Product(models.Model):
         verbose_name = "produit"
         verbose_name_plural = "produits"
         ordering = ["id"]
+        constraints = [models.UniqueConstraint(fields=["hospital", "name"], name="stocks_produit_unique_par_hopital")]
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        # Un produit créé sans hôpital (script, ancien code) appartient au premier hôpital.
+        if self.hospital_id is None:
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)
+
 
 class Supplier(models.Model):
-    name = models.CharField(max_length=150, unique=True)
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="fournisseurs", verbose_name="hôpital")
+    name = models.CharField(max_length=150)
     contact = models.CharField(max_length=120)
     phone = models.CharField(max_length=40)
     products_count = models.PositiveIntegerField(default=0)
@@ -36,9 +53,15 @@ class Supplier(models.Model):
         verbose_name = "fournisseur"
         verbose_name_plural = "fournisseurs"
         ordering = ["id"]
+        constraints = [models.UniqueConstraint(fields=["hospital", "name"], name="stocks_fournisseur_unique_par_hopital")]
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)
 
 
 class Movement(models.Model):

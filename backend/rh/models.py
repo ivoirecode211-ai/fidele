@@ -3,11 +3,13 @@ from django.db import models
 
 class Employee(models.Model):
     """Membre du personnel (module Ressources humaines)."""
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="+", verbose_name="hôpital")
     SEXES = [("Homme", "Homme"), ("Femme", "Femme")]
     CONTRACTS = [(c, c) for c in ("CDI", "CDD", "Stage", "Prestataire")]
     STATUSES = [(s, s) for s in ("Actif", "Congé", "Suspendu", "Inactif")]
 
-    matricule = models.CharField(max_length=20, unique=True)
+    matricule = models.CharField(max_length=20)
     nom = models.CharField(max_length=120)
     prenom = models.CharField(max_length=120)
     sexe = models.CharField(max_length=10, choices=SEXES, default="Homme")
@@ -23,6 +25,14 @@ class Employee(models.Model):
         verbose_name = "employé"
         verbose_name_plural = "employés"
         ordering = ["matricule"]
+        constraints = [models.UniqueConstraint(fields=["hospital", "matricule"], name="rh_matricule_unique_par_hopital")]
 
     def __str__(self):
         return f"{self.matricule} — {self.nom} {self.prenom}"
+
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            from accounts.tenancy import premier_hopital_id
+
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)

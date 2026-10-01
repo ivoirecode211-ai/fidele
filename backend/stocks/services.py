@@ -32,10 +32,15 @@ def record_movement(*, product, kind, quantity, user, motif, date=None, **extra)
     )
 
 
+def produits(hospital):
+    """Le stock d'un hôpital : chaque établissement a ses produits, ses quantités et ses prix."""
+    return Product.objects.filter(hospital=hospital)
+
+
 @transaction.atomic
-def create_product(*, data, user):
+def create_product(*, data, user, hospital):
     initial = data.pop("stock", 0)
-    product = Product.objects.create(**data)
+    product = Product.objects.create(hospital=hospital, **data)
     if initial:
         record_movement(product=product, kind="Entrée", quantity=initial, user=user, motif="Stock initial")
     return Product.objects.get(pk=product.pk)
@@ -44,7 +49,8 @@ def create_product(*, data, user):
 def dispense(*, prescription, user):
     """Sorties de stock d'une ordonnance servie : la quantité prescrite de chaque médicament du catalogue."""
     patient = f"{prescription.patient.last_name} {prescription.patient.first_names}"
-    products = {p.name.lower().strip(): p for p in Product.objects.filter(category="Médicament")}
+    products = {p.name.lower().strip(): p
+                for p in produits(prescription.patient.hospital).filter(category="Médicament")}
     matched = [
         (products[item.medicine.lower().strip()], max(item.quantity, 1))
         for item in prescription.items.all() if item.medicine.lower().strip() in products

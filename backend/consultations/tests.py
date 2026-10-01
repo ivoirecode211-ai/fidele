@@ -15,15 +15,19 @@ class ConsultationApiTests(APITestCase):
             birth_date="1995-09-05", sex="F",
         )
 
-    def test_consultation_is_assigned_to_authenticated_doctor(self):
-        other_doctor = User.objects.create_user(username="autre", password="pass1234", role="DOCTOR")
+    def test_generic_route_is_read_only_and_scoped(self):
+        from accounts.models import Hospital
 
-        response = self.client.post("/api/consultations/", {
-            "patient": self.patient.id, "doctor": other_doctor.id, "reason": "Fièvre",
-        })
-        self.assertEqual(response.status_code, 201)
-        # Le médecin est toujours celui qui est connecté, quoi que le client envoie.
-        self.assertEqual(response.data["doctor"], self.doctor.id)
+        self.assertEqual(self.client.post("/api/consultations/", {"patient": self.patient.id}).status_code, 405)
+        self.assertEqual(self.client.get("/api/consultations/").status_code, 200)
+        autre = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        self.client.force_authenticate(User.objects.create_user(username="dr-b", password="x", role="DOCTOR", hospital=autre))
+        data = self.client.get("/api/consultations/").data
+        self.assertEqual(data.get("results", data) if isinstance(data, dict) else data, [])
+
+    def test_other_roles_are_refused(self):
+        self.client.force_authenticate(User.objects.create_user(username="cpt", password="x", role="ACCOUNTING"))
+        self.assertEqual(self.client.get("/api/consultations/").status_code, 403)
 
     def test_requires_authentication(self):
         self.client.force_authenticate(None)

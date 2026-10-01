@@ -83,5 +83,26 @@ contre la nouvelle charte vert sapin (encore en cours dans l'autre session) :
   seulement à l'impression d'un résultat de laboratoire. Démarrage : environ 104 kB compressés au lieu de 382 kB.
   Vérifié : 26 pages ouvertes sans erreur ; impression PDF d'un résultat de laboratoire réussie.
 
+## Isolation complète des hôpitaux (2 octobre 2026)
+
+Un hôpital témoin, avec un compte par rôle (13 rôles), interroge toutes les routes de lecture (115) et
+tente d'ouvrir les fiches de MA SANTÉ par leur numéro (53 routes × 48 numéros × 7 rôles). On cherche dans
+chaque réponse les noms, numéros de dossier, produits, employés, équipements et documents de MA SANTÉ.
+
+Fuites trouvées puis corrigées :
+- Laboratoire : liste de travail et demandes ouvertes par numéro, tous hôpitaux confondus.
+- Archives : patients, comptes rendus, factures et résultats de tous les hôpitaux.
+- `/api/consultations/` et `/api/prescriptions/` (routes génériques inutilisées par l'écran) : lecture et
+  écriture de tous les hôpitaux pour tout compte connecté → lecture seule, par hôpital, rôles médicaux ;
+  consultations VIH réservées aux médecins et à l'administrateur.
+- Stocks : produits, mouvements (avec noms de patients) et fournisseurs rattachés à un hôpital
+  (migration : l'existant à MA SANTÉ) ; la Pharmacie, la Consultation, l'assistant IA, le reçu de
+  pharmacie, les rapports, les notifications et le tableau de bord lisent le stock de leur hôpital.
+- Hygiène (tâches, produits, déchets, audits) et RH (employés, matricules par hôpital) rattachés à un hôpital.
+- Références de la Consultation : chambres de tous les hôpitaux → celles de l'hôpital.
+- Module IA : alertes cliniques et activité de tous les hôpitaux → celles de l'hôpital.
+
+Résultat : 0 fuite sur les listes, 0 fuite sur les fiches, aucune erreur serveur. Tests ajoutés :
+`dossier/tests_cloisonnement.py` (modules), `ia/tests.py`, `administration/tests.py` (logo).
+
 ## Reste à faire
-- Stocks et Hygiène : rattachement à un hôpital, avant la mise en service d'un deuxième hôpital.

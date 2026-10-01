@@ -5,10 +5,11 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.tenancy import hospital_of
 from parcours.permissions import PharmacyAccess, RoleAccess
 
 from .models import CATEGORIES, Movement, Product, Supplier
-from .services import StockError, create_product, record_movement
+from .services import StockError, create_product, produits, record_movement
 
 
 class StocksAccess(RoleAccess):
@@ -59,23 +60,26 @@ def serialize_supplier(supplier, last_orders):
     }
 
 
-def product_from_code(code):
-    return get_object_or_404(Product, pk=int(str(code).lstrip("0") or 0))
+def product_from_code(code, user):
+    """Un produit du stock de l'hôpital de l'utilisateur ; celui d'un autre hôpital est introuvable."""
+    return get_object_or_404(produits(hospital_of(user)), pk=int(str(code).lstrip("0") or 0))
 
 
 class OverviewView(APIView):
     permission_classes = [StocksAccess]
 
     def get(self, request):
+        hopital = hospital_of(request.user)
         last_orders = {
             row["supplier"].lower(): row["last"]
-            for row in Movement.objects.filter(type="Entrée").exclude(supplier="")
+            for row in Movement.objects.filter(type="Entrée", product__hospital=hopital).exclude(supplier="")
             .values("supplier").annotate(last=Max("date"))
         }
         return Response({
-            "produits": [serialize_product(p) for p in Product.objects.all()],
-            "mouvements": [serialize_movement(m) for m in Movement.objects.select_related("product", "user")[:500]],
-            "fournisseurs": [serialize_supplier(s, last_orders) for s in Supplier.objects.all()],
+            "produits": [serialize_product(p) for p in produits(hopital)],
+            "mouvements": [serialize_movement(m) for m in
+                           Movement.objects.filter(product__hospital=hopital).select_related("product", "user")[:500]],
+            "fournisseurs": [serialize_supplier(s, last_orders) for s in Supplier.objects.filter(hospital=hopital)],
         })
 
 
@@ -86,7 +90,7 @@ class ProductInputSerializer(serializers.Serializer):
     seuil = serializers.IntegerField(min_value=0)
 
     def validate_produit(self, value):
-        if Product.objects.filter(name__iexact=value.strip()).exists():
+        if produits(self.context["hospital"]).filter(name__iexact=value.strip()).exists():
             raise serializers.ValidationError("Ce produit existe déjà.")
         return value.strip()
 
@@ -95,13 +99,13 @@ class ProductsView(APIView):
     permission_classes = [StocksAccess]
 
     def post(self, request):
-        serializer = ProductInputSerializer(data=request.data)
+        serializer = ProductInputSerializer(data=request.data, context={"hospital": hospital_of(request.user)})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         product = create_product(
             data={"name": data["produit"], "category": data["categorie"], "stock": data["stock"],
                   "threshold": data["seuil"]},
-            user=request.user,
+            user=request.user, hospital=hospital_of(request.user),
         )
         return Response(serialize_product(product), status=status.HTTP_201_CREATED)
 
@@ -128,7 +132,7 @@ class MovementsView(APIView):
         data = serializer.validated_data
         try:
             movement = record_movement(
-                product=product_from_code(data["produitId"]), kind=data["type"], quantity=data["quantite"],
+                product=product_from_code(data["produitId"], request.user), kind=data["type"], quantity=data["quantite"],
                 user=request.user, motif=data["motif"], date=data["date"], supplier=data["fournisseur"],
                 document_reference=data["referenceDocument"], service=data["service"],
                 patient=data["patient"], observation=data["observation"],
@@ -158,7 +162,7 @@ class SuppliersView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         supplier, created = Supplier.objects.get_or_create(
-            name=data["fournisseur"].strip(),
+            hospital=hospital_of(request.user), name=data["fournisseur"].strip(),
             defaults={"contact": data["contact"], "phone": data["telephone"],
                       "products_count": data["produits"], "active": data["statut"] == "Actif"},
         )
@@ -171,7 +175,7 @@ class SupplierView(APIView):
     permission_classes = [StocksAccess]
 
     def delete(self, request, code):
-        get_object_or_404(Supplier, pk=int(code.replace("FOU-", ""))).delete()
+        get_object_or_404(Supplier, pk=int(code.replace("FOU-", "") or 0), hospital=hospital_of(request.user)).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -184,5 +188,5 @@ class PharmacyProductsView(APIView):
             {"id": f"P{p.pk:03d}", "name": p.name, "category": p.therapeutic_class or "Médicament",
              "reference": p.reference, "stock": p.stock, "alertStock": p.threshold,
              "price": float(p.price), "unit": p.unit}
-            for p in Product.objects.filter(category="Médicament")
+            for p in produits(hospital_of(request.user)).filter(category="Médicament")
         ])

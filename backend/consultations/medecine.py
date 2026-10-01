@@ -293,8 +293,11 @@ def carnet(patient, code, sauf=None):
 
 def references(user):
     """Listes du formulaire : examens, médicaments, lits libres, services."""
+    from accounts.tenancy import hospital_of
+
+    hopital = hospital_of(user)
     chambres = []
-    for chambre in Room.objects.prefetch_related("beds").order_by("name"):
+    for chambre in Room.objects.filter(hospital=hopital).prefetch_related("beds").order_by("name"):
         libres = [lit.number for lit in chambre.beds.all() if lit.status != "OCCUPIED"]
         if libres:
             chambres.append({"nom": chambre.name, "service": chambre.department, "lits": libres})
@@ -302,7 +305,7 @@ def references(user):
         "examens": [{"code": e.code, "nom": e.name, "categorie": e.category, "prix": float(e.price)}
                     for e in LabExam.objects.filter(active=True)],
         "medicaments": [{"nom": p.name, "stock": p.stock, "unite": p.unit, "classe": p.therapeutic_class}
-                        for p in Product.objects.filter(category="Médicament").order_by("name")],
+                        for p in Product.objects.filter(hospital=hopital, category="Médicament").order_by("name")],
         "chambres": chambres,
         "services": list(Department.objects.filter(active=True).values_list("name", flat=True)),
         "issues": [{"code": code, "libelle": libelle} for code, libelle in Consultation.OUTCOMES],

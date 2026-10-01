@@ -34,34 +34,34 @@ def patient_name(patient):
     return f"{patient.last_name} {patient.first_names}"
 
 
-def collect():
-    """Tous les documents archivés, du plus récent au plus ancien."""
+def collect(hospital):
+    """Les documents archivés de l'hôpital, du plus récent au plus ancien."""
     rows = []
-    for patient in Patient.objects.prefetch_related("admissions__created_by"):
+    for patient in Patient.objects.filter(hospital=hospital).prefetch_related("admissions__created_by"):
         admission = next(iter(patient.admissions.all()), None)
         rows.append({
             "when": patient.created_at, "type": "Dossier patient", "patient": patient_name(patient),
             "reference": f"DOS-{patient.created_at:%Y}-{patient.pk:05d}",
             "author": person(admission.created_by) if admission else "Secrétariat",
         })
-    for consultation in Consultation.objects.filter(completed_at__isnull=False).select_related("patient", "doctor"):
+    for consultation in Consultation.objects.filter(completed_at__isnull=False, patient__hospital=hospital).select_related("patient", "doctor"):
         rows.append({
             "when": consultation.completed_at, "type": "Compte rendu", "patient": patient_name(consultation.patient),
             "reference": f"CR-{consultation.completed_at:%Y}-{consultation.pk:05d}",
             "author": f"Dr. {person(consultation.doctor)}",
         })
-    for admission in Admission.objects.encaissees().select_related("patient", "created_by"):
+    for admission in Admission.objects.of_hospital(hospital).encaissees().select_related("patient", "created_by"):
         rows.append({
             "when": admission.created_at, "type": "Facture", "patient": patient_name(admission.patient),
             "reference": f"FAC-{admission.created_at:%Y}-{admission.pk:05d}",
             "author": person(admission.created_by),
         })
-    for lab in LabRequest.objects.filter(status="Terminée").select_related("admission__patient", "completed_by"):
+    for lab in LabRequest.objects.filter(status="Terminée", admission__patient__hospital=hospital).select_related("admission__patient", "completed_by"):
         rows.append({
             "when": lab.completed_at, "type": "Résultat labo", "patient": patient_name(lab.admission.patient),
             "reference": f"LAB-{lab.completed_at:%Y}-{lab.pk:05d}", "author": person(lab.completed_by),
         })
-    for document in AdminDocument.objects.select_related("created_by"):
+    for document in AdminDocument.objects.filter(created_by__hospital=hospital).select_related("created_by"):
         rows.append({
             "when": document.created_at, "type": "Document administratif", "patient": "—",
             "reference": f"ADM-{document.created_at:%Y}-{document.pk:05d}", "author": person(document.created_by),
@@ -71,8 +71,8 @@ def collect():
     return rows
 
 
-def overview(year=None):
-    rows = collect()
+def overview(hospital, year=None):
+    rows = collect(hospital)
     this_year = timezone.localdate().year
     year = year or this_year
     type_to_category = {doc_type: name for _, name, doc_type, _ in CATEGORIES}

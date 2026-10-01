@@ -4,6 +4,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.tenancy import hospital_of
 from parcours.permissions import RoleAccess
 
 from .models import CleaningTask
@@ -26,7 +27,7 @@ class OverviewView(APIView):
     permission_classes = [HygieneAccess]
 
     def get(self, request):
-        return Response(overview())
+        return Response(overview(hospital_of(request.user)))
 
 
 class TasksView(APIView):
@@ -35,7 +36,7 @@ class TasksView(APIView):
     def post(self, request):
         serializer = TaskInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        task = serializer.save(created_by=request.user)
+        task = serializer.save(created_by=request.user, hospital=hospital_of(request.user))
         return Response(serialize_task(task), status=status.HTTP_201_CREATED)
 
 
@@ -43,7 +44,7 @@ class TaskView(APIView):
     permission_classes = [HygieneAccess]
 
     def put(self, request, pk):
-        task = get_object_or_404(CleaningTask, pk=pk)
+        task = get_object_or_404(CleaningTask, pk=pk, hospital=hospital_of(request.user))
         serializer = TaskInputSerializer(task, data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serialize_task(serializer.save()))
@@ -54,7 +55,7 @@ class TaskStatusView(APIView):
     permission_classes = [HygieneAccess]
 
     def post(self, request, pk):
-        task = get_object_or_404(CleaningTask, pk=pk)
+        task = get_object_or_404(CleaningTask, pk=pk, hospital=hospital_of(request.user))
         new_status = request.data.get("status")
         if new_status not in dict(CleaningTask.STATUSES):
             return Response({"status": "Statut inconnu."}, status=status.HTTP_400_BAD_REQUEST)

@@ -4,6 +4,8 @@ from django.db import models
 
 
 class CleaningTask(models.Model):
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="+", verbose_name="hôpital")
     TYPES = [(t, t) for t in ("Nettoyage", "Désinfection", "Décontamination", "Stérilisation")]
     # « En retard » n'est pas stocké : il se déduit de l'heure prévue.
     STATUSES = [(s, s) for s in ("Planifiée", "En cours", "Terminée")]
@@ -26,11 +28,20 @@ class CleaningTask(models.Model):
     def __str__(self):
         return f"{self.zone} — {self.date:%d/%m/%Y} {self.hour:%H:%M}"
 
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            from accounts.tenancy import premier_hopital_id
+
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)
+
 
 class HygieneProduct(models.Model):
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="+", verbose_name="hôpital")
     ICONS = [(i, i) for i in ("FlaskConical", "LockKeyhole", "ShieldCheck", "Biohazard", "Package")]
 
-    name = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=120)
     icon = models.CharField(max_length=30, choices=ICONS, default="Package")
     last_check = models.DateField(help_text="Dernier contrôle de disponibilité.")
 
@@ -38,12 +49,22 @@ class HygieneProduct(models.Model):
         verbose_name = "produit d'hygiène"
         verbose_name_plural = "produits d'hygiène"
         ordering = ["name"]
+        constraints = [models.UniqueConstraint(fields=["hospital", "name"], name="hygiene_produit_unique_par_hopital")]
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            from accounts.tenancy import premier_hopital_id
+
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)
+
 
 class WasteCollection(models.Model):
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="+", verbose_name="hôpital")
     TYPES = [(t, t) for t in ("Déchets infectieux", "Déchets chimiques", "Déchets assimilés")]
 
     type = models.CharField(max_length=40, choices=TYPES)
@@ -55,8 +76,17 @@ class WasteCollection(models.Model):
         verbose_name_plural = "collectes de déchets"
         ordering = ["-date", "-id"]
 
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            from accounts.tenancy import premier_hopital_id
+
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)
+
 
 class HygieneAudit(models.Model):
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="+", verbose_name="hôpital")
     date = models.DateField()
     score = models.PositiveSmallIntegerField(validators=[MaxValueValidator(100)], help_text="Conformité en %.")
     compliant = models.BooleanField(default=True)
@@ -67,3 +97,10 @@ class HygieneAudit(models.Model):
         verbose_name = "contrôle d'hygiène"
         verbose_name_plural = "contrôles d'hygiène"
         ordering = ["-date", "-id"]
+
+    def save(self, *args, **kwargs):
+        if self.hospital_id is None:
+            from accounts.tenancy import premier_hopital_id
+
+            self.hospital_id = premier_hopital_id()
+        super().save(*args, **kwargs)

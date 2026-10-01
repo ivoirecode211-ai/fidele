@@ -139,7 +139,8 @@ def proposer_examens(admission, valeurs):
 
 def proposer_ordonnance(admission, valeurs):
     exiger(texte(valeurs, "diagnostic"), "Posez d'abord le diagnostic : l'ordonnance en découle.")
-    stock = list(Product.objects.filter(category="Médicament", stock__gt=0).order_by("name"))
+    stock = list(Product.objects.filter(hospital_id=admission.patient.hospital_id, category="Médicament",
+                                        stock__gt=0).order_by("name"))
     disponibles = {p.name.lower(): p.name for p in stock}
     liste = "Médicaments en stock à la pharmacie :\n" + (
         "\n".join(f"- {p.name} ({p.therapeutic_class or 'médicament'}, {p.stock} {p.unit})" for p in stock) or "- aucun")

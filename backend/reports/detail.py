@@ -123,7 +123,7 @@ def appointments_section(year, month, hospital):
 def stock_section(year, month, hospital):
     rows = [[m.date.strftime("%d/%m/%Y"), m.reference, m.product.name, m.type, m.quantity, m.stock_after,
              m.motif, m.patient or m.supplier or "—", person(m.user)]
-            for m in Movement.objects.filter(**month_filter("date", year, month))
+            for m in Movement.objects.filter(product__hospital=hospital, **month_filter("date", year, month))
             .select_related("product", "user").order_by("date", "id")]
     return section("Mouvements de stock", ["Date", "Référence", "Produit", "Type", "Quantité", "Stock après",
                                            "Motif", "Patient / fournisseur", "Utilisateur"], rows)
@@ -139,7 +139,7 @@ def maintenance_section(year, month, hospital):
 
 def hygiene_section(year, month, hospital):
     rows = [[t.date.strftime("%d/%m/%Y"), t.hour.strftime("%H:%M"), t.zone, t.type, t.responsible, t.status]
-            for t in CleaningTask.objects.filter(**month_filter("date", year, month)).order_by("date", "hour")]
+            for t in CleaningTask.objects.filter(hospital=hospital, **month_filter("date", year, month)).order_by("date", "hour")]
     return section("Tâches d'hygiène", ["Date", "Heure", "Zone", "Type", "Responsable", "Statut"], rows)
 
 

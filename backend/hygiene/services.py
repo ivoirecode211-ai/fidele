@@ -47,13 +47,13 @@ def compliance(tasks, audit):
     return round(100 * sum(1 for t in due if t.status == "Terminée") / len(due))
 
 
-def overview():
+def overview(hospital):
     today = timezone.localdate()
-    tasks = list(CleaningTask.objects.filter(date__gte=today - timedelta(days=30)))
-    audit = HygieneAudit.objects.first()
+    tasks = list(CleaningTask.objects.filter(hospital=hospital, date__gte=today - timedelta(days=30)))
+    audit = HygieneAudit.objects.filter(hospital=hospital).first()
     rows = [serialize_task(task) for task in tasks]
     latest_waste = {}
-    for collection in WasteCollection.objects.all():
+    for collection in WasteCollection.objects.filter(hospital=hospital):
         latest_waste.setdefault(collection.type, collection)
     score = compliance(tasks, audit)
     return {
@@ -62,12 +62,12 @@ def overview():
             "compliance": score,
             "inProgress": sum(1 for row in rows if row["status"] == "En cours"),
             "late": sum(1 for row in rows if row["status"] == "En retard"),
-            "incidents": HygieneAudit.objects.filter(compliant=False, date__gte=today - timedelta(days=30)).count(),
+            "incidents": HygieneAudit.objects.filter(hospital=hospital, compliant=False, date__gte=today - timedelta(days=30)).count(),
         },
         "tasks": rows,
         "products": [
             {"id": p.pk, "name": p.name, "quantity": fmt(p.last_check), "icon": p.icon, "color": "blue"}
-            for p in HygieneProduct.objects.all()
+            for p in HygieneProduct.objects.filter(hospital=hospital)
         ],
         "wastes": [
             {"id": index, "name": name, "quantity": f"{float(latest_waste[name].quantity_kg):g} kg" if name in latest_waste else "—",

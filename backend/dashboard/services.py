@@ -40,7 +40,7 @@ def alerts(hospital):
     """
     now = timezone.now()
     rows = []
-    for product in Product.objects.filter(stock__lte=F("threshold")).order_by("stock")[:3]:
+    for product in Product.objects.filter(hospital=hospital, stock__lte=F("threshold")).order_by("stock")[:3]:
         rows.append({"type": "critical", "icon": "AlertTriangle", "title": f"Stock critique : {product.name}",
                      "text": f"Il reste {product.stock} unité(s) (seuil : {product.threshold})", "at": now})
     for equipment in Equipment.objects.filter(hospital=hospital).prefetch_related("interventions"):
@@ -49,7 +49,7 @@ def alerts(hospital):
             rows.append({"type": "critical" if state == "Critique" else "warning", "icon": "Wrench",
                          "title": f"Maintenance : {equipment.name}", "text": cause.description or state,
                          "at": cause.created_at})
-    late = [t for t in CleaningTask.objects.filter(date__gte=timezone.localdate() - timedelta(days=7))
+    late = [t for t in CleaningTask.objects.filter(hospital=hospital, date__gte=timezone.localdate() - timedelta(days=7))
             if task_status(t) == "En retard"]
     if late:
         rows.append({"type": "warning", "icon": "AlertTriangle", "title": f"{len(late)} tâche(s) d'hygiène en retard",
@@ -114,7 +114,7 @@ def direction_overview(hospital):
     all_beds = Bed.objects.filter(room__hospital=hospital)
     beds = all_beds.count()
     occupied = all_beds.filter(status="OCCUPIED").count()
-    critical_stock = Product.objects.filter(stock__lte=F("threshold")).count()
+    critical_stock = Product.objects.filter(hospital=hospital, stock__lte=F("threshold")).count()
     hospitalized = Hospitalization.objects.filter(patient__hospital=hospital, discharge_date__isnull=True).count()
 
     week = [today - timedelta(days=offset) for offset in range(6, -1, -1)]

@@ -15,12 +15,19 @@ class PrescriptionApiTests(APITestCase):
             birth_date="1988-07-22", sex="M",
         )
 
-    def test_prescription_is_assigned_to_authenticated_doctor(self):
-        response = self.client.post("/api/prescriptions/", {
-            "patient": self.patient.id, "instructions": "3x/jour après repas",
-        })
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["doctor"], self.doctor.id)
+    def test_generic_route_is_read_only_and_scoped(self):
+        from accounts.models import Hospital
+
+        self.assertEqual(self.client.post("/api/prescriptions/", {"patient": self.patient.id}).status_code, 405)
+        self.assertEqual(self.client.get("/api/prescriptions/").status_code, 200)
+        autre = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        self.client.force_authenticate(User.objects.create_user(username="dr-b", password="x", role="DOCTOR", hospital=autre))
+        data = self.client.get("/api/prescriptions/").data
+        self.assertEqual(data.get("results", data) if isinstance(data, dict) else data, [])
+
+    def test_other_roles_are_refused(self):
+        self.client.force_authenticate(User.objects.create_user(username="cpt", password="x", role="ACCOUNTING"))
+        self.assertEqual(self.client.get("/api/prescriptions/").status_code, 403)
 
     def test_requires_authentication(self):
         self.client.force_authenticate(None)

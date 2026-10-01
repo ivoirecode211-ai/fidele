@@ -71,3 +71,63 @@ class CloisonnementTests(APITestCase):
         # La chambre « A-1 » créée pour B est distincte de celle de A.
         self.assertEqual(Room.objects.filter(name__iexact="A-1").count(), 2)
         self.assertEqual(Room.objects.get(hospital=self.b).beds.count(), 1)
+
+
+class CloisonnementModulesTests(APITestCase):
+    """Stocks, RH, Hygiène, Laboratoire, Archives : chaque hôpital ne voit et ne touche que ses données."""
+
+    def setUp(self):
+        from hygiene.models import CleaningTask
+        from rh.models import Employee
+        from stocks.models import Product, Supplier
+
+        self.a = Hospital.objects.order_by("pk").first()
+        self.b = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        self.admin_b = User.objects.create_user(username="adm-b", password="x", role="ADMIN", hospital=self.b)
+        self.produit_a = Product.objects.create(hospital=self.a, name="Paracétamol 500 mg", category="Médicament", stock=40)
+        Supplier.objects.create(hospital=self.a, name="Laborex", contact="M. Kone", phone="0102")
+        self.employe_a = Employee.objects.create(hospital=self.a, matricule="EMP-0001", nom="KOUASSI", prenom="Ange",
+                                                 poste="Infirmier", departement="Soins", dateEmbauche="2024-01-02")
+        admin_a = User.objects.create_user(username="adm-a", password="x", role="ADMIN", hospital=self.a)
+        self.tache_a = CleaningTask.objects.create(hospital=self.a, zone="Bloc A", type="Désinfection", responsible="Équipe 1",
+                                                   date=timezone.localdate(), hour="08:00", created_by=admin_a)
+        patient_a = Patient.objects.create(hospital=self.a, patient_number="P26AAAMAS", last_name="KONE", first_names="Awa", sex="F")
+        self.client.force_authenticate(self.admin_b)
+        self.patient_a = patient_a
+
+    def test_stocks_par_hopital(self):
+        from stocks.models import Product
+
+        vue = self.client.get("/api/stocks/overview/").data
+        self.assertEqual((vue["produits"], vue["fournisseurs"], vue["mouvements"]), ([], [], []))
+        self.assertEqual(self.client.get("/api/stocks/pharmacie/produits/").data, [])
+        # Même nom de produit permis dans B ; un mouvement sur le produit de A est introuvable.
+        cree = self.client.post("/api/stocks/produits/", {"produit": "Paracétamol 500 mg", "categorie": "Médicament",
+                                                          "stock": 5, "seuil": 1}, format="json")
+        self.assertEqual(cree.status_code, 201, cree.data)
+        self.assertEqual(Product.objects.get(hospital=self.b).stock, 5)
+        sortie = self.client.post("/api/stocks/mouvements/", {"type": "Sortie", "produitId": f"{self.produit_a.pk:03d}",
+                                                              "quantite": 1, "motif": "Test", "date": str(timezone.localdate())},
+                                  format="json")
+        self.assertEqual(sortie.status_code, 404)
+        self.produit_a.refresh_from_db()
+        self.assertEqual(self.produit_a.stock, 40)
+
+    def test_rh_et_hygiene_par_hopital(self):
+        self.assertEqual(self.client.get("/api/rh/employes/").data, [])
+        self.assertEqual(self.client.delete(f"/api/rh/employes/{self.employe_a.pk}/").status_code, 404)
+        # Le matricule EMP-0001 est libre dans B : chaque hôpital a sa suite.
+        cree = self.client.post("/api/rh/employes/", {"nom": "YAO", "prenom": "Paul", "sexe": "Homme", "poste": "Agent",
+                                                      "departement": "Accueil", "dateEmbauche": "2025-01-01"}, format="json")
+        self.assertEqual(cree.data["matricule"], "EMP-0001")
+        self.assertEqual(self.client.get("/api/hygiene/overview/").data["tasks"], [])
+        self.assertEqual(self.client.post(f"/api/hygiene/tasks/{self.tache_a.pk}/statut/", {"status": "Terminée"},
+                                          format="json").status_code, 404)
+
+    def test_laboratoire_archives_et_routes_generiques(self):
+        self.assertEqual(self.client.get("/api/laboratory/overview/").data["analyses"], [])
+        archives = self.client.get("/api/archives/overview/").data
+        self.assertEqual(archives["stats"]["patientFiles"], 0)
+        for url in ("/api/consultations/", "/api/prescriptions/"):
+            data = self.client.get(url).data
+            self.assertEqual(data.get("results", data) if isinstance(data, dict) else data, [])

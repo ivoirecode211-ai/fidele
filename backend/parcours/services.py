@@ -334,7 +334,7 @@ def notifications_for(user):
 
         items.append({
             "id": "stock",
-            "count": Product.objects.filter(stock__lte=F("threshold")).count(),
+            "count": Product.objects.filter(hospital=hospital, stock__lte=F("threshold")).count(),
             "label": "produit(s) sous le seuil d'alerte",
             "link": "/stocks",
         })
