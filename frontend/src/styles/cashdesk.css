@@ -101,7 +101,7 @@
 @media (hover: hover) and (pointer: fine) {
   .cashdesk .cd-button:not(:disabled):hover { background: var(--primary-800); border-color: var(--primary-800); }
   .cashdesk .cd-button.secondary:not(:disabled):hover { background: var(--surface-100); border-color: #94a3b8; }
-  .cashdesk .cd-button.danger:not(:disabled):hover { background: #5e2424; }
+  .cashdesk .cd-button.danger:not(:disabled):hover { background: var(--danger-soft-text); }
   .cd-sidebar nav button:hover, .cd-sidebar-bottom a:hover, .cd-sidebar-bottom button:hover { background: var(--surface-100); }
 }
 @media (min-width: 1800px) { .cd-main { padding-top: 40px; } }

@@ -70,7 +70,7 @@
 }
 
 .pharmacy-sidebar-brand strong span {
-  color: #22c55e;
+  color: var(--green);
 }
 
 .pharmacy-sidebar-brand small {
@@ -139,7 +139,7 @@
   height: 8px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--green);
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.13);
 }
 
@@ -675,7 +675,7 @@
 
 .status-badge.prepare {
   background: var(--warning-soft);
-  color: #d97706;
+  color: var(--warning-soft-text-strong);
 }
 
 .status-badge.ready {
@@ -1093,7 +1093,7 @@
   bottom: 24px;
   max-width: 330px;
   padding: 13px 17px;
-  border: 1px solid #86efac;
+  border: 1px solid var(--green-soft-border);
   border-radius: 8px;
   background: var(--bg);
   color: #15803d;

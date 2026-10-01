@@ -99,6 +99,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+# Où « collectstatic » rassemble les fichiers de l'admin Django, servis par le serveur web en production.
+STATIC_ROOT = Path(os.getenv("STATIC_ROOT", BASE_DIR / "staticfiles"))
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
@@ -108,7 +110,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5174",
     "http://localhost:5180",
     "http://127.0.0.1:5180",
-]
+] + [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -142,3 +144,28 @@ MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR / "media"))
 MEDIA_URL = "/media/"
 # Un scan va jusqu'à 25 Mo : au-delà de 5 Mo, Django l'écrit sur disque plutôt qu'en mémoire.
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
+
+# ------------------------------------------------------------------
+# Production : tout ce qui suit s'active dès que DEBUG=False.
+# Voir .env.example pour les valeurs à renseigner sur le serveur.
+# ------------------------------------------------------------------
+if not DEBUG:
+    from django.core.exceptions import ImproperlyConfigured
+
+    if SECRET_KEY in ("", "dev-only-secret-key", "change-me-in-production") or len(SECRET_KEY) < 50:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY doit être une longue valeur aléatoire en production "
+            "(python -c \"import secrets; print(secrets.token_urlsafe(64))\").")
+    # Le site n'est servi qu'en HTTPS : redirection, cookies réservés au HTTPS, HSTS.
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True").lower() == "true"
+    # Derrière un proxy (Nginx, Caddy) qui termine le HTTPS et transmet X-Forwarded-Proto.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv("SECURE_HSTS_INCLUDE_SUBDOMAINS", "False").lower() == "true"
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]

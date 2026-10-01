@@ -115,7 +115,7 @@
   gap: 8px;
   margin-bottom: 12px;
   padding: 6px 6px 6px 12px;
-  border: 1px solid #f5c2c2;
+  border: 1px solid var(--danger-soft-border);
   border-radius: 10px;
   background: var(--danger-soft);
   color: var(--danger);
@@ -134,7 +134,7 @@
   align-items: center;
   gap: 3px;
   padding: 0 10px;
-  border: 1px solid #f5c2c2;
+  border: 1px solid var(--danger-soft-border);
   border-radius: 7px;
   background: white;
   color: var(--danger);
@@ -910,7 +910,7 @@
 }
 
 .nursing-input-abnormal {
-  border-color: #d26868 !important;
+  border-color: var(--danger) !important;
   background: #fef2f2 !important;
   color: #b34242 !important;
 }

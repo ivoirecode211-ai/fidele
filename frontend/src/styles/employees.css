@@ -727,7 +727,7 @@
 }
 
 .employee-leave-btn {
-  border: 1px solid #fcd34d;
+  border: 1px solid var(--warning-soft-border);
   background: var(--warning-soft);
   color: #b45309;
   padding: 11px 15px;

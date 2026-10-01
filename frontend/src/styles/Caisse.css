@@ -605,7 +605,7 @@ a.caisse-nav-item { font: inherit; }
 
   background: transparent;
 
-  color: #294b65;
+  color: var(--ink-muted);
 
   font-size: 16px;
 }
@@ -754,7 +754,7 @@ a.caisse-nav-item { font: inherit; }
 /* Corps */
 
 .patients-table td {
-  color: #49657b;
+  color: var(--ink-faint);
 
   font-size: 15px;
 
@@ -772,7 +772,7 @@ a.caisse-nav-item { font: inherit; }
 /* Nom patient */
 
 .patient-name {
-  color: #284b65 !important;
+  color: var(--ink-muted) !important;
 
   font-weight: 750 !important;
 }
@@ -791,13 +791,13 @@ a.caisse-nav-item { font: inherit; }
 */
 
 .sexe-masculin {
-  color: #dc2626 !important;
+  color: var(--danger) !important;
 
   font-weight: 800 !important;
 }
 
 .sexe-femme {
-  color: #2563eb !important;
+  color: var(--primary) !important;
 
   font-weight: 800 !important;
 }
@@ -828,7 +828,7 @@ a.caisse-nav-item { font: inherit; }
 /* Badge Masculin */
 
 .sexe-badge-masculin {
-  color: #dc2626;
+  color: var(--danger);
 
   background: #fee2e2;
 }
@@ -837,7 +837,7 @@ a.caisse-nav-item { font: inherit; }
 /* Badge Femme */
 
 .sexe-badge-femme {
-  color: #2563eb;
+  color: var(--primary);
 
   background: #dbeafe;
 }
@@ -846,7 +846,7 @@ a.caisse-nav-item { font: inherit; }
 /* Select Masculin */
 
 .sexe-select-masculin {
-  color: #dc2626 !important;
+  color: var(--danger) !important;
 
   font-weight: 700 !important;
 }
@@ -855,7 +855,7 @@ a.caisse-nav-item { font: inherit; }
 /* Select Femme */
 
 .sexe-select-femme {
-  color: #2563eb !important;
+  color: var(--primary) !important;
 
   font-weight: 700 !important;
 }
@@ -875,7 +875,7 @@ a.caisse-nav-item { font: inherit; }
 
   background: var(--bg);
 
-  color: #1682d7;
+  color: var(--primary);
 
   cursor: pointer;
 
@@ -897,7 +897,7 @@ a.caisse-nav-item { font: inherit; }
    ============================================================ */
 
 .row-action.delete {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .row-action.delete:hover {
@@ -964,7 +964,7 @@ a.caisse-nav-item { font: inherit; }
 
   margin-bottom: 8px;
 
-  color: #37556e;
+  color: var(--ink-faint);
 
   font-size: 16px;
 
@@ -998,14 +998,14 @@ a.caisse-nav-item { font: inherit; }
 /* Montant bleu */
 
 .summary-value.blue {
-  color: #0757bd;
+  color: var(--primary-700);
 }
 
 
 /* Montant rouge */
 
 .summary-value.red {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 
@@ -1038,7 +1038,7 @@ a.caisse-nav-item { font: inherit; }
 */
 
 .patient-form select[name="sexe"].sexe-select-masculin {
-  color: #dc2626 !important;
+  color: var(--danger) !important;
 
   border-color: #fca5a5;
 }
@@ -1049,7 +1049,7 @@ a.caisse-nav-item { font: inherit; }
 */
 
 .patient-form select[name="sexe"].sexe-select-femme {
-  color: #2563eb !important;
+  color: var(--primary) !important;
 
   border-color: #93c5fd;
 }

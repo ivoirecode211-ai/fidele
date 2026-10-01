@@ -300,7 +300,7 @@
 
 .ia-suggestion-icon.warning {
   background: #fff7ed;
-  color: #d97706;
+  color: var(--warning-soft-text-strong);
 }
 
 .ia-suggestion-icon.danger {

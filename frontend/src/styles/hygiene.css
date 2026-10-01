@@ -426,7 +426,7 @@
 
 .waste-icon.orange {
   background: #fff7ed;
-  color: #d97706;
+  color: var(--warning-soft-text-strong);
 }
 
 .waste-icon.gray {
@@ -603,7 +603,7 @@
 }
 
 .summary-content strong {
-  color: #14532d;
+  color: var(--green-soft-text);
   font-size: 13px;
   font-weight: 700;
 }

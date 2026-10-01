@@ -354,7 +354,7 @@
 
   border-radius: 50%;
 
-  background: #d26868;
+  background: var(--danger);
 
   color: white;
 
@@ -625,7 +625,7 @@
 .direction-stat-icon.red {
   background: var(--danger-soft);
 
-  color: #d26868;
+  color: var(--danger);
 }
 
 
@@ -1126,7 +1126,7 @@
 .direction-alert-icon.critical {
   background: var(--danger-soft);
 
-  color: #d26868;
+  color: var(--danger);
 }
 
 

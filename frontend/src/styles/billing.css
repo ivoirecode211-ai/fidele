@@ -195,7 +195,7 @@
   padding: 14px 17px;
 
   background: #fff8e6;
-  border: 1px solid #fcd34d;
+  border: 1px solid var(--warning-soft-border);
   border-left: 5px solid #f59e0b;
 
   border-radius: 9px;
@@ -439,7 +439,7 @@
 }
 
 .billing-dot-orange {
-  background: #d97706;
+  background: var(--warning-soft-text-strong);
 }
 
 .billing-dot-blue {

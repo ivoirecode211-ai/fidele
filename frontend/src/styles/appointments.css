@@ -510,7 +510,7 @@
 
 .action-confirm:hover {
   background: var(--green-soft);
-  border-color: #86efac;
+  border-color: var(--green-soft-border);
 }
 
 .action-edit {
@@ -528,7 +528,7 @@
 
 .action-cancel:hover {
   background: var(--warning-soft);
-  border-color: #fcd34d;
+  border-color: var(--warning-soft-border);
 }
 
 .action-delete {

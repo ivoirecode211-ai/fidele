@@ -158,7 +158,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--green);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.10);
 }
 
@@ -374,7 +374,7 @@
 
   background:
     conic-gradient(
-      #22c55e 0deg 112deg,
+      var(--green) 0deg 112deg,
       #368ad1 112deg 202deg,
       #368ad1 202deg 260deg,
       #dc8a8a 260deg 303deg,

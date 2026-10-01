@@ -169,7 +169,7 @@
 }
 .eq-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 .eq-video.active video { opacity: 1; }
-.eq-video-repos { position: absolute; display: grid; justify-items: center; gap: 10px; color: #8fa6bd; font-size: 13.5px; font-weight: 600; }
+.eq-video-repos { position: absolute; display: grid; justify-items: center; gap: 10px; color: var(--primary-300); font-size: 13.5px; font-weight: 600; }
 
 .eq-code { display: flex; align-items: flex-end; gap: 12px; max-width: 520px; margin: 22px auto 0; }
 .eq-code .field { flex: 1; }

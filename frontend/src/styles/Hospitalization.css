@@ -464,7 +464,7 @@
 
 .status-badge.sortie-prévue {
   background: var(--warning-soft);
-  color: #d97706;
+  color: var(--warning-soft-text-strong);
 }
 
 

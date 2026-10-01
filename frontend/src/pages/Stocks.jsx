@@ -2552,7 +2552,7 @@ export default function Stocks() {
                                   ecart < 0
                                     ? "#c94f4f"
                                     : ecart === 0
-                                    ? "#d97706"
+                                    ? "var(--warning-soft-text-strong)"
                                     : "#15803d",
                               }}
                             >

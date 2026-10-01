@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Printer, X } from "lucide-react";
+import { Check, Printer, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import Logo from "../components/Logo";
@@ -60,7 +60,7 @@ function ageDetaille(naissance, edition) {
 function Case({ cochee, children }) {
   return (
     <span className="souche-case">
-      <span className={`souche-case-boite ${cochee ? "cochee" : ""}`} aria-hidden="true">{cochee ? "✓" : ""}</span>
+      <span className={`souche-case-boite ${cochee ? "cochee" : ""}`} aria-hidden="true">{cochee && <Check size={9} strokeWidth={3.5} />}</span>
       {children}
     </span>
   );
