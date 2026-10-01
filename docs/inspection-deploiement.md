@@ -64,10 +64,21 @@ contre la nouvelle charte vert sapin (encore en cours dans l'autre session) :
   (au-dessus du libellé sur une rangée serrée, à côté sur téléphone).
 - Téléphone, 24 pages : aucune erreur JS ni erreur serveur.
 
+- Débordements sur téléphone corrigés (à la demande d'Antoine, dans des fichiers de la session fidele-47) :
+  - `/reports` (443 px) : la grille de la page et celle du document refusaient de rétrécir sous leur
+    contenu (sélecteur de 680 px, tableaux). Correctif en fin de `styles/rapports.css` : à commiter avec
+    ce fichier, encore jamais commité.
+  - `/laboratory` (40 px) : la zone principale gardait 100 % de largeur en plus de la marge de la barre fixe.
+    Correctif dans `styles/shell.css` (commité) ; la barre étroite ne montre plus que les icônes.
+  - Contrôle final : 24 pages sur téléphone, aucun débordement, aucune erreur JS ni serveur ;
+    22 pages sur ordinateur, aucune couleur hors charte.
+
 ### Signalé à la session fidele-47
-- Débordement horizontal sur téléphone : `/laboratory` 40 px (cartes de statistiques, barre d'outils),
-  `/reports` 443 px (boutons `caisse-nav-item` de la navigation des rapports).
 - Glycémie et Tension partagent l'icône `Activity` dans `pages/Nursing.jsx` : `Droplet` distinguerait la glycémie.
 
-## Reste à inspecter
-- Relancer le contrôle des couleurs une fois la nouvelle charte commitée.
+## Reste à faire
+- La nouvelle charte (`styles/variables.css`, `index.html`, 26 feuilles de style) est validée par le contrôle
+  des couleurs mais pas encore commitée par la session fidele-47.
+- Pages chargées à la demande (`React.lazy` dans `App.jsx`) et `jspdf` chargé à l'impression : quand
+  `App.jsx` et `Laboratory.jsx` seront commités.
+- Stocks et Hygiène : rattachement à un hôpital, avant la mise en service d'un deuxième hôpital.
