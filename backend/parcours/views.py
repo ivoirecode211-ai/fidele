@@ -213,7 +213,7 @@ class PharmacyReceiptView(APIView):
         from django.utils import timezone
         from stocks.models import Product
 
-        from .accueil_views import etablissement
+        from .accueil_views import assurance_de, etablissement
 
         prescription = prescription_from_code(code, request.user)
         patient = prescription.patient
@@ -236,6 +236,10 @@ class PharmacyReceiptView(APIView):
             })
         pharmacien = prescription.served_by or request.user
         servie = prescription.status == "SERVED"
+        # Tiers payant : l'organisme du patient prend sa part, le patient règle le reste.
+        assurance = assurance_de(patient)
+        taux = float(assurance.coverage) if assurance else 0
+        part_assurance = round(total * taux / 100)
         return Response({
             "etablissement": etablissement(request.user),
             "recu": {
@@ -248,10 +252,14 @@ class PharmacyReceiptView(APIView):
                 "patient_sexe": patient.sex,
                 "patient_naissance": patient.birth_date.isoformat() if patient.birth_date else None,
                 "medecin": doctor_label(prescription.doctor),
+                "date_prescription": prescription.date.isoformat() if prescription.date else None,
+                "assurance": {"nom": assurance.name, "taux": taux, "numero": patient.insurance_number} if assurance else None,
                 "pharmacien": pharmacien.get_full_name() or pharmacien.username,
                 "instructions": prescription.instructions,
                 "lignes": lignes,
                 "total": total,
+                "part_assurance": part_assurance,
+                "net_a_payer": total - part_assurance,
                 "hors_catalogue": sum(1 for ligne in lignes if ligne["prix_unitaire"] is None),
             },
         })

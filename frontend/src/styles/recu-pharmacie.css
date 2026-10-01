@@ -205,3 +205,8 @@
     print-color-adjust: exact;
   }
 }
+
+/* Assurance sur toute la largeur ; totaux du tiers payant */
+.recu-ph-identite .recu-ph-large { grid-column: 1 / -1; }
+.recu-ph-lignes tfoot .recu-ph-assurance td { color: var(--ink-muted); font-weight: 600; }
+.recu-ph-lignes tfoot .recu-ph-net td { background: var(--primary-50); color: var(--primary-800); font-size: 13px; }

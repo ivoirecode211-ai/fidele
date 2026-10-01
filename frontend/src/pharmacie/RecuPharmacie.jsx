@@ -86,6 +86,7 @@ export default function RecuPharmacie({ ordonnance, onClose }) {
                       <span>{[maison.adresse, maison.quartier, maison.ville].filter(Boolean).join(", ")}</span>
                     )}
                     {maison.telephone && <span>{maison.telephone}</span>}
+                    {maison.agrement && <span>Agrément : {maison.agrement}</span>}
                   </div>
                 </div>
                 <div className="recu-ph-piece">
@@ -104,7 +105,16 @@ export default function RecuPharmacie({ ordonnance, onClose }) {
                 <div><dt>Sexe :</dt><dd>{SEXES[recu.patient_sexe] || "—"}</dd></div>
                 <div><dt>Âge :</dt><dd>{age(recu.patient_naissance)}</dd></div>
                 <div><dt>Prescripteur :</dt><dd>{recu.medecin || "—"}</dd></div>
-                <div><dt>Date :</dt><dd>{horodatage(recu.date)}</dd></div>
+                <div><dt>Prescrite le :</dt><dd>{recu.date_prescription ? new Date(`${recu.date_prescription}T00:00:00`).toLocaleDateString("fr-FR") : "—"}</dd></div>
+                <div className="recu-ph-large">
+                  <dt>Assurance :</dt>
+                  <dd>
+                    {recu.assurance
+                      ? `${recu.assurance.nom} (${recu.assurance.taux.toLocaleString("fr-FR")} %)${recu.assurance.numero ? ` — N° ${recu.assurance.numero}` : ""}`
+                      : "Aucune (règlement intégral par le patient)"}
+                  </dd>
+                </div>
+                <div><dt>{recu.servie ? "Délivrée le :" : "Édité le :"}</dt><dd>{horodatage(recu.date)}</dd></div>
               </dl>
 
               <table className="recu-ph-lignes">
@@ -127,6 +137,13 @@ export default function RecuPharmacie({ ordonnance, onClose }) {
                 </tbody>
                 <tfoot>
                   <tr><td colSpan={3}>Total :</td><td>{argent(recu.total)}</td></tr>
+                  {recu.assurance && (
+                    <tr className="recu-ph-assurance">
+                      <td colSpan={3}>Part {recu.assurance.nom} ({recu.assurance.taux.toLocaleString("fr-FR")} %) :</td>
+                      <td>− {argent(recu.part_assurance)}</td>
+                    </tr>
+                  )}
+                  <tr className="recu-ph-net"><td colSpan={3}>Net à payer par le patient :</td><td>{argent(recu.net_a_payer)}</td></tr>
                 </tfoot>
               </table>
 
@@ -142,7 +159,8 @@ export default function RecuPharmacie({ ordonnance, onClose }) {
               </div>
 
               <p className="recu-ph-mention">
-                *** Respectez la posologie prescrite. En cas d'effet indésirable, consultez votre médecin. ***
+                *** Les médicaments délivrés ne sont ni repris ni échangés. Respectez la posologie prescrite ;
+                en cas d'effet indésirable, consultez votre médecin. ***
                 {maison.mentions_legales && <><br />{maison.mentions_legales}</>}
               </p>
             </article>
