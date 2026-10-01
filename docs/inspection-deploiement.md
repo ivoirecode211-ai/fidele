@@ -42,6 +42,17 @@ Tableau de bord et Direction : chiffres, lits, recettes et alertes désormais ca
 l'utilisateur. Exception connue : Stocks et Hygiène n'ont pas encore de rattachement à un hôpital (un seul
 stock et un seul planning pour toute l'installation) : sans conséquence tant qu'un seul hôpital est en service.
 
+## Passe 5 — préparation du déploiement
+
+| Contrôle | Résultat |
+|---|---|
+| Migrations | `makemigrations --check` : aucune en attente. La base de test est reconstruite depuis zéro à chaque lancement : les migrations passent sur une base neuve. |
+| Comptes par défaut | Corrigé : `seed_default_users` remettait les mots de passe connus (`Admin@2026!`…). Avec DEBUG=False il exige `--production`, ne modifie aucun compte existant et donne aux nouveaux un mot de passe aléatoire affiché une seule fois. |
+| Paquet frontend | 1 326 kB d'un seul bloc → bibliothèques séparées (`react`, `pdf`, `icones`) gardées en cache entre deux mises à jour ; code de l'application : 654 kB (170 kB compressé). |
+
+### Signalé à la session fidele-47
+- `pages/Laboratory.jsx` importe `jspdf` au démarrage : 139 kB compressés chargés par tous les utilisateurs. Un `await import("jspdf")` au moment d'imprimer les retire du chargement initial.
+- `App.jsx` : aucune page chargée à la demande (`React.lazy`) ; à faire une fois ses modifications commitées.
+
 ## Reste à inspecter
 - Passe 4 : revue visuelle module par module (captures ordinateur et téléphone) contre la charte.
-- Passe 5 : performances (taille du paquet frontend, requêtes N+1) et préparation du déploiement (collectstatic, migrations sur base neuve, comptes par défaut).

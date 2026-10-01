@@ -1,4 +1,7 @@
-from django.core.management.base import BaseCommand
+import secrets
+
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from accounts.models import Hospital, User
 from accounts.tenancy import code_candidates
 
@@ -22,9 +25,18 @@ USERS = [
 ]
 
 class Command(BaseCommand):
-    help = "Crée les utilisateurs par défaut de MA SANTÉ."
+    help = ("Crée les utilisateurs par défaut de MA SANTÉ. En développement, remet les mots de passe connus ; "
+            "en production (DEBUG=False), crée seulement les comptes absents avec un mot de passe aléatoire.")
+
+    def add_arguments(self, parser):
+        parser.add_argument("--production", action="store_true",
+                            help="Confirme l'exécution sur un serveur de production.")
 
     def handle(self, *args, **kwargs):
+        production = not settings.DEBUG
+        if production and not kwargs["production"]:
+            raise CommandError("DEBUG=False : relancez avec --production. Les comptes existants ne seront pas modifiés "
+                               "et chaque nouveau compte recevra un mot de passe aléatoire, affiché une seule fois.")
         hospital = Hospital.objects.order_by("pk").first() or Hospital.objects.create(
             name="MA SANTÉ", code=code_candidates("MA SANTÉ")[0])
         for username, email, first, last, role, password in [PLATFORM, *USERS]:
@@ -38,6 +50,11 @@ class Command(BaseCommand):
                     "is_staff": role == "ADMIN",
                 },
             )
+            if production:
+                if not created:
+                    self.stdout.write(f"Inchangé : {username}")
+                    continue
+                password = secrets.token_urlsafe(12)
             user.email = email
             user.first_name = first
             user.last_name = last
