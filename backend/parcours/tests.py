@@ -278,8 +278,9 @@ class ParcoursCompletTests(ParcoursBase):
         paracetamol, amoxicilline = recu["lignes"]
         self.assertEqual((paracetamol["prix_unitaire"], amoxicilline["prix_unitaire"]), (500.0, None))
         self.assertEqual((recu["total"], recu["hors_catalogue"]), (paracetamol["montant"], 1))
-        # Sans assurance, le patient règle tout.
-        self.assertEqual((recu["assurance"], recu["part_assurance"], recu["net_a_payer"]), (None, 0, recu["total"]))
+        # Tiers payant : la CNPS du patient prend 20 %, le patient règle le reste.
+        self.assertEqual(recu["assurance"], {"nom": "CNPS", "taux": 20.0, "numero": "C-1"})
+        self.assertEqual((recu["part_assurance"], recu["net_a_payer"]), (100, 400.0))
         self.as_user(self.comptable)
         self.assertEqual(self.client.get(f"{base}/recu/").status_code, 403)
 
