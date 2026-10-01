@@ -25,9 +25,11 @@ from .serializers import (
     PharmacyPrescriptionSerializer,
     VitalsInputSerializer,
     dispensing_history,
+    prescription_code,
 )
 from .services import (
     WorkflowError,
+    doctor_label,
     notifications_for,
     prepare_prescription,
     record_vitals,
@@ -201,6 +203,58 @@ class PharmacyServeView(APIView):
             return Response(PharmacyPrescriptionSerializer(prescription_from_code(code, request.user)).data)
 
         return workflow_response(action)
+
+
+class PharmacyReceiptView(APIView):
+    """Reçu de dispensation : l'établissement, le patient, chaque médicament avec sa posologie et son prix."""
+    permission_classes = [PharmacyAccess]
+
+    def get(self, request, code):
+        from django.utils import timezone
+        from stocks.models import Product
+
+        from .accueil_views import etablissement
+
+        prescription = prescription_from_code(code, request.user)
+        patient = prescription.patient
+        catalogue = {p.name.lower().strip(): p for p in Product.objects.filter(category="Médicament")}
+        lignes, total = [], 0
+        for item in prescription.items.all():
+            produit = catalogue.get(item.medicine.lower().strip())
+            quantite = max(item.quantity, 1)
+            prix = float(produit.price) if produit else None
+            montant = prix * quantite if prix is not None else None
+            total += montant or 0
+            lignes.append({
+                "medicament": item.medicine,
+                "posologie": " · ".join(x for x in (item.dose, item.frequency, item.duration) if x),
+                "consignes": item.instructions,
+                "quantite": quantite,
+                "unite": produit.unit if produit else "",
+                "prix_unitaire": prix,
+                "montant": montant,
+            })
+        pharmacien = prescription.served_by or request.user
+        servie = prescription.status == "SERVED"
+        return Response({
+            "etablissement": etablissement(request.user),
+            "recu": {
+                "reference": f"ORD-{prescription_code(prescription)}",
+                "statut": "Délivrée" if servie else "Non encore délivrée",
+                "servie": servie,
+                "date": timezone.localtime(prescription.served_at or timezone.now()).isoformat(),
+                "patient_nom": f"{patient.last_name} {patient.first_names}".strip(),
+                "patient_code": patient.patient_number,
+                "patient_sexe": patient.sex,
+                "patient_naissance": patient.birth_date.isoformat() if patient.birth_date else None,
+                "medecin": doctor_label(prescription.doctor),
+                "pharmacien": pharmacien.get_full_name() or pharmacien.username,
+                "instructions": prescription.instructions,
+                "lignes": lignes,
+                "total": total,
+                "hors_catalogue": sum(1 for ligne in lignes if ligne["prix_unitaire"] is None),
+            },
+        })
 
 
 class PharmacyHistoryView(APIView):

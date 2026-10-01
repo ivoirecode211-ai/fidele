@@ -259,6 +259,28 @@ class ParcoursCompletTests(ParcoursBase):
         self.assertEqual([row["medicine"] for row in history], ["Paracétamol 500 mg", "Amoxicilline 500 mg"])
         self.assertEqual(history[0]["pharmacist"], "Clara Ahoue")
 
+    def test_pharmacy_receipt_lists_each_medicine_with_its_price(self):
+        from stocks.models import Product
+
+        Product.objects.create(name="Paracétamol 500 mg", category="Médicament", stock=100, threshold=5, price=500)
+        self.envoyer_en_consultation()
+        self.valider()
+        self.as_user(self.pharmacien)
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]["id"]
+        base = f"/api/parcours/pharmacie/ordonnances/{code}"
+        self.client.post(f"{base}/preparer/")
+        self.client.post(f"{base}/servir/")
+        data = self.client.get(f"{base}/recu/").data
+        recu = data["recu"]
+        self.assertTrue(data["etablissement"]["nom"])
+        self.assertEqual((recu["reference"], recu["statut"], recu["pharmacien"]), (f"ORD-{code}", "Délivrée", "Clara Ahoue"))
+        self.assertEqual([l["medicament"] for l in recu["lignes"]], ["Paracétamol 500 mg", "Amoxicilline 500 mg"])
+        paracetamol, amoxicilline = recu["lignes"]
+        self.assertEqual((paracetamol["prix_unitaire"], amoxicilline["prix_unitaire"]), (500.0, None))
+        self.assertEqual((recu["total"], recu["hors_catalogue"]), (paracetamol["montant"], 1))
+        self.as_user(self.comptable)
+        self.assertEqual(self.client.get(f"{base}/recu/").status_code, 403)
+
     def test_served_prescription_cannot_be_rewritten(self):
         self.envoyer_en_consultation()
         self.valider()

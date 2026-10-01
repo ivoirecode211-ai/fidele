@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Logo from "../components/Logo";
 import api from "../services/api";
+import RecuPharmacie from "../pharmacie/RecuPharmacie";
 import SidebarFooter from "../components/SidebarFooter";
 import UserBadge from "../components/UserBadge";
 import NotificationBell from "../components/NotificationBell";
@@ -22,7 +23,6 @@ import {
   Stethoscope,
   X,
   Menu,
-  LayoutDashboard,
   Eye,
   UserRound,
   AlertTriangle,
@@ -2202,129 +2202,11 @@ function Pharmacy({ onNavigate }) {
           MODALE TICKET
           ====================================================== */}
 
-      {showTicket && (
-        <div
-          className="modal-overlay"
-          onMouseDown={() =>
-            setShowTicket(false)
-          }
-        >
-
-          <div
-            className="ticket-modal"
-            onMouseDown={(e) =>
-              e.stopPropagation()
-            }
-          >
-
-            <button
-              type="button"
-              className="close-modal"
-              onClick={() =>
-                setShowTicket(false)
-              }
-            >
-              <X size={18} />
-            </button>
-
-            <div className="ticket-logo">
-
-              <LayoutDashboard
-                size={20}
-              />
-
-              <strong>
-                MA<span>SANTE</span>
-              </strong>
-
-            </div>
-
-            <h3>
-              Ticket de dispensation
-            </h3>
-
-            <div className="ticket-line">
-
-              <span>
-                Patient
-              </span>
-
-              <strong>
-                {
-                  ticketPrescription?.patient ||
-                  "—"
-                }
-              </strong>
-
-            </div>
-
-            <div className="ticket-line">
-
-              <span>
-                Pharmacien
-              </span>
-
-              <strong>
-                AHOUE Clara
-              </strong>
-
-            </div>
-
-            <div className="ticket-line">
-
-              <span>
-                Date
-              </span>
-
-              <strong>
-                {new Date().toLocaleDateString(
-                  "fr-FR"
-                )}
-              </strong>
-
-            </div>
-
-            <div className="ticket-line">
-
-              <span>
-                Référence
-              </span>
-
-              <strong>
-                ORD-
-                {
-                  ticketPrescription?.id ||
-                  "000"
-                }
-              </strong>
-
-            </div>
-
-            <div className="ticket-actions">
-
-              <button
-                type="button"
-                className="blue-btn"
-                onClick={() => {
-
-                  window.print();
-
-                  showToast(
-                    "Fenêtre d'impression ouverte."
-                  );
-
-                }}
-              >
-                <Printer size={17} />
-
-                Imprimer
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
+      {showTicket && ticketPrescription && (
+        <RecuPharmacie
+          ordonnance={ticketPrescription.id}
+          onClose={() => setShowTicket(false)}
+        />
       )}
 
       {/* ======================================================

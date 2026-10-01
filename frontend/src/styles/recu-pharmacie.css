@@ -1,0 +1,207 @@
+/* ============================================================
+   REÇU DE DISPENSATION — PHARMACIE
+   ============================================================ */
+
+.recu-ph-voile {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 31, 36, .45);
+}
+
+.recu-ph-boite {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+
+.recu-ph-barre {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.recu-ph-barre h2 { margin: 0; color: var(--ink); font-size: 18px; }
+.recu-ph-barre p { margin: 4px 0 0; color: var(--ink-faint); font-size: 13px; }
+
+.recu-ph-fermer {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.recu-ph-corps {
+  padding: 16px 20px;
+  overflow-y: auto;
+  background: var(--surface-100);
+}
+
+.recu-ph-erreur { margin: 0; color: var(--danger); font-weight: 600; }
+
+/* ---- Le reçu ---- */
+
+.recu-ph {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.recu-ph-tete {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--ink);
+}
+
+.recu-ph-maison { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.recu-ph-maison svg { flex-shrink: 0; }
+.recu-ph-maison div { display: grid; gap: 1px; min-width: 0; }
+.recu-ph-maison strong { font-size: 13px; text-transform: uppercase; }
+.recu-ph-maison span { color: var(--ink-muted); font-size: 10.5px; }
+
+.recu-ph-piece { display: grid; gap: 2px; text-align: right; }
+.recu-ph-piece strong { font-size: 12.5px; }
+.recu-ph-piece span { color: var(--ink-muted); font-size: 10.5px; text-transform: uppercase; }
+
+.recu-ph-titre {
+  margin: 10px 0 8px;
+  color: var(--primary-700);
+  font-size: 13px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.recu-ph-identite {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin: 0 0 10px;
+}
+
+.recu-ph-identite div { display: flex; gap: 6px; min-width: 0; }
+.recu-ph-identite dt { color: var(--ink-muted); white-space: nowrap; }
+.recu-ph-identite dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+
+.recu-ph-lignes { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; }
+.recu-ph-lignes th:nth-child(2) { width: 17%; }
+.recu-ph-lignes th:nth-child(3) { width: 21%; }
+.recu-ph-lignes th:nth-child(4) { width: 22%; }
+.recu-ph-lignes th,
+.recu-ph-lignes td { padding: 5px; border: 1px solid var(--surface-300); text-align: left; vertical-align: top; }
+.recu-ph-lignes th { background: var(--surface-100); font-size: 10.5px; text-transform: uppercase; }
+.recu-ph-lignes th:nth-child(n+2) { text-align: right; }
+.recu-ph-lignes td:nth-child(n+2) { text-align: right; }
+.recu-ph-lignes td { overflow-wrap: anywhere; }
+.recu-ph-lignes td strong { display: block; }
+.recu-ph-lignes td small { display: block; margin-top: 2px; color: var(--ink-muted); font-size: 10.5px; }
+.recu-ph-lignes tfoot td { font-weight: 800; text-align: right; }
+
+.recu-ph-note { margin: 6px 0 0; color: var(--danger); font-size: 10.5px; font-weight: 600; }
+
+.recu-ph-pied {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-top: 10px;
+}
+
+.recu-ph-pied p { margin: 0; }
+.recu-ph-pied .regle { color: var(--green-soft-text); }
+.recu-ph-pied .attente { color: var(--danger); }
+
+.recu-ph-mention {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--surface-300);
+  color: var(--ink-muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+/* ---- Actions ---- */
+
+.recu-ph-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.recu-ph-bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.recu-ph-bouton:hover:not(:disabled) { background: var(--primary-dark); }
+.recu-ph-bouton:disabled { opacity: .5; cursor: not-allowed; }
+.recu-ph-bouton.secondaire { border-color: var(--border); background: var(--surface); color: var(--ink); }
+.recu-ph-bouton.secondaire:hover { background: var(--surface-100); }
+
+@media (max-width: 520px) {
+  .recu-ph-tete { grid-template-columns: minmax(0, 1fr) auto; }
+  .recu-ph-piece { grid-column: 1 / -1; grid-row: 2; text-align: left; }
+  .recu-ph-identite { grid-template-columns: 1fr; }
+}
+
+/* ---- Impression : le reçu seul, en A5 ---- */
+
+@media print {
+  body:has(#recu-pharmacie) { background: #fff !important; }
+  body:has(#recu-pharmacie) > *:not(.recu-ph-voile),
+  body:has(#recu-pharmacie) .recu-ph-barre,
+  body:has(#recu-pharmacie) .recu-ph-actions { display: none !important; }
+  body:has(#recu-pharmacie) .recu-ph-voile,
+  body:has(#recu-pharmacie) .recu-ph-boite,
+  body:has(#recu-pharmacie) .recu-ph-corps {
+    position: static;
+    display: block;
+    width: auto;
+    max-height: none;
+    padding: 0;
+    overflow: visible;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  body:has(#recu-pharmacie) #recu-pharmacie {
+    border: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
