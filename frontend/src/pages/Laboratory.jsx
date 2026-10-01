@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import "../styles/Laboratory.css";
 
 import {
@@ -312,8 +310,14 @@ function Laboratory() {
      PDF
      ========================================================== */
 
-  const printResultPdf = (analysis) => {
+  const printResultPdf = async (analysis) => {
     if (!analysis) return;
+
+    // La bibliothèque PDF n'est téléchargée qu'au moment d'imprimer.
+    const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+    ]);
 
     const doc = new jsPDF();
 

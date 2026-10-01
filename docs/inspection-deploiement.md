@@ -76,9 +76,12 @@ contre la nouvelle charte vert sapin (encore en cours dans l'autre session) :
 ### Signalé à la session fidele-47
 - Glycémie et Tension partagent l'icône `Activity` dans `pages/Nursing.jsx` : `Droplet` distinguerait la glycémie.
 
+## Après le commit de la charte (7d8fb43, session fidele-32)
+
+- Contrôle des couleurs : 22 pages, aucune hors charte vert sapin. Téléphone : 24 pages, ni débordement ni erreur.
+- Chargement allégé : chaque module est téléchargé à sa première ouverture (`App.jsx`, `differe`) et `jspdf`
+  seulement à l'impression d'un résultat de laboratoire. Démarrage : environ 104 kB compressés au lieu de 382 kB.
+  Vérifié : 26 pages ouvertes sans erreur ; impression PDF d'un résultat de laboratoire réussie.
+
 ## Reste à faire
-- La nouvelle charte (`styles/variables.css`, `index.html`, 26 feuilles de style) est validée par le contrôle
-  des couleurs mais pas encore commitée par la session fidele-47.
-- Pages chargées à la demande (`React.lazy` dans `App.jsx`) et `jspdf` chargé à l'impression : quand
-  `App.jsx` et `Laboratory.jsx` seront commités.
 - Stocks et Hygiène : rattachement à un hôpital, avant la mise en service d'un deuxième hôpital.

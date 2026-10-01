@@ -39,6 +39,31 @@ import {
    ============================================================ */
 
 import { useAuth } from "./context/AuthContext";
+import { lazy, Suspense } from "react";
+import Chargement from "./components/Chargement";
+
+
+/* ============================================================
+   CHARGEMENT À LA DEMANDE
+   ============================================================
+
+   Chaque module n'est téléchargé qu'à sa première ouverture :
+   la connexion et la page des modules s'affichent sans attendre
+   le code de tous les autres. Pendant le téléchargement, le
+   tracé d'électrocardiogramme habituel.
+
+   ============================================================ */
+
+function differe(charger) {
+  const Module = lazy(charger);
+  return function PageDifferee(props) {
+    return (
+      <Suspense fallback={<Chargement taille="grande" pleine />}>
+        <Module {...props} />
+      </Suspense>
+    );
+  };
+}
 
 
 /* ============================================================
@@ -59,14 +84,14 @@ import Modules from "./pages/Modules";
    ANCIEN TABLEAU DE BORD
    ============================================================ */
 
-import Dashboard from "./pages/Dashboard";
+const Dashboard = differe(() => import("./pages/Dashboard"));
 
-import EspacePatientsPersonnel from "./patient/Personnel";
-import Dossiers from "./dossier/Dossiers";
-import ConnexionPatient from "./patient/Connexion";
-import EspacePatient from "./patient/Espace";
-import Ged from "./ged/Ged";
-import Catalogue from "./catalogue/Catalogue";
+const EspacePatientsPersonnel = differe(() => import("./patient/Personnel"));
+const Dossiers = differe(() => import("./dossier/Dossiers"));
+const ConnexionPatient = differe(() => import("./patient/Connexion"));
+const EspacePatient = differe(() => import("./patient/Espace"));
+const Ged = differe(() => import("./ged/Ged"));
+const Catalogue = differe(() => import("./catalogue/Catalogue"));
 
 
 /* ============================================================
@@ -80,94 +105,94 @@ import Catalogue from "./catalogue/Catalogue";
 
    ============================================================ */
 
-import Direction from "./pages/Direction";
+const Direction = differe(() => import("./pages/Direction"));
 
 
 /* ============================================================
    MODULE CAISSE
    ============================================================ */
 
-import Caisse from "./accueil/Caisse";
-import Hopitaux from "./pages/Hopitaux";
-import Equipements from "./equipements/Equipements";
-import FicheEquipement from "./equipements/FicheEquipement";
+const Caisse = differe(() => import("./accueil/Caisse"));
+const Hopitaux = differe(() => import("./pages/Hopitaux"));
+const Equipements = differe(() => import("./equipements/Equipements"));
+const FicheEquipement = differe(() => import("./equipements/FicheEquipement"));
 
 
 /* ============================================================
    MODULE GESTION DES STOCKS
    ============================================================ */
 
-import Stocks from "./pages/Stocks";
+const Stocks = differe(() => import("./pages/Stocks"));
 
 
 /* ============================================================
    FORMULAIRE DE CRÉATION D'UN PATIENT
    ============================================================ */
 
-import PatientForm from "./pages/PatientForm";
+const PatientForm = differe(() => import("./pages/PatientForm"));
 
 
 /* ============================================================
    MODULE RENDEZ-VOUS
    ============================================================ */
 
-import Appointments from "./pages/Appointments";
+const Appointments = differe(() => import("./pages/Appointments"));
 
 
 /* ============================================================
    MODULE RESSOURCES HUMAINES
    ============================================================ */
 
-import Employees from "./pages/employees";
+const Employees = differe(() => import("./pages/employees"));
 
 
 /* ============================================================
    MODULE CONSULTATIONS
    ============================================================ */
 
-import ModuleConsultation from "./medecine/ModuleConsultation";
+const ModuleConsultation = differe(() => import("./medecine/ModuleConsultation"));
 
 
 /* ============================================================
    MODULE HOSPITALISATION
    ============================================================ */
 
-import Hospitalization from "./pages/Hospitalization";
+const Hospitalization = differe(() => import("./pages/Hospitalization"));
 
 
 /* ============================================================
    MODULE FACTURATION
    ============================================================ */
 
-import Billing from "./pages/Billing";
+const Billing = differe(() => import("./pages/Billing"));
 
 
 /* ============================================================
    MODULE LABORATOIRE
    ============================================================ */
 
-import Laboratory from "./pages/Laboratory";
+const Laboratory = differe(() => import("./pages/Laboratory"));
 
 
 /* ============================================================
    MODULE PHARMACIE
    ============================================================ */
 
-import Pharmacy from "./pages/pharmacy";
+const Pharmacy = differe(() => import("./pages/pharmacy"));
 
 
 /* ============================================================
    MODULE SOINS INFIRMIERS
    ============================================================ */
 
-import Nursing from "./pages/Nursing";
+const Nursing = differe(() => import("./pages/Nursing"));
 
 
 /* ============================================================
    PAGES TEMPORAIRES
    ============================================================ */
 
-import PlaceholderPage from "./pages/PlaceholderPage";
+const PlaceholderPage = differe(() => import("./pages/PlaceholderPage"));
 
 
 /* ============================================================
@@ -179,7 +204,7 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 
    ============================================================ */
 
-import ModuleRapports from "./rapports/ModuleRapports";
+const ModuleRapports = differe(() => import("./rapports/ModuleRapports"));
 
 
 /* ============================================================
@@ -191,35 +216,35 @@ import ModuleRapports from "./rapports/ModuleRapports";
    MAINTENANCE
    ------------------------------------------------------------ */
 
-import ModuleMaintenance from "./maintenance/ModuleMaintenance";
+const ModuleMaintenance = differe(() => import("./maintenance/ModuleMaintenance"));
 
 
 /* ------------------------------------------------------------
    ADMINISTRATION
    ------------------------------------------------------------ */
 
-import Administration from "./pages/Administration";
+const Administration = differe(() => import("./pages/Administration"));
 
 
 /* ------------------------------------------------------------
    HYGIÈNE ET SÉCURITÉ
    ------------------------------------------------------------ */
 
-import Hygiene from "./pages/Hygiene";
+const Hygiene = differe(() => import("./pages/Hygiene"));
 
 
 /* ------------------------------------------------------------
    ARCHIVES
    ------------------------------------------------------------ */
 
-import Archives from "./pages/Archives";
+const Archives = differe(() => import("./pages/Archives"));
 
 
 /* ------------------------------------------------------------
    INTELLIGENCE ARTIFICIELLE
    ------------------------------------------------------------ */
 
-import Ia from "./pages/Ia";
+const Ia = differe(() => import("./pages/Ia"));
 
 
 /* ============================================================

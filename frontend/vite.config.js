@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Bibliothèques dans des fichiers à part : le navigateur les garde en cache d'une mise à jour à l'autre.
+// Bibliothèques utilisées partout, dans des fichiers à part : le navigateur les garde en cache d'une mise à jour
+// à l'autre. jspdf n'y figure pas : il n'est téléchargé qu'à l'impression (import dynamique).
 const VENDORS = {
   react: ["react", "react-dom", "react-router-dom", "scheduler"],
-  pdf: ["jspdf", "jspdf-autotable"],
   icones: ["lucide-react"],
 };
 
