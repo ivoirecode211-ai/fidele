@@ -499,9 +499,20 @@
 }
 
 .nursing-vital-mini > svg {
-  display: none;
+  display: block;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
   color: var(--primary);
+}
+
+/* Carte étroite : l'icône passe au-dessus du libellé, elle reste toujours visible. */
+@container (max-width: 599px) {
+  .nursing-vital-mini {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
 }
 
 .nursing-vital-mini div {
