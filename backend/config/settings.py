@@ -139,6 +139,11 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+# Ancienne caisse (/api/cashdesk/), remplacée par l'Accueil & Caisse et non cloisonnée par hôpital :
+# fermée par défaut, ses données restent dans l'admin Django.
+LEGACY_CASHDESK = os.getenv("LEGACY_CASHDESK", "False").lower() == "true"
+
+
 # Fichiers déposés (GED). Jamais servis tels quels : ils passent par l'API, qui vérifie les droits.
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR / "media"))
 MEDIA_URL = "/media/"

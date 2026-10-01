@@ -1,5 +1,6 @@
 """Les garanties de verrouillage se vérifient sur PostgreSQL, pas sur SQLite."""
 import uuid
+from django.test import override_settings
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 from unittest import skipUnless
@@ -15,6 +16,7 @@ from .tests import CashdeskTests
 
 
 @skipUnless(connection.vendor == "postgresql", "Verrouillage transactionnel : PostgreSQL requis")
+@override_settings(LEGACY_CASHDESK=True)
 class ConcurrentCashdeskTests(TransactionTestCase):
     act = CashdeskTests.act
     patient_body = CashdeskTests.patient_body

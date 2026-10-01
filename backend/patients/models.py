@@ -40,5 +40,13 @@ class Patient(models.Model):
         verbose_name_plural = "patients"
         ordering = ["last_name", "first_names"]
 
+    def save(self, *args, **kwargs):
+        # Un patient appartient toujours à un hôpital : à défaut, le premier (comme les comptes).
+        if self.hospital_id is None:
+            from accounts.models import Hospital
+
+            self.hospital = Hospital.objects.filter(active=True).order_by("pk").first()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.patient_number} — {self.last_name} {self.first_names}"

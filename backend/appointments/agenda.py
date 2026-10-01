@@ -57,6 +57,16 @@ class AppointmentInputSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=list(CODES), required=False, default="En attente")
 
     def validate(self, attrs):
+        user = self.context.get("user")
+        if user is not None:
+            from accounts.tenancy import hospital_of
+
+            hospital = hospital_of(user)
+            if attrs["patientId"].hospital_id != hospital.pk:
+                raise serializers.ValidationError({"patientId": "Ce patient n'appartient pas à votre hôpital."})
+            doctor = attrs.get("doctorId")
+            if doctor is not None and doctor.hospital_id not in (hospital.pk, None):
+                raise serializers.ValidationError({"doctorId": "Ce praticien n'appartient pas à votre hôpital."})
         moment = timezone.make_aware(datetime.combine(attrs["date"], attrs["time"]))
         if moment < timezone.now() and attrs.get("status") != "Annulé":
             raise serializers.ValidationError({"date": "Le rendez-vous ne peut pas être fixé dans le passé."})
@@ -75,18 +85,22 @@ def fields_from(data, user):
     }
 
 
-def queryset():
-    return Appointment.objects.select_related("patient", "professional").order_by("date_time")
+def queryset(user):
+    """L'agenda de l'hôpital de l'utilisateur, et de lui seul."""
+    from accounts.tenancy import hospital_of
+
+    return (Appointment.objects.select_related("patient", "professional")
+            .filter(patient__hospital=hospital_of(user)).order_by("date_time"))
 
 
 class AgendaView(APIView):
     permission_classes = [AgendaAccess]
 
     def get(self, request):
-        return Response([serialize(item) for item in queryset()])
+        return Response([serialize(item) for item in queryset(request.user)])
 
     def post(self, request):
-        serializer = AppointmentInputSerializer(data=request.data)
+        serializer = AppointmentInputSerializer(data=request.data, context={"user": request.user})
         serializer.is_valid(raise_exception=True)
         appointment = Appointment.objects.create(**fields_from(serializer.validated_data, request.user))
         return Response(serialize(appointment), status=status.HTTP_201_CREATED)
@@ -96,8 +110,8 @@ class AgendaItemView(APIView):
     permission_classes = [AgendaAccess]
 
     def put(self, request, pk):
-        appointment = get_object_or_404(queryset(), pk=pk)
-        serializer = AppointmentInputSerializer(data=request.data)
+        appointment = get_object_or_404(queryset(request.user), pk=pk)
+        serializer = AppointmentInputSerializer(data=request.data, context={"user": request.user})
         serializer.is_valid(raise_exception=True)
         for field, value in fields_from(serializer.validated_data, appointment.professional).items():
             setattr(appointment, field, value)
@@ -105,7 +119,7 @@ class AgendaItemView(APIView):
         return Response(serialize(appointment))
 
     def delete(self, request, pk):
-        get_object_or_404(Appointment, pk=pk).delete()
+        get_object_or_404(queryset(request.user), pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -113,7 +127,7 @@ class AgendaStatusView(APIView):
     permission_classes = [AgendaAccess]
 
     def post(self, request, pk):
-        appointment = get_object_or_404(queryset(), pk=pk)
+        appointment = get_object_or_404(queryset(request.user), pk=pk)
         label = request.data.get("status")
         if label not in CODES:
             return Response({"status": "Statut inconnu."}, status=status.HTTP_400_BAD_REQUEST)

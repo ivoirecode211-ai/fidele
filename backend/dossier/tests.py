@@ -72,3 +72,98 @@ class DossierTests(APITestCase):
         stranger = User.objects.create_user(username="med9", password="x", role="DOCTOR", hospital=other)
         self.assertEqual(self.ouvrir(stranger).status_code, 404)
         self.assertEqual(self.client.get(f"{BASE}/", {"q": "kone"}).data["total"], 0)
+
+
+from consultations.tests import MG, consultation_complete  # noqa: E402
+from parcours.tests import ParcoursBase  # noqa: E402
+
+
+class ParcoursEntreModulesTests(ParcoursBase):
+    """Un patient de bout en bout ; chaque module en aval doit voir la même chose."""
+
+    def test_caisse_soins_consultation_pharmacie_puis_tous_les_modules(self):
+        patient = Patient.objects.get()
+        self.envoyer_en_consultation()
+        self.as_user(self.medecin)
+        termine = self.client.post(f"{MG}{self.pk}/terminer/", {"valeurs": consultation_complete()}, format="json")
+        self.assertEqual(termine.status_code, 200, termine.data)
+
+        self.as_user(self.pharmacien)
+        code = self.client.get("/api/parcours/pharmacie/ordonnances/").data[0]["id"]
+        self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/preparer/")
+        self.assertEqual(self.client.post(f"/api/parcours/pharmacie/ordonnances/{code}/servir/").data["status"], "Servie")
+
+        # Comptabilité : le passage payé.
+        self.as_user(self.comptable)
+        paiements = self.client.get("/api/parcours/comptabilite/paiements/").data
+        self.assertEqual([p["patientId"] for p in paiements], [patient.patient_number])
+
+        # Dossier patient : chaque module y apparaît, avec les mêmes faits.
+        self.as_user(self.medecin)
+        dossier = self.client.get(f"/api/dossier/patients/{patient.pk}/").data
+        self.assertEqual(len(dossier["passages"]), 1)
+        self.assertEqual(len(dossier["constantes"]), 1)
+        self.assertEqual(dossier["consultations"][0]["diagnostic"], "Paludisme simple")
+        self.assertEqual(dossier["ordonnances"][0]["statut"], "Servie")
+        self.assertTrue({"passage", "constantes", "consultation", "ordonnance"} <= {e["type"] for e in dossier["chronologie"]})
+        # L'allergie notée en consultation est celle que tous les modules affichent.
+        self.assertIn("Pénicilline", dossier["identite"]["allergies"])
+
+        # Espace patient : le même diagnostic et le même traitement.
+        self.as_user(self.caissier)
+        pin = self.client.post(f"/api/portail/acces/{patient.pk}/activer/").data["temporaryPin"]
+        self.client.force_authenticate(None)
+        token = self.client.post("/api/portail/connexion/", {"code": patient.patient_number, "pin": pin}, format="json").data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Patient {token}")
+        token = self.client.post("/api/portail/pin/", {"current": pin, "new": "482915"}, format="json").data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Patient {token}")
+        portail = self.client.get("/api/portail/dossier/").data
+        self.assertEqual(portail["consultations"][0]["diagnosis"], "Paludisme simple")
+        medicaments = self.client.get("/api/portail/medicaments/").data["ordonnances"][0]["items"]
+        self.assertEqual(medicaments[0]["medicine"], "Artéméther-Luméfantrine")
+        self.assertEqual([f["doctorId"] for f in self.client.get("/api/portail/messages/").data], [self.medecin.pk])
+
+    def test_issues_de_consultation_visibles_dans_le_dossier_et_l_espace_patient(self):
+        from datetime import timedelta
+
+        from hospitalization.models import Bed, Room
+        from laboratory.models import LabExam
+
+        patient = Patient.objects.get()
+        LabExam.objects.create(code="test-nfs", name="NFS test", category="Hématologie", price=5000)
+        chambre = Room.objects.create(name="C-1", department="Médecine")
+        Bed.objects.create(room=chambre, number="1")
+        self.envoyer_en_consultation()
+        self.as_user(self.medecin)
+        jour = (timezone.localdate() + timedelta(days=7)).isoformat()
+        rdv = self.client.post(f"{MG}{self.pk}/terminer/", {"valeurs": consultation_complete(
+            issue="rdv", rdv_date=jour, rdv_heure="10:30", examens=["test-nfs"])}, format="json")
+        self.assertEqual(rdv.status_code, 200, rdv.data)
+
+        dossier = self.client.get(f"/api/dossier/patients/{patient.pk}/").data
+        self.assertEqual(dossier["laboratoire"][0]["resultats"][0]["examen"], "NFS test")
+        self.assertTrue(dossier["rendezVous"][0]["aVenir"])
+        self.assertTrue(dossier["resume"]["prochainRendezVous"].startswith(timezone.datetime.fromisoformat(jour).strftime("%d/%m/%Y")))
+
+        self.as_user(self.caissier)
+        pin = self.client.post(f"/api/portail/acces/{patient.pk}/activer/").data["temporaryPin"]
+        self.client.force_authenticate(None)
+        token = self.client.post("/api/portail/connexion/", {"code": patient.patient_number, "pin": pin}, format="json").data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Patient {token}")
+        token = self.client.post("/api/portail/pin/", {"current": pin, "new": "482915"}, format="json").data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Patient {token}")
+        accueil = self.client.get("/api/portail/accueil/").data
+        self.assertEqual((accueil["nextAppointment"]["time"], accueil["nextAppointment"]["reason"]),
+                         ("10:30", "Consultation de contrôle"))
+        self.assertEqual(self.client.get("/api/portail/dossier/").data["consultations"][0]["nextConsultation"],
+                         timezone.datetime.fromisoformat(jour).strftime("%d/%m/%Y"))
+        self.client.credentials()
+
+        # Hospitalisation décidée en consultation : le dossier signale le séjour en cours.
+        self.as_user(self.medecin)
+        hospit = self.client.post(f"{MG}{self.pk}/terminer/", {"valeurs": consultation_complete(
+            issue="hospitalisation", chambre="C-1", lit="1")}, format="json")
+        self.assertEqual(hospit.status_code, 200, hospit.data)
+        dossier = self.client.get(f"/api/dossier/patients/{patient.pk}/").data
+        self.assertTrue(dossier["hospitalisations"][0]["enCours"])
+        self.assertTrue(dossier["resume"]["hospitaliseLe"])

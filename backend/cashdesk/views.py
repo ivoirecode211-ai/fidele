@@ -23,9 +23,30 @@ from . import services
 from .presenters import bill_data, session_data, actor_name, payment_data
 
 
+def ancienne_caisse_active():
+    """Ancienne caisse, remplacée par l'Accueil & Caisse (/api/accueil/).
+
+    Elle n'est pas cloisonnée par hôpital : désactivée par défaut, ses données
+    restent consultables dans l'admin Django. LEGACY_CASHDESK=True la rouvre.
+    """
+    from django.conf import settings
+
+    return getattr(settings, "LEGACY_CASHDESK", False)
+
+
 class CashAccess(BasePermission):
+    message = "L'ancienne caisse est désactivée : utilisez le module Caisse."
+
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and (request.user.has_role("ADMIN") or request.user.role_codes & services.CASHIERS))
+        return bool(ancienne_caisse_active() and request.user.is_authenticated
+                    and (request.user.has_role("ADMIN") or request.user.role_codes & services.CASHIERS))
+
+
+class LegacyQueueAccess(BasePermission):
+    message = CashAccess.message
+
+    def has_permission(self, request, view):
+        return bool(ancienne_caisse_active() and request.user.is_authenticated)
 
 
 class CashView(APIView):
@@ -246,7 +267,7 @@ class ClinicView(CashView):
 
 
 class QueueView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [LegacyQueueAccess]
 
     def get(self, request):
         if not request.user.has_role(*(services.CASHIERS | {"NURSE", "DOCTOR", "LAB"})):

@@ -25,13 +25,14 @@ class HospitalizationApiTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-    def test_admit_patient(self):
+    def test_generic_route_is_read_only(self):
+        # On admet par /service/sejours/, qui vérifie le lit et l'hôpital du patient.
         response = self.client.post("/api/hospitalization/", {
             "patient": self.patient.id, "bed": self.bed.id,
             "admission_date": "2026-01-10T08:00:00Z",
         })
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(Hospitalization.objects.count(), 1)
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(Hospitalization.objects.count(), 0)
 
     def test_requires_authentication(self):
         self.client.force_authenticate(None)

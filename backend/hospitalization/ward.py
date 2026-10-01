@@ -16,6 +16,8 @@ from parcours.models import Admission
 from parcours.permissions import RoleAccess
 from parcours.services import age_from_birth_date, doctor_label
 
+from accounts.tenancy import hospital_of
+
 from .models import Bed, Hospitalization, Room
 
 
@@ -68,17 +70,26 @@ def serialize_room(room):
     }
 
 
-def stays():
-    return Hospitalization.objects.select_related("patient", "bed__room", "doctor").order_by("-admission_date", "-id")
+def stays(user=None):
+    """Séjours des patients de l'hôpital de l'utilisateur.
+
+    Sans utilisateur, tous les séjours : l'appelant filtre alors lui-même par hôpital
+    (c'est le cas de la Consultation)."""
+    qs = Hospitalization.objects.select_related("patient", "bed__room", "doctor").order_by("-admission_date", "-id")
+    return qs if user is None else qs.filter(patient__hospital=hospital_of(user))
+
+
+def rooms_of(hospital):
+    return Room.objects.filter(hospital=hospital)
 
 
 class OverviewView(APIView):
     permission_classes = [WardAccess]
 
     def get(self, request):
-        rooms = Room.objects.prefetch_related("beds").order_by("name")
+        rooms = rooms_of(hospital_of(request.user)).prefetch_related("beds").order_by("name")
         return Response({
-            "hospitalizations": [serialize_stay(stay) for stay in stays()],
+            "hospitalizations": [serialize_stay(stay) for stay in stays(request.user)],
             "rooms": [serialize_room(room) for room in rooms],
         })
 
@@ -96,8 +107,9 @@ class BedsView(APIView):
             return Response({"bed": "Indiquez le numéro du lit."}, status=status.HTTP_400_BAD_REQUEST)
         # Chambre saisie librement : créée si elle n'existe pas encore
         # (service et type se précisent ensuite dans l'admin).
-        room = Room.objects.filter(name__iexact=name).first() or Room.objects.create(
-            name=name, department="Non précisé", type="Standard"
+        hospital = hospital_of(request.user)
+        room = rooms_of(hospital).filter(name__iexact=name).first() or Room.objects.create(
+            hospital=hospital, name=name, department="Non précisé", type="Standard"
         )
         if room.beds.filter(number__iexact=number).exists():
             return Response({"bed": f"Le lit {number} existe déjà dans la chambre {room.name}."},
@@ -118,9 +130,11 @@ class StayInputSerializer(serializers.Serializer):
     def validate(self, attrs):
         if attrs["dateSortie"] < attrs["dateAdmission"]:
             raise serializers.ValidationError({"dateSortie": "La sortie prévue précède l'admission."})
-        room = Room.objects.filter(name__iexact=attrs["chambre"].strip()).first()
+        # Les chambres de l'hôpital du patient, et d'aucun autre.
+        chambres = rooms_of(attrs["admissionId"].patient.hospital)
+        room = chambres.filter(name__iexact=attrs["chambre"].strip()).first()
         if room is None:
-            known = ", ".join(Room.objects.order_by("name").values_list("name", flat=True)) or "aucune"
+            known = ", ".join(chambres.order_by("name").values_list("name", flat=True)) or "aucune"
             raise serializers.ValidationError({"chambre": f"Chambre inconnue. Chambres existantes : {known}."})
         bed = room.beds.filter(number__iexact=attrs["lit"].strip()).first()
         if bed is None:
@@ -167,11 +181,13 @@ class StaysView(APIView):
     def post(self, request):
         serializer = StayInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        if serializer.validated_data["admissionId"].patient.hospital_id != hospital_of(request.user).pk:
+            return Response({"admissionId": "Ce patient n'appartient pas à votre hôpital."}, status=status.HTTP_404_NOT_FOUND)
         try:
             stay = open_stay(data=serializer.validated_data, user=request.user)
         except BedTaken as taken:
             return Response({"lit": str(taken)}, status=status.HTTP_409_CONFLICT)
-        return Response(serialize_stay(stays().get(pk=stay.pk)), status=status.HTTP_201_CREATED)
+        return Response(serialize_stay(stays(request.user).get(pk=stay.pk)), status=status.HTTP_201_CREATED)
 
 
 class DischargeView(APIView):
@@ -180,9 +196,9 @@ class DischargeView(APIView):
 
     @transaction.atomic
     def post(self, request, pk):
-        stay = get_object_or_404(stays().select_for_update(of=("self",)), pk=pk)
+        stay = get_object_or_404(stays(request.user).select_for_update(of=("self",)), pk=pk)
         if stay.discharge_date is None:
             stay.discharge_date = timezone.now()
             stay.save(update_fields=["discharge_date"])
             Bed.objects.filter(pk=stay.bed_id).update(status="AVAILABLE")
-        return Response(serialize_stay(stays().get(pk=pk)))
+        return Response(serialize_stay(stays(request.user).get(pk=pk)))

@@ -7,7 +7,8 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = "__all__"
-        read_only_fields = ["created_at", "full_name"]
+        # L'hôpital et le numéro de dossier sont fixés par le serveur, jamais par le client.
+        read_only_fields = ["created_at", "full_name", "hospital", "patient_number"]
 
     def get_full_name(self, obj):
         return f"{obj.last_name} {obj.first_names}"

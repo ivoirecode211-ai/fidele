@@ -6,9 +6,21 @@ class Room(models.Model):
         verbose_name = "chambre"
         verbose_name_plural = "chambres"
 
+    # Chaque hôpital a ses chambres et ses lits : jamais partagés entre hôpitaux.
+    hospital = models.ForeignKey("accounts.Hospital", null=True, blank=True, on_delete=models.PROTECT,
+                                 related_name="rooms", verbose_name="hôpital")
     name = models.CharField(max_length=100)
     department = models.CharField(max_length=120)
     type = models.CharField(max_length=40, default="Standard")
+
+    def save(self, *args, **kwargs):
+        # Une chambre appartient toujours à un hôpital : à défaut, le premier.
+        if self.hospital_id is None:
+            from accounts.models import Hospital
+
+            self.hospital = Hospital.objects.filter(active=True).order_by("pk").first()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 

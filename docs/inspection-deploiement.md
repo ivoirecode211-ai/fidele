@@ -19,8 +19,26 @@ et signale le reste à la session qui tient les fichiers concernés.
 - Téléphone : débordement horizontal de `/laboratory` (40 px) et `/reports` (395 px).
 - `styles/Laboratory.css` : 2 × `#d97706` (orange hors charte) → `var(--warning-soft-text-strong)`.
 
-## Reste à inspecter
-- Passe 2 : parcours métier de bout en bout avec écriture (caisse → soins → consultation → pharmacie → comptabilité, laboratoire, hospitalisation, rendez-vous) ; cohérence des données entre modules.
-- Passe 3 : droits et cloisonnement par hôpital sur les routes de détail (`<id>`), et compte plateforme.
+## Passe 2 — parcours métier entre modules
+
+Test automatique `dossier.tests.ParcoursEntreModulesTests` : caisse → constantes → consultation → pharmacie,
+puis comptabilité, dossier patient et espace patient ; issues de consultation (rendez-vous, analyses,
+hospitalisation). Résultat : cohérent partout (l'allergie notée en consultation remonte dans le dossier ;
+le rendez-vous de contrôle apparaît dans l'agenda, le dossier et l'espace patient). Aucune correction nécessaire.
+
+## Passe 3 — cloisonnement par hôpital
+
+Un second hôpital fictif tente de lire les données de MA SANTÉ (111 listes, 43 fiches de détail, 12 rôles).
+Fuites trouvées puis corrigées :
+- `/api/patients/` : liste et fiche limitées à son hôpital ; hôpital et n° de dossier fixés par le serveur.
+- `/api/appointments/` et l'agenda : limités à son hôpital ; refus d'un patient ou d'un praticien d'un autre hôpital.
+- Hospitalisation : chambres rattachées à un hôpital (migration 0004, chambres existantes → MA SANTÉ) ;
+  service, lits et séjours limités à son hôpital ; routes génériques passées en lecture seule.
+- Ancienne caisse `/api/cashdesk/` (remplacée, non cloisonnée) : fermée par défaut (`LEGACY_CASHDESK`).
+- Patient ou chambre créés sans hôpital : rattachés d'office au premier hôpital.
+Après correction : 0 fuite sur les listes et les fiches. Tests `dossier/tests_cloisonnement.py`. Suite complète : 259 tests OK.
+
+À surveiller : le Tableau de bord et la Direction comptent encore les lits et les chiffres de tous les hôpitaux
+(aucune donnée nominative, mais des totaux mêlés).
 - Passe 4 : revue visuelle module par module (captures ordinateur et téléphone) contre la charte.
 - Passe 5 : performances (taille du paquet frontend, requêtes N+1) et préparation du déploiement (collectstatic, migrations sur base neuve, comptes par défaut).

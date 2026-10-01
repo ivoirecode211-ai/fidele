@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from patients.models import Patient
@@ -15,6 +16,7 @@ from .services import balances, session_totals
 User = get_user_model()
 
 
+@override_settings(LEGACY_CASHDESK=True)
 class CashdeskTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -374,3 +376,15 @@ class CashdeskTests(APITestCase):
                      f"visits/{bill.visit_id}", "bills", f"bills/{bill.pk}", "sessions", "claims", "batches", "clinic", "audit", "queue", "reports"]:
             with self.subTest(path=path):
                 self.assertEqual(self.client.get(f"/api/cashdesk/{path}/").status_code, 200)
+
+
+
+class AncienneCaisseDesactiveeTests(APITestCase):
+    """Sans LEGACY_CASHDESK, l'ancienne caisse (non cloisonnée par hôpital) ne répond plus."""
+
+    def test_routes_fermees_par_defaut(self):
+        from django.contrib.auth import get_user_model
+
+        self.client.force_authenticate(get_user_model().objects.create_user(username="adm", password="x", role="ADMIN"))
+        for url in ("/api/cashdesk/patients/", "/api/cashdesk/queue/", "/api/cashdesk/overview/"):
+            self.assertEqual(self.client.get(url).status_code, 403, url)

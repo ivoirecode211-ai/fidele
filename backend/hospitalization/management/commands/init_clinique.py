@@ -20,10 +20,13 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        if Room.objects.exists():
+        from accounts.models import Hospital
+
+        hospital = Hospital.objects.order_by("pk").first()
+        if Room.objects.filter(hospital=hospital).exists():
             self.stdout.write("Des chambres existent déjà : rien n'est modifié.")
             return
         for name, department, kind, beds in ROOMS:
-            room = Room.objects.create(name=name, department=department, type=kind)
+            room = Room.objects.create(hospital=hospital, name=name, department=department, type=kind)
             Bed.objects.bulk_create(Bed(room=room, number=f"Lit {n:02d}") for n in range(1, beds + 1))
         self.stdout.write(self.style.SUCCESS(f"{len(ROOMS)} chambres et {sum(r[3] for r in ROOMS)} lits créés."))
