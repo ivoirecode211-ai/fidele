@@ -339,7 +339,8 @@ function Etiquettes({ donnees }) {
    SCANNER — caméra de la tablette ou du PC, ou code saisi
    ============================================================ */
 
-function Scanner({ donnees }) {
+/* `onJeton` : le module Maintenance ouvre la fiche chez lui plutôt que sur sa propre page. */
+export function Scanner({ donnees, onJeton }) {
   const navigate = useNavigate();
   const video = useRef(null);
   const lecteur = useRef(null);
@@ -347,7 +348,7 @@ function Scanner({ donnees }) {
   const [erreur, setErreur] = useState("");
   const [code, setCode] = useState("");
 
-  const ouvrir = (jeton) => navigate(`/equipement/${jeton}`);
+  const ouvrir = (jeton) => (onJeton ? onJeton(jeton) : navigate(`/equipement/${jeton}`));
 
   useEffect(() => () => lecteur.current?.destroy(), []);
 

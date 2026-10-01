@@ -128,7 +128,7 @@ function Info({ libelle, valeur }) {
   return <div><dt>{libelle}</dt><dd>{valeur || valeur === 0 ? valeur : "—"}</dd></div>;
 }
 
-function Identite({ fiche }) {
+export function Identite({ fiche }) {
   const enService = fiche.state === "En service";
   return (
     <section className="fiche-identite">
@@ -155,7 +155,7 @@ function Identite({ fiche }) {
 
 const CLASSE_PRIORITE = { Critique: "critique", Haute: "attente", Normale: "" };
 
-function Intervention({ item, peutCloturer, onCloturer }) {
+export function Intervention({ item, peutCloturer, onCloturer }) {
   const terminee = item.status === "Terminée";
   const auteur = item.company
     ? `${item.technician} — ${item.company}`
@@ -191,7 +191,7 @@ function Intervention({ item, peutCloturer, onCloturer }) {
   );
 }
 
-function Popup({ titre, sous, onClose, children, pied }) {
+export function Popup({ titre, sous, onClose, children, pied }) {
   return (
     <div className="pop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="pop-boite etroite" role="dialog" aria-modal="true" aria-label={titre}>
@@ -203,7 +203,7 @@ function Popup({ titre, sous, onClose, children, pied }) {
   );
 }
 
-function NouvelleIntervention({ fiche, onClose, onSaved }) {
+export function NouvelleIntervention({ fiche, onClose, onSaved }) {
   const aujourdhui = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({ type: "Corrective", priority: "Normale", technician: "", company: "", description: "", date: aujourdhui });
   const [occupe, setOccupe] = useState(false);
@@ -253,7 +253,7 @@ function NouvelleIntervention({ fiche, onClose, onSaved }) {
   );
 }
 
-function Cloture({ intervention, onClose, onSaved }) {
+export function Cloture({ intervention, onClose, onSaved }) {
   const [form, setForm] = useState({ diagnosis: "", work_done: "", parts: "", cost: "", duration_minutes: "" });
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState("");

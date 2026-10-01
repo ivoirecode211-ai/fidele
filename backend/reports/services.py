@@ -43,25 +43,26 @@ def month_filter(field, year, month):
     return {f"{field}__year": year, f"{field}__month": month}
 
 
-def figures(kind, year, month):
+def figures(kind, year, month, hospital):
     """Les chiffres d'un rapport, dans l'ordre d'affichage."""
-    admissions = Admission.objects.actives().filter(**month_filter("created_at", year, month))
+    admissions = Admission.objects.of_hospital(hospital).actives().filter(**month_filter("created_at", year, month))
+    consultations = Consultation.objects.filter(patient__hospital=hospital)
     if kind == "Activité":
         return [
             ("Patients enregistrés à la caisse", admissions.count()),
-            ("Nouveaux dossiers patients", Patient.objects.filter(**month_filter("created_at", year, month)).count()),
-            ("Constantes prises", VitalSigns.objects.filter(**month_filter("recorded_at", year, month)).count()),
-            ("Consultations validées", Consultation.objects.filter(**month_filter("completed_at", year, month)).count()),
+            ("Nouveaux dossiers patients", Patient.objects.filter(hospital=hospital, **month_filter("created_at", year, month)).count()),
+            ("Constantes prises", VitalSigns.objects.filter(admission__patient__hospital=hospital, **month_filter("recorded_at", year, month)).count()),
+            ("Consultations validées", consultations.filter(**month_filter("completed_at", year, month)).count()),
         ]
     if kind == "Consultations":
-        done = Consultation.objects.filter(**month_filter("completed_at", year, month))
+        done = consultations.filter(**month_filter("completed_at", year, month))
         return [
             ("Consultations validées", done.count()),
             ("Ordonnances prescrites", Prescription.objects.filter(consultation__in=done).count()),
             ("Médecins ayant consulté", done.values("doctor").distinct().count()),
         ]
     if kind == "Finances":
-        paid = Admission.objects.encaissees().filter(**month_filter("paid_at", year, month))
+        paid = Admission.objects.of_hospital(hospital).encaissees().filter(**month_filter("paid_at", year, month))
         totals = paid.aggregate(total=Sum("service_price"), patient=Sum("cost"))
         insurance = (totals["total"] or 0) - (totals["patient"] or 0)
         return [
@@ -69,22 +70,23 @@ def figures(kind, year, month):
             ("Encaissé auprès des patients", money(totals["patient"])),
             ("Part des assurances", money(insurance)),
             ("Nombre d'encaissements", paid.count()),
-            ("Tickets annulés", Admission.objects.filter(cancelled_at__isnull=False, **month_filter("cancelled_at", year, month)).count()),
+            ("Tickets annulés", Admission.objects.of_hospital(hospital).filter(cancelled_at__isnull=False, **month_filter("cancelled_at", year, month)).count()),
         ]
     if kind == "Stocks":
-        served = Prescription.objects.filter(status="SERVED", **month_filter("served_at", year, month))
+        prescriptions = Prescription.objects.filter(patient__hospital=hospital)
+        served = prescriptions.filter(status="SERVED", **month_filter("served_at", year, month))
         return [
             ("Ordonnances servies", served.count()),
             ("Médicaments délivrés", PrescriptionItem.objects.filter(prescription__in=served).count()),
-            ("Ordonnances en attente", Prescription.objects.exclude(status="SERVED").count()),
+            ("Ordonnances en attente", prescriptions.exclude(status="SERVED").count()),
         ]
     if kind == "Hospitalisation":
-        stays = Hospitalization.objects.filter(**month_filter("admission_date", year, month))
+        stays = Hospitalization.objects.filter(patient__hospital=hospital, **month_filter("admission_date", year, month))
         return [
             ("Admissions en hospitalisation", stays.count()),
-            ("Sorties", Hospitalization.objects.filter(**month_filter("discharge_date", year, month)).count()),
+            ("Sorties", Hospitalization.objects.filter(patient__hospital=hospital, **month_filter("discharge_date", year, month)).count()),
         ]
-    interventions = Intervention.objects.filter(**month_filter("date", year, month))
+    interventions = Intervention.objects.filter(equipment__hospital=hospital, **month_filter("date", year, month))
     return [
         ("Interventions", interventions.count()),
         ("Interventions terminées", interventions.filter(status="Terminée").count()),
@@ -92,10 +94,10 @@ def figures(kind, year, month):
     ]
 
 
-def available_months():
+def available_months(hospital):
     """Du premier mois d'activité enregistrée au mois courant, le plus récent d'abord."""
     today = timezone.localdate()
-    first = Admission.objects.order_by("created_at").values_list("created_at", flat=True).first()
+    first = Admission.objects.of_hospital(hospital).order_by("created_at").values_list("created_at", flat=True).first()
     start = timezone.localtime(first).date() if first else today
     months, (year, month) = [], (today.year, today.month)
     while (year, month) >= (start.year, start.month) and len(months) < 24:
@@ -104,7 +106,7 @@ def available_months():
     return months
 
 
-def build_report(kind, year, month, today):
+def build_report(kind, year, month, today, hospital):
     current = (year, month) == (today.year, today.month)
     last_day = date(year, month, calendar.monthrange(year, month)[1])
     title, service, author = TYPES[kind]
@@ -117,12 +119,12 @@ def build_report(kind, year, month, today):
         "author": author,
         "status": "En cours" if current else "Disponible",
         "date": (today if current else last_day).strftime("%d/%m/%Y"),
-        "figures": [{"label": name, "value": value} for name, value in figures(kind, year, month)],
+        "figures": [{"label": name, "value": value} for name, value in figures(kind, year, month, hospital)],
     }
 
 
-def service_activity(year, month):
-    admissions = Admission.objects.actives().filter(**month_filter("created_at", year, month))
+def service_activity(year, month, hospital):
+    admissions = Admission.objects.of_hospital(hospital).actives().filter(**month_filter("created_at", year, month))
     counts = Counter(admissions.values_list("service_name", flat=True))
     total = sum(counts.values())
     return [
@@ -131,10 +133,10 @@ def service_activity(year, month):
     ] if total else []
 
 
-def overview(period=None):
+def overview(hospital, period=None):
     today = timezone.localdate()
-    months = available_months()
-    reports = [build_report(kind, year, month, today) for year, month in months for kind in TYPES]
+    months = available_months(hospital)
+    reports = [build_report(kind, year, month, today, hospital) for year, month in months for kind in TYPES]
     available = sum(1 for report in reports if report["status"] == "Disponible")
     periods = [label(year, month) for year, month in months]
     selected = next(((y, m) for y, m in months if label(y, m) == period), months[0])
@@ -147,5 +149,5 @@ def overview(period=None):
         },
         "periods": periods,
         "reports": reports,
-        "serviceStats": service_activity(*selected),
+        "serviceStats": service_activity(*selected, hospital),
     }

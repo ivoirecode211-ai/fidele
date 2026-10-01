@@ -1,66 +1,80 @@
 :root {
   /* ============================================================
-     CHARTE GRAPHIQUE — CLINIQUE
+     CHARTE GRAPHIQUE — MA SANTÉ (inspirée de seynsis.com)
      ============================================================
-     Bleu hôpital : échelle complète 50→950 (OKLCH, teinte 248°).
-     Pour habiller un autre établissement, ne changer que cette
-     échelle : tout le reste de l'application en dépend via les
-     alias de compatibilité ci-dessous.
+     Un seul vert profond, le vert sapin #0B5F59, porte la marque :
+     il désigne ce qui est cliquable et ce qui compte. Tout le reste
+     est blanc, gris-vert très doux et encre teintée de vert, pour
+     des écrans calmes qu'on regarde huit heures par jour.
+
+     Pour habiller un autre établissement, ne changer que l'échelle
+     --primary : tout le reste de l'application en dépend.
      ============================================================ */
 
-  --primary-50: #f1f8ff;
-  --primary-100: #e0effe;
-  --primary-200: #c2e0ff;
-  --primary-300: #98caf9;
-  --primary-400: #67aae9;
-  --primary-500: #368ad1;
-  --primary-600: #1671b7;
-  --primary-700: #0b5d98;
-  --primary-800: #0a4979;
-  --primary-900: #0c3557;
-  --primary-950: #08233a;
+  --primary-50: #f2f8f7;
+  --primary-100: #e6f2f0;
+  --primary-200: #c5e2dd;
+  --primary-300: #98c9c1;
+  --primary-400: #5ea79c;
+  --primary-500: #2b8177;
+  --primary-600: #0b5f59;   /* vert de marque */
+  --primary-700: #084844;   /* survol, texte sur fond vert pâle */
+  --primary-800: #073c39;
+  --primary-900: #05302e;
+  --primary-950: #032220;
 
-  /* Neutres */
+  /* Neutres : gris-vert, jamais de gris froid */
   --surface: #ffffff;
-  --surface-50: #f8fafc;
-  --surface-100: #f1f5f9;
-  --surface-200: #e2e8f0;
-  --ink: #0f172a;
-  --ink-muted: #334155;
-  --ink-faint: #475569;
+  --surface-50: #f7faf9;
+  --surface-100: #f3f7f6;   /* fond des pages */
+  --surface-200: #e2eae8;   /* bordures */
+  --surface-300: #cdd9d6;
+  --ink: #0f1f24;           /* titres, texte fort */
+  --ink-muted: #3c4f55;     /* texte courant */
+  --ink-faint: #56686e;     /* texte secondaire, libellés */
+  --ink-ghost: #879a9e;     /* indications, placeholders */
 
-  /* États — jamais décoratifs, réservés à un statut */
-  --green: #16a34a;
-  --green-hover: #15803d;
-  --green-soft: #f0fdf4;
-  --green-soft-text: #166534;
-  --green-soft-border: #bbf7d0;
+  /* États — jamais décoratifs, réservés à un statut.
+     Le vert « fait » est plus clair et plus franc que le vert de marque,
+     pour ne jamais confondre un bouton et une réussite. */
+  --green: #1b8a4b;
+  --green-hover: #157340;
+  --green-soft: #eef8f1;
+  --green-soft-text: #14653a;
+  --green-soft-border: #c4e6d0;
 
   /* Rouge apaisé : visible pour les alertes, sans agressivité */
-  --danger: #c94f4f;
-  --danger-hover: #b34242;
-  --danger-soft: #fbf1f1;
-  --danger-soft-text: #8c3434;
-  --danger-soft-border: #efcfcf;
-  --danger-field-border: #dc8a8a;
+  --danger: #c2453f;
+  --danger-hover: #a83a35;
+  --danger-soft: #fbf1f0;
+  --danger-soft-text: #8a2f2b;
+  --danger-soft-border: #efcdca;
+  --danger-field-border: #d98a85;
 
-  --warning: #f59e0b;
-  --warning-soft: #fffbeb;
-  --warning-soft-text: #92400e;
-  --warning-soft-text-strong: #b45309;
-  --warning-soft-border: #fde68a;
+  /* « Attention / en attente » : pas de jaune dans la charte.
+     Ces noms restent pour le code existant ; ils portent un vert
+     d'eau neutre, distinct du vert « fait ». */
+  --warning: #2b8177;
+  --warning-soft: #eef6f4;
+  --warning-soft-text: #1d5c56;
+  --warning-soft-text-strong: #084844;
+  --warning-soft-border: #c5e2dd;
 
-  /* Rayons */
+  /* Rayons : cartes douces, boutons en pilule */
   --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-2xl: 16px;
+  --radius-pill: 999px;
 
-  /* Ombres — toujours douces, décalées vers le bas */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .04);
-  --shadow-sidebar: 2px 0 12px rgba(0, 0, 0, .06);
-  --shadow-tuile: 0 10px 20px -8px rgba(22, 113, 183, .35);
+  /* Ombres — presque absentes : la bordure fine sépare, l'ombre soulève à peine */
+  --shadow-card: 0 1px 2px rgba(15, 31, 36, .04);
+  --shadow-float: 0 12px 32px -12px rgba(15, 31, 36, .18);
+  --shadow-sidebar: 1px 0 0 rgba(15, 31, 36, .06);
+  --shadow-tuile: 0 10px 24px -14px rgba(11, 95, 89, .45);
 
-  --font: "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Polices : Inter pour lire, Manrope pour les titres */
+  --font: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-titre: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
 
   /* ============================================================
      ALIAS DE COMPATIBILITÉ
@@ -79,7 +93,7 @@
   --bg: var(--surface-100);
   --border: var(--surface-200);
 
-  /* Anciennes teintes violettes : ramenées au bleu de la charte */
+  /* Anciennes teintes violettes : ramenées au vert de la charte */
   --purple: var(--primary-600);
   --purple-soft: var(--primary-50);
 

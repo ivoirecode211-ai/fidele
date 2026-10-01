@@ -5,8 +5,10 @@ import api from "../services/api";
 import SidebarFooter from "../components/SidebarFooter";
 import UserBadge from "../components/UserBadge";
 import NotificationBell from "../components/NotificationBell";
+import RapportsPraticien from "../rapports/RapportsPraticien";
 
 import {
+  BarChart3,
   Home,
   Package,
   ClipboardList,
@@ -66,6 +68,10 @@ const menuItems = [
   {
     label: "Historique",
     icon: History,
+  },
+  {
+    label: "Rapports",
+    icon: BarChart3,
   },
 ];
 
@@ -583,6 +589,8 @@ function Pharmacy({ onNavigate }) {
             ==================================================== */}
 
         <section className="pharmacy-content">
+          {/* Sous-module « Rapports » : les ordonnances servies par le pharmacien connecté. */}
+          {activeMenu === "Rapports" && <RapportsPraticien />}
 
           {/* ==================================================
               ACCUEIL

@@ -34,7 +34,7 @@
   height: 52px;
   border-radius: 14px;
   background: var(--purple-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +42,7 @@
 
 .employees-header h1 {
   margin: 0;
-  color: #172033;
+  color: var(--ink);
   font-size: 27px;
   font-weight: 700;
 }
@@ -60,7 +60,7 @@
 .employees-primary-btn {
   border: none;
   border-radius: 9px;
-  background: #1671b7;
+  background: var(--primary-600);
   color: white;
   padding: 11px 17px;
   display: inline-flex;
@@ -74,7 +74,7 @@
 }
 
 .employees-primary-btn:hover {
-  background: #0b5d98;
+  background: var(--primary-700);
   transform: translateY(-1px);
 }
 
@@ -97,7 +97,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 2px 8px rgba(15, 31, 36, 0.03);
 }
 
 .employee-stat-icon {
@@ -111,22 +111,22 @@
 
 .employee-blue {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .employee-green {
   background: var(--green-soft);
-  color: #16a34a;
+  color: var(--green);
 }
 
 .employee-orange {
   background: var(--warning-soft);
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .employee-purple {
   background: var(--purple-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .employee-stat-card span {
@@ -138,7 +138,7 @@
 
 .employee-stat-card strong {
   display: block;
-  color: #172033;
+  color: var(--ink);
   font-size: 22px;
 }
 
@@ -168,7 +168,7 @@
   align-items: center;
   gap: 9px;
   padding: 0 12px;
-  color: #8b95a5;
+  color: var(--ink-ghost);
 }
 
 .employee-search input {
@@ -181,7 +181,7 @@
 }
 
 .employee-search input::placeholder {
-  color: #9aa3b1;
+  color: var(--ink-ghost);
 }
 
 .employee-filter {
@@ -192,7 +192,7 @@
   align-items: center;
   gap: 8px;
   padding: 0 11px;
-  color: #697386;
+  color: var(--ink-ghost);
   background: white;
 }
 
@@ -200,7 +200,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #374151;
+  color: var(--ink-muted);
   font-size: 13px;
 }
 
@@ -213,7 +213,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 2px 8px rgba(15, 31, 36, 0.03);
 }
 
 .employees-card-header {
@@ -226,13 +226,13 @@
 
 .employees-card-header h2 {
   margin: 0;
-  color: #1f2937;
+  color: var(--ink);
   font-size: 17px;
 }
 
 .employees-card-header p {
   margin: 4px 0 0;
-  color: #8a94a3;
+  color: var(--ink-ghost);
   font-size: 13px;
 }
 
@@ -240,7 +240,7 @@
   padding: 7px 11px;
   border-radius: 20px;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 12px;
   font-weight: 700;
 }
@@ -275,7 +275,7 @@
 .employees-table td {
   padding: 15px 16px;
   border-bottom: 1px solid var(--green-soft);
-  color: #3c4655;
+  color: var(--ink-muted);
   font-size: 13px;
   vertical-align: middle;
 }
@@ -305,7 +305,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,7 +327,7 @@
 }
 
 .employee-person span {
-  color: #929baa;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -343,11 +343,11 @@
 }
 
 .employee-job svg {
-  color: #368ad1;
+  color: var(--primary-500);
 }
 
 .employee-job span {
-  color: #4b5563;
+  color: var(--ink-faint);
 }
 
 /* ============================================================
@@ -362,11 +362,11 @@
 }
 
 .employee-department svg {
-  color: #16a34a;
+  color: var(--green);
 }
 
 .employee-department span {
-  color: #4b5563;
+  color: var(--ink-faint);
 }
 
 /* ============================================================
@@ -380,7 +380,7 @@
   padding: 5px 9px;
   border-radius: 6px;
   background: var(--bg);
-  color: #5f6877;
+  color: var(--ink-faint);
   font-size: 11px;
   font-weight: 700;
 }
@@ -393,7 +393,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #596474;
+  color: var(--ink-faint);
   white-space: nowrap;
 }
 
@@ -418,22 +418,22 @@
 
 .employee-status-active {
   background: var(--green-soft);
-  color: #15803d;
+  color: var(--green-hover);
 }
 
 .employee-status-leave {
   background: var(--warning-soft);
-  color: #b45309;
+  color: var(--warning-soft-text-strong);
 }
 
 .employee-status-suspended {
   background: var(--danger-soft);
-  color: #b34242;
+  color: var(--danger-hover);
 }
 
 .employee-status-inactive {
   background: var(--green-soft);
-  color: #687385;
+  color: var(--ink-faint);
 }
 
 /* ============================================================
@@ -459,7 +459,7 @@
 }
 
 .employee-action-view {
-  color: #64748b;
+  color: var(--ink-faint);
 }
 
 .employee-action-view:hover {
@@ -467,7 +467,7 @@
 }
 
 .employee-action-edit {
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .employee-action-edit:hover {
@@ -475,7 +475,7 @@
 }
 
 .employee-action-delete {
-  color: #c94f4f;
+  color: var(--danger);
 }
 
 .employee-action-delete:hover {
@@ -489,18 +489,18 @@
 .employees-empty {
   height: 250px;
   text-align: center !important;
-  color: #9aa3b1 !important;
+  color: var(--ink-ghost) !important;
 }
 
 .employees-empty svg {
   display: block;
   margin: 0 auto 12px;
-  color: #b8c0cb;
+  color: var(--surface-300);
 }
 
 .employees-empty strong {
   display: block;
-  color: #667085;
+  color: var(--ink-faint);
   margin-bottom: 5px;
 }
 
@@ -517,7 +517,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(15, 23, 42, 0.48);
+  background: rgba(15, 31, 36, 0.48);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -532,7 +532,7 @@
   overflow-y: auto;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 25px 70px rgba(15, 31, 36, 0.25);
 }
 
 .employee-details-modal {
@@ -563,7 +563,7 @@
   height: 42px;
   border-radius: 10px;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -571,13 +571,13 @@
 
 .employee-modal-header h2 {
   margin: 0;
-  color: #1f2937;
+  color: var(--ink);
   font-size: 18px;
 }
 
 .employee-modal-header p {
   margin: 4px 0 0;
-  color: #8992a1;
+  color: var(--ink-ghost);
   font-size: 12px;
 }
 
@@ -587,7 +587,7 @@
   border: none;
   border-radius: 8px;
   background: var(--bg);
-  color: #687385;
+  color: var(--ink-faint);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -614,7 +614,7 @@
   margin: 0 0 14px;
   padding-bottom: 9px;
   border-bottom: 1px solid var(--primary-soft);
-  color: #374151;
+  color: var(--ink-muted);
   font-size: 13px;
 }
 
@@ -635,13 +635,13 @@
 }
 
 .employee-form-group label {
-  color: #596474;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 600;
 }
 
 .employee-form-group label span {
-  color: #c94f4f;
+  color: var(--danger);
   margin-left: 3px;
 }
 
@@ -655,15 +655,15 @@
   border-radius: 8px;
   outline: none;
   background: white;
-  color: #303b4c;
+  color: var(--ink-muted);
   font-family: inherit;
   font-size: 13px;
 }
 
 .employee-form-group input:focus,
 .employee-form-group select:focus {
-  border-color: #67aae9;
-  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(11, 95, 89, 0.08);
 }
 
 .employee-input-icon {
@@ -674,12 +674,12 @@
   align-items: center;
   gap: 8px;
   padding: 0 11px;
-  color: #8993a3;
+  color: var(--ink-ghost);
 }
 
 .employee-input-icon:focus-within {
-  border-color: #67aae9;
-  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(11, 95, 89, 0.08);
 }
 
 .employee-input-icon input {
@@ -711,7 +711,7 @@
 .employee-secondary-btn {
   border: 1px solid var(--border);
   background: white;
-  color: #4b5563;
+  color: var(--ink-faint);
   padding: 11px 18px;
   border-radius: 9px;
   font-weight: 600;
@@ -729,7 +729,7 @@
 .employee-leave-btn {
   border: 1px solid var(--warning-soft-border);
   background: var(--warning-soft);
-  color: #b45309;
+  color: var(--warning-soft-text-strong);
   padding: 11px 15px;
   border-radius: 9px;
   font-weight: 600;
@@ -770,14 +770,14 @@
 
 .employee-detail-item span {
   display: block;
-  color: #8a94a3;
+  color: var(--ink-ghost);
   font-size: 11px;
   margin-bottom: 5px;
 }
 
 .employee-detail-item strong {
   display: block;
-  color: #364152;
+  color: var(--ink-muted);
   font-size: 13px;
   word-break: break-word;
 }

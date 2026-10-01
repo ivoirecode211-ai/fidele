@@ -12,7 +12,7 @@
   display: flex;
   background: var(--bg);
   color: var(--primary-dark);
-  font-family: "Segoe UI", Inter, Arial, sans-serif;
+  font-family: var(--font);
 }
 
 /* ============================================================
@@ -28,10 +28,10 @@
   background: linear-gradient(
     180deg,
     var(--primary-dark) 0%,
-    #0c3557 100%
+    var(--primary-900) 100%
   );
   color: var(--surface);
-  box-shadow: 4px 0 18px rgba(12, 53, 87, 0.12);
+  box-shadow: 4px 0 18px rgba(5, 48, 46, 0.12);
 }
 
 .pharmacy-sidebar-brand {
@@ -52,10 +52,10 @@
   flex-shrink: 0;
   background: linear-gradient(
     135deg,
-    #67aae9,
-    #67aae9
+    var(--primary-400),
+    var(--primary-400)
   );
-  box-shadow: 0 4px 12px rgba(103, 170, 233, 0.25);
+  box-shadow: 0 4px 12px rgba(94, 167, 156, 0.25);
 }
 
 .mini-heart-logo span {
@@ -76,7 +76,7 @@
 .pharmacy-sidebar-brand small {
   display: block;
   margin-top: 2px;
-  color: #98caf9;
+  color: var(--primary-300);
   font-size: 8px;
 }
 
@@ -116,11 +116,11 @@
 .pharmacy-nav-item.active {
   background: linear-gradient(
     90deg,
-    #368ad1,
-    #1671b7
+    var(--primary-500),
+    var(--primary-600)
   );
   color: var(--surface);
-  box-shadow: inset 3px 0 0 #98caf9;
+  box-shadow: inset 3px 0 0 var(--primary-300);
 }
 
 .sidebar-footer {
@@ -129,7 +129,7 @@
   align-items: center;
   gap: 7px;
   padding: 16px 15px;
-  color: #98caf9;
+  color: var(--primary-300);
   font-size: 9px;
   border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -165,7 +165,7 @@
     var(--bg) 55%,
     var(--primary-soft) 100%
   );
-  border-bottom: 1px solid #c2e0ff;
+  border-bottom: 1px solid var(--primary-200);
 }
 
 .header-left {
@@ -196,7 +196,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #0a4979;
+  color: var(--primary-800);
 }
 
 .pharmacist-profile .avatar {
@@ -209,13 +209,13 @@
   background: linear-gradient(
     135deg,
     var(--border),
-    #67aae9
+    var(--primary-400)
   );
   color: var(--primary);
   font-weight: 800;
   font-size: 12px;
   border: 2px solid var(--surface);
-  box-shadow: 0 2px 7px rgba(10, 73, 121, 0.16);
+  box-shadow: 0 2px 7px rgba(7, 60, 57, 0.16);
 }
 
 .pharmacist-profile strong,
@@ -279,8 +279,8 @@
   flex-shrink: 0;
   border-radius: 11px;
   background: var(--primary-soft);
-  color: #1671b7;
-  border: 1px solid #c2e0ff;
+  color: var(--primary-600);
+  border: 1px solid var(--primary-200);
 }
 
 .toolbar-title h2 {
@@ -292,7 +292,7 @@
 
 .toolbar-title p {
   margin: 4px 0 0;
-  color: #368ad1;
+  color: var(--primary-500);
   font-size: 11px;
 }
 
@@ -325,8 +325,8 @@
 }
 
 .search-box:focus-within {
-  border-color: #98caf9;
-  box-shadow: 0 0 0 3px rgba(54, 138, 209, 0.08);
+  border-color: var(--primary-300);
+  box-shadow: 0 0 0 3px rgba(43, 129, 119, 0.08);
 }
 
 .search-box input {
@@ -334,14 +334,14 @@
   flex: 1;
   border: 0;
   outline: 0;
-  color: #0a4979;
+  color: var(--primary-800);
   font: inherit;
   font-size: 13px;
   background: transparent;
 }
 
 .search-box input::placeholder {
-  color: #9ab0c1;
+  color: var(--surface-300);
 }
 
 .clear-search {
@@ -352,7 +352,7 @@
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #368ad1;
+  color: var(--primary-500);
   cursor: pointer;
 }
 
@@ -393,41 +393,41 @@
 .purple-btn:hover,
 .blue-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 13px rgba(22, 113, 183, 0.15);
+  box-shadow: 0 6px 13px rgba(11, 95, 89, 0.15);
 }
 
 .primary-btn,
 .blue-btn {
   background: linear-gradient(
     135deg,
-    #368ad1,
-    #1671b7
+    var(--primary-500),
+    var(--primary-600)
   );
 }
 
 .green-btn {
   background: linear-gradient(
     135deg,
-    #67aae9,
-    #67aae9
+    var(--primary-400),
+    var(--primary-400)
   );
 }
 
 .purple-btn {
   background: linear-gradient(
     135deg,
-    #1671b7,
+    var(--primary-600),
     var(--purple)
   );
 }
 
 .secondary-btn {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .secondary-btn:hover {
-  background: #dceffb;
+  background: var(--primary-100);
 }
 
 .large {
@@ -452,7 +452,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 6px 20px rgba(22, 113, 183, 0.07);
+  box-shadow: 0 6px 20px rgba(11, 95, 89, 0.07);
   overflow: hidden;
 }
 
@@ -489,7 +489,7 @@
 
 .card-header h3 {
   margin: 0;
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 20px;
   font-weight: 800;
 }
@@ -497,7 +497,7 @@
 .card-header span {
   display: block;
   margin-top: 5px;
-  color: #67aae9;
+  color: var(--primary-400);
   font-size: 12px;
   font-weight: 500;
 }
@@ -528,14 +528,14 @@
 }
 
 .filter-tabs button:hover {
-  border-color: #98caf9;
-  color: #1671b7;
+  border-color: var(--primary-300);
+  color: var(--primary-600);
 }
 
 .filter-tabs button.selected {
   background: var(--primary-soft);
-  border-color: #c2e0ff;
-  color: #1671b7;
+  border-color: var(--primary-200);
+  color: var(--primary-600);
   font-weight: 800;
 }
 
@@ -569,7 +569,7 @@
 .orders-table td {
   padding: 18px 20px;
   border-bottom: 1px solid var(--primary-soft);
-  color: #0b5d98;
+  color: var(--primary-700);
   font-size: 14px;
   font-weight: 500;
   vertical-align: middle;
@@ -580,7 +580,7 @@
 }
 
 .orders-table tbody tr:hover {
-  background: #f5fbff;
+  background: var(--primary-50);
 }
 
 .orders-table tbody tr:last-child td {
@@ -588,7 +588,7 @@
 }
 
 .number-cell {
-  color: #368ad1 !important;
+  color: var(--primary-500) !important;
   font-size: 13px !important;
   font-weight: 800 !important;
 }
@@ -605,7 +605,7 @@
 }
 
 .patient-cell strong {
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 15px;
   font-weight: 800;
 }
@@ -618,7 +618,7 @@
   flex: 0 0 36px;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 /* ============================================================
@@ -626,14 +626,14 @@
    ============================================================ */
 
 .doctor-cell {
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .doctor-cell svg {
-  color: #67aae9;
+  color: var(--primary-400);
   flex-shrink: 0;
 }
 
@@ -649,7 +649,7 @@
 }
 
 .medicine-list span {
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -685,7 +685,7 @@
 
 .status-badge.served {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 /* ============================================================
@@ -700,14 +700,14 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  color: #1671b7;
+  color: var(--primary-600);
   cursor: pointer;
   transition: 0.18s ease;
 }
 
 .icon-action:hover {
   background: var(--primary-soft);
-  border-color: #98caf9;
+  border-color: var(--primary-300);
   transform: translateY(-1px);
 }
 
@@ -718,7 +718,7 @@
 .empty-state {
   height: 250px;
   text-align: center !important;
-  color: #67aae9 !important;
+  color: var(--primary-400) !important;
 }
 
 .empty-state svg,
@@ -729,11 +729,11 @@
 }
 
 .empty-state svg {
-  color: #67aae9;
+  color: var(--primary-400);
 }
 
 .empty-state strong {
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 15px;
   font-weight: 700;
 }
@@ -782,7 +782,7 @@
   border: 1px solid var(--border);
   border-radius: 11px;
   background: var(--surface);
-  box-shadow: 0 4px 12px rgba(22, 113, 183, 0.04);
+  box-shadow: 0 4px 12px rgba(11, 95, 89, 0.04);
 }
 
 .stat-icon {
@@ -796,7 +796,7 @@
 
 .stat-icon.blue {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .stat-icon.orange {
@@ -806,7 +806,7 @@
 
 .stat-icon.green {
   background: var(--green-soft);
-  color: #16a34a;
+  color: var(--green);
 }
 
 .stat-icon.red {
@@ -816,7 +816,7 @@
 
 .stat-card strong {
   display: block;
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 21px;
   line-height: 1;
   font-weight: 800;
@@ -825,7 +825,7 @@
 .stat-card span {
   display: block;
   margin-top: 5px;
-  color: #829aaa;
+  color: var(--ink-ghost);
   font-size: 11px;
   font-weight: 500;
 }
@@ -841,7 +841,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(8, 35, 58, 0.42);
+  background: rgba(3, 34, 32, 0.42);
   backdrop-filter: blur(3px);
 }
 
@@ -852,7 +852,7 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 20px 60px rgba(12, 53, 87, 0.25);
+  box-shadow: 0 20px 60px rgba(5, 48, 46, 0.25);
   overflow: hidden;
 }
 
@@ -867,7 +867,7 @@
 }
 
 .modal-kicker {
-  color: #368ad1;
+  color: var(--primary-500);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.6px;
@@ -875,7 +875,7 @@
 
 .modal-header h3 {
   margin: 5px 0 0;
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 21px;
   font-weight: 800;
 }
@@ -932,7 +932,7 @@
 
 .modal-section h4 {
   margin: 0 0 9px;
-  color: #0b5d98;
+  color: var(--primary-700);
   font-size: 12px;
   font-weight: 800;
 }
@@ -954,19 +954,19 @@
   flex-shrink: 0;
   border-radius: 6px;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 10px;
   font-weight: 800;
 }
 
 .modal-medicine strong {
   flex: 1;
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 11px;
 }
 
 .modal-medicine svg {
-  color: #16a34a;
+  color: var(--green);
 }
 
 /* ============================================================
@@ -1008,13 +1008,13 @@
   margin: 8px auto 16px;
   border-radius: 20px;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .scan-modal h3,
 .ticket-modal h3 {
   margin: 0;
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 20px;
   font-weight: 800;
 }
@@ -1022,7 +1022,7 @@
 .scan-modal p {
   max-width: 390px;
   margin: 9px auto 21px;
-  color: #368ad1;
+  color: var(--primary-500);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -1046,11 +1046,11 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .ticket-logo span {
-  color: #16a34a;
+  color: var(--green);
 }
 
 .ticket-modal h3 {
@@ -1067,11 +1067,11 @@
 }
 
 .ticket-line span {
-  color: #8198a8;
+  color: var(--ink-ghost);
 }
 
 .ticket-line strong {
-  color: #0b5d98;
+  color: var(--primary-700);
 }
 
 .ticket-actions {
@@ -1096,8 +1096,8 @@
   border: 1px solid var(--green-soft-border);
   border-radius: 8px;
   background: var(--bg);
-  color: #15803d;
-  box-shadow: 0 10px 30px rgba(11, 93, 152, 0.14);
+  color: var(--green-hover);
+  box-shadow: 0 10px 30px rgba(8, 72, 68, 0.14);
   font-size: 12px;
   font-weight: 700;
 }

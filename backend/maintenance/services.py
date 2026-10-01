@@ -75,7 +75,9 @@ def serialize_intervention(item):
 
 def overview(hospital):
     equipments = list(Equipment.objects.filter(hospital=hospital).prefetch_related("interventions"))
-    interventions = list(Intervention.objects.filter(equipment__hospital=hospital).select_related("equipment"))
+    interventions = list(Intervention.objects.filter(equipment__hospital=hospital)
+                         .select_related("equipment", "technician_user", "closed_by", "created_by")
+                         .order_by("-date", "-time", "-id"))
     park = [serialize_equipment(equipment) for equipment in equipments]
     today = timezone.localdate()
     week_start = today - timedelta(days=today.weekday())
@@ -97,7 +99,10 @@ def overview(hospital):
             "attention": sum(1 for row in park if row["status"] == "Attention"),
             "critical": sum(1 for row in park if row["status"] == "Critique"),
         },
-        "interventions": [serialize_intervention(item) for item in interventions],
+        # Avec le compte rendu et l'appareil : l'historique se lit sans ouvrir chaque fiche.
+        "interventions": [{**intervention_detail(item), "equipmentId": item.equipment_id, "code": item.equipment.code,
+                           "token": str(item.equipment.qr_token), "isoDate": item.date.isoformat()}
+                          for item in interventions],
         "equipments": park,
         "criticalEquipments": critical,
     }

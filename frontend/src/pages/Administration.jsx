@@ -52,12 +52,12 @@ const EMPTY_USER_FORM = {
 
 // Couleur de chaque rôle dans l'anneau (identique aux pastilles .role-dot).
 const ROLE_COLORS = {
-  doctor: "#0a4979",
-  nurse: "#1671b7",
-  pharmacy: "#67aae9",
-  secretary: "#98caf9",
-  accounting: "#c2e0ff",
-  other: "#cbd5e1",
+  doctor: "#073c39",
+  nurse: "#0b5f59",
+  pharmacy: "#879a9e",
+  secretary: "#cdd9d6",
+  accounting: "#c5e2dd",
+  other: "#cdd9d6",
 };
 
 // ============================================================

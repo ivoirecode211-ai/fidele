@@ -50,7 +50,7 @@ ANTECEDENTS = (
 
 ETATS_GENERAUX = {"bon": "Bon", "moyen": "Moyen", "altere": "Altéré"}
 TDR = [("tdr_palu", "Paludisme"), ("tdr_vih", "VIH"), ("tdr_dengue", "Dengue"),
-       ("tdr_covid", "COVID-19"), ("tdr_grossesse", "Grossesse")]
+       ("tdr_covid", "COVID-19"), ("tdr_grossesse", "Grossesse"), ("goutte_epaisse", "goutte épaisse")]
 RESULTATS_TDR = {"positif": "positif", "negatif": "négatif"}
 ISSUES = dict(Consultation.OUTCOMES)
 ATTENTE_JOURS = 7
@@ -407,6 +407,8 @@ def enregistrer_etape(*, admission, user, etape, valeurs, complete):
 
 def texte(valeurs, cle):
     valeur = valeurs.get(cle)
+    if isinstance(valeur, list):   # liste déroulante à choix multiples (pathologies associées…)
+        return ", ".join(str(v).strip() for v in valeur if str(v).strip())
     return valeur.strip() if isinstance(valeur, str) else ""
 
 

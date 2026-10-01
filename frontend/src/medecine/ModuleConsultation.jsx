@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
-  BedDouble, CalendarDays, FlaskConical, MessageCircle, Pill, Sparkles, UserCheck, Users,
+  BarChart3, BedDouble, CalendarDays, FlaskConical, MessageCircle, Pill, Sparkles, UserCheck, Users,
 } from "lucide-react";
 
 import "../styles/Caisse.css";
@@ -17,6 +17,7 @@ import Consultation from "./Consultation";
 import { SignauxPatient, identite } from "./EntetePatient";
 import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } from "./Listes";
 import { Messagerie } from "../patient/Personnel";
+import RapportsPraticien from "../rapports/RapportsPraticien";
 
 /*
  * ============================================================
@@ -34,6 +35,7 @@ import { Messagerie } from "../patient/Personnel";
  *   Hospitalisations       les séjours décidés
  *   Messages               la boîte de réception du médecin : ses
  *                          patients seulement (Espace patient)
+ *   Rapports               son bilan et ses états (pathologies, TDR…)
  *   Assistant IA           la conversation, déjà engagée sur le
  *                          patient ouvert
  *
@@ -44,7 +46,7 @@ import { Messagerie } from "../patient/Personnel";
 
 const RAFRAICHISSEMENT = 30000;
 
-const ECRANS_IDS = ["attente", "consultes", "ordonnances", "examens", "rdv", "sejours", "messages"];
+const ECRANS_IDS = ["attente", "consultes", "ordonnances", "examens", "rdv", "sejours", "messages", "rapports"];
 
 export default function ModuleConsultation() {
   const { search } = useLocation();
@@ -96,6 +98,7 @@ export default function ModuleConsultation() {
     { id: "rdv", label: "Rendez-vous", icone: CalendarDays, titre: "Rendez-vous", sous: "" },
     { id: "sejours", label: "Hospitalisations", icone: BedDouble, titre: "Hospitalisations", sous: "" },
     { id: "messages", label: "Messages", icone: MessageCircle, titre: "Messages des patients", sous: "" },
+    { id: "rapports", label: "Rapports", icone: BarChart3, titre: "Mes rapports", sous: "" },
     { id: "assistant", label: "Assistant IA", icone: Sparkles, titre: "Assistant IA", sous: "" },
   ];
 
@@ -164,6 +167,7 @@ export default function ModuleConsultation() {
         {ecran === "rdv" && suivi && <RendezVous lignes={suivi.rendezVous} />}
         {ecran === "sejours" && suivi && <Sejours lignes={suivi.sejours} />}
         {ecran === "messages" && <Messagerie />}
+        {ecran === "rapports" && <RapportsPraticien consultation />}
       </>}
     </Coquille>
   );

@@ -3,8 +3,8 @@
    ============================================================ */
 
 .archives-page {
-  color: #172033;
-  background: #f8fafc;
+  color: var(--ink);
+  background: var(--surface-50);
 }
 
 /* ============================================================
@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #334155;
+  color: var(--ink-muted);
   font-size: 13px;
   font-weight: 600;
 }
@@ -31,8 +31,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #16a34a;
-  box-shadow: 0 0 0 3px #dcfce7;
+  background: var(--green);
+  box-shadow: 0 0 0 3px var(--green-soft-border);
 }
 
 /* ============================================================
@@ -65,20 +65,20 @@
   align-items: center;
   gap: 10px;
   padding: 0 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--surface-300);
   border-radius: 8px;
   background: #ffffff;
-  color: #475569;
+  color: var(--ink-faint);
 }
 
 .archives-search:focus-within {
-  border-color: #1671b7;
-  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(11, 95, 89, 0.08);
 }
 
 .archives-search svg {
   flex-shrink: 0;
-  color: #64748b;
+  color: var(--ink-faint);
 }
 
 .archives-search input {
@@ -86,14 +86,14 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #172033;
+  color: var(--ink);
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
 }
 
 .archives-search input::placeholder {
-  color: #64748b;
+  color: var(--ink-faint);
   opacity: 1;
 }
 
@@ -104,12 +104,12 @@
   padding: 4px;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--ink-faint);
   cursor: pointer;
 }
 
 .archives-clear-search:hover {
-  color: #c94f4f;
+  color: var(--danger);
 }
 
 .archives-filters {
@@ -132,11 +132,11 @@
   min-height: 42px;
   appearance: none;
   padding: 0 34px 0 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--surface-300);
   border-radius: 8px;
   outline: none;
   background: #ffffff;
-  color: #334155;
+  color: var(--ink-muted);
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -144,7 +144,7 @@
 }
 
 .archive-select select:focus {
-  border-color: #1671b7;
+  border-color: var(--primary-600);
 }
 
 .archive-select svg {
@@ -153,7 +153,7 @@
   right: 10px;
   transform: translateY(-50%);
   pointer-events: none;
-  color: #64748b;
+  color: var(--ink-faint);
 }
 
 .archives-search-button {
@@ -163,9 +163,9 @@
   justify-content: center;
   gap: 7px;
   padding: 0 15px;
-  border: 1px solid #1671b7;
+  border: 1px solid var(--primary-600);
   border-radius: 8px;
-  background: #1671b7;
+  background: var(--primary-600);
   color: #ffffff;
   font-family: inherit;
   font-size: 13px;
@@ -174,7 +174,7 @@
 }
 
 .archives-search-button:hover {
-  background: #0b5d98;
+  background: var(--primary-700);
 }
 
 /* ============================================================
@@ -194,10 +194,10 @@
 .archives-panel {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--surface-200);
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 8px rgba(15, 31, 36, 0.04);
 }
 
 .archives-panel-title {
@@ -207,12 +207,12 @@
   justify-content: space-between;
   gap: 12px;
   padding: 15px 18px;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid var(--surface-100);
 }
 
 .archives-panel-title h2 {
   margin: 0 0 4px;
-  color: #172033;
+  color: var(--ink);
   font-size: 17px;
   line-height: 1.3;
   font-weight: 750;
@@ -220,7 +220,7 @@
 
 .archives-panel-title p {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 13px;
   line-height: 1.4;
   font-weight: 500;
@@ -233,8 +233,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  background: #eff6ff;
-  color: #1671b7;
+  background: var(--primary-50);
+  color: var(--primary-600);
   font-size: 12px;
   font-weight: 700;
 }
@@ -257,7 +257,7 @@
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: #334155;
+  color: var(--ink-muted);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -265,7 +265,7 @@
 }
 
 .archive-category:hover {
-  background: #f1f5f9;
+  background: var(--surface-100);
 }
 
 .archive-category-icon {
@@ -276,19 +276,19 @@
   align-items: center;
   justify-content: center;
   border-radius: 7px;
-  background: #eff6ff;
-  color: #1671b7;
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 .archive-category span {
   flex: 1;
-  color: #334155;
+  color: var(--ink-muted);
   font-size: 13px;
   font-weight: 600;
 }
 
 .archive-category strong {
-  color: #172033;
+  color: var(--ink);
   font-size: 13px;
   font-weight: 750;
 }
@@ -303,7 +303,7 @@
   gap: 5px;
   border: none;
   background: transparent;
-  color: #1671b7;
+  color: var(--primary-600);
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -311,7 +311,7 @@
 }
 
 .archive-view-all:hover {
-  color: #0b5d98;
+  color: var(--primary-700);
 }
 
 /* ============================================================
@@ -331,9 +331,9 @@
 
 .archive-table thead th {
   padding: 12px 15px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-  color: #475569;
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-200);
+  color: var(--ink-faint);
   text-align: left;
   font-size: 12px;
   font-weight: 750;
@@ -342,8 +342,8 @@
 
 .archive-table tbody td {
   padding: 13px 15px;
-  border-bottom: 1px solid #edf1f5;
-  color: #334155;
+  border-bottom: 1px solid var(--surface-100);
+  color: var(--ink-muted);
   font-size: 13px;
   font-weight: 500;
   vertical-align: middle;
@@ -354,7 +354,7 @@
 }
 
 .archive-table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--surface-50);
 }
 
 /* ============================================================
@@ -365,14 +365,14 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #475569;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .archive-date svg {
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 /* ============================================================
@@ -393,8 +393,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  background: #eff6ff;
-  color: #1671b7;
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 .archive-document-type > div {
@@ -404,13 +404,13 @@
 }
 
 .archive-document-type strong {
-  color: #172033;
+  color: var(--ink);
   font-size: 13px;
   font-weight: 700;
 }
 
 .archive-document-type small {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 11px;
   font-weight: 600;
 }
@@ -426,13 +426,13 @@
 }
 
 .archive-patient strong {
-  color: #172033;
+  color: var(--ink);
   font-size: 13px;
   font-weight: 700;
 }
 
 .archive-patient span {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 11px;
   font-weight: 600;
 }
@@ -442,7 +442,7 @@
    ============================================================ */
 
 .archive-author {
-  color: #475569;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 600;
 }
@@ -457,17 +457,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d5dde7;
+  border: 1px solid var(--surface-300);
   border-radius: 6px;
   background: #ffffff;
-  color: #475569;
+  color: var(--ink-faint);
   cursor: pointer;
 }
 
 .archive-eye-button:hover {
-  border-color: #1671b7;
-  background: #eff6ff;
-  color: #1671b7;
+  border-color: var(--primary-600);
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 /* ============================================================
@@ -481,21 +481,21 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--ink-faint);
 }
 
 .archive-empty svg {
-  color: #94a3b8;
+  color: var(--ink-ghost);
 }
 
 .archive-empty strong {
-  color: #334155;
+  color: var(--ink-muted);
   font-size: 15px;
   font-weight: 700;
 }
 
 .archive-empty span {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 500;
 }
@@ -506,28 +506,28 @@
 
 .archives-actions {
   margin-top: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--surface-200);
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 8px rgba(15, 31, 36, 0.04);
   overflow: hidden;
 }
 
 .archives-actions-header {
   padding: 16px 18px;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid var(--surface-100);
 }
 
 .archives-actions-header h2 {
   margin: 0 0 4px;
-  color: #172033;
+  color: var(--ink);
   font-size: 17px;
   font-weight: 750;
 }
 
 .archives-actions-header p {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 13px;
   font-weight: 500;
 }
@@ -545,10 +545,10 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--surface-200);
   border-radius: 8px;
   background: #ffffff;
-  color: #334155;
+  color: var(--ink-muted);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -556,8 +556,8 @@
 }
 
 .archive-action-card:hover {
-  border-color: #c2e0ff;
-  background: #f8fbff;
+  border-color: var(--primary-200);
+  background: var(--primary-50);
 }
 
 .archive-action-icon {
@@ -568,8 +568,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: #eff6ff;
-  color: #1671b7;
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 .archive-action-card > div:nth-child(2) {
@@ -580,19 +580,19 @@
 }
 
 .archive-action-card strong {
-  color: #172033;
+  color: var(--ink);
   font-size: 14px;
   font-weight: 750;
 }
 
 .archive-action-card span {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 500;
 }
 
 .archive-action-card > svg {
-  color: #94a3b8;
+  color: var(--ink-ghost);
 }
 
 /* ============================================================
@@ -605,9 +605,9 @@
   gap: 12px;
   margin-top: 16px;
   padding: 14px 17px;
-  border: 1px solid #c2e0ff;
+  border: 1px solid var(--primary-200);
   border-radius: 9px;
-  background: #eff6ff;
+  background: var(--primary-50);
 }
 
 .archives-information-icon {
@@ -618,8 +618,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 7px;
-  background: #dbeafe;
-  color: #1671b7;
+  background: var(--primary-200);
+  color: var(--primary-600);
 }
 
 .archives-information > div:nth-child(2) {
@@ -630,20 +630,20 @@
 }
 
 .archives-information strong {
-  color: #0a4979;
+  color: var(--primary-800);
   font-size: 13px;
   font-weight: 750;
 }
 
 .archives-information span {
-  color: #334155;
+  color: var(--ink-muted);
   font-size: 12px;
   line-height: 1.5;
   font-weight: 500;
 }
 
 .archives-security-icon {
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 /* ============================================================
@@ -658,7 +658,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 31, 36, 0.5);
 }
 
 .archives-modal {
@@ -667,7 +667,7 @@
   overflow-y: auto;
   border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 25px 60px rgba(15, 31, 36, 0.22);
 }
 
 .archives-modal-header {
@@ -676,7 +676,7 @@
   justify-content: space-between;
   gap: 15px;
   padding: 18px 20px;
-  border-bottom: 1px solid #e5eaf0;
+  border-bottom: 1px solid var(--surface-100);
 }
 
 .archives-modal-title {
@@ -692,20 +692,20 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: #eff6ff;
-  color: #1671b7;
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 .archives-modal-title h2 {
   margin: 0 0 4px;
-  color: #172033;
+  color: var(--ink);
   font-size: 18px;
   font-weight: 750;
 }
 
 .archives-modal-title p {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 600;
 }
@@ -718,14 +718,14 @@
   justify-content: center;
   border: none;
   border-radius: 6px;
-  background: #f8fafc;
-  color: #475569;
+  background: var(--surface-50);
+  color: var(--ink-faint);
   cursor: pointer;
 }
 
 .archives-modal-close:hover {
-  background: #fee2e2;
-  color: #c94f4f;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 /* ============================================================
@@ -745,19 +745,19 @@
   gap: 9px;
   margin-bottom: 18px;
   padding: 20px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--surface-300);
   border-radius: 9px;
-  background: #f8fafc;
+  background: var(--surface-50);
   text-align: center;
 }
 
 .archive-preview svg {
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 .archive-preview h3 {
   margin: 0;
-  color: #172033;
+  color: var(--ink);
   font-size: 17px;
   font-weight: 750;
 }
@@ -765,7 +765,7 @@
 .archive-preview p {
   max-width: 430px;
   margin: 0;
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 13px;
   line-height: 1.5;
   font-weight: 500;
@@ -782,19 +782,19 @@
   flex-direction: column;
   gap: 5px;
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--surface-200);
   border-radius: 7px;
   background: #ffffff;
 }
 
 .archive-document-details span {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 11px;
   font-weight: 600;
 }
 
 .archive-document-details strong {
-  color: #172033;
+  color: var(--ink);
   font-size: 13px;
   font-weight: 700;
 }
@@ -808,7 +808,7 @@
   justify-content: flex-end;
   gap: 9px;
   padding: 15px 20px;
-  border-top: 1px solid #e5eaf0;
+  border-top: 1px solid var(--surface-100);
 }
 
 .archive-modal-cancel,
@@ -827,23 +827,23 @@
 }
 
 .archive-modal-cancel {
-  border: 1px solid #d5dde7;
+  border: 1px solid var(--surface-300);
   background: #ffffff;
-  color: #475569;
+  color: var(--ink-faint);
 }
 
 .archive-modal-cancel:hover {
-  background: #f8fafc;
+  background: var(--surface-50);
 }
 
 .archive-modal-download {
-  border: 1px solid #1671b7;
-  background: #1671b7;
+  border: 1px solid var(--primary-600);
+  background: var(--primary-600);
   color: #ffffff;
 }
 
 .archive-modal-download:hover {
-  background: #0b5d98;
+  background: var(--primary-700);
 }
 
 /* ============================================================

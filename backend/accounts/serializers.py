@@ -34,9 +34,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "id", "username", "email", "first_name", "last_name",
             "role", "role_label", "roles", "is_superuser", "is_staff",
-            "phone", "department", "hospital", "is_platform",
+            "phone", "department", "hospital", "is_platform", "specialites",
         ]
-        read_only_fields = ["is_superuser", "is_staff"]
+        read_only_fields = ["is_superuser", "is_staff", "specialites"]
 
     def get_hospital(self, obj):
         hospital = obj.hospital

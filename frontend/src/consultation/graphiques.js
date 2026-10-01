@@ -144,6 +144,8 @@ export const ACCOUCHEMENT = bloc({
       options: paires(["Intacte", "Rompue, liquide clair", "Rompue, liquide teinté", "Rompue, liquide méconial"]) },
     { id: "tension_admission", type: "text", label: "Tension de la mère", span: 6, spanMobile: 1 },
     choix("vih_mere", "Statut VIH de la mère", [["negatif", "Négatif"], ["positif", "Positif"], ["inconnu", "Inconnu"]]),
+    { id: "statut_vat", type: "select", label: "Statut vaccinal Td (VAT)", span: 6,
+      options: paires(["Non vaccinée", "Td1", "Td2", "Td3", "Td4", "Td5", "Inconnu"]) },
   ],
   etapes: [
     {
@@ -170,6 +172,8 @@ export const ACCOUCHEMENT = bloc({
       title: "Naissance",
       fields: [
         carte("mode", "Accouchement", "gauche"),
+        { id: "lieu_accouchement_acc", type: "select", label: "Lieu", span: 12, defaut: "Établissement",
+          options: paires(["Établissement", "Domicile", "En route"]) },
         { id: "mode_accouchement", type: "select", label: "Mode", required: true, span: 12, requiredMessage: "Veuillez indiquer le mode d'accouchement.",
           options: paires(["Voie basse", "Voie basse instrumentale", "Césarienne"]) },
         { id: "date_naissance_bebe", type: "date", label: "Date", span: 6, spanMobile: 1 },
@@ -186,6 +190,7 @@ export const ACCOUCHEMENT = bloc({
         choix("vivant", "Naissance vivante", [["oui", "Oui"], ["non", "Mort-né"]], { defaut: "oui" }),
         choix("reanimation", "Réanimation du nouveau-né", OUI_NON),
         choix("peau_a_peau", "Peau à peau et mise au sein", OUI_NON),
+        choix("declaration_naissance", "Déclaration de naissance faite", OUI_NON),
       ],
     },
   ],

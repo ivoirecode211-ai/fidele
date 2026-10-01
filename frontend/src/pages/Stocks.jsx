@@ -1219,8 +1219,8 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#15803d",
-                    background: "#dcfce7",
+                    color: "#157340",
+                    background: "#c4e6d0",
                   }}
                 >
                   <ArrowDownLeft size={22} strokeWidth={2} aria-hidden="true" />
@@ -1243,8 +1243,8 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#c94f4f",
-                    background: "#fee2e2",
+                    color: "#c2453f",
+                    background: "#fbf1f0",
                   }}
                 >
                   <ArrowUpRight size={22} strokeWidth={2} aria-hidden="true" />
@@ -1319,7 +1319,7 @@ export default function Stocks() {
                   type="button"
                   className="stocks-new-button"
                   style={{
-                    background: "#c94f4f",
+                    background: "#c2453f",
                   }}
                   onClick={() =>
                     ouvrirFormulaireMouvement(
@@ -1378,11 +1378,11 @@ export default function Stocks() {
                 style={{
                   height: "44px",
                   border:
-                    "1px solid #dbe2ea",
+                    "1px solid #e2eae8",
                   borderRadius: "8px",
                   padding: "0 14px",
                   background: "#ffffff",
-                  color: "#1e293b",
+                  color: "#0f1f24",
                   fontSize: "13px",
                   outline: "none",
                 }}
@@ -1448,7 +1448,7 @@ export default function Stocks() {
                               <strong
                                 style={{
                                   color:
-                                    "#334155",
+                                    "#3c4f55",
                                 }}
                               >
                                 {mouvement.date}
@@ -1457,7 +1457,7 @@ export default function Stocks() {
                               <span
                                 style={{
                                   color:
-                                    "#94a3b8",
+                                    "#879a9e",
                                   fontSize:
                                     "11px",
                                 }}
@@ -1474,9 +1474,9 @@ export default function Stocks() {
                             <span
                               style={{
                                 background:
-                                  "#f1f5f9",
+                                  "#f3f7f6",
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 padding:
                                   "5px 8px",
                                 borderRadius:
@@ -1504,9 +1504,9 @@ export default function Stocks() {
                               <span
                                 style={{
                                   background:
-                                    "#dcfce7",
+                                    "#c4e6d0",
                                   color:
-                                    "#15803d",
+                                    "#157340",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -1525,9 +1525,9 @@ export default function Stocks() {
                               <span
                                 style={{
                                   background:
-                                    "#fee2e2",
+                                    "#fbf1f0",
                                   color:
-                                    "#c94f4f",
+                                    "#c2453f",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -1552,8 +1552,8 @@ export default function Stocks() {
                                 color:
                                   mouvement.type ===
                                   "Entrée"
-                                    ? "#15803d"
-                                    : "#c94f4f",
+                                    ? "#157340"
+                                    : "#c2453f",
                                 fontSize:
                                   "14px",
                               }}
@@ -1576,7 +1576,7 @@ export default function Stocks() {
                             <span
                               style={{
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 fontSize:
                                   "11px",
                               }}
@@ -1973,9 +1973,9 @@ export default function Stocks() {
                             <span
                               style={{
                                 background:
-                                  "#f1f5f9",
+                                  "#f3f7f6",
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 padding:
                                   "6px 9px",
                                 borderRadius:
@@ -1996,7 +1996,7 @@ export default function Stocks() {
                             <strong
                               style={{
                                 color:
-                                  "#0f172a",
+                                  "#0f1f24",
                                 fontSize:
                                   "13px",
                               }}
@@ -2047,9 +2047,9 @@ export default function Stocks() {
                                 className="stocks-status critical"
                                 style={{
                                   background:
-                                    "#f1f5f9",
+                                    "#f3f7f6",
                                   color:
-                                    "#64748b",
+                                    "#56686e",
                                 }}
                               >
                                 Inactif
@@ -2080,11 +2080,11 @@ export default function Stocks() {
                                 }
                                 style={{
                                   border:
-                                    "1px solid #dbe2ea",
+                                    "1px solid #e2eae8",
                                   background:
                                     "#ffffff",
                                   color:
-                                    "#1671b7",
+                                    "#0b5f59",
                                   borderRadius:
                                     "7px",
                                   padding:
@@ -2109,11 +2109,11 @@ export default function Stocks() {
                                 }
                                 style={{
                                   border:
-                                    "1px solid #efcfcf",
+                                    "1px solid #efcdca",
                                   background:
-                                    "#fff1f2",
+                                    "#fbf1f0",
                                   color:
-                                    "#c94f4f",
+                                    "#c2453f",
                                   borderRadius:
                                     "7px",
                                   padding:
@@ -2215,14 +2215,14 @@ export default function Stocks() {
                   style={{
                     height: "44px",
                     border:
-                      "1px solid #dbe2ea",
+                      "1px solid #e2eae8",
                     borderRadius: "8px",
                     padding:
                       "0 14px",
                     background:
                       "#ffffff",
                     color:
-                      "#1e293b",
+                      "#0f1f24",
                     fontSize:
                       "13px",
                     outline:
@@ -2359,8 +2359,8 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#15803d",
-                    background: "#dcfce7",
+                    color: "#157340",
+                    background: "#c4e6d0",
                   }}
                 >
                   <ArrowDownLeft size={22} strokeWidth={2} aria-hidden="true" />
@@ -2385,8 +2385,8 @@ export default function Stocks() {
                 <div
                   className="stocks-stat-icon"
                   style={{
-                    color: "#c94f4f",
-                    background: "#fee2e2",
+                    color: "#c2453f",
+                    background: "#fbf1f0",
                   }}
                 >
                   <ArrowUpRight size={22} strokeWidth={2} aria-hidden="true" />
@@ -2550,10 +2550,10 @@ export default function Stocks() {
                               style={{
                                 color:
                                   ecart < 0
-                                    ? "#c94f4f"
+                                    ? "#c2453f"
                                     : ecart === 0
                                     ? "var(--warning-soft-text-strong)"
-                                    : "#15803d",
+                                    : "#157340",
                               }}
                             >
                               {ecart > 0
@@ -2698,7 +2698,7 @@ export default function Stocks() {
                               <strong
                                 style={{
                                   color:
-                                    "#c94f4f",
+                                    "#c2453f",
                                 }}
                               >
                                 {manque > 0
@@ -2818,7 +2818,7 @@ export default function Stocks() {
                               <strong
                                 style={{
                                   color:
-                                    "#334155",
+                                    "#3c4f55",
                                 }}
                               >
                                 {mouvement.date}
@@ -2827,7 +2827,7 @@ export default function Stocks() {
                               <span
                                 style={{
                                   color:
-                                    "#94a3b8",
+                                    "#879a9e",
                                   fontSize:
                                     "11px",
                                 }}
@@ -2844,9 +2844,9 @@ export default function Stocks() {
                             <span
                               style={{
                                 background:
-                                  "#f1f5f9",
+                                  "#f3f7f6",
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 padding:
                                   "5px 8px",
                                 borderRadius:
@@ -2878,9 +2878,9 @@ export default function Stocks() {
                               <span
                                 style={{
                                   background:
-                                    "#dcfce7",
+                                    "#c4e6d0",
                                   color:
-                                    "#15803d",
+                                    "#157340",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -2899,9 +2899,9 @@ export default function Stocks() {
                               <span
                                 style={{
                                   background:
-                                    "#fee2e2",
+                                    "#fbf1f0",
                                   color:
-                                    "#c94f4f",
+                                    "#c2453f",
                                   padding:
                                     "6px 10px",
                                   borderRadius:
@@ -2926,8 +2926,8 @@ export default function Stocks() {
                                 color:
                                   mouvement.type ===
                                   "Entrée"
-                                    ? "#15803d"
-                                    : "#c94f4f",
+                                    ? "#157340"
+                                    : "#c2453f",
                                 fontSize:
                                   "14px",
                               }}
@@ -2954,7 +2954,7 @@ export default function Stocks() {
                             <span
                               style={{
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 fontSize:
                                   "11px",
                               }}
@@ -3069,9 +3069,9 @@ export default function Stocks() {
                             <span
                               style={{
                                 background:
-                                  "#f1f5f9",
+                                  "#f3f7f6",
                                 color:
-                                  "#475569",
+                                  "#56686e",
                                 padding:
                                   "6px 9px",
                                 borderRadius:
@@ -3132,9 +3132,9 @@ export default function Stocks() {
                                 className="stocks-status critical"
                                 style={{
                                   background:
-                                    "#f1f5f9",
+                                    "#f3f7f6",
                                   color:
-                                    "#64748b",
+                                    "#56686e",
                                 }}
                               >
                                 Inactif
@@ -3180,9 +3180,9 @@ export default function Stocks() {
                 marginTop: "30px",
                 padding: "22px",
                 background:
-                  "#f8fafc",
+                  "#f7faf9",
                 border:
-                  "1px solid #e2e8f0",
+                  "1px solid #e2eae8",
                 borderRadius: "12px",
                 display: "grid",
                 gridTemplateColumns:
@@ -3196,7 +3196,7 @@ export default function Stocks() {
                 <span
                   style={{
                     display: "block",
-                    color: "#64748b",
+                    color: "#56686e",
                     fontSize: "11px",
                     marginBottom:
                       "6px",
@@ -3207,7 +3207,7 @@ export default function Stocks() {
 
                 <strong
                   style={{
-                    color: "#0f172a",
+                    color: "#0f1f24",
                     fontSize: "20px",
                   }}
                 >
@@ -3221,7 +3221,7 @@ export default function Stocks() {
                 <span
                   style={{
                     display: "block",
-                    color: "#64748b",
+                    color: "#56686e",
                     fontSize: "11px",
                     marginBottom:
                       "6px",
@@ -3232,7 +3232,7 @@ export default function Stocks() {
 
                 <strong
                   style={{
-                    color: "#1671b7",
+                    color: "#0b5f59",
                     fontSize: "20px",
                   }}
                 >
@@ -3246,7 +3246,7 @@ export default function Stocks() {
                 <span
                   style={{
                     display: "block",
-                    color: "#64748b",
+                    color: "#56686e",
                     fontSize: "11px",
                     marginBottom:
                       "6px",
@@ -3259,8 +3259,8 @@ export default function Stocks() {
                   style={{
                     color:
                       produitsCritiques > 0
-                        ? "#c94f4f"
-                        : "#15803d",
+                        ? "#c2453f"
+                        : "#157340",
                     fontSize: "20px",
                   }}
                 >
@@ -3274,7 +3274,7 @@ export default function Stocks() {
                 <span
                   style={{
                     display: "block",
-                    color: "#64748b",
+                    color: "#56686e",
                     fontSize: "11px",
                     marginBottom:
                       "6px",
@@ -3285,7 +3285,7 @@ export default function Stocks() {
 
                 <strong
                   style={{
-                    color: "#0f172a",
+                    color: "#0f1f24",
                     fontSize: "20px",
                   }}
                 >
@@ -3554,8 +3554,8 @@ export default function Stocks() {
                     color:
                       typeMouvement ===
                       "Entrée"
-                        ? "#15803d"
-                        : "#c94f4f",
+                        ? "#157340"
+                        : "#c2453f",
                     marginBottom:
                       "6px",
                   }}
@@ -3916,7 +3916,7 @@ export default function Stocks() {
                   style={{
                     width: "100%",
                     border:
-                      "1px solid #cbd5e1",
+                      "1px solid #cdd9d6",
                     borderRadius: "8px",
                     padding:
                       "13px 14px",
@@ -3935,13 +3935,13 @@ export default function Stocks() {
                     background:
                       typeMouvement ===
                       "Entrée"
-                        ? "#f0fdf4"
-                        : "#fef2f2",
+                        ? "#eef8f1"
+                        : "#fbf1f0",
                     border:
                       typeMouvement ===
                       "Entrée"
-                        ? "1px solid #bbf7d0"
-                        : "1px solid #efcfcf",
+                        ? "1px solid #c4e6d0"
+                        : "1px solid #efcdca",
                     borderRadius:
                       "10px",
                     padding:
@@ -3962,7 +3962,7 @@ export default function Stocks() {
                         display:
                           "block",
                         color:
-                          "#64748b",
+                          "#56686e",
                         fontSize:
                           "11px",
                         marginBottom:
@@ -3991,7 +3991,7 @@ export default function Stocks() {
                       fontSize:
                         "22px",
                       color:
-                        "#94a3b8",
+                        "#879a9e",
                     }}
                   >
                     <ArrowRight size={20} strokeWidth={2} aria-hidden="true" />
@@ -4002,7 +4002,7 @@ export default function Stocks() {
                         display:
                           "block",
                         color:
-                          "#64748b",
+                          "#56686e",
                         fontSize:
                           "11px",
                         marginBottom:
@@ -4018,8 +4018,8 @@ export default function Stocks() {
                         color:
                           typeMouvement ===
                           "Entrée"
-                            ? "#15803d"
-                            : "#c94f4f",
+                            ? "#157340"
+                            : "#c2453f",
                       }}
                     >
                       {(() => {
@@ -4067,8 +4067,8 @@ export default function Stocks() {
                     background:
                       typeMouvement ===
                       "Entrée"
-                        ? "#1671b7"
-                        : "#c94f4f",
+                        ? "#0b5f59"
+                        : "#c2453f",
                   }}
                 >
                   {typeMouvement ===
@@ -4113,7 +4113,7 @@ export default function Stocks() {
                     fontWeight: "800",
                     letterSpacing:
                       "0.8px",
-                    color: "#1671b7",
+                    color: "#0b5f59",
                     marginBottom:
                       "6px",
                   }}
@@ -4281,7 +4281,7 @@ export default function Stocks() {
                   className="stocks-submit-button"
                   style={{
                     background:
-                      "#1671b7",
+                      "#0b5f59",
                   }}
                 >
                   + Ajouter le fournisseur
@@ -4325,7 +4325,7 @@ export default function Stocks() {
                     fontWeight: "800",
                     letterSpacing:
                       "0.8px",
-                    color: "#1671b7",
+                    color: "#0b5f59",
                     marginBottom:
                       "6px",
                   }}
@@ -4373,9 +4373,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4387,7 +4387,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4401,7 +4401,7 @@ export default function Stocks() {
                       fontSize:
                         "16px",
                       color:
-                        "#0f172a",
+                        "#0f1f24",
                     }}
                   >
                     {
@@ -4413,9 +4413,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4427,7 +4427,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4441,8 +4441,8 @@ export default function Stocks() {
                       color:
                         fournisseurSelectionne.statut ===
                         "Actif"
-                          ? "#15803d"
-                          : "#64748b",
+                          ? "#157340"
+                          : "#56686e",
                       fontSize:
                         "16px",
                     }}
@@ -4455,9 +4455,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4469,7 +4469,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4483,7 +4483,7 @@ export default function Stocks() {
                       fontSize:
                         "15px",
                       color:
-                        "#0f172a",
+                        "#0f1f24",
                     }}
                   >
                     {
@@ -4495,9 +4495,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4509,7 +4509,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4523,7 +4523,7 @@ export default function Stocks() {
                       fontSize:
                         "15px",
                       color:
-                        "#0f172a",
+                        "#0f1f24",
                     }}
                   >
                     {
@@ -4534,9 +4534,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4548,7 +4548,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4563,7 +4563,7 @@ export default function Stocks() {
                       fontSize:
                         "18px",
                       color:
-                        "#1671b7",
+                        "#0b5f59",
                     }}
                   >
                     {
@@ -4574,9 +4574,9 @@ export default function Stocks() {
                 <div
                   style={{
                     background:
-                      "#f8fafc",
+                      "#f7faf9",
                     border:
-                      "1px solid #e2e8f0",
+                      "1px solid #e2eae8",
                     borderRadius:
                       "10px",
                     padding:
@@ -4588,7 +4588,7 @@ export default function Stocks() {
                       display:
                         "block",
                       color:
-                        "#64748b",
+                        "#56686e",
                       fontSize:
                         "11px",
                       marginBottom:
@@ -4602,7 +4602,7 @@ export default function Stocks() {
                       fontSize:
                         "15px",
                       color:
-                        "#0f172a",
+                        "#0f1f24",
                     }}
                   >
                     {
@@ -4634,7 +4634,7 @@ export default function Stocks() {
                 className="stocks-submit-button"
                 style={{
                   background:
-                    "#c94f4f",
+                    "#c2453f",
                 }}
                 onClick={() => {
                   handleSupprimerFournisseur(

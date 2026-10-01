@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 import { useModuleView } from "../layouts/AppLayout";
+import RapportsPraticien from "../rapports/RapportsPraticien";
 import api from "../services/api";
 
 import "../styles/nursing.css";
@@ -746,6 +747,11 @@ export default function Nursing() {
    * RENDU
    * ==========================================================
    */
+
+  // Sous-module « Mon rapport » : les constantes prises par l'agent connecté.
+  if (vue.id === "rapports") {
+    return <div className="nursing-page"><RapportsPraticien /></div>;
+  }
 
   return (
     <div className="nursing-page">

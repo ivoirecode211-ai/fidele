@@ -17,7 +17,7 @@
    ------------------------------------------------------------ */
 
 .pop-boite.sf {
-  --sf-bord: #cbd5e1;
+  --sf-bord: var(--surface-300);
   width: 96vw;
   max-width: 1480px;
   height: 94vh;
@@ -204,7 +204,7 @@
   border: 1px solid var(--surface-200);
   border-radius: 16px;
   background: white;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 6px 18px -12px rgba(15, 23, 42, .12);
+  box-shadow: 0 1px 2px rgba(15, 31, 36, .05), 0 6px 18px -12px rgba(15, 31, 36, .12);
 }
 
 .sf-groupe-tete {
@@ -303,13 +303,13 @@
 
 /* Le choix fait se lit de loin : plein. */
 .pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input:checked),
-.pop-boite.sf .pop-corps .champ-switch .field-switch button.active { background: var(--primary); color: white; box-shadow: 0 2px 6px -2px rgba(22, 113, 183, .6); }
+.pop-boite.sf .pop-corps .champ-switch .field-switch button.active { background: var(--primary); color: white; box-shadow: 0 2px 6px -2px rgba(11, 95, 89, .6); }
 /* Ce qui sort de la normale : en rouge, la couleur des alertes. */
 .pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="anormal"]:checked),
 .pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="altere"]:checked),
 .pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="positif"]:checked),
 .pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="Urgente"]:checked),
-.pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="oui"]:checked) { background: var(--danger); color: white; box-shadow: 0 2px 6px -2px rgba(201, 79, 79, .6); }
+.pop-boite.sf .pop-corps .champ-radio .field-radio-option:has(input[value="oui"]:checked) { background: var(--danger); color: white; box-shadow: 0 2px 6px -2px rgba(194, 69, 63, .6); }
 
 /* Une ligne : le libellé à gauche, le choix à droite. Huit appareils sans huit blocs. */
 .sf-corps .variante-ligne .field { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 0; }
@@ -444,7 +444,7 @@
   border: 1px solid var(--sf-bord, var(--border));
   border-radius: 11px;
   background: white;
-  box-shadow: 0 16px 32px -12px rgba(8, 35, 58, .3);
+  box-shadow: 0 16px 32px -12px rgba(3, 34, 32, .3);
   list-style: none;
 }
 .liste-options li {
@@ -547,7 +547,7 @@
   font: inherit;
   font-size: 13.5px;
   font-weight: 750;
-  box-shadow: 0 4px 12px -4px rgba(22, 113, 183, .55);
+  box-shadow: 0 4px 12px -4px rgba(11, 95, 89, .55);
   transition: background .15s ease, transform .15s ease;
 }
 .ia-proposer:hover:not(:disabled) { background: var(--primary-700); transform: translateY(-1px); }
@@ -566,7 +566,7 @@
   border: 1.5px solid var(--primary-300);
   border-radius: 13px;
   background: white;
-  box-shadow: 0 16px 32px -14px rgba(8, 35, 58, .38), 0 2px 6px rgba(8, 35, 58, .06);
+  box-shadow: 0 16px 32px -14px rgba(3, 34, 32, .38), 0 2px 6px rgba(3, 34, 32, .06);
   animation: champ-arrivee .22s cubic-bezier(.16, 1, .3, 1);
 }
 .ia-badge { display: grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 9px; background: var(--primary); color: white; }
@@ -613,7 +613,7 @@
   width: min(460px, 100vw);
   border-left: 1px solid var(--border);
   background: white;
-  box-shadow: -12px 0 32px -12px rgba(8, 35, 58, .22);
+  box-shadow: -12px 0 32px -12px rgba(3, 34, 32, .22);
   transform: translateX(104%);
   visibility: hidden;
   transition: transform .28s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .28s;
@@ -650,7 +650,7 @@
   min-height: 48px;
   max-height: 160px;
   padding: 11px 13px;
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid var(--surface-300);
   border-radius: 12px;
   background: white;
   color: var(--ink);
@@ -837,13 +837,13 @@
   overflow: visible;
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(28, 81, 113, .05);
+  box-shadow: 0 2px 10px rgba(15, 31, 36, .05);
 }
 .pop-boite.sf.en-page .pop-tete { border-radius: 16px 16px 0 0; }
 /* Les étapes restent visibles en haut, les boutons en bas, pendant qu'on défile. */
 .pop-boite.sf.en-page .sf-etapes { position: sticky; top: 0; z-index: 6; border-bottom: 1px solid var(--border); }
 .pop-boite.sf.en-page .pop-corps.sf-corps { flex: none; overflow: visible; }
-.pop-boite.sf.en-page .pop-pied { position: sticky; bottom: 0; z-index: 6; border-radius: 0 0 16px 16px; box-shadow: 0 -6px 16px -12px rgba(8, 35, 58, .25); }
+.pop-boite.sf.en-page .pop-pied { position: sticky; bottom: 0; z-index: 6; border-radius: 0 0 16px 16px; box-shadow: 0 -6px 16px -12px rgba(3, 34, 32, .25); }
 
 .sf-retour {
   display: grid;
@@ -916,7 +916,7 @@
 .ia-retour { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border: 1px solid var(--primary-200); border-radius: 11px; background: white; color: var(--primary-700); }
 .ia-retour:hover { border-color: var(--primary); }
 .ia-historique { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 16px; overflow-y: auto; }
-.ia-recherche { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border: 1.5px solid #cbd5e1; border-radius: 12px; background: white; color: var(--ink-muted); }
+.ia-recherche { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border: 1.5px solid var(--surface-300); border-radius: 12px; background: white; color: var(--ink-muted); }
 .ia-recherche:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-50); }
 .ia-recherche input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; }
 .ia-courant { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border: 1px solid var(--primary-200); border-radius: 12px; background: var(--primary-50); color: var(--primary-800); font: inherit; font-size: 14.5px; font-weight: 750; }
@@ -946,10 +946,10 @@
 
 .dents-outils { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .dents-palette { display: flex; flex-wrap: wrap; gap: 6px; }
-.dents-etat { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 4px 11px; border: 1.5px solid #cbd5e1; border-radius: 999px; background: white; color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 650; }
+.dents-etat { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 4px 11px; border: 1.5px solid var(--surface-300); border-radius: 999px; background: white; color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 650; }
 .dents-etat.actif { border-color: var(--primary); background: var(--primary-50); color: var(--primary-800); }
 .dents-etat i { width: 12px; height: 12px; border-radius: 4px; border: 1.5px solid currentColor; }
-.dents-denture { display: inline-flex; gap: 4px; padding: 3px; border: 1.5px solid #cbd5e1; border-radius: 10px; background: var(--surface-100); }
+.dents-denture { display: inline-flex; gap: 4px; padding: 3px; border: 1.5px solid var(--surface-300); border-radius: 10px; background: var(--surface-100); }
 .dents-denture button { height: 32px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--ink-muted); font: inherit; font-size: 14px; font-weight: 700; }
 .dents-denture button.actif { background: var(--primary); color: white; }
 
@@ -960,10 +960,10 @@
 .dent:hover { background: var(--surface-100); }
 .dent:focus-visible { outline: 2px solid var(--primary-300); }
 .dent small { color: var(--ink-muted); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.dent-couronne { width: 26px; height: 30px; border: 2px solid #94a3b8; border-radius: 9px 9px 12px 12px; background: white; }
+.dent-couronne { width: 26px; height: 30px; border: 2px solid var(--ink-ghost); border-radius: 9px 9px 12px 12px; background: white; }
 .dent.carie .dent-couronne, .dents-etat.carie i { border-color: var(--danger); background: var(--danger-soft); }
 .dent.obturee .dent-couronne, .dents-etat.obturee i { border-color: var(--primary); background: var(--primary-200); }
-.dent.absente .dent-couronne, .dents-etat.absente i { border-style: dashed; border-color: #94a3b8; background: transparent; }
+.dent.absente .dent-couronne, .dents-etat.absente i { border-style: dashed; border-color: var(--ink-ghost); background: transparent; }
 .dent.a_extraire .dent-couronne, .dents-etat.a_extraire i { border-color: var(--danger); background: var(--danger); }
 .dent.couronne .dent-couronne, .dents-etat.couronne i { border-color: var(--primary-800); background: var(--primary-700); }
 .dent.mobile .dent-couronne, .dents-etat.mobile i { border-color: var(--danger); border-style: dotted; }
@@ -974,7 +974,7 @@
 .courbe-grille { stroke: var(--surface-200); stroke-width: 1; }
 .courbe-axe { fill: var(--ink-muted); font-size: 11px; font-weight: 600; }
 .courbe-zone { fill: var(--green-soft); }
-.courbe-limite { fill: none; stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 4 4; }
+.courbe-limite { fill: none; stroke: var(--ink-ghost); stroke-width: 1.2; stroke-dasharray: 4 4; }
 .courbe-limite.severe { stroke: var(--danger); }
 .courbe-mediane { fill: none; stroke: var(--green); stroke-width: 1.6; }
 .courbe-enfant { fill: none; stroke: var(--primary); stroke-width: 2.2; }

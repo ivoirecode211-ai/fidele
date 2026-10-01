@@ -25,7 +25,7 @@
   cursor: pointer;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.ds-resultats button:hover { border-color: var(--primary-200); box-shadow: 0 8px 20px -16px rgba(8, 35, 58, .4); }
+.ds-resultats button:hover { border-color: var(--primary-200); box-shadow: 0 8px 20px -16px rgba(3, 34, 32, .4); }
 .ds-resultats button > div { display: grid; flex: 1; gap: 2px; min-width: 0; }
 .ds-resultats strong { font-size: 15px; }
 .ds-resultats span:not(.ds-avatar):not(.ds-puce-alerte) { color: var(--ink-muted); font-size: 13px; }

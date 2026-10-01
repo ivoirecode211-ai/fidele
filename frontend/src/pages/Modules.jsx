@@ -3,36 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import { UserAvatar } from "../components/UserBadge";
 import {
-  Search,
-  X,
-  Filter,
-  Users,
-  CalendarDays,
-  Stethoscope,
-  BedDouble,
-  HeartPulse,
-  FlaskConical,
-  Pill,
-  Package,
-  Calculator,
-  UserRoundCog,
-  Building2,
-  Wrench,
-  FileText,
-  ShieldCheck,
-  Archive,
-  Bot,
-  Hospital,
-  QrCode,
-  FolderHeart,
-  ChevronRight,
   ChevronDown,
+  ChevronRight,
+  Filter,
   LayoutGrid,
   LogOut,
-  UserRound,
-  FolderArchive,
+  Search,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import IconeModule from "../components/IconeModule";
 import "../styles/modules.css";
 
 // ============================================================
@@ -56,7 +35,6 @@ const ALL_MODULES = [
     description:
       "Enregistrer les patients, gérer l'accueil et les opérations de caisse",
     path: "/caisse",
-    icon: Users,
     color: "blue",
   },
 
@@ -66,7 +44,6 @@ const ALL_MODULES = [
     description:
       "Saisir les soins, surveillances et traitements",
     path: "/nursing",
-    icon: HeartPulse,
     color: "cyan",
   },
 
@@ -76,7 +53,6 @@ const ALL_MODULES = [
     description:
       "Consultations de toutes les spécialités et prescriptions",
     path: "/consultations",
-    icon: Stethoscope,
     color: "purple",
   },
 
@@ -86,7 +62,6 @@ const ALL_MODULES = [
     description:
       "Planifier et gérer les rendez-vous des patients",
     path: "/appointments",
-    icon: CalendarDays,
     color: "green",
   },
 
@@ -96,7 +71,6 @@ const ALL_MODULES = [
     description:
       "Gérer les admissions, séjours et sorties des patients",
     path: "/hospitalization",
-    icon: BedDouble,
     color: "red",
   },
 
@@ -106,7 +80,6 @@ const ALL_MODULES = [
     description:
       "Gérer les analyses et résultats de laboratoire",
     path: "/laboratory",
-    icon: FlaskConical,
     color: "orange",
   },
 
@@ -116,7 +89,6 @@ const ALL_MODULES = [
     description:
       "Gérer les médicaments, ordonnances et stocks pharmaceutiques",
     path: "/pharmacy",
-    icon: Pill,
     color: "pink",
   },
 
@@ -126,7 +98,6 @@ const ALL_MODULES = [
     description:
       "Suivre les stocks de médicaments, matériel et consommables",
     path: "/stocks",
-    icon: Package,
     color: "blue-dark",
   },
 
@@ -136,7 +107,6 @@ const ALL_MODULES = [
     description:
       "Gérer la facturation, les paiements et les rapports financiers",
     path: "/billing",
-    icon: Calculator,
     color: "purple",
   },
 
@@ -146,7 +116,6 @@ const ALL_MODULES = [
     description:
       "Gérer le personnel, les congés et les plannings",
     path: "/employees",
-    icon: UserRoundCog,
     color: "green-dark",
   },
 
@@ -156,7 +125,6 @@ const ALL_MODULES = [
     description:
       "Tableau de bord de la direction et suivi de l'activité de l'établissement",
     path: "/direction",
-    icon: Building2,
     color: "yellow",
   },
 
@@ -166,7 +134,6 @@ const ALL_MODULES = [
     description:
       "Gérer les interventions et la maintenance des équipements",
     path: "/maintenance",
-    icon: Wrench,
     color: "gray",
   },
 
@@ -176,7 +143,6 @@ const ALL_MODULES = [
     description:
       "Consulter les rapports et les indicateurs clés",
     path: "/reports",
-    icon: FileText,
     color: "blue-light",
   },
 
@@ -186,7 +152,6 @@ const ALL_MODULES = [
     description:
       "Gérer les utilisateurs, les rôles et les paramètres système",
     path: "/administration",
-    icon: ShieldCheck,
     color: "indigo",
   },
 
@@ -196,7 +161,6 @@ const ALL_MODULES = [
     description:
       "Suivre les contrôles d'hygiène et la sécurité sanitaire",
     path: "/hygiene",
-    icon: ShieldCheck,
     color: "green",
   },
 
@@ -206,7 +170,6 @@ const ALL_MODULES = [
     description:
       "Consulter et gérer les dossiers archivés",
     path: "/archives",
-    icon: Archive,
     color: "blue-light",
   },
 
@@ -216,7 +179,6 @@ const ALL_MODULES = [
     description:
       "Assistance intelligente pour l'analyse des informations et l'aide à la décision",
     path: "/ia",
-    icon: Bot,
     color: "indigo",
   },
 
@@ -229,7 +191,6 @@ const ALL_MODULES = [
     description:
       "Activer l'espace de chaque patient (dossier, médicaments, rendez-vous) et répondre à ses messages",
     path: "/patient-space",
-    icon: UserRound,
     color: "blue-light",
   },
 
@@ -242,7 +203,6 @@ const ALL_MODULES = [
     description:
       "Gestion électronique, indexation, recherche et archivage des documents de la clinique",
     path: "/ged",
-    icon: FolderArchive,
     color: "indigo",
   },
 
@@ -255,7 +215,6 @@ const ALL_MODULES = [
     description:
       "Retrouver un patient et tout son parcours : caisse, soins, consultations, ordonnances, analyses, séjours",
     path: "/dossiers",
-    icon: FolderHeart,
     color: "blue",
   },
 
@@ -268,7 +227,6 @@ const ALL_MODULES = [
     description:
       "Étiqueter les appareils du centre et retrouver leur historique de maintenance en les scannant",
     path: "/equipements",
-    icon: QrCode,
     color: "blue",
   },
 
@@ -281,7 +239,6 @@ const ALL_MODULES = [
     description:
       "Créer les hôpitaux clients et leur administrateur",
     path: "/hopitaux",
-    icon: Hospital,
     color: "blue",
   },
 ];
@@ -324,7 +281,6 @@ const DEFAULT_ROLE_MODULES = {
     "hospitalization",
     "laboratory",
     "pharmacy",
-    "reports",
     "ia",
     "patient-space",
     "ged",
@@ -840,9 +796,6 @@ export default function Modules() {
                 {filteredModules.map(
                   (module) => {
 
-                    const Icon =
-                      module.icon;
-
                     return (
                       <Link
                         key={module.id}
@@ -860,10 +813,7 @@ export default function Modules() {
 
                         <div className="module-icon">
 
-                          <Icon
-                            size={28}
-                            strokeWidth={2}
-                          />
+                          <IconeModule module={module.id} />
 
                         </div>
 

@@ -34,13 +34,13 @@
 .cd-form-actions { margin-top: 32px; justify-content: flex-end; }
 .cd-tabs { margin-bottom: 22px; }
 .cashdesk .cd-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; min-width: 48px; max-width: 100%; padding: 11px 16px; border: 1px solid var(--primary-700); background: var(--primary-700); color: white; border-radius: 7px; font-size: 13px; font-weight: 600; line-height: 1.4; text-align: center; transition: background-color 150ms, border-color 150ms; box-shadow: none; }
-.cashdesk .cd-button.secondary { background: white; border-color: #cbd5e1; color: var(--ink-muted); }
+.cashdesk .cd-button.secondary { background: white; border-color: var(--surface-300); color: var(--ink-muted); }
 .cashdesk .cd-button.danger { background: var(--danger-soft-text); border-color: var(--danger-soft-text); color: white; }
 .cd-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin-bottom: 18px; font-size: 13px; color: var(--ink); }
 .cd-field > span { font-weight: 600; }
 .cd-field small { line-height: 1.5; color: var(--ink-faint); }
 .cd-required { color: var(--danger-soft-text); }
-.cashdesk .cd-field input, .cashdesk .cd-field select, .cashdesk .cd-field textarea { display: block; min-width: 0; width: 100%; min-height: 48px; border: 1px solid #b8c5d4; border-radius: 6px; padding: 11px 12px; background: white; color: var(--ink); font-size: 14px; }
+.cashdesk .cd-field input, .cashdesk .cd-field select, .cashdesk .cd-field textarea { display: block; min-width: 0; width: 100%; min-height: 48px; border: 1px solid var(--surface-300); border-radius: 6px; padding: 11px 12px; background: white; color: var(--ink); font-size: 14px; }
 .cashdesk .cd-field input::placeholder { color: var(--ink-faint); opacity: 1; }
 .cashdesk .cd-field input[readonly] { background: var(--surface-100); }
 .cd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; }
@@ -91,7 +91,7 @@
 .cd-print-box .cd-section-head { align-items: center; }
 .cd-print-box .cd-field { margin: 0; }
 .cd-print-box h3 { margin-top: 0; }
-.cd-document { background: white; border: 1px solid #cbd5e1; max-width: 650px; padding: 24px; margin: 0 auto; overflow-wrap: anywhere; }
+.cd-document { background: white; border: 1px solid var(--surface-300); max-width: 650px; padding: 24px; margin: 0 auto; overflow-wrap: anywhere; }
 .cd-document h2 { font-size: 20px; }
 .cd-document p { font-size: 12px; }
 .cd-document th, .cd-document td { padding: 8px 5px; font-size: 11px; }
@@ -100,7 +100,7 @@
 @keyframes cd-spin { to { transform: rotate(360deg); } }
 @media (hover: hover) and (pointer: fine) {
   .cashdesk .cd-button:not(:disabled):hover { background: var(--primary-800); border-color: var(--primary-800); }
-  .cashdesk .cd-button.secondary:not(:disabled):hover { background: var(--surface-100); border-color: #94a3b8; }
+  .cashdesk .cd-button.secondary:not(:disabled):hover { background: var(--surface-100); border-color: var(--ink-ghost); }
   .cashdesk .cd-button.danger:not(:disabled):hover { background: var(--danger-soft-text); }
   .cd-sidebar nav button:hover, .cd-sidebar-bottom a:hover, .cd-sidebar-bottom button:hover { background: var(--surface-100); }
 }

@@ -4,6 +4,7 @@ import autoTable from "jspdf-autotable";
 import "../styles/Laboratory.css";
 
 import {
+  BarChart3,
   Check,
   CircleCheck,
   Download,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import Logo from "../components/Logo";
 import api from "../services/api";
+import RapportsPraticien from "../rapports/RapportsPraticien";
 import SidebarFooter from "../components/SidebarFooter";
 /* ============================================================
    TARIFS DES EXAMENS
@@ -56,6 +58,8 @@ const getInitials = (name = "") => {
    ============================================================ */
 
 function Laboratory() {
+  // Sous-modules : les analyses, et le rapport du laborantin.
+  const [ecranLabo, setEcranLabo] = useState("analyses");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
 
@@ -662,6 +666,15 @@ function Laboratory() {
 
         </div>
 
+        <nav className="lab-nav" aria-label="Sous-modules du laboratoire">
+          {[["analyses", "Analyses", FlaskConical], ["rapports", "Mon rapport", BarChart3]].map(([id, label, Icone]) => (
+            <button key={id} type="button" className={`lab-nav-item ${ecranLabo === id ? "active" : ""}`}
+              aria-current={ecranLabo === id ? "page" : undefined} onClick={() => setEcranLabo(id)}>
+              <Icone size={18} strokeWidth={2} aria-hidden="true" />{label}
+            </button>
+          ))}
+        </nav>
+
         <SidebarFooter />
 
       </aside>
@@ -669,6 +682,7 @@ function Laboratory() {
       {/* CONTENU PRINCIPAL */}
 
       <main className="laboratory-main">
+        {ecranLabo === "rapports" ? <RapportsPraticien /> : <>
 
         {/* HEADER */}
 
@@ -1522,6 +1536,7 @@ function Laboratory() {
 
           )}
 
+        </>}
       </main>
 
     </div>

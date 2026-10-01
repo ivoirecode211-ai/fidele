@@ -69,11 +69,16 @@ export const CPN = bloc({
     { id: "signes_danger", type: "liste", label: "Signes de danger", span: 12, libre: false,
       options: paires(["Saignement vaginal", "Céphalées et troubles visuels", "Convulsions", "Fièvre", "Perte de liquide",
         "Diminution des mouvements du bébé", "Douleurs abdominales intenses", "Pâleur importante"]) },
+    // Rapport « Pathologies par tranche d'âge » de la CPN.
+    { id: "pathologies_grossesse", type: "liste", label: "Pathologies au cours de la grossesse", span: 12,
+      options: paires(["Paludisme", "Anémie", "Hypertension artérielle", "Pré-éclampsie", "Infection urinaire", "Diabète gestationnel",
+        "Infection sexuellement transmissible", "Menace d'accouchement prématuré", "Vomissements graves"]) },
 
     carte("depistages", "Dépistages", "gauche"),
     choix("vih_cpn", "VIH", RESULTAT, { defaut: "non_fait" }),
     choix("syphilis", "Syphilis", RESULTAT, { defaut: "non_fait" }),
     choix("tdr_palu_cpn", "TDR paludisme", RESULTAT, { defaut: "non_fait" }),
+    choix("goutte_epaisse", "Goutte épaisse", RESULTAT, { defaut: "non_fait" }),
     { id: "hemoglobine", type: "number", label: "Hémoglobine (g/dL)", span: 4, spanMobile: 1, min: 0, step: 0.1 },
     { id: "proteinurie", type: "select", label: "Protéinurie", span: 4, spanMobile: 1, options: paires(["Négative", "Traces", "+", "++", "+++"]) },
     { id: "groupe_rhesus", type: "select", label: "Groupe / rhésus", span: 4, spanMobile: 1,
@@ -97,10 +102,11 @@ export const CPON = bloc({
   titre: "Consultation postnatale",
   grossesse: false,
   titreEtape1: "Mère et nouveau-né",
-  intitule: (v) => `CPON ${v.visite_cpon || ""}`.trim(),
+  intitule: (v) => `CPON ${{ immediate: "6-72 h", j6_10: "6e-10e jour", s6_8: "6e-8e semaine", autre: "autre période" }[v.visite_cpon] || v.visite_cpon || ""}`.trim(),
   examen: [
     carte("visite", "Visite", "gauche"),
-    choix("visite_cpon", "Visite", [["J3", "J3"], ["J7", "J7"], ["S6", "6 semaines"], ["autre", "Autre"]],
+    // Périodes du rapport CPON du DPI.
+    choix("visite_cpon", "Visite", [["immediate", "6 à 72 h"], ["j6_10", "6e-10e jour"], ["s6_8", "6e-8e semaine"], ["autre", "Autre période"]],
       { required: true, requiredMessage: "Veuillez indiquer la visite postnatale." }),
     carte("mere", "Mère", "gauche"),
     { id: "tension_cpon", type: "text", label: "Tension (mmHg)", span: 6, spanMobile: 1 },

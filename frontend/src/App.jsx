@@ -179,7 +179,7 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 
    ============================================================ */
 
-import Reports from "./pages/Reports";
+import ModuleRapports from "./rapports/ModuleRapports";
 
 
 /* ============================================================
@@ -191,7 +191,7 @@ import Reports from "./pages/Reports";
    MAINTENANCE
    ------------------------------------------------------------ */
 
-import Maintenance from "./pages/Maintenance";
+import ModuleMaintenance from "./maintenance/ModuleMaintenance";
 
 
 /* ------------------------------------------------------------
@@ -313,6 +313,10 @@ export default function App() {
           (double sidebar, double en-tête).
 
           ====================================================== */}
+
+      {/* Maintenance et Rapports : barre latérale de sous-modules, comme la Caisse. */}
+      <Route path="/maintenance" element={<Protected><ModuleMaintenance /></Protected>} />
+      <Route path="/reports" element={<Protected><ModuleRapports /></Protected>} />
 
       <Route
         path="/consultations"
@@ -548,14 +552,11 @@ export default function App() {
                 /maintenance
 
             Fichier :
-                src/pages/Maintenance.jsx
+                src/maintenance/ModuleMaintenance.jsx
 
             ==================================================== */}
 
-        <Route
-          path="maintenance"
-          element={<Maintenance />}
-        />
+        {/* Maintenance : page autonome (charte de la Caisse), voir plus haut. */}
 
 
         {/* ====================================================
@@ -620,17 +621,14 @@ export default function App() {
                 /reports
 
             Fichier :
-                src/pages/Reports.jsx
+                src/rapports/ModuleRapports.jsx
 
             IMPORTANT :
             Ce module est indépendant de Direction.
 
             ==================================================== */}
 
-        <Route
-          path="reports"
-          element={<Reports />}
-        />
+        {/* Rapports : page autonome (charte de la Caisse), voir plus haut. */}
 
 
         {/* ====================================================

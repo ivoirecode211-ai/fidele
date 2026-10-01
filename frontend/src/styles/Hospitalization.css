@@ -36,19 +36,19 @@
   align-items: center;
   gap: 9px;
   margin-bottom: 8px;
-  color: #8a94a6;
+  color: var(--ink-ghost);
   font-size: 13px;
 }
 
 
 .hospitalization-breadcrumb span {
-  color: #b8c0cc;
+  color: var(--surface-300);
 }
 
 
 .hospitalization-header h1 {
   margin: 0;
-  color: #172033;
+  color: var(--ink);
   font-size: 28px;
   font-weight: 700;
 }
@@ -74,7 +74,7 @@
   padding: 0 18px;
   border: none;
   border-radius: 8px;
-  background: #1671b7;
+  background: var(--primary-600);
   color: white;
   font-size: 14px;
   font-weight: 600;
@@ -85,7 +85,7 @@
 
 
 .hospitalization-primary-btn:hover {
-  background: #1671b7;
+  background: var(--primary-600);
   transform: translateY(-1px);
 }
 
@@ -136,19 +136,19 @@
 
 .stat-icon.blue {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 
 .stat-icon.green {
   background: var(--green-soft);
-  color: #16a34a;
+  color: var(--green);
 }
 
 
 .stat-icon.orange {
   background: var(--warning-soft);
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 
@@ -173,7 +173,7 @@
 
 .stat-content strong {
   display: block;
-  color: #1b2538;
+  color: var(--ink-muted);
   font-size: 24px;
   line-height: 1.2;
 }
@@ -182,7 +182,7 @@
 .stat-content small {
   display: block;
   margin-top: 3px;
-  color: #9aa3b2;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -208,7 +208,7 @@
   padding: 17px 4px;
   border: none;
   background: transparent;
-  color: #818b9c;
+  color: var(--ink-ghost);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -216,7 +216,7 @@
 
 
 .hospitalization-tabs button.active {
-  color: #1671b7;
+  color: var(--primary-600);
   font-weight: 600;
 }
 
@@ -228,7 +228,7 @@
   bottom: 0;
   left: 0;
   height: 2px;
-  background: #1671b7;
+  background: var(--primary-600);
 }
 
 
@@ -273,7 +273,7 @@
 
 .hospitalization-search span {
   margin-right: 9px;
-  color: #8993a3;
+  color: var(--ink-ghost);
   font-size: 20px;
 }
 
@@ -282,13 +282,13 @@
   width: 100%;
   border: none;
   outline: none;
-  color: #303a4b;
+  color: var(--ink-muted);
   font-size: 13px;
 }
 
 
 .hospitalization-search input::placeholder {
-  color: #a5adba;
+  color: var(--surface-300);
 }
 
 
@@ -299,7 +299,7 @@
   border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
-  color: #505b6c;
+  color: var(--ink-faint);
   outline: none;
   cursor: pointer;
 }
@@ -342,7 +342,7 @@
 .hospitalization-table td {
   padding: 15px 16px;
   border-bottom: 1px solid var(--primary-soft);
-  color: #4e596b;
+  color: var(--ink-faint);
   font-size: 13px;
   vertical-align: middle;
 }
@@ -373,7 +373,7 @@
   height: 37px;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 11px;
   font-weight: 700;
 }
@@ -388,7 +388,7 @@
 
 
 .patient-cell span {
-  color: #9aa3b1;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -399,7 +399,7 @@
 
 .service-name {
   display: block;
-  color: #455064;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 500;
 }
@@ -408,7 +408,7 @@
 .motif {
   display: block;
   margin-top: 4px;
-  color: #9ba4b1;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -419,7 +419,7 @@
 
 .room-cell strong {
   display: block;
-  color: #374154;
+  color: var(--ink-muted);
   font-size: 12px;
 }
 
@@ -427,7 +427,7 @@
 .room-cell span {
   display: block;
   margin-top: 3px;
-  color: #9ca5b2;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -458,7 +458,7 @@
 
 .status-badge.en-cours {
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
 }
 
 
@@ -470,7 +470,7 @@
 
 .status-badge.sortie {
   background: var(--green-soft);
-  color: #16a34a;
+  color: var(--green);
 }
 
 
@@ -487,15 +487,15 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: white;
-  color: #697487;
+  color: var(--ink-ghost);
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 
 .action-button:hover {
-  border-color: #1671b7;
-  color: #1671b7;
+  border-color: var(--primary-600);
+  color: var(--primary-600);
   background: var(--bg);
 }
 
@@ -506,7 +506,7 @@
 
 .empty-state {
   padding: 45px !important;
-  color: #98a1af !important;
+  color: var(--ink-ghost) !important;
   text-align: center !important;
 }
 
@@ -538,7 +538,7 @@
 
 .rooms-header p {
   margin: 5px 0 0;
-  color: #8993a2;
+  color: var(--ink-ghost);
   font-size: 13px;
 }
 
@@ -560,7 +560,7 @@
 
 
 .room-card:hover {
-  border-color: #cbd8e7;
+  border-color: var(--surface-200);
   box-shadow: 0 5px 18px rgba(35, 52, 75, 0.06);
 }
 
@@ -575,7 +575,7 @@
 .room-label {
   display: block;
   margin-bottom: 3px;
-  color: #99a2b0;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
@@ -591,7 +591,7 @@
   padding: 5px 9px;
   border-radius: 15px;
   background: var(--primary-soft);
-  color: #607287;
+  color: var(--ink-ghost);
   font-size: 10px;
   font-weight: 600;
 }
@@ -605,7 +605,7 @@
 
 .room-service {
   margin: 16px 0;
-  color: #657083;
+  color: var(--ink-ghost);
   font-size: 12px;
 }
 
@@ -623,13 +623,13 @@
 
 
 .occupancy-header span {
-  color: #8a94a4;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
 
 .occupancy-header strong {
-  color: #485467;
+  color: var(--ink-faint);
   font-size: 11px;
 }
 
@@ -646,7 +646,7 @@
 .occupancy-progress {
   height: 100%;
   border-radius: 10px;
-  background: #1671b7;
+  background: var(--primary-600);
 }
 
 
@@ -670,7 +670,7 @@
 
 
 .available {
-  color: #16a34a;
+  color: var(--green);
   font-weight: 600;
 }
 
@@ -725,7 +725,7 @@
 
 .modal-header p {
   margin: 5px 0 0;
-  color: #8c96a5;
+  color: var(--ink-ghost);
   font-size: 12px;
 }
 
@@ -739,7 +739,7 @@
   border: none;
   border-radius: 6px;
   background: var(--bg);
-  color: #667184;
+  color: var(--ink-ghost);
   font-size: 21px;
   cursor: pointer;
 }
@@ -770,7 +770,7 @@
 .form-group label {
   display: block;
   margin-bottom: 7px;
-  color: #4d5869;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 600;
 }
@@ -786,7 +786,7 @@
   border-radius: 7px;
   outline: none;
   background: white;
-  color: #374154;
+  color: var(--ink-muted);
   font-family: inherit;
   font-size: 13px;
 }
@@ -800,8 +800,8 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #1671b7;
-  box-shadow: 0 0 0 3px rgba(22, 113, 183, 0.08);
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(11, 95, 89, 0.08);
 }
 
 
@@ -820,7 +820,7 @@
   border: 1px solid var(--border);
   border-radius: 7px;
   background: white;
-  color: #606b7b;
+  color: var(--ink-faint);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -859,7 +859,7 @@
   height: 54px;
   border-radius: 50%;
   background: var(--primary-soft);
-  color: #1671b7;
+  color: var(--primary-600);
   font-size: 14px;
   font-weight: 700;
 }
@@ -874,7 +874,7 @@
 
 .details-profile p {
   margin: 0;
-  color: #929baa;
+  color: var(--ink-ghost);
   font-size: 12px;
 }
 
@@ -896,14 +896,14 @@
 .details-grid span {
   display: block;
   margin-bottom: 5px;
-  color: #8c96a5;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
 
 .details-grid strong {
   display: block;
-  color: #394456;
+  color: var(--ink-muted);
   font-size: 13px;
 }
 
@@ -919,14 +919,14 @@
 .details-motif span {
   display: block;
   margin-bottom: 6px;
-  color: #8c96a5;
+  color: var(--ink-ghost);
   font-size: 11px;
 }
 
 
 .details-motif p {
   margin: 0;
-  color: #394456;
+  color: var(--ink-muted);
   font-size: 13px;
 }
 
@@ -1023,9 +1023,9 @@
    ============================================================ */
 
 .hospitalization-danger-btn {
-  background: #c94f4f;
+  background: var(--danger);
   color: #ffffff;
-  border: 1px solid #c94f4f;
+  border: 1px solid var(--danger);
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 600;
@@ -1034,8 +1034,8 @@
 }
 
 .hospitalization-danger-btn:hover {
-  background: #b34242;
-  border-color: #b34242;
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
 }
 
 .hospitalization-danger-btn:active {
@@ -1048,8 +1048,8 @@
 .bed-add-info {
   margin-top: 16px;
   padding: 14px 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -1057,12 +1057,12 @@
 }
 
 .bed-add-info strong {
-  color: #1e293b;
+  color: var(--ink);
   font-size: 14px;
 }
 
 .bed-add-info span {
-  color: #64748b;
+  color: var(--ink-faint);
   font-size: 13px;
 }
 
@@ -1074,7 +1074,7 @@
 .room-beds-list {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--surface-200);
 }
 
 .room-beds-title {
@@ -1082,7 +1082,7 @@
   margin-bottom: 10px;
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink-faint);
 }
 
 .beds-container {
@@ -1107,15 +1107,15 @@
 }
 
 .bed-item.available {
-  background: #ecfdf5;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: var(--green-soft);
+  color: var(--green-hover);
+  border: 1px solid var(--green-soft-border);
 }
 
 .bed-item.occupied {
-  background: #fef2f2;
-  color: #c94f4f;
-  border: 1px solid #efcfcf;
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid var(--danger-soft-border);
 }
 
 
@@ -1124,9 +1124,9 @@
    ============================================================ */
 
 .hospitalization-danger-btn {
-  background: #c94f4f;
+  background: var(--danger);
   color: #ffffff;
-  border: 1px solid #c94f4f;
+  border: 1px solid var(--danger);
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 600;
@@ -1135,8 +1135,8 @@
 }
 
 .hospitalization-danger-btn:hover {
-  background: #b34242;
-  border-color: #b34242;
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
 }
 
 .hospitalization-danger-btn:active {

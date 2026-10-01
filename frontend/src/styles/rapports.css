@@ -1,0 +1,408 @@
+/* ============================================================
+   MODULE RAPPORTS
+   ============================================================
+   Charte de la Caisse : bleu de la clinique, vert pour ce qui
+   est disponible, rouge pour les alertes. Pas de jaune.
+   ============================================================ */
+
+.etat.bleu {
+  border-color: var(--primary-200);
+  background: var(--primary-50);
+  color: var(--primary-700);
+}
+
+/* ---- Filtres ---- */
+
+.rp-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.rp-filtres .field { min-width: 150px; margin: 0; }
+.rp-praticien { flex: 1 1 280px; }
+.rp-filtres-ligne { margin-bottom: 16px; }
+
+.rp-periodes {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+}
+
+.rp-periodes button {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.rp-periodes button.actif {
+  background: white;
+  color: var(--primary-700);
+  box-shadow: 0 1px 3px rgba(3, 34, 32, .14);
+}
+
+.rp-retour { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+
+/* ---- Liste des rapports de l'établissement ---- */
+
+.rp-liste { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+
+.rp-carte {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1.2fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.rp-carte:hover { border-color: var(--primary-300); box-shadow: var(--shadow-card); }
+
+.rp-carte-icone {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.rp-carte-texte strong { display: block; font-size: 15px; }
+.rp-carte-texte small { color: var(--ink-faint); font-size: 13px; }
+
+.rp-carte-chiffres { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-faint); font-size: 12.5px; }
+.rp-carte-chiffres b { margin-right: 5px; color: var(--ink); font-size: 15px; }
+
+/* ---- Un rapport ---- */
+
+.rp-document {
+  display: grid;
+  gap: 18px;
+  margin-top: 16px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: white;
+  box-shadow: var(--shadow-card);
+}
+
+.rp-entete { display: flex; justify-content: space-between; gap: 16px; }
+.rp-entete h2 { margin: 0; color: var(--primary-800); font-size: 20px; }
+.rp-entete p { margin: 4px 0 2px; color: var(--ink-muted); font-size: 14px; }
+.rp-entete small { color: var(--ink-faint); font-size: 12.5px; }
+
+.rp-actions { display: flex; align-items: flex-start; gap: 8px; }
+.rp-actions button { display: inline-flex; align-items: center; gap: 6px; }
+
+.rp-chiffres {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.rp-chiffres div {
+  padding: 12px 14px;
+  border: 1px solid var(--primary-100);
+  border-radius: var(--radius-lg);
+  background: var(--primary-50);
+}
+
+.rp-chiffres dt { color: var(--ink-muted); font-size: 12.5px; }
+.rp-chiffres dd { margin: 4px 0 0; color: var(--primary-800); font-size: 22px; font-weight: 750; }
+
+.rp-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 15.5px;
+}
+
+.rp-section h3 span {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-100);
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+@media (max-width: 860px) {
+  .rp-carte { grid-template-columns: auto minmax(0, 1fr); }
+  .rp-carte-chiffres, .rp-carte .etat { grid-column: 2; }
+  .rp-entete { flex-direction: column; }
+}
+
+/* ---- Impression : le rapport seul, en A4 ---- */
+
+@media print {
+  body:has(.rp-document) .caisse-sidebar,
+  body:has(.rp-document) .caisse-header { display: none !important; }
+  body:has(.rp-document) .caisse-content { margin: 0 !important; padding: 0 !important; }
+  .rp-document { margin: 0; padding: 0; border: 0; box-shadow: none; }
+  .rp-section { break-inside: auto; }
+  .rp-section tr { break-inside: avoid; }
+}
+
+/* ---- États officiels ---- */
+
+.rp-etats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.rp-etats button {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.rp-etats button:hover { border-color: var(--primary-300); color: var(--primary-700); }
+.rp-etats button.actif { border-color: var(--primary-600); background: var(--primary-600); color: white; }
+
+.rp-service { flex: 1 1 200px; }
+
+.rp-bascule {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  color: var(--ink-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rp-bascule input { width: 18px; height: 18px; accent-color: var(--primary-600); }
+
+.rp-medecins { position: relative; flex: 1 1 220px; }
+
+.rp-medecins-bouton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rp-medecins-liste {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 320px);
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: white;
+  box-shadow: var(--shadow-card);
+}
+
+.rp-medecins-liste input[type="text"],
+.rp-medecins-liste > input { width: 100%; height: 38px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-lg); font: inherit; }
+.rp-medecins-liste ul { max-height: 260px; margin: 8px 0; padding: 0; overflow-y: auto; list-style: none; }
+.rp-medecins-liste label { display: flex; gap: 10px; padding: 7px 6px; border-radius: var(--radius-lg); cursor: pointer; }
+.rp-medecins-liste label:hover { background: var(--primary-50); }
+.rp-medecins-liste label input { margin-top: 3px; accent-color: var(--primary-600); }
+.rp-medecins-liste small { display: block; color: var(--ink-faint); font-size: 12px; }
+.rp-medecins-pied { display: flex; justify-content: flex-end; gap: 8px; }
+
+.rp-officiel { position: relative; }
+.rp-actions-haut { justify-content: flex-end; margin-bottom: -6px; }
+
+.rp-officiel-entete {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11.5px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.rp-officiel-entete div { display: grid; align-content: start; gap: 3px; color: var(--ink-muted); }
+.rp-officiel-entete strong { color: var(--ink); font-size: 12px; }
+.rp-officiel-centre { text-transform: none; }
+.rp-officiel-centre strong { color: var(--primary-800); font-size: 14px; text-transform: uppercase; }
+
+.rp-officiel-titre { margin: 4px 0 0; color: var(--ink); font-size: 17px; text-transform: uppercase; }
+.rp-officiel-precision { margin: -10px 0 0; color: var(--ink-muted); font-size: 13.5px; }
+.rp-officiel-sous { justify-content: center; text-transform: uppercase; }
+.rp-officiel-pied { margin: 0; color: var(--ink-faint); font-size: 12px; text-align: right; }
+
+.rp-grille th { text-align: center; white-space: nowrap; }
+.rp-grille th:first-child { text-align: left; }
+.rp-grille .rp-sous { font-size: 11px; }
+.rp-nombre { text-align: center; font-variant-numeric: tabular-nums; }
+.rp-ligne-groupe td { background: var(--primary-800); color: white; font-weight: 700; text-transform: uppercase; }
+.rp-ligne-total td { background: var(--primary-50); color: var(--primary-900); font-weight: 750; }
+
+@media (max-width: 860px) {
+  .rp-officiel-entete { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .rp-officiel-entete { padding-top: 0; }
+  .rp-ligne-groupe td, .rp-ligne-total td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ============================================================
+   RAPPORT DU PRATICIEN (dans son module) — disposition du DPI
+   ============================================================ */
+
+.rp-page { display: grid; gap: 18px; }
+
+.rp-page-tete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rp-page-icone {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-xl);
+  background: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.rp-page-tete h2 { margin: 0; color: var(--primary-700); font-size: 24px; }
+.rp-page-tete p { margin: 4px 0 0; color: var(--ink-muted); font-size: 14.5px; font-weight: 600; }
+.rp-page-actions { display: flex; gap: 10px; margin-left: auto; }
+.rp-page-actions button { display: inline-flex; align-items: center; gap: 8px; }
+
+.rp-filtres-boite { max-width: 640px; }
+.rp-filtres-corps { display: grid; gap: 22px; }
+.rp-filtres-corps h3 { margin: 0 0 10px; color: var(--ink); font-size: 17px; }
+.rp-filtres-corps select,
+.rp-filtres-corps input[type="date"] {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+.rp-deux { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.rp-deux .field { margin: 0; }
+
+.rp-officiel-intro { display: grid; gap: 4px; }
+.rp-officiel-intro p { margin: 0; font-size: 14.5px; }
+.rp-officiel-intro p b { text-transform: uppercase; }
+.rp-officiel-intro p span { color: var(--primary-700); font-weight: 700; text-transform: uppercase; }
+
+/* Tableau à la manière des états officiels : quadrillé, compact. */
+.rp-grille-officielle table { border-collapse: collapse; }
+.rp-grille-officielle th,
+.rp-grille-officielle td { border: 1px solid var(--surface-200); padding: 7px 10px; }
+.rp-grille-officielle thead th { background: var(--primary-100); color: var(--primary-900); font-size: 12.5px; text-transform: none; }
+.rp-grille-officielle tbody td:first-child { white-space: normal; }
+.rp-grille-officielle .rp-total-col { font-weight: 750; }
+.rp-grille-officielle .rp-ligne-total td { background: var(--primary-100); }
+
+@media (max-width: 760px) {
+  .rp-page-tete { flex-wrap: wrap; }
+  .rp-page-actions { width: 100%; margin-left: 0; }
+  .rp-deux { grid-template-columns: 1fr; }
+}
+
+/* Impression : la copie du document seule (voir imprimerDocument). */
+#rp-impression { display: none; }
+
+@media print {
+  body.rp-impression-active > *:not(#rp-impression) { display: none !important; }
+  body.rp-impression-active #rp-impression { display: block; }
+  html:has(body.rp-impression-active), body.rp-impression-active { background: white !important; }
+  #rp-impression .rp-officiel-entete { grid-template-columns: 1fr 1fr 1fr !important; font-size: 9px; }
+  #rp-impression .rp-officiel-entete strong { font-size: 9.5px; }
+  #rp-impression .rp-document { margin: 0; padding: 0; border: 0; box-shadow: none; font-size: 11px; }
+  #rp-impression .rp-grille-officielle th,
+  #rp-impression .rp-grille-officielle td { padding: 3px 5px; font-size: 10px; }
+  #rp-impression .rp-officiel-titre { font-size: 13px; }
+  #rp-impression .tableau { overflow: visible; }
+  #rp-impression thead { display: table-header-group; }
+  #rp-impression tr { break-inside: avoid; }
+  #rp-impression * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Choix des médecins dans « Filtres sur les données » (module général). */
+.rp-choix-medecins { border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.rp-choix-recherche { display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--border); color: var(--ink-faint); }
+.rp-choix-recherche input { flex: 1; height: 44px; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; }
+.rp-choix-medecins ul { max-height: 220px; margin: 0; padding: 6px; overflow-y: auto; list-style: none; }
+.rp-choix-medecins label { display: flex; gap: 10px; padding: 8px; border-radius: var(--radius-lg); cursor: pointer; }
+.rp-choix-medecins label:hover { background: var(--primary-50); }
+.rp-choix-medecins label input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--primary-600); }
+.rp-choix-medecins small { display: block; color: var(--ink-faint); font-size: 12.5px; }
+.rp-choix-resume { margin: 0; padding: 8px 12px; border-top: 1px solid var(--border); color: var(--ink-muted); font-size: 13px; font-weight: 600; }
+.rp-choix-praticien { max-width: 520px; margin: 0; }
+.rp-filtres-boite .pop-corps { max-height: 70vh; overflow-y: auto; }
+
+/* « Sélectionner un type de rapport » (module du praticien), comme le DPI. */
+.rp-type { max-width: 640px; margin: 0; }
+.rp-type select { height: 48px; font-size: 15.5px; }
+
+/* Barre du DPI : type de rapport (liste déroulante), puis Filtres, CSV, Imprimer. */
+.rp-barre { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; }
+.rp-barre .rp-type { flex: 1 1 420px; max-width: 680px; }
+.rp-barre .rp-page-actions { margin-left: auto; }
+
+/* Téléphone : le choix du rapport et les boutons tiennent dans la largeur de l'écran. */
+@media (max-width: 760px) {
+  .rp-page > * { min-width: 0; }
+  .rp-document > *, .rp-officiel-intro > * { min-width: 0; }
+  .rp-section { overflow-x: auto; }
+  .rp-barre > * { min-width: 0; max-width: 100%; }
+  .rp-barre .rp-type { flex: 1 1 100%; }
+  .rp-barre select { width: 100%; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
+  .rp-barre .rp-page-actions { flex-wrap: wrap; margin-left: 0; }
+}

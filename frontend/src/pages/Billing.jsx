@@ -546,7 +546,7 @@ export default function Billing() {
           body {
             font-family: Arial, sans-serif;
             padding: 40px;
-            color: #111827;
+            color: #0f1f24;
           }
 
           h1 {
@@ -554,7 +554,7 @@ export default function Billing() {
           }
 
           .subtitle {
-            color: #6b7280;
+            color: #56686e;
             margin-bottom: 30px;
           }
 
@@ -562,7 +562,7 @@ export default function Billing() {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e2eae8;
           }
 
           .total {
@@ -843,7 +843,7 @@ export default function Billing() {
 
         <div className="billing-stat-card">
 
-          <div className="billing-stat-icon billing-stat-red">
+          <div className="billing-stat-icon billing-stat-blue">
 
             <Building2 size={24} />
 

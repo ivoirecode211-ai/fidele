@@ -196,6 +196,8 @@ export function configConsultation({ dossier, refs, bloc = BLOC_GENERAL }) {
         fields: [
           { id: "__motif__", type: "section", label: "Motif et histoire de la maladie", colonne: "gauche" },
           { id: "motif", type: "text", label: "Motif de consultation", required: bloc.motif !== false, span: 12, requiredMessage: "Veuillez indiquer le motif de consultation." },
+          // Compté dans le rapport d'activités (« référés d'une autre structure reçus »).
+          { id: "refere_recu", type: "switch", label: "Référé par une autre structure", span: 12 },
           { id: "histoire", type: "textarea", label: "Histoire de la maladie", required: bloc.histoire !== false,
             visibleIf: () => !bloc.sansHistoire, span: 12, rows: bloc.histoire === false ? 2 : 4,
             requiredMessage: "Veuillez décrire l'histoire de la maladie." },
@@ -229,7 +231,7 @@ export function configConsultation({ dossier, refs, bloc = BLOC_GENERAL }) {
           { id: "__tdr__", type: "section", label: "Tests rapides", colonne: "gauche", visibleIf: () => bloc.tdr !== false },
           { id: "tdr_palu", type: "radio", label: "TDR paludisme", span: 12, options: RESULTATS, variant: "ligne", visibleIf: () => bloc.tdr !== false },
           { id: "__autres_tdr__", type: "disclosure", label: "Autres tests rapides", colonne: "gauche", visibleIf: () => bloc.tdr !== false },
-          ...[["tdr_vih", "TDR VIH"], ["tdr_dengue", "TDR dengue"], ["tdr_covid", "Test COVID-19"]].map(([id, label]) => ({
+          ...[["goutte_epaisse", "Goutte épaisse"], ["tdr_vih", "TDR VIH"], ["tdr_dengue", "TDR dengue"], ["tdr_covid", "Test COVID-19"]].map(([id, label]) => ({
             id, type: "radio", label, span: 12, options: RESULTATS, variant: "ligne",
             visibleIf: { field: "__autres_tdr__", operator: "truthy" },
           })),
@@ -239,7 +241,10 @@ export function configConsultation({ dossier, refs, bloc = BLOC_GENERAL }) {
           { id: "__diagnostic__", type: "section", label: "Diagnostic", colonne: "droite" },
           { id: "diagnostic", type: "text", label: "Diagnostic retenu", required: bloc.diagnostic !== false, span: 12, assist: "diagnostic", requiredMessage: "Veuillez poser le diagnostic retenu." },
           { id: "hypotheses", type: "text", label: "Hypothèses", span: 6 },
-          { id: "pathologies", type: "text", label: "Pathologies associées", span: 6 },
+          // Liste déroulante (le crayon permet d'en écrire une autre) : rapport « maladies avec pathologies associées ».
+          { id: "pathologies", type: "liste", label: "Pathologies associées", span: 6,
+            options: paires(["Paludisme", "Anémie", "Hypertension artérielle", "Diabète", "Infection urinaire", "Gastro-entérite",
+              "Infection respiratoire", "Fièvre typhoïde", "Drépanocytose", "Malnutrition", "VIH", "Tuberculose"]) },
           ...(bloc.diagnosticChamps || []),
 
           { id: "__examens__", type: "section", label: "Examens au laboratoire", colonne: "gauche" },
