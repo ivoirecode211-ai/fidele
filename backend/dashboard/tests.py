@@ -38,7 +38,7 @@ class DirectionTests(ParcoursBase):
         self.assertEqual(stats["Recettes du jour"]["value"], "8 000")
         self.assertEqual(stats["Stock critiques"]["value"], "1")
         self.assertEqual(data["consultationData"][-1]["patients"], 1)
-        self.assertEqual(data["services"], [{"name": "Médecine générale", "percentage": 100, "color": "#0a4979"}])
+        self.assertEqual(data["services"], [{"name": "Médecine générale", "percentage": 100, "color": "var(--primary-800)"}])
         self.assertEqual(data["alerts"][0]["title"], "Stock critique : Gants")
 
     def test_only_direction(self):

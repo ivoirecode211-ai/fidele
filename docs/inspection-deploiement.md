@@ -54,10 +54,20 @@ stock et un seul planning pour toute l'installation) : sans conséquence tant qu
 - `pages/Laboratory.jsx` importe `jspdf` au démarrage : 139 kB compressés chargés par tous les utilisateurs. Un `await import("jspdf")` au moment d'imprimer les retire du chargement initial.
 - `App.jsx` : aucune page chargée à la demande (`React.lazy`) ; à faire une fois ses modifications commitées.
 
+## Passe 4 — revue visuelle
+
+Contrôle automatique des couleurs réellement affichées (textes, fonds, bordures, graphiques SVG), 22 pages,
+contre la nouvelle charte vert sapin (encore en cours dans l'autre session) :
+- Seule anomalie : la palette des services de la Direction, codée en bleu dans `dashboard/services.py`.
+  Corrigé : elle envoie maintenant les jetons `var(--primary-…)` et suit la charte, quelle qu'elle soit.
+- Soins infirmiers : les icônes Lucide des constantes étaient masquées sous 600 px. Corrigé : toujours visibles
+  (au-dessus du libellé sur une rangée serrée, à côté sur téléphone).
+- Téléphone, 24 pages : aucune erreur JS ni erreur serveur.
+
+### Signalé à la session fidele-47
+- Débordement horizontal sur téléphone : `/laboratory` 40 px (cartes de statistiques, barre d'outils),
+  `/reports` 443 px (boutons `caisse-nav-item` de la navigation des rapports).
+- Glycémie et Tension partagent l'icône `Activity` dans `pages/Nursing.jsx` : `Droplet` distinguerait la glycémie.
+
 ## Reste à inspecter
-- Passe 4 : revue visuelle module par module contre la charte. **En attente** : la charte est en cours de
-  refonte dans une autre session (bleu → vert sapin `#0B5F59`, plus d'orange, polices Inter et Manrope ;
-  `styles/variables.css` et `index.html` non commités). Le contrôle automatique des couleurs rendues
-  (toutes les pages, textes, fonds, bordures, graphiques SVG) est prêt et sera relancé sur la nouvelle charte.
-  Couleurs encore codées en dur à reprendre alors : la palette des services de la Direction
-  (`dashboard/services.py`, échelle bleue).
+- Relancer le contrôle des couleurs une fois la nouvelle charte commitée.

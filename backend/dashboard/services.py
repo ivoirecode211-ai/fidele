@@ -19,7 +19,8 @@ from prescriptions.models import PrescriptionItem
 from stocks.models import Product
 
 DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
-SERVICE_COLORS = ["#0a4979", "#1671b7", "#368ad1", "#67aae9", "#98caf9", "#c2e0ff"]
+# Jetons de la charte (échelle --primary) : la Direction suit la charte, quelle qu'elle soit.
+SERVICE_COLORS = [f"var(--primary-{n})" for n in (800, 600, 500, 400, 300, 200)]
 
 
 def ago(moment):
