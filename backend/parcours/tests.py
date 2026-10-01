@@ -592,6 +592,24 @@ class AccueilTests(APITestCase):
         self.assertEqual(cancelled["motif_annulation"], "Erreur de saisie")
         self.assertEqual(self.client.get("/api/accueil/bilan/").data["totaux"]["tickets_annules"], 1)
 
+    def test_session_of_a_past_day_stays_visible_once_validated(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from accounts.tenancy import hospital_of
+        from .models import CashSession
+
+        hier = timezone.localdate() - timedelta(days=1)
+        session = CashSession.objects.create(hospital=hospital_of(self.caissier), cashier=self.caissier, session_date=hier)
+        self.client.force_authenticate(self.regisseur)
+        cloture = self.client.post(f"/api/accueil/sessions/{session.pk}/cloturer/", {"montant_compte": "0"}, format="json")
+        self.assertEqual(cloture.data["statut"], "en_attente")
+        self.assertEqual([s["id"] for s in self.client.get("/api/accueil/bilan/").data["clotures_a_valider"]], [session.pk])
+        validee = self.client.post(f"/api/accueil/sessions/{session.pk}/valider/", {"montant_recu": "0"}, format="json")
+        self.assertEqual(validee.data["statut"], "validee")
+        bilan = self.client.get("/api/accueil/bilan/").data
+        self.assertEqual(bilan["clotures_a_valider"], [])
+        self.assertEqual([(s["id"], s["statut"]) for s in bilan["toutes_sessions"]], [(session.pk, "validee")])
+
     def test_cashier_cannot_cancel(self):
         fiche = self.fiche().data
         self.assertEqual(self.client.post(f"/api/accueil/fiches/{fiche['id']}/annuler/", {"motif": "Erreur"}, format="json").status_code, 403)

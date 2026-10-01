@@ -499,7 +499,11 @@ class BilanView(APIView):
             donnees.update({
                 "clotures_a_valider": [session_data(s) for s in sessions.filter(status=CashSession.PENDING)],
                 "caisses_ouvertes": [session_data(s) for s in sessions.filter(status=CashSession.OPEN)],
-                "toutes_sessions": [session_data(s) for s in sur_periode[:100]],
+                # Une caisse d'un jour passé, clôturée ou validée pendant la période, y figure aussi :
+                # sinon elle disparaissait de la régie au moment même où on la validait.
+                "toutes_sessions": [session_data(s) for s in sessions.filter(
+                    Q(session_date__range=(du, au)) | Q(closed_at__date__range=(du, au))
+                    | Q(validated_at__date__range=(du, au))).order_by("-session_date", "-pk")[:100]],
                 "toutes_fiches": [fiche_data(a) for a in
                                   fiches_periode.filter(cancelled_at__isnull=True).order_by("-created_at")[:200]],
                 "corbeille": [fiche_data(a) for a in

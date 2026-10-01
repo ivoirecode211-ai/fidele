@@ -1322,6 +1322,7 @@ a.caisse-nav-item { font: inherit; }
 .bandeau.attention { border: 1px solid var(--warning-soft-border); background: var(--warning-soft); color: var(--warning-soft-text); }
 .bandeau.erreur { border: 1px solid var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
 .bandeau.info { border: 1px solid var(--primary-100); background: var(--primary-50); color: var(--primary-800); }
+.bandeau.succes { border: 1px solid var(--green-soft-border); background: var(--green-soft); color: var(--green-soft-text); }
 
 
 /* ============================================================

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BadgeCheck, Lock, ShieldAlert, Trash2 } from "lucide-react";
 
 import Chargement from "../components/Chargement";
@@ -26,13 +26,19 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
   const [aAnnuler, setAAnnuler] = useState(null);
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState("");
+  const [succes, setSucces] = useState("");
+
+  // Une fenêtre qui s'ouvre repart sans le refus d'une action précédente.
+  const ouverte = aValider?.session.id ?? aCloturer?.session.id ?? aAnnuler?.fiche.id;
+  useEffect(() => { setErreur(""); }, [ouverte]);
 
   const t = bilan.totaux;
 
+  /* Après chaque action, un message dit ce qui a changé : la ligne quitte souvent le tableau où on l'a vue. */
   function agir(action) {
     return async () => {
-      setOccupe(true); setErreur("");
-      try { await action(); rafraichir(); }
+      setOccupe(true); setErreur(""); setSucces("");
+      try { setSucces(await action()); rafraichir(); }
       catch (e) { setErreur(messageErreur(e)); }
       finally { setOccupe(false); }
     };
@@ -42,17 +48,20 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
     await accueil.post(`sessions/${aValider.session.id}/valider`,
       { montant_recu: aValider.montant, note: aValider.note });
     setAValider(null);
+    return `Caisse de ${aValider.session.ouverte_par_nom} du ${aValider.session.date_session} validée : elle figure dans l'historique avec l'état « Validée ».`;
   });
 
   const cloturer = agir(async () => {
     await accueil.post(`sessions/${aCloturer.session.id}/cloturer`,
       { montant_compte: aCloturer.montant, justificatif: aCloturer.justificatif });
     setACloturer(null);
+    return `Caisse de ${aCloturer.session.ouverte_par_nom} clôturée : elle attend votre validation dans « Clôtures à valider ».`;
   });
 
   const annuler = agir(async () => {
     await accueil.post(`fiches/${aAnnuler.fiche.id}/annuler`, { motif: aAnnuler.motif });
     setAAnnuler(null);
+    return "Ticket annulé : il est passé dans la corbeille.";
   });
 
   const ecartValidation = aValider && aValider.montant !== ""
@@ -60,7 +69,8 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
 
   return (
     <>
-      {erreur && <p className="bandeau erreur" role="alert">{erreur}</p>}
+      {erreur && !aValider && !aCloturer && !aAnnuler && <p className="bandeau erreur" role="alert">{erreur}</p>}
+      {succes && <p className="bandeau succes" role="status">{succes}</p>}
 
       {/* ── Totaux : le régisseur pilote par les chiffres, pas par les lignes ── */}
       <section className="bloc">
@@ -316,6 +326,7 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
                     onChange={(e) => setAValider({ ...aValider, note: e.target.value })} />
                 </label>
               )}
+              {erreur && <p className="pop-erreur" role="alert">{erreur}</p>}
             </div>
             <footer className="pop-pied">
               <button type="button" className="secondary-button" onClick={() => setAValider(null)} disabled={occupe}>Annuler</button>
@@ -355,6 +366,7 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
                 <textarea rows={3} value={aCloturer.justificatif}
                   onChange={(e) => setACloturer({ ...aCloturer, justificatif: e.target.value })} />
               </label>
+              {erreur && <p className="pop-erreur" role="alert">{erreur}</p>}
             </div>
             <footer className="pop-pied">
               <button type="button" className="secondary-button" onClick={() => setACloturer(null)} disabled={occupe}>Annuler</button>
@@ -397,6 +409,7 @@ export default function Regie({ bilan, periode, setPeriode, rafraichir }) {
                   placeholder="Ce motif restera attaché au ticket."
                   onChange={(e) => setAAnnuler({ ...aAnnuler, motif: e.target.value })} />
               </label>
+              {erreur && <p className="pop-erreur" role="alert">{erreur}</p>}
             </div>
             <footer className="pop-pied">
               <button type="button" className="secondary-button" onClick={() => setAAnnuler(null)} disabled={occupe}>
