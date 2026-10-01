@@ -187,13 +187,24 @@ PROPOSITIONS = {
 }
 
 
-def proposer(*, consultation, cible, valeurs):
-    """Calcule la proposition et en garde la trace sur la consultation."""
+def journaliser(*, consultation, user, nature, demande="", reponse=None):
+    """Chaque intervention de l'IA sur un patient s'ajoute au journal (module IA → Interventions)."""
+    from .models import Intervention
+
+    patient = consultation.admission.patient
+    Intervention.objects.create(hospital_id=patient.hospital_id, patient=patient, consultation=consultation,
+                                user=user or consultation.doctor, nature=nature, demande=demande,
+                                reponse=reponse or {})
+
+
+def proposer(*, consultation, cible, valeurs, user=None):
+    """Calcule la proposition, en garde la trace sur la consultation et dans le journal."""
     if cible not in PROPOSITIONS:
         raise IaIndisponible("Rubrique inconnue pour l'assistant.")
     proposition = PROPOSITIONS[cible](consultation.admission, valeurs)
     consultation.ai_trace = {**consultation.ai_trace, cible: {"le": timezone.now().isoformat(), **proposition}}
     consultation.save(update_fields=["ai_trace"])
+    journaliser(consultation=consultation, user=user, nature=cible, reponse=proposition)
     return proposition
 
 
@@ -201,7 +212,7 @@ MAX_MESSAGES = 16
 MAX_CARACTERES = 2000
 
 
-def discuter(*, consultation, question, valeurs=None):
+def discuter(*, consultation, question, valeurs=None, user=None):
     """Une question du médecin sur CE patient : la réponse s'ajoute à la conversation enregistrée."""
     question = str(question or "").strip()[:MAX_CARACTERES]
     exiger(question, "Posez une question à l'assistant.")
@@ -238,4 +249,6 @@ def discuter(*, consultation, question, valeurs=None):
     ]
     consultation.ia_echange_le = maintenant
     consultation.save(update_fields=["ia_messages", "ia_echange_le"])
+    journaliser(consultation=consultation, user=user, nature="conversation", demande=question,
+                reponse={"texte": reponse})
     return consultation.ia_messages

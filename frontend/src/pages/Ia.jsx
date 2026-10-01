@@ -1,395 +1,447 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
-  BrainCircuit,
-  MessageCircle,
-  Image as ImageIcon,
   AlertTriangle,
-  CheckCircle2,
-  Clock3,
-  TrendingUp,
-  ShieldCheck,
-  Stethoscope,
-  Search,
-  X,
-  ChevronRight,
-  Sparkles,
-  BarChart3,
+  ArrowRight,
   Bot,
-  FileText,
+  Clock3,
+  FolderOpen,
+  History,
   Info,
+  Search,
+  Send,
+  ShieldCheck,
+  UserRound,
 } from "lucide-react";
+
+import Chargement from "../components/Chargement";
+import { useModuleView } from "../layouts/AppLayout";
 import api from "../services/api";
 import "../styles/ia.css";
 
-// Données de démonstration — seront reliées aux API Django/PostgreSQL.
+/*
+ * ============================================================
+ * INTELLIGENCE ARTIFICIELLE
+ * ============================================================
+ *
+ * Trois sous-modules, tous servis par /api/ia/ pour l'hôpital
+ * de l'utilisateur :
+ *
+ *   Assistant      questions sur le logiciel, et « où se trouve
+ *                  ce patient ? » (la recherche et la situation
+ *                  sont calculées par le serveur ; ni nom ni
+ *                  numéro ne partent chez le fournisseur d'IA)
+ *   Interventions  tout ce que l'IA a proposé, patient par patient
+ *   Alertes        règles cliniques appliquées aux constantes
+ * ============================================================
+ */
 
-const AI_TOOLS = [
-  { id: "diagnostic", title: "Aide au diagnostic", description: "Analyse des symptômes", icon: Stethoscope, color: "blue" },
-  { id: "risks", title: "Prédiction des risques", description: "Analyse des données", icon: TrendingUp, color: "green" },
-  { id: "assistant", title: "Assistant médical", description: "Réponses & conseils", icon: MessageCircle, color: "cyan" },
-  { id: "images", title: "Analyse d'images", description: "Radiologie & imagerie", icon: ImageIcon, color: "purple" },
-];
+const erreurApi = (e, defaut) => e?.response?.data?.detail || defaut;
 
-// Suggestions, courbe et modèles servis par /api/ia/ (règles cliniques
-// appliquées aux constantes réelles).
-const MODEL_ICONS = { Stethoscope, TrendingUp, ImageIcon, MessageCircle };
-
-// Points de la courbe dans le repère du SVG (700 × 210).
-function chartPoints(values, max) {
-  const step = values.length > 1 ? 670 / (values.length - 1) : 0;
-  return values.map((value, index) => [10 + index * step, 210 - (value / max) * 205]);
-}
-
-function AIToolCard({ icon: Icon, title, description, color, onClick }) {
+/* Gras (**…**), listes (1. / - ) et paragraphes : ce que l'assistant écrit. */
+function Texte({ contenu }) {
+  const enLigne = (ligne) => ligne.split(/(\*\*[^*]+\*\*)/g).map((morceau, i) =>
+    morceau.startsWith("**") && morceau.endsWith("**")
+      ? <strong key={i}>{morceau.slice(2, -2)}</strong>
+      : <Fragment key={i}>{morceau}</Fragment>);
+  const blocs = [];
+  let liste = null;
+  contenu.split("\n").forEach((brute) => {
+    const ligne = brute.trim();
+    const puce = ligne.match(/^(?:[-•*]|\d+[.)])\s+(.*)$/);
+    if (puce) {
+      const ordonnee = /^\d/.test(ligne);
+      if (!liste || liste.ordonnee !== ordonnee) {
+        liste = { ordonnee, items: [] };
+        blocs.push(liste);
+      }
+      liste.items.push(puce[1]);
+      return;
+    }
+    liste = null;
+    if (ligne) blocs.push(ligne);
+  });
   return (
-    <button type="button" className="ia-tool-card" onClick={onClick}>
-      <div className={`ia-tool-icon ${color}`}>
-        <Icon size={21} />
-      </div>
-      <strong>{title}</strong>
-      <span>{description}</span>
-      <ChevronRight size={13} className="ia-tool-arrow" />
-    </button>
+    <div className="ia-texte">
+      {blocs.map((bloc, i) => {
+        if (typeof bloc === "string") return <p key={i}>{enLigne(bloc)}</p>;
+        const Balise = bloc.ordonnee ? "ol" : "ul";
+        return <Balise key={i}>{bloc.items.map((item, j) => <li key={j}>{enLigne(item)}</li>)}</Balise>;
+      })}
+    </div>
   );
 }
 
-function SuggestionIcon({ type }) {
-  if (type === "warning") {
-    return <div className="ia-suggestion-icon warning"><AlertTriangle size={15} /></div>;
-  }
-  if (type === "danger") {
-    return <div className="ia-suggestion-icon danger"><AlertTriangle size={15} /></div>;
-  }
-  if (type === "success") {
-    return <div className="ia-suggestion-icon success"><CheckCircle2 size={15} /></div>;
-  }
-  return <div className="ia-suggestion-icon info"><Clock3 size={15} /></div>;
+/* ============================================================
+   ASSISTANT
+   ============================================================ */
+
+const EXEMPLES = [
+  "Comment un patient passe-t-il de la caisse à la consultation ?",
+  "Où se trouve le patient … ?",
+  "Comment valider la clôture d'une caisse ?",
+  "Comment imprimer le reçu d'une ordonnance délivrée ?",
+];
+
+function FichePatient({ fiche }) {
+  return (
+    <article className="ia-fiche">
+      <header>
+        <span className="ia-fiche-icone"><UserRound size={16} /></span>
+        <div>
+          <strong>{fiche.nom}</strong>
+          <span>{fiche.numero}{fiche.dernierPassage && ` · dernier passage le ${fiche.dernierPassage}`}</span>
+        </div>
+        <Link to={fiche.dossier} className="ia-lien"><FolderOpen size={14} />Dossier</Link>
+      </header>
+      <ul>
+        {fiche.etapes.map((etape, i) => (
+          <li key={i}>
+            <span className="ia-etape-module">{etape.module}</span>
+            <span className="ia-etape-etat">{etape.etat}</span>
+            <Link to={etape.lien} className="ia-lien" aria-label={`Ouvrir ${etape.module}`}>
+              Ouvrir<ArrowRight size={13} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
 }
 
-export default function Ia() {
-  const [search, setSearch] = useState("");
-  const [activeTool, setActiveTool] = useState(null);
-  const [data, setData] = useState({ suggestions: [], analysis: [], models: [] });
+function Assistant({ configure }) {
+  const [messages, setMessages] = useState([]);
+  const [question, setQuestion] = useState("");
+  const [envoi, setEnvoi] = useState(false);
+  const [erreur, setErreur] = useState("");
+  const fil = useRef(null);
 
   useEffect(() => {
-    api
-      .get("/ia/overview/")
-      .then((response) => setData(response.data))
-      .catch((error) => console.error("Erreur de chargement de l'IA :", error));
-  }, []);
+    fil.current?.scrollTo({ top: fil.current.scrollHeight, behavior: "smooth" });
+  }, [messages, envoi]);
 
-  const analysedAt = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const AI_SUGGESTIONS = data.suggestions;
-  const ANALYSIS_DATA = data.analysis;
-  const AI_MODELS = data.models.map((model) => ({ ...model, icon: MODEL_ICONS[model.icon] || Stethoscope }));
+  const envoyer = async (texte) => {
+    const q = (texte ?? question).trim();
+    if (!q || envoi) return;
+    setErreur("");
+    setQuestion("");
+    const historique = messages.map(({ role, content }) => ({ role, content }));
+    setMessages((m) => [...m, { role: "user", content: q }]);
+    setEnvoi(true);
+    try {
+      const { data } = await api.post("/ia/assistant/", { question: q, historique });
+      setMessages((m) => [...m, { role: "assistant", content: data.reponse, patients: data.patients }]);
+    } catch (e) {
+      setErreur(erreurApi(e, "L'assistant n'a pas pu répondre. Réessayez."));
+      setMessages((m) => m.slice(0, -1));
+      setQuestion(q);
+    } finally {
+      setEnvoi(false);
+    }
+  };
 
-  // Échelle : un multiple de 4 au-dessus de la plus haute valeur.
-  const chartMax = Math.max(4, Math.ceil(Math.max(0, ...ANALYSIS_DATA.flatMap((d) => [d.reel, d.prediction])) / 4) * 4);
-  const realPoints = chartPoints(ANALYSIS_DATA.map((d) => d.reel), chartMax);
-  const predictionPoints = chartPoints(ANALYSIS_DATA.map((d) => d.prediction), chartMax);
+  return (
+    <section className="ia-carte ia-chat">
+      <header className="ia-carte-tete">
+        <div>
+          <h2>Assistant MA SANTÉ</h2>
+          <p>Posez une question sur le logiciel, ou demandez où se trouve un patient (nom ou n° de dossier).</p>
+        </div>
+        <span className={`ia-etat ${configure ? "actif" : "inactif"}`}>
+          <span aria-hidden="true" />{configure ? "Connecté" : "Non configuré"}
+        </span>
+      </header>
 
-  const filteredSuggestions = useMemo(() => {
-    const value = search.toLowerCase().trim();
-    if (!value) return AI_SUGGESTIONS;
+      <div className="ia-fil" ref={fil} aria-live="polite">
+        {messages.length === 0 && (
+          <div className="ia-accueil">
+            <span className="ia-accueil-icone"><Bot size={26} /></span>
+            <p>Exemples de questions :</p>
+            <div className="ia-exemples">
+              {EXEMPLES.map((exemple) => (
+                <button key={exemple} type="button" onClick={() => exemple.includes("…") ? setQuestion("Où se trouve le patient ") : envoyer(exemple)}>
+                  {exemple}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} className={`ia-message ${m.role}`}>
+            {m.role === "assistant" ? <Texte contenu={m.content} /> : <p>{m.content}</p>}
+            {m.patients?.map((fiche) => <FichePatient key={fiche.id} fiche={fiche} />)}
+          </div>
+        ))}
+        {envoi && <div className="ia-message assistant"><Chargement taille="petite" centre={false} texte="L'assistant réfléchit…" /></div>}
+      </div>
 
-    return AI_SUGGESTIONS.filter(
-      (item) =>
-        item.title.toLowerCase().includes(value) ||
-        item.patient.toLowerCase().includes(value)
+      {erreur && <p className="ia-erreur" role="alert">{erreur}</p>}
+
+      <form className="ia-saisie" onSubmit={(e) => { e.preventDefault(); envoyer(); }}>
+        <textarea
+          rows={1}
+          value={question}
+          placeholder="Votre question…"
+          aria-label="Votre question"
+          maxLength={1500}
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); envoyer(); }
+          }}
+        />
+        <button type="submit" className="ia-envoyer" disabled={envoi || !question.trim()} aria-label="Envoyer">
+          <Send size={17} />
+        </button>
+      </form>
+      <p className="ia-note"><ShieldCheck size={13} />Les noms et numéros de dossier restent sur le serveur de l'hôpital.</p>
+    </section>
+  );
+}
+
+/* ============================================================
+   INTERVENTIONS PAR PATIENT
+   ============================================================ */
+
+function Reponse({ nature, reponse, demande }) {
+  if (nature === "conversation") {
+    return (
+      <>
+        <p className="ia-demande"><strong>Question :</strong> {demande}</p>
+        <Texte contenu={reponse.texte || ""} />
+      </>
     );
-  }, [search, AI_SUGGESTIONS]);
+  }
+  if (nature === "diagnostic") {
+    return (
+      <dl className="ia-details">
+        <dt>Diagnostic</dt><dd>{reponse.diagnostic || "—"}</dd>
+        {reponse.hypotheses?.length > 0 && <><dt>Hypothèses</dt><dd>{reponse.hypotheses.join(" · ")}</dd></>}
+        {reponse.justification && <><dt>Justification</dt><dd>{reponse.justification}</dd></>}
+        {reponse.gravite && <><dt>Signes de gravité</dt><dd>{reponse.gravite}</dd></>}
+      </dl>
+    );
+  }
+  if (nature === "examens") {
+    return (
+      <dl className="ia-details">
+        <dt>Examens</dt><dd>{(reponse.examensNoms || []).join(" · ") || "Aucun"}</dd>
+        {reponse.justification && <><dt>Justification</dt><dd>{reponse.justification}</dd></>}
+      </dl>
+    );
+  }
+  if (nature === "ordonnance") {
+    return (
+      <>
+        <ul className="ia-ordonnance">
+          {(reponse.ordonnance || []).map((l, i) => (
+            <li key={i}><strong>{l.medicament}</strong> — {[l.posologie, l.duree && `${l.duree} j`, l.voie].filter(Boolean).join(" · ")}</li>
+          ))}
+        </ul>
+        {reponse.retraits?.length > 0 && <p className="ia-retraits">Retiré par le serveur : {reponse.retraits.join(" ")}</p>}
+        {reponse.precautions && <p><strong>Précautions :</strong> {reponse.precautions}</p>}
+      </>
+    );
+  }
+  return <Texte contenu={reponse.conseils || ""} />;
+}
 
-  const closeTool = () => setActiveTool(null);
+function Interventions() {
+  const { search } = useLocation();
+  const [q, setQ] = useState("");
+  const [liste, setListe] = useState(null);
+  const [choisi, setChoisi] = useState(() => Number(new URLSearchParams(search).get("patient")) || null);
+  const [detail, setDetail] = useState(null);
+  const [erreur, setErreur] = useState("");
+
+  useEffect(() => {
+    const minuteur = setTimeout(() => {
+      api.get("/ia/interventions/", { params: q ? { q } : {} })
+        .then((r) => setListe(r.data))
+        .catch((e) => setErreur(erreurApi(e, "Impossible de charger les interventions.")));
+    }, 250);
+    return () => clearTimeout(minuteur);
+  }, [q]);
+
+  useEffect(() => {
+    if (!choisi) return;
+    setDetail(null);
+    api.get(`/ia/interventions/${choisi}/`)
+      .then((r) => setDetail(r.data))
+      .catch((e) => setErreur(erreurApi(e, "Impossible de charger ce patient.")));
+  }, [choisi]);
+
+  return (
+    <div className="ia-interventions">
+      <section className="ia-carte ia-patients">
+        <header className="ia-carte-tete">
+          <div><h2>Patients</h2><p>Ceux sur qui l'IA est intervenue, du plus récent au plus ancien.</p></div>
+        </header>
+        <label className="ia-recherche">
+          <Search size={15} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nom ou n° de dossier" aria-label="Rechercher un patient" />
+        </label>
+        {erreur && <p className="ia-erreur" role="alert">{erreur}</p>}
+        {!liste ? <Chargement taille="moyenne" /> : liste.length === 0 ? (
+          <p className="ia-vide">Aucune intervention de l'IA{q && " pour cette recherche"}.</p>
+        ) : (
+          <ul className="ia-liste-patients">
+            {liste.map((p) => (
+              <li key={p.id}>
+                <button type="button" className={choisi === p.id ? "actif" : ""} onClick={() => setChoisi(p.id)}>
+                  <strong>{p.nom}</strong>
+                  <span>{p.numero} · {p.interventions} intervention{p.interventions > 1 ? "s" : ""}</span>
+                  <small>Dernière : {p.derniere}</small>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="ia-carte ia-journal">
+        {!choisi ? (
+          <div className="ia-vide grand"><History size={26} /><p>Choisissez un patient pour voir chaque intervention de l'IA.</p></div>
+        ) : !detail ? <Chargement taille="moyenne" /> : (
+          <>
+            <header className="ia-carte-tete">
+              <div><h2>{detail.patient.nom}</h2><p>{detail.patient.numero}</p></div>
+              <Link to={detail.patient.dossier} className="ia-lien"><FolderOpen size={14} />Dossier patient</Link>
+            </header>
+            <ol className="ia-chronologie">
+              {detail.interventions.map((i) => (
+                <li key={i.id}>
+                  <div className="ia-chrono-tete">
+                    <span className={`ia-nature ${i.nature}`}>{i.libelle}</span>
+                    <span>{i.le} · {i.par}</span>
+                  </div>
+                  <Reponse nature={i.nature} reponse={i.reponse} demande={i.demande} />
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+/* ============================================================
+   ALERTES CLINIQUES
+   ============================================================ */
+
+function LigneAlerte({ s }) {
+  return (
+    <li className={s.type}>
+      <span className="ia-alerte-icone">{s.type === "info" ? <Clock3 size={15} /> : <AlertTriangle size={15} />}</span>
+      <div><strong>{s.title}</strong><span>{s.patient}</span></div>
+      <small>{s.le}</small>
+      <Link to={`/dossiers/${s.patientId}`} className="ia-lien"><FolderOpen size={14} />Dossier</Link>
+    </li>
+  );
+}
+
+const ATTENTES_VISIBLES = 5;
+
+function Alertes({ donnees }) {
+  const [toutes, setToutes] = useState(false);
+  const max = Math.max(4, ...donnees.analysis.flatMap((d) => [d.reel, d.prediction]));
+  const constantes = donnees.suggestions.filter((s) => s.type !== "info");
+  const attentes = donnees.suggestions.filter((s) => s.type === "info");
+  return (
+    <div className="ia-alertes">
+      <div className="ia-colonne">
+        <section className="ia-carte">
+          <header className="ia-carte-tete">
+            <div>
+              <h2>Constantes hors seuils <span className="ia-compte">{constantes.length}</span></h2>
+              <p>Seuils médicaux appliqués aux dernières constantes de chaque patient (7 derniers jours).</p>
+            </div>
+          </header>
+          {constantes.length === 0 ? (
+            <p className="ia-vide">Aucune constante récente ne dépasse un seuil.</p>
+          ) : (
+            <ul className="ia-liste-alertes">{constantes.map((s) => <LigneAlerte key={s.id} s={s} />)}</ul>
+          )}
+        </section>
+
+        <section className="ia-carte">
+          <header className="ia-carte-tete">
+            <div>
+              <h2>Attente de plus de 2 h <span className="ia-compte">{attentes.length}</span></h2>
+              <p>Patients aux constantes prises qui attendent encore le médecin, la plus ancienne attente d'abord.</p>
+            </div>
+          </header>
+          {attentes.length === 0 ? (
+            <p className="ia-vide">Aucun patient n'attend depuis plus de 2 heures.</p>
+          ) : (
+            <>
+              <ul className="ia-liste-alertes">
+                {(toutes ? attentes : attentes.slice(0, ATTENTES_VISIBLES)).map((s) => <LigneAlerte key={s.id} s={s} />)}
+              </ul>
+              {attentes.length > ATTENTES_VISIBLES && (
+                <button type="button" className="ia-plus" onClick={() => setToutes(!toutes)}>
+                  {toutes ? "Réduire la liste" : `Voir les ${attentes.length - ATTENTES_VISIBLES} autres`}
+                </button>
+              )}
+            </>
+          )}
+        </section>
+      </div>
+
+      <section className="ia-carte">
+        <header className="ia-carte-tete">
+          <div>
+            <h2>Activité de l'infirmerie</h2>
+            <p>Constantes prises par jour, et la tendance (moyenne des trois jours précédents).</p>
+          </div>
+        </header>
+        <div className="ia-barres" role="img" aria-label="Constantes prises par jour">
+          {donnees.analysis.map((d) => (
+            <div key={d.date} className="ia-barre">
+              <span className="ia-barre-valeur">{d.reel}</span>
+              <div className="ia-barre-piste">
+                <div className="ia-barre-reel" style={{ height: `${(d.reel / max) * 100}%` }} />
+                <div className="ia-barre-tendance" style={{ bottom: `${(d.prediction / max) * 100}%` }} title={`Tendance : ${d.prediction}`} />
+              </div>
+              <span className="ia-barre-date">{d.date}</span>
+            </div>
+          ))}
+        </div>
+        <div className="ia-legende">
+          <span><i className="reel" />Constantes prises</span>
+          <span><i className="tendance" />Tendance</span>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+export default function Ia() {
+  const vue = useModuleView("/ia");
+  const [donnees, setDonnees] = useState(null);
+  const [erreur, setErreur] = useState("");
+
+  useEffect(() => {
+    api.get("/ia/overview/")
+      .then((r) => setDonnees(r.data))
+      .catch((e) => setErreur(erreurApi(e, "Impossible de charger le module IA.")));
+  }, []);
 
   return (
     <div className="ia-page">
-      <header className="ia-header">
-
-        <div className="ia-status">
-          <span className="ia-status-dot"></span>
-          IA opérationnelle
-        </div>
-      </header>
-
-      <section className="ia-tools-grid">
-        {AI_TOOLS.map((tool) => (
-          <AIToolCard
-            key={tool.id}
-            icon={tool.icon}
-            title={tool.title}
-            description={tool.description}
-            color={tool.color}
-            onClick={() => setActiveTool(tool)}
-          />
-        ))}
-      </section>
-
-      <div className="ia-toolbar">
-        <div className="ia-search">
-          <Search size={15} />
-          <input
-            type="text"
-            placeholder="Rechercher une suggestion, un patient..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          {search && (
-            <button
-              type="button"
-              className="ia-clear-search"
-              onClick={() => setSearch("")}
-              aria-label="Effacer la recherche"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        <div className="ia-last-update">
-          <Clock3 size={13} />
-          Dernière analyse :
-          <strong>aujourd'hui à {analysedAt}</strong>
-        </div>
-      </div>
-
-      <div className="ia-main-grid">
-        <section className="ia-panel suggestions-panel">
-          <div className="ia-panel-header">
-            <div>
-              <h2>
-                Suggestions IA
-                <span className="ia-today">Aujourd'hui</span>
-              </h2>
-              <p>Alertes et recommandations générées par l'intelligence artificielle</p>
-            </div>
-
-            <button
-              type="button"
-              className="ia-view-all"
-              onClick={() => setSearch("")}
-            >
-              Voir tout
-              <ChevronRight size={13} />
-            </button>
-          </div>
-
-          <div className="ia-suggestions-list">
-            {filteredSuggestions.map((suggestion) => (
-              <div className="ia-suggestion-row" key={suggestion.id}>
-                <SuggestionIcon type={suggestion.type} />
-                <div className="ia-suggestion-content">
-                  <strong>{suggestion.title}</strong>
-                  <span>{suggestion.patient}</span>
-                </div>
-                <button
-                  type="button"
-                  className="ia-suggestion-view"
-                  onClick={() => alert(`Détails : ${suggestion.title}`)}
-                >
-                  Voir
-                </button>
-              </div>
-            ))}
-
-            {filteredSuggestions.length === 0 && (
-              <div className="ia-empty">
-                <Search size={22} />
-                <span>Aucune suggestion trouvée.</span>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="ia-panel analysis-panel">
-          <div className="ia-panel-header">
-            <div>
-              <h2>Analyse des données</h2>
-              <p>Prédiction des admissions (7 jours)</p>
-            </div>
-            <div className="ia-analysis-icon">
-              <BarChart3 size={17} />
-            </div>
-          </div>
-
-          <div className="ia-chart">
-            <div className="ia-chart-y">
-              {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
-                <span key={ratio}>{chartMax * ratio}</span>
-              ))}
-            </div>
-
-            <div className="ia-chart-body">
-              <div className="ia-chart-grid-line line-40"></div>
-              <div className="ia-chart-grid-line line-30"></div>
-              <div className="ia-chart-grid-line line-20"></div>
-              <div className="ia-chart-grid-line line-10"></div>
-              <div className="ia-chart-grid-line line-0"></div>
-
-              <svg className="ia-chart-svg" viewBox="0 0 700 210" preserveAspectRatio="none">
-                <polyline
-                  points={realPoints.map((p) => p.join(",")).join(" ")}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                />
-                <polyline
-                  points={predictionPoints.map((p) => p.join(",")).join(" ")}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeDasharray="7 5"
-                  className="prediction-line"
-                />
-                {realPoints.map(([x, y], index) => (
-                  <circle key={index} cx={x} cy={y} r="4" />
-                ))}
-              </svg>
-
-              <div className="ia-chart-x">
-                {ANALYSIS_DATA.map((item) => (
-                  <span key={item.date}>{item.date}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="ia-chart-legend">
-            <span><i className="legend-real"></i>Réel</span>
-            <span><i className="legend-prediction"></i>Prédiction</span>
-          </div>
-        </section>
-      </div>
-
-      <div className="ia-bottom-grid">
-        <section className="ia-health-card">
-          <div className="ia-health-icon">
-            <Bot size={28} />
-          </div>
-          <div className="ia-health-content">
-            <h2>L'IA au service de la santé</h2>
-            <p>
-              Une technologie conçue pour rendre la clinique plus performante,
-              plus intelligente et mieux organisée.
-            </p>
-            <button
-              type="button"
-              onClick={() => alert("Découvrez les fonctionnalités IA de MA SANTÉ.")}
-            >
-              Découvrir
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        </section>
-
-        <section className="ia-panel models-panel">
-          <div className="ia-panel-header">
-            <div>
-              <h2>Modèles IA</h2>
-              <p>État des modèles disponibles</p>
-            </div>
-            <Sparkles size={17} className="models-sparkle" />
-          </div>
-
-          <div className="ia-models-list">
-            {AI_MODELS.map((model) => {
-              const Icon = model.icon;
-              return (
-                <div className="ia-model-row" key={model.id}>
-                  <div className="ia-model-name">
-                    <Icon size={13} />
-                    <span>{model.name}</span>
-                  </div>
-                  <span className="ia-model-status">{model.status}</span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-
-      <div className="ia-information">
-        <div className="ia-information-icon">
-          <Info size={17} />
-        </div>
-        <div>
-          <strong>Assistance à la décision</strong>
-          <span>
-            Les résultats produits par l'IA sont des outils d'aide à la décision
-            et ne remplacent pas l'analyse d'un professionnel de santé.
-          </span>
-        </div>
-        <ShieldCheck size={19} className="ia-information-check" />
-      </div>
-
-      {activeTool && (() => {
-        const ActiveToolIcon = activeTool.icon;
-
-        return (
-          <div
-            className="ia-modal-overlay"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) closeTool();
-            }}
-          >
-            <div className="ia-modal">
-              <div className="ia-modal-header">
-                <div className="ia-modal-title">
-                  <div className={`ia-modal-icon ${activeTool.color}`}>
-                    <ActiveToolIcon size={21} />
-                  </div>
-                  <div>
-                    <h2>{activeTool.title}</h2>
-                    <p>{activeTool.description}</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="ia-modal-close"
-                  onClick={closeTool}
-                  aria-label="Fermer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="ia-modal-body">
-                <div className="ia-modal-placeholder">
-                  <div className="ia-placeholder-icon">
-                    <BrainCircuit size={28} />
-                  </div>
-                  <h3>Module {activeTool.title}</h3>
-                  <p>
-                    Cette fonctionnalité est prête pour être connectée au moteur
-                    d'intelligence artificielle.
-                  </p>
-                  <div className="ia-development-info">
-                    <FileText size={15} />
-                    <span>
-                      L'API Django pourra traiter les données et retourner les
-                      résultats de l'analyse.
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="ia-modal-footer">
-                <button type="button" className="ia-modal-cancel" onClick={closeTool}>
-                  Fermer
-                </button>
-                <button
-                  type="button"
-                  className="ia-modal-action"
-                  onClick={() => alert("Cet outil n'est pas encore disponible : les alertes de la page sont calculées à partir des constantes réelles.")}
-                >
-                  <Sparkles size={15} />
-                  Démarrer l'analyse
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {erreur && <p className="ia-erreur" role="alert">{erreur}</p>}
+      {!donnees && !erreur && <Chargement taille="grande" pleine />}
+      {donnees && vue?.id === "assistant" && <Assistant configure={donnees.assistantConfigure} />}
+      {donnees && vue?.id === "interventions" && <Interventions />}
+      {donnees && vue?.id === "alertes" && <Alertes donnees={donnees} />}
+      <p className="ia-avertissement">
+        <Info size={15} />
+        Les propositions de l'IA aident à la décision ; elles ne remplacent pas le jugement d'un professionnel de santé.
+      </p>
     </div>
   );
 }

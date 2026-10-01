@@ -1,6 +1,6 @@
 
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
-import { BarChart3, Clock3, Menu, Tags, UserCheck, Users, X } from "lucide-react";
+import { Activity, BarChart3, Bot, Clock3, History, Menu, Tags, UserCheck, Users, X } from "lucide-react";
 import { useState } from "react";
 import Logo from "../components/Logo";
 import SidebarFooter from "../components/SidebarFooter";
@@ -39,6 +39,11 @@ export const MODULE_VIEWS = {
   "/administration": [
     { id: "utilisateurs", label: "Utilisateurs", icon: Users },
     { id: "prestations", label: "Prestations et tarifs", icon: Tags },
+  ],
+  "/ia": [
+    { id: "assistant", label: "Assistant", icon: Bot },
+    { id: "interventions", label: "Interventions par patient", icon: History },
+    { id: "alertes", label: "Alertes cliniques", icon: Activity },
   ],
   "/nursing": [
     { id: "attente", label: "Patients en attente", icon: Clock3 },

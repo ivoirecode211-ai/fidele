@@ -32,35 +32,44 @@ def rules(vitals):
     return alerts
 
 
-def suggestions():
+def suggestions(hospital):
     since = timezone.now() - timedelta(days=WINDOW_DAYS)
     rows, seen = [], set()
-    latest = VitalSigns.objects.filter(recorded_at__gte=since).select_related("admission__patient")
+    latest = VitalSigns.objects.filter(recorded_at__gte=since, admission__patient__hospital=hospital
+                                       ).select_related("admission__patient")
     for vitals in latest:  # du plus récent au plus ancien
         if vitals.admission_id in seen:
             continue
         seen.add(vitals.admission_id)
         for kind, title in rules(vitals):
             rows.append({"type": kind, "title": title, "patient": patient_label(vitals.admission.patient),
-                         "at": vitals.recorded_at})
-    waiting = Admission.objects.filter(
+                         "patient_id": vitals.admission.patient_id, "at": vitals.recorded_at})
+    waiting = Admission.objects.of_hospital(hospital).filter(
         sent_to_consultation_at__lte=timezone.now() - LONG_WAIT,
     ).exclude(statut="Terminée").select_related("patient")
-    for admission in waiting:
+    attendus = set()
+    for admission in waiting.order_by("sent_to_consultation_at"):
+        # Un patient n'apparaît qu'une fois, pour son attente la plus ancienne.
+        if admission.patient_id in attendus:
+            continue
+        attendus.add(admission.patient_id)
         rows.append({"type": "info", "title": "Attente prolongée avant consultation",
-                     "patient": patient_label(admission.patient), "at": admission.sent_to_consultation_at})
+                     "patient": patient_label(admission.patient), "patient_id": admission.patient_id,
+                     "at": admission.sent_to_consultation_at})
     order = {"danger": 0, "warning": 1, "info": 2, "success": 3}
     rows.sort(key=lambda row: (order[row["type"]], -row["at"].timestamp()))
-    return [{"id": index, "type": row["type"], "title": row["title"], "patient": row["patient"]}
+    return [{"id": index, "type": row["type"], "title": row["title"], "patient": row["patient"],
+             "patientId": row["patient_id"], "le": timezone.localtime(row["at"]).strftime("%d/%m %H:%M")}
             for index, row in enumerate(rows, start=1)]
 
 
-def analysis():
+def analysis(hospital):
     """Patients analysés par jour ; la prédiction est la moyenne des 3 jours précédents."""
     today = timezone.localdate()
     days = [today - timedelta(days=offset) for offset in range(WINDOW_DAYS + 2, -1, -1)]
     counts = {day: 0 for day in days}
-    for recorded in VitalSigns.objects.filter(recorded_at__date__gte=days[0]).values_list("recorded_at", flat=True):
+    for recorded in VitalSigns.objects.filter(recorded_at__date__gte=days[0], admission__patient__hospital=hospital
+                                              ).values_list("recorded_at", flat=True):
         day = timezone.localtime(recorded).date()
         if day in counts:
             counts[day] += 1
@@ -75,13 +84,12 @@ def analysis():
     return rows[-WINDOW_DAYS:]
 
 
-MODELS = [
-    {"id": 1, "name": "Diagnostic médical", "status": "Actif", "icon": "Stethoscope"},
-    {"id": 2, "name": "Prédiction des risques", "status": "Actif", "icon": "TrendingUp"},
-    {"id": 3, "name": "Analyse d'images", "status": "Non disponible", "icon": "ImageIcon"},
-    {"id": 4, "name": "Assistant conversationnel", "status": "Non disponible", "icon": "MessageCircle"},
-]
+def overview(hospital):
+    import os
 
-
-def overview():
-    return {"suggestions": suggestions(), "analysis": analysis(), "models": MODELS}
+    return {
+        "suggestions": suggestions(hospital),
+        "analysis": analysis(hospital),
+        # L'assistant ne répond que si la clé du fournisseur est posée sur le serveur.
+        "assistantConfigure": bool(os.getenv("GROQ_API_KEY")),
+    }

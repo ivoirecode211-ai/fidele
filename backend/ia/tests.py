@@ -13,11 +13,81 @@ class IaTests(ParcoursBase):
         self.assertTrue(data["suggestions"][0]["patient"].startswith("Patient : TRAORE Awa"))
         self.assertEqual(len(data["analysis"]), 7)
         self.assertEqual(data["analysis"][-1]["reel"], 2)
-        self.assertEqual([m["status"] for m in data["models"]].count("Actif"), 2)
+        self.assertIn("assistantConfigure", data)
 
     def test_roles(self):
         self.as_user(self.infirmier)
         self.assertEqual(self.client.get("/api/ia/overview/").status_code, 403)
+
+
+class JournalEtAssistantTests(ParcoursBase):
+    """Journal des interventions de l'IA par patient, et assistant du module IA, cloisonnés par hôpital."""
+
+    def setUp(self):
+        super().setUp()
+        self.envoyer_en_consultation()
+
+    def autre_hopital(self):
+        from accounts.models import Hospital
+        from django.contrib.auth import get_user_model
+
+        autre = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        return get_user_model().objects.create_user(username="dr-b", password="x", role="DOCTOR", hospital=autre)
+
+    def test_chaque_proposition_est_journalisee_sur_le_patient(self):
+        from unittest.mock import patch
+
+        from consultations.tests import MG, consultation_complete
+
+        self.as_user(self.medecin)
+        with patch("ia.clinique.completer") as completer:
+            completer.return_value = {"diagnostic": "Paludisme simple", "hypotheses": [], "justification": "TDR+",
+                                      "gravite": "", "manque": ""}
+            for _ in range(2):
+                self.client.post(f"{MG}{self.pk}/ia/", {"cible": "diagnostic", "valeurs": consultation_complete()},
+                                 format="json")
+        liste = self.client.get("/api/ia/interventions/").data
+        self.assertEqual([(p["nom"], p["interventions"]) for p in liste], [("TRAORE Awa", 2)])
+        detail = self.client.get(f"/api/ia/interventions/{liste[0]['id']}/").data
+        self.assertEqual([i["libelle"] for i in detail["interventions"]], ["Diagnostic proposé"] * 2)
+        self.assertEqual(detail["interventions"][0]["reponse"]["diagnostic"], "Paludisme simple")
+        self.assertEqual(detail["interventions"][0]["par"], "Jean Kouame")
+        # Un autre hôpital ne voit ni la liste ni le patient.
+        self.as_user(self.autre_hopital())
+        self.assertEqual(self.client.get("/api/ia/interventions/").data, [])
+        self.assertEqual(self.client.get(f"/api/ia/interventions/{liste[0]['id']}/").status_code, 404)
+
+    def test_assistant_localise_le_patient_sans_envoyer_son_nom(self):
+        from unittest.mock import patch
+
+        self.as_user(self.medecin)
+        with patch("ia.assistant.completer", return_value="Consultez la fiche ci-dessous.") as completer:
+            reponse = self.client.post("/api/ia/assistant/", {"question": "Où se trouve Awa Traore ?"}, format="json")
+        self.assertEqual(reponse.status_code, 200, reponse.data)
+        fiche, = reponse.data["patients"]
+        self.assertEqual(fiche["nom"], "TRAORE Awa")
+        self.assertEqual(fiche["etapes"][0]["module"], "Consultation")
+        envoye = str(completer.call_args.args[0]).lower()
+        self.assertIn("où se trouve [patient]", envoye)
+        for mot in ("traore", "awa", fiche["numero"].lower()):
+            self.assertNotIn(mot, envoye)
+        # Le même nom, cherché depuis un autre hôpital : aucune fiche.
+        self.as_user(self.autre_hopital())
+        with patch("ia.assistant.completer", return_value="Je ne trouve personne."):
+            self.assertEqual(self.client.post("/api/ia/assistant/", {"question": "Où se trouve Awa Traore ?"},
+                                              format="json").data["patients"], [])
+
+    def test_sans_cle_les_fiches_restent_la_reponse(self):
+        from unittest.mock import patch
+
+        from .groq import IaIndisponible
+
+        self.as_user(self.medecin)
+        with patch("ia.assistant.completer", side_effect=IaIndisponible("clé absente")):
+            data = self.client.post("/api/ia/assistant/", {"question": "où est traore"}, format="json").data
+            self.assertEqual(len(data["patients"]), 1)
+            self.assertEqual(self.client.post("/api/ia/assistant/", {"question": "comment encaisser ?"},
+                                              format="json").status_code, 400)
 
 
 from django.test import SimpleTestCase

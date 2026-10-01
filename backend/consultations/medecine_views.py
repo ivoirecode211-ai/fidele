@@ -115,7 +115,7 @@ class PropositionView(APIView):
             medecine.ouvrir(admission=admission, user=request.user)
             consultation = Consultation.objects.select_related("admission__patient").get(admission=admission)
             proposition = proposer(consultation=consultation, cible=request.data.get("cible"),
-                                   valeurs=valeurs if isinstance(valeurs, dict) else {})
+                                   valeurs=valeurs if isinstance(valeurs, dict) else {}, user=request.user)
         except (WorkflowError, IaIndisponible) as erreur:
             return refus(erreur)
         return Response(proposition)
@@ -183,7 +183,7 @@ class ConversationView(APIView):
             consultation = self.consultation(request, pk)
             consultation = Consultation.objects.select_related("admission__patient").get(pk=consultation.pk)
             discuter(consultation=consultation, question=request.data.get("question"),
-                     valeurs=request.data.get("valeurs"))
+                     valeurs=request.data.get("valeurs"), user=request.user)
         except (WorkflowError, IaIndisponible) as erreur:
             return refus(erreur)
         return Response(fiche_conversation(consultation))
