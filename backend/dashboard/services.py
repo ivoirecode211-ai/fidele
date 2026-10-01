@@ -32,14 +32,17 @@ def ago(moment):
     return f"Il y a {minutes // (24 * 60)} j"
 
 
-def alerts():
-    """Points d'attention réels, du plus grave au moins grave."""
+def alerts(hospital):
+    """Points d'attention réels de l'hôpital, du plus grave au moins grave.
+
+    Stocks et hygiène ne sont pas encore rattachés à un hôpital : ils restent communs.
+    """
     now = timezone.now()
     rows = []
     for product in Product.objects.filter(stock__lte=F("threshold")).order_by("stock")[:3]:
         rows.append({"type": "critical", "icon": "AlertTriangle", "title": f"Stock critique : {product.name}",
                      "text": f"Il reste {product.stock} unité(s) (seuil : {product.threshold})", "at": now})
-    for equipment in Equipment.objects.prefetch_related("interventions"):
+    for equipment in Equipment.objects.filter(hospital=hospital).prefetch_related("interventions"):
         state, cause = equipment_state(equipment)
         if cause:
             rows.append({"type": "critical" if state == "Critique" else "warning", "icon": "Wrench",
@@ -50,31 +53,33 @@ def alerts():
     if late:
         rows.append({"type": "warning", "icon": "AlertTriangle", "title": f"{len(late)} tâche(s) d'hygiène en retard",
                      "text": ", ".join(sorted({t.zone for t in late}))[:120], "at": now})
-    waiting = Admission.objects.filter(sent_to_consultation_at__lte=now - timedelta(hours=2)).exclude(statut="Terminée")
+    waiting = Admission.objects.of_hospital(hospital).filter(sent_to_consultation_at__lte=now - timedelta(hours=2)).exclude(statut="Terminée")
     if waiting.exists():
         rows.append({"type": "info", "icon": "Siren", "title": f"{waiting.count()} patient(s) en attente depuis plus de 2 h",
                      "text": "Consultation à prévoir", "at": waiting.order_by("sent_to_consultation_at").first().sent_to_consultation_at})
-    pending_lab = LabRequest.objects.exclude(status="Terminée").filter(results__isnull=False).distinct()
+    pending_lab = LabRequest.objects.filter(admission__patient__hospital=hospital).exclude(status="Terminée").filter(results__isnull=False).distinct()
     if pending_lab.exists():
         rows.append({"type": "success", "icon": "CheckCircle2", "title": f"{pending_lab.count()} analyse(s) en attente de résultat",
                      "text": "", "at": pending_lab.order_by("requested_at").first().requested_at})
     return [{**{k: v for k, v in row.items() if k != "at"}, "time": ago(row["at"])} for row in rows]
 
 
-def get_summary():
+def get_summary(hospital):
     today = timezone.localdate()
+    patients = Patient.objects.filter(hospital=hospital)
+    beds = Bed.objects.filter(room__hospital=hospital)
     return {
-        "patients": Patient.objects.count(),
-        "new_patients": Patient.objects.filter(created_at__date=today).count(),
-        "consultations_today": Consultation.objects.filter(completed_at__date=today).count(),
-        "appointments_today": Appointment.objects.filter(date_time__date=today).exclude(status="CANCELLED").count(),
-        "beds_available": Bed.objects.filter(status="AVAILABLE").count(),
-        "beds_occupied": Bed.objects.filter(status="OCCUPIED").count(),
-        "beds_reserved": Bed.objects.filter(status="RESERVED").count(),
-        "beds_cleaning": Bed.objects.filter(status="CLEANING").count(),
-        "unpaid_invoices": Invoice.objects.filter(status__in=["UNPAID", "PARTIAL"]).count(),
-        "revenue_today": Admission.objects.encaissees().filter(paid_at__date=today).aggregate(total=Sum("cost"))["total"] or 0,
-        "alerts": [f"{row['title']}{' — ' + row['text'] if row['text'] else ''}" for row in alerts()],
+        "patients": patients.count(),
+        "new_patients": patients.filter(created_at__date=today).count(),
+        "consultations_today": Consultation.objects.filter(patient__hospital=hospital, completed_at__date=today).count(),
+        "appointments_today": Appointment.objects.filter(patient__hospital=hospital, date_time__date=today).exclude(status="CANCELLED").count(),
+        "beds_available": beds.filter(status="AVAILABLE").count(),
+        "beds_occupied": beds.filter(status="OCCUPIED").count(),
+        "beds_reserved": beds.filter(status="RESERVED").count(),
+        "beds_cleaning": beds.filter(status="CLEANING").count(),
+        "unpaid_invoices": Invoice.objects.filter(patient__hospital=hospital, status__in=["UNPAID", "PARTIAL"]).count(),
+        "revenue_today": Admission.objects.of_hospital(hospital).encaissees().filter(paid_at__date=today).aggregate(total=Sum("cost"))["total"] or 0,
+        "alerts": [f"{row['title']}{' — ' + row['text'] if row['text'] else ''}" for row in alerts(hospital)],
     }
 
 
@@ -89,26 +94,27 @@ def fr_number(value):
     return f"{int(value):,}".replace(",", " ")
 
 
-def direction_overview():
+def direction_overview(hospital):
     today = timezone.localdate()
     yesterday = today - timedelta(days=1)
 
     def per_day(day):
-        admissions = Admission.objects.actives().filter(created_at__date=day)
-        paid = Admission.objects.encaissees().filter(paid_at__date=day)
+        admissions = Admission.objects.of_hospital(hospital).actives().filter(created_at__date=day)
+        paid = Admission.objects.of_hospital(hospital).encaissees().filter(paid_at__date=day)
         return {
             "patients": admissions.count(),
-            "consultations": Consultation.objects.filter(completed_at__date=day).count(),
+            "consultations": Consultation.objects.filter(patient__hospital=hospital, completed_at__date=day).count(),
             "revenue": paid.aggregate(total=Sum("cost"))["total"] or 0,
-            "analyses": LabRequest.objects.filter(status="Terminée", completed_at__date=day).count(),
-            "medicines": PrescriptionItem.objects.filter(prescription__served_at__date=day).count(),
+            "analyses": LabRequest.objects.filter(admission__patient__hospital=hospital, status="Terminée", completed_at__date=day).count(),
+            "medicines": PrescriptionItem.objects.filter(prescription__patient__hospital=hospital, prescription__served_at__date=day).count(),
         }
 
     now_, before = per_day(today), per_day(yesterday)
-    beds = Bed.objects.count()
-    occupied = Bed.objects.filter(status="OCCUPIED").count()
+    all_beds = Bed.objects.filter(room__hospital=hospital)
+    beds = all_beds.count()
+    occupied = all_beds.filter(status="OCCUPIED").count()
     critical_stock = Product.objects.filter(stock__lte=F("threshold")).count()
-    hospitalized = Hospitalization.objects.filter(discharge_date__isnull=True).count()
+    hospitalized = Hospitalization.objects.filter(patient__hospital=hospital, discharge_date__isnull=True).count()
 
     week = [today - timedelta(days=offset) for offset in range(6, -1, -1)]
     chart = []
@@ -117,7 +123,7 @@ def direction_overview():
         chart.append({"day": DAYS[day.weekday()], "consultations": counts["consultations"], "patients": counts["patients"]})
 
     since = today - timedelta(days=30)
-    by_service = Counter(Admission.objects.actives().filter(created_at__date__gte=since).values_list("service_name", flat=True))
+    by_service = Counter(Admission.objects.of_hospital(hospital).actives().filter(created_at__date__gte=since).values_list("service_name", flat=True))
     total = sum(by_service.values())
     ranked = by_service.most_common()
     rows = ranked[:5] + ([("Autres", sum(n for _, n in ranked[5:]))] if len(ranked) > 5 else [])
@@ -138,5 +144,5 @@ def direction_overview():
         "consultationData": chart,
         "services": services,
         "servicesTotal": total,
-        "alerts": alerts(),
+        "alerts": alerts(hospital),
     }

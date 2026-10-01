@@ -38,7 +38,10 @@ Fuites trouvées puis corrigées :
 - Patient ou chambre créés sans hôpital : rattachés d'office au premier hôpital.
 Après correction : 0 fuite sur les listes et les fiches. Tests `dossier/tests_cloisonnement.py`. Suite complète : 259 tests OK.
 
-À surveiller : le Tableau de bord et la Direction comptent encore les lits et les chiffres de tous les hôpitaux
-(aucune donnée nominative, mais des totaux mêlés).
+Tableau de bord et Direction : chiffres, lits, recettes et alertes désormais calculés pour l'hôpital de
+l'utilisateur. Exception connue : Stocks et Hygiène n'ont pas encore de rattachement à un hôpital (un seul
+stock et un seul planning pour toute l'installation) : sans conséquence tant qu'un seul hôpital est en service.
+
+## Reste à inspecter
 - Passe 4 : revue visuelle module par module (captures ordinateur et téléphone) contre la charte.
 - Passe 5 : performances (taille du paquet frontend, requêtes N+1) et préparation du déploiement (collectstatic, migrations sur base neuve, comptes par défaut).

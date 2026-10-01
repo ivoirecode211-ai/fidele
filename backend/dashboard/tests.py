@@ -45,3 +45,15 @@ class DirectionTests(ParcoursBase):
         self.as_user(self.medecin)
         self.assertEqual(self.client.get("/api/dashboard/direction/").status_code, 403)
 
+
+    def test_other_hospital_sees_its_own_figures(self):
+        from accounts.models import Hospital
+
+        self.envoyer_en_consultation()
+        self.valider()
+        autre = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        self.as_user(User.objects.create_user(username="dir-b", password="x", role="DIRECTOR", hospital=autre))
+        stats = {row["title"]: row for row in self.client.get("/api/dashboard/direction/").data["statistics"]}
+        self.assertEqual((stats["Patients aujourd'hui"]["value"], stats["Recettes du jour"]["value"]), ("0", "0"))
+        summary = self.client.get("/api/dashboard/").data
+        self.assertEqual((summary["patients"], summary["revenue_today"]), (0, 0))
