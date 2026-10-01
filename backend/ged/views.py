@@ -1,4 +1,6 @@
 """API de la GED (/api/ged/), aux noms de champs de l'écran."""
+import re
+
 from django.db import transaction
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -154,6 +156,45 @@ class RechercheView(APIView):
         return Response(services.rechercher(hospital_of(request.user), request.query_params.get("q")))
 
 
+def lire_naissance(valeur):
+    """« 1962 », « 1962-04-18 » ou « 18/04/1962 » -> (date, année). Vide -> (None, None).
+
+    Une naissance illisible ou impossible est refusée avec un message clair,
+    plutôt que d'échouer à l'enregistrement.
+    """
+    from datetime import date, datetime
+
+    texte = str(valeur or "").strip()
+    if not texte:
+        return None, None
+    if re.fullmatch(r"\d{4}", texte):
+        annee = int(texte)
+        if not 1880 <= annee <= date.today().year:
+            raise ValueError(f"Année de naissance impossible : {texte}.")
+        return None, annee
+    for format_ in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+        try:
+            jour = datetime.strptime(texte, format_).date()
+        except ValueError:
+            continue
+        if not date(1880, 1, 1) <= jour <= date.today():
+            raise ValueError("La date de naissance ne peut pas être dans le futur ni avant 1880.")
+        return jour, None
+    raise ValueError("Naissance : indiquez une année (1962) ou une date (18/04/1962).")
+
+
+def lire_annee(valeur):
+    """Année du registre : entre 1900 et l'année en cours, ou vide."""
+    from datetime import date
+
+    texte = str(valeur or "").strip()
+    if not texte:
+        return None
+    if not texte.isdigit() or not 1900 <= int(texte) <= date.today().year:
+        raise ValueError(f"Année du registre impossible : {texte}.")
+    return int(texte)
+
+
 class IdentitesView(APIView):
     """GET : les identités d'archive. POST : en créer une (un patient des registres papier)."""
     permission_classes = [GedAccess]
@@ -171,7 +212,11 @@ class IdentitesView(APIView):
         nom = str(donnees.get("nom") or "").strip().upper()
         if not nom:
             return Response({"nom": "Le nom est obligatoire."}, status=status.HTTP_400_BAD_REQUEST)
-        naissance = str(donnees.get("naissance") or "").strip()
+        try:
+            date_naissance, annee_naissance = lire_naissance(donnees.get("naissance"))
+            annee_registre = lire_annee(donnees.get("anneeRegistre"))
+        except ValueError as erreur:
+            return Response({"detail": str(erreur)}, status=status.HTTP_400_BAD_REQUEST)
         # Un même n° de registre, c'est la même personne : on renvoie la fiche existante (409), jamais un doublon.
         numero = str(donnees.get("numeroRegistre") or "").strip()
         existante = numero and IdentiteArchive.objects.filter(
@@ -184,10 +229,10 @@ class IdentitesView(APIView):
             hospital=hospital_of(request.user), nom=nom[:120],
             prenoms=str(donnees.get("prenoms") or "").strip()[:180],
             sexe=donnees.get("sexe") if donnees.get("sexe") in ("M", "F") else "",
-            date_naissance=naissance if len(naissance) == 10 else None,
-            annee_naissance=int(naissance) if naissance.isdigit() and len(naissance) == 4 else None,
-            numero_registre=str(donnees.get("numeroRegistre") or "").strip()[:60],
-            annee_registre=int(donnees["anneeRegistre"]) if str(donnees.get("anneeRegistre") or "").isdigit() else None,
+            date_naissance=date_naissance,
+            annee_naissance=annee_naissance,
+            numero_registre=numero[:60],
+            annee_registre=annee_registre,
             service=str(donnees.get("service") or "")[:120], notes=str(donnees.get("notes") or ""),
             created_by=request.user,
         )

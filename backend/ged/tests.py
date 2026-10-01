@@ -93,6 +93,21 @@ class GedTests(ParcoursBase):
         self.assertTrue({"Registre papier", "Consultation", "Pharmacie", "Caisse"} <= sources, sources)
         self.assertEqual(len(dossier["identites"]), 1)
 
+    def test_naissance_complete_ou_a_la_francaise_sans_erreur_serveur(self):
+        from ged.models import IdentiteArchive
+
+        iso = self.client.post(f"{G}identites/", {"nom": "kone", "naissance": "1962-04-18",
+                                                  "numeroRegistre": "A12", "anneeRegistre": "1998"})
+        self.assertEqual((iso.status_code, iso.data["naissance"], iso.data["anneeRegistre"]), (201, "1962-04-18", 1998))
+        francaise = self.client.post(f"{G}identites/", {"nom": "yao", "naissance": "18/04/1962"})
+        self.assertEqual((francaise.status_code, francaise.data["naissance"]), (201, "1962-04-18"))
+        # Illisible ou impossible : refusé avec un message, et rien n'est créé.
+        avant = IdentiteArchive.objects.count()
+        for naissance, annee in (("1962-13-40", ""), ("hier", ""), ("2999", ""), ("1962", "1850")):
+            refus = self.client.post(f"{G}identites/", {"nom": "bah", "naissance": naissance, "anneeRegistre": annee})
+            self.assertEqual(refus.status_code, 400, (naissance, annee))
+        self.assertEqual(IdentiteArchive.objects.count(), avant)
+
     def test_acces_et_cloisonnement_par_hopital(self):
         self.as_user(self.infirmier)
         self.assertEqual(self.client.get(f"{G}documents/").status_code, 403)
