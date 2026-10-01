@@ -288,6 +288,24 @@
   .laboratory-sidebar .ms-sidebar-action span {
     display: none;
   }
+
+  /* Barre étroite : l'icône seule, le libellé reste lu par les lecteurs d'écran. */
+  .laboratory-sidebar .lab-nav {
+    padding: 16px 6px;
+  }
+
+  .laboratory-sidebar .lab-nav-item {
+    justify-content: center;
+    padding: 10px 0;
+    font-size: 0;
+  }
+
+  /* La zone principale prend la place laissée par la barre fixe, sans déborder de l'écran. */
+  .laboratory-main {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+  }
 }
 
 
