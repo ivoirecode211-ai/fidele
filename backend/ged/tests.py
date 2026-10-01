@@ -108,6 +108,15 @@ class GedTests(ParcoursBase):
             self.assertEqual(refus.status_code, 400, (naissance, annee))
         self.assertEqual(IdentiteArchive.objects.count(), avant)
 
+    def test_document_date_au_depot_et_a_la_modification(self):
+        depose = self.deposer(titre="Ordonnance datée", type="ordonnance", date="2026-09-29")
+        self.assertEqual((depose.status_code, depose.data[0]["date"]), (201, "2026-09-29"))
+        pk = depose.data[0]["id"]
+        modifie = self.client.patch(f"{G}documents/{pk}/", {"date": "15/08/2025"}, format="json")
+        self.assertEqual((modifie.status_code, modifie.data["date"]), (200, "2025-08-15"))
+        self.assertEqual(self.client.patch(f"{G}documents/{pk}/", {"date": "2999-01-01"}, format="json").status_code, 400)
+        self.assertEqual(self.deposer(titre="X", date="n'importe quoi").status_code, 400)
+
     def test_acces_et_cloisonnement_par_hopital(self):
         self.as_user(self.infirmier)
         self.assertEqual(self.client.get(f"{G}documents/").status_code, 403)

@@ -157,6 +157,28 @@ def rattacher(hospital, donnees):
     return patient, identite
 
 
+def lire_date(valeur):
+    """Date du document : « 2026-09-29 » ou « 29/09/2026 », vide sinon.
+
+    Gardée en texte, elle s'enregistrait mais faisait échouer la réponse
+    (erreur 500 alors que le document était bien déposé).
+    """
+    from datetime import date, datetime
+
+    texte = str(valeur or "").strip()
+    if not texte:
+        return None
+    for format_ in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            jour = datetime.strptime(texte, format_).date()
+        except ValueError:
+            continue
+        if not date(1900, 1, 1) <= jour <= date.today():
+            raise RefusGed("La date du document ne peut pas être dans le futur ni avant 1900.")
+        return jour
+    raise RefusGed("Date du document illisible : indiquez-la au format 29/09/2026.")
+
+
 def deposer(*, hospital, user, fichier, donnees):
     """Enregistre un fichier et sa fiche. Le fichier reste sur le serveur tant qu'aucun logiciel n'est branché."""
     if fichier is None:
@@ -172,7 +194,7 @@ def deposer(*, hospital, user, fichier, donnees):
     distant = connecteur().actif
     return Document.objects.create(
         hospital=hospital, titre=titre[:200], type=type_,
-        date_document=donnees.get("date") or None,
+        date_document=lire_date(donnees.get("date")),
         patient=patient, identite=identite,
         service=str(donnees.get("service") or "")[:120],
         mots_cles=str(donnees.get("motsCles") or "")[:255],

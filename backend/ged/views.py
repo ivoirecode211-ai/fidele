@@ -100,7 +100,10 @@ class DocumentView(APIView):
         if donnees.get("type") in services.TYPES:
             d.type = donnees["type"]
         if "date" in donnees:
-            d.date_document = donnees["date"] or None
+            try:
+                d.date_document = services.lire_date(donnees["date"])
+            except services.RefusGed as erreur:
+                return refus(erreur)
         for champ, cle, limite in (("service", "service", 120), ("mots_cles", "motsCles", 255), ("description", "description", None)):
             if cle in donnees:
                 valeur = str(donnees[cle] or "")
