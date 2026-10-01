@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Save, Settings, X } from "lucide-react";
+import { ImagePlus, Save, Settings, Trash2, X } from "lucide-react";
 
 import api from "../../services/api";
+import { oublierEtablissement } from "../LogoEtablissement";
 
 const SECTIONS = [
   {
@@ -38,6 +39,83 @@ const SECTIONS = [
   },
 ];
 
+/*
+ * Logo de l'hôpital : déposé tout de suite (route à part, qui vérifie le format),
+ * puis imprimé sur les tickets, les reçus et les documents de cet hôpital seulement.
+ */
+function LogoHopital({ logo, onChange }) {
+  const [envoi, setEnvoi] = useState(false);
+  const [erreur, setErreur] = useState("");
+
+  const deposer = async (event) => {
+    const fichier = event.target.files?.[0];
+    event.target.value = "";
+    if (!fichier) return;
+    setErreur("");
+    if (fichier.size > 300 * 1024) {
+      setErreur("Le logo dépasse 300 Ko : réduisez l'image puis réessayez.");
+      return;
+    }
+    const corps = new FormData();
+    corps.append("logo", fichier);
+    setEnvoi(true);
+    try {
+      const { data } = await api.post("/administration/parametres/logo/", corps,
+        { headers: { "Content-Type": "multipart/form-data" } });
+      onChange(data.logo);
+      oublierEtablissement();
+    } catch (error) {
+      setErreur(error.response?.data?.detail || "Envoi du logo impossible.");
+    } finally {
+      setEnvoi(false);
+    }
+  };
+
+  const retirer = async () => {
+    setEnvoi(true);
+    try {
+      const { data } = await api.delete("/administration/parametres/logo/");
+      onChange(data.logo);
+      oublierEtablissement();
+    } catch {
+      setErreur("Retrait du logo impossible.");
+    } finally {
+      setEnvoi(false);
+    }
+  };
+
+  return (
+    <fieldset className="admin-settings-section">
+      <legend>Logo de l'hôpital</legend>
+      <div className="admin-logo">
+        <div className="admin-logo-apercu">
+          {logo ? <img src={logo} alt="Logo de l'hôpital" /> : <span>Aucun logo</span>}
+        </div>
+        <div className="admin-logo-actions">
+          <p className="admin-settings-help">
+            Imprimé sur les tickets de caisse, les reçus de pharmacie, les résultats de laboratoire et les rapports.
+            PNG, JPEG ou WebP, 300 Ko au plus ; de préférence carré, sur fond blanc ou transparent.
+          </p>
+          <div className="admin-logo-boutons">
+            <label className={`administration-save-button admin-logo-choisir ${envoi ? "occupe" : ""}`}>
+              <ImagePlus size={16} />
+              {logo ? "Changer le logo" : "Choisir une image"}
+              <input type="file" accept="image/png,image/jpeg,image/webp" onChange={deposer} disabled={envoi} hidden />
+            </label>
+            {logo && (
+              <button type="button" className="administration-cancel-button" onClick={retirer} disabled={envoi}>
+                <Trash2 size={16} />
+                Retirer
+              </button>
+            )}
+          </div>
+          {erreur && <p className="admin-logo-erreur" role="alert">{erreur}</p>}
+        </div>
+      </div>
+    </fieldset>
+  );
+}
+
 /* Paramètres de l'hôpital de l'administrateur (/api/administration/parametres/). */
 export default function GeneralSettingsModal({ onClose }) {
   const [form, setForm] = useState(null);
@@ -60,6 +138,7 @@ export default function GeneralSettingsModal({ onClose }) {
     setSaving(true);
     try {
       await api.put("/administration/parametres/", form);
+      oublierEtablissement();
       alert("Paramètres généraux enregistrés.");
       onClose();
     } catch (error) {
@@ -100,6 +179,7 @@ export default function GeneralSettingsModal({ onClose }) {
           <p className="admin-panel-loading">Chargement…</p>
         ) : (
           <form className="administration-form" onSubmit={handleSubmit}>
+            <LogoHopital logo={form.logo} onChange={(logo) => setForm((previous) => ({ ...previous, logo }))} />
             {SECTIONS.map((section) => (
               <fieldset className="admin-settings-section" key={section.title}>
                 <legend>{section.title}</legend>

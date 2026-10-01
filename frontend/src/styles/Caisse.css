@@ -2192,3 +2192,8 @@ a.caisse-nav-item { font: inherit; }
 .pop-deplier > span { font-weight: 750; }
 .ligne-actions { display: flex; justify-content: flex-end; gap: 6px; }
 .ligne-actions a { display: inline-flex; align-items: center; text-decoration: none; }
+
+/* Bilan imprimé : le logo de l'hôpital devant son nom */
+@media print {
+  body:not(:has(#ticket)) .bilan-entete-impression { display: flex; align-items: center; gap: 8px; }
+}

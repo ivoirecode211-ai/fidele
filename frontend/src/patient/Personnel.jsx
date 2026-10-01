@@ -1,3 +1,4 @@
+import LogoEtablissement, { useEtablissement } from "../components/LogoEtablissement";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { KeyRound, MessageCircle, Printer, Search, Send, ShieldOff } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -128,6 +129,7 @@ function Acces() {
 const ETATS = { Actif: "regle", "PIN provisoire": "attente", Bloqué: "critique", Désactivé: "", "Aucun accès": "" };
 
 function CarteAcces({ carte, hopital, onClose }) {
+  const { logo } = useEtablissement();
   const adresse = `${window.location.origin}/patient?code=${encodeURIComponent(carte.code)}`;
   return (
     <div className="pop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -137,7 +139,10 @@ function CarteAcces({ carte, hopital, onClose }) {
         </header>
         <div className="pop-corps">
           <article className="pp-carte" id="carte-acces">
-            <header><strong>{hopital || carte.hospital}</strong><span>Mon espace patient</span></header>
+            <header>
+              {logo && <LogoEtablissement logo={logo} size={28} nom={hopital || carte.hospital} />}
+              <strong>{hopital || carte.hospital}</strong><span>Mon espace patient</span>
+            </header>
             <div className="pp-carte-corps">
               <QRCodeSVG value={adresse} level="M" marginSize={0} className="pp-carte-qr" />
               <div>

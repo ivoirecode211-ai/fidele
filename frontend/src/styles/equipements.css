@@ -284,3 +284,7 @@
 .fiche-vide h1 { margin: 0; color: var(--ink); font-size: 22px; }
 .fiche-vide p { max-width: 380px; margin: 0 0 8px; line-height: 1.55; }
 .eq-erreur { margin: 0 0 16px; }
+
+/* Logo de l'hôpital devant son nom, sur l'étiquette */
+.etiquette-hopital { display: inline-flex; align-items: center; gap: 3px; }
+.etiquette-logo { width: 1.4em; height: 1.4em; object-fit: contain; flex-shrink: 0; }

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Check, Printer, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
-import Logo from "../components/Logo";
+import LogoEtablissement from "../components/LogoEtablissement";
 import { argent } from "./api";
 import { A5_PORTRAIT, imprimer } from "./impression";
 
@@ -76,7 +76,7 @@ function Souche({ fiche, maison, duplicata }) {
     <article className="souche">
       <header className="souche-tete">
         <div className="souche-maison">
-          <Logo size={34} />
+          <LogoEtablissement logo={maison.logo} size={34} nom={maison.nom} />
           <div>
             <strong>{maison.nom || "—"}</strong>
             {(maison.adresse || maison.quartier || maison.ville) && (

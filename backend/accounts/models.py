@@ -22,6 +22,9 @@ class Hospital(models.Model):
     currency = models.CharField("devise", max_length=10, default="FCFA")
     license_number = models.CharField("numéro d'agrément", max_length=80, blank=True)
     opening_hours = models.CharField("horaires d'ouverture", max_length=160, default="24h/24 – 7j/7", blank=True)
+    # Logo de l'hôpital, en data URL (PNG, JPEG ou WebP, 300 Ko au plus) : il s'imprime sur les tickets,
+    # les reçus et les documents, et s'insère tel quel dans les PDF, sans serveur de fichiers.
+    logo = models.TextField("logo", blank=True)
 
     # Caisse et tickets : réglés par l'administrateur de l'hôpital.
     ticket_copies = models.PositiveSmallIntegerField(

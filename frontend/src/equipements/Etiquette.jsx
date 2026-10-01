@@ -1,3 +1,4 @@
+import { useEtablissement } from "../components/LogoEtablissement";
 import { QRCodeSVG } from "qrcode.react";
 
 import { adresseEtiquette } from "./commun";
@@ -8,12 +9,18 @@ import { adresseEtiquette } from "./commun";
  * gros (lisible sans téléphone) et le nom de l'appareil.
  */
 export default function Etiquette({ equipement, hopital }) {
+  const { logo } = useEtablissement();
   return (
     <article className="etiquette">
       <QRCodeSVG value={adresseEtiquette(equipement.token)} level="M" marginSize={0} className="etiquette-qr" />
       <strong className="etiquette-code">{equipement.code}</strong>
       <span className="etiquette-nom">{equipement.name}</span>
-      {hopital && <span className="etiquette-hopital">{hopital}</span>}
+      {hopital && (
+        <span className="etiquette-hopital">
+          {logo && <img src={logo} alt="" className="etiquette-logo" />}
+          {hopital}
+        </span>
+      )}
     </article>
   );
 }

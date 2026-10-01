@@ -263,3 +263,47 @@ class CatalogueParHopitalTests(APITestCase):
         reponse = self.client.post(URL, form(service=etrangere.pk), format="json")
         self.assertEqual(reponse.status_code, 400)
         self.assertIn("service", reponse.data)
+
+
+class LogoHopitalTests(APITestCase):
+    """Chaque hôpital a son logo : déposé par son administrateur, imprimé sur ses seuls documents."""
+
+    PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+
+    def setUp(self):
+        from accounts.models import Hospital
+
+        self.a = Hospital.objects.order_by("pk").first()
+        self.b = Hospital.objects.create(name="Clinique Sainte Marie", code="CSM")
+        self.admin_a = User.objects.create_user(username="adm-a", password="x", role="ADMIN", hospital=self.a)
+        self.admin_b = User.objects.create_user(username="adm-b", password="x", role="ADMIN", hospital=self.b)
+        self.caissier_b = User.objects.create_user(username="caisse-b", password="x", role="RECEPTION", hospital=self.b)
+
+    def deposer(self, contenu, nom="logo.png"):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        return self.client.post(f"{BASE}/parametres/logo/", {"logo": SimpleUploadedFile(nom, contenu)}, format="multipart")
+
+    def test_chaque_hopital_a_son_logo(self):
+        self.client.force_authenticate(self.admin_b)
+        depose = self.deposer(self.PNG)
+        self.assertEqual(depose.status_code, 200, depose.data)
+        self.assertTrue(depose.data["logo"].startswith("data:image/png;base64,"))
+        self.b.refresh_from_db()
+        self.a.refresh_from_db()
+        self.assertTrue(self.b.logo)
+        self.assertEqual(self.a.logo, "")
+        # Les tickets de B portent le logo de B ; ceux de A, aucun.
+        self.client.force_authenticate(self.caissier_b)
+        self.assertEqual(self.client.get("/api/accueil/referentiels/").data["etablissement"]["logo"], self.b.logo)
+        self.client.force_authenticate(self.admin_a)
+        self.assertEqual(self.client.get(f"{BASE}/parametres/").data["logo"], "")
+
+    def test_formats_et_droits(self):
+        self.client.force_authenticate(self.admin_a)
+        self.assertIn("Format", self.deposer(b"<svg onload='x'></svg>", "logo.svg").data["detail"])
+        self.assertIn("300 Ko", self.deposer(self.PNG + b"\x00" * 300 * 1024).data["detail"])
+        self.assertEqual(self.deposer(b"\xff\xd8\xff\xe0" + b"\x00" * 32, "logo.jpg").status_code, 200)
+        self.assertEqual(self.client.delete(f"{BASE}/parametres/logo/").data["logo"], "")
+        self.client.force_authenticate(self.caissier_b)
+        self.assertEqual(self.deposer(self.PNG).status_code, 403)

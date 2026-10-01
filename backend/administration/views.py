@@ -111,6 +111,52 @@ class GeneralSettingsView(APIView):
         return Response(serializer.data)
 
 
+# Formats reconnus à leurs premiers octets : l'extension ou le type annoncé par le navigateur ne suffisent pas.
+SIGNATURES_LOGO = {b"\x89PNG\r\n\x1a\n": "image/png", b"\xff\xd8\xff": "image/jpeg"}
+TAILLE_MAX_LOGO = 300 * 1024
+
+
+def type_image(debut):
+    for signature, mime in SIGNATURES_LOGO.items():
+        if debut.startswith(signature):
+            return mime
+    if debut[:4] == b"RIFF" and debut[8:12] == b"WEBP":
+        return "image/webp"
+    return None
+
+
+class LogoView(APIView):
+    """Logo de l'hôpital, imprimé sur les tickets, reçus et documents : déposé ou retiré par l'Admin."""
+    permission_classes = [AdministrationAccess]
+
+    def post(self, request):
+        import base64
+
+        fichier = request.FILES.get("logo")
+        if fichier is None:
+            return Response({"detail": "Choisissez une image."}, status=status.HTTP_400_BAD_REQUEST)
+        if fichier.size > TAILLE_MAX_LOGO:
+            return Response({"detail": "Le logo dépasse 300 Ko : réduisez l'image puis réessayez."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        contenu = fichier.read()
+        mime = type_image(contenu[:12])
+        if mime is None:
+            return Response({"detail": "Format non reconnu : utilisez une image PNG, JPEG ou WebP."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        hopital = hospital_of(request.user)
+        hopital.logo = f"data:{mime};base64,{base64.b64encode(contenu).decode()}"
+        hopital.updated_by = request.user
+        hopital.save(update_fields=["logo", "updated_by", "updated_at"])
+        return Response({"logo": hopital.logo})
+
+    def delete(self, request):
+        hopital = hospital_of(request.user)
+        hopital.logo = ""
+        hopital.updated_by = request.user
+        hopital.save(update_fields=["logo", "updated_by", "updated_at"])
+        return Response({"logo": ""})
+
+
 class AuditLogView(APIView):
     """Journal d'audit, du plus récent au plus ancien (200 lignes maximum)."""
     permission_classes = [AdministrationAccess]

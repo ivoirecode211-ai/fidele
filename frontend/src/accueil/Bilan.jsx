@@ -1,3 +1,4 @@
+import LogoEtablissement from "../components/LogoEtablissement";
 import { useEffect, useState } from "react";
 import { Lock, Printer, Unlock } from "lucide-react";
 
@@ -87,8 +88,9 @@ export default function Bilan({ bilan, periode, setPeriode, rafraichir, etabliss
           <div>
             <h2>Mon bilan</h2>
             <p className="no-print">Choisissez la période, puis imprimez ou enregistrez en PDF.</p>
-            <p className="seulement-impression">
-              {etablissement?.nom} · {caissier} · du {periode.du} au {periode.au}
+            <p className="seulement-impression bilan-entete-impression">
+              <LogoEtablissement logo={etablissement?.logo} size={30} nom={etablissement?.nom} />
+              <span>{etablissement?.nom} · {caissier} · du {periode.du} au {periode.au}</span>
             </p>
           </div>
           <button type="button" className="secondary-button no-print" onClick={() => imprimer(A4)}>

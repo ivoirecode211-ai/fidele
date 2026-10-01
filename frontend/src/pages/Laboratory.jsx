@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { lireEtablissement } from "../components/LogoEtablissement";
 import api from "../services/api";
 import RapportsPraticien from "../rapports/RapportsPraticien";
 import SidebarFooter from "../components/SidebarFooter";
@@ -324,6 +325,20 @@ function Laboratory() {
     const pageWidth =
       doc.internal.pageSize.getWidth();
 
+    // En-tête : le nom et le logo de l'hôpital de l'utilisateur (Administration → Paramètres généraux).
+    const hopital = await lireEtablissement();
+    const nomHopital = hopital.name || "MA SANTE";
+    let marge = 15;
+    if (hopital.logo) {
+      const format = (hopital.logo.match(/^data:image\/(png|jpeg|webp)/) || [])[1];
+      try {
+        doc.addImage(hopital.logo, (format || "png").toUpperCase(), 15, 8, 20, 20);
+        marge = 39;
+      } catch {
+        // Image illisible : le document sort quand même, sans logo.
+      }
+    }
+
     doc.setFontSize(20);
     doc.setFont(
       "helvetica",
@@ -331,8 +346,8 @@ function Laboratory() {
     );
 
     doc.text(
-      "MA SANTE",
-      15,
+      nomHopital,
+      marge,
       18
     );
 
@@ -343,8 +358,8 @@ function Laboratory() {
     );
 
     doc.text(
-      "Gestion de Clinique",
-      15,
+      [hopital.city, hopital.phone].filter(Boolean).join(" · ") || "Gestion de Clinique",
+      marge,
       25
     );
 
@@ -533,6 +548,9 @@ function Laboratory() {
 
       headStyles: {
         fontStyle: "bold",
+        // Vert sapin de la charte (--primary-600), au lieu du turquoise par défaut de jspdf-autotable.
+        fillColor: [11, 95, 89],
+        textColor: [255, 255, 255],
       },
     });
 
@@ -626,7 +644,7 @@ function Laboratory() {
     );
 
     doc.text(
-      `Document généré le ${getToday()} - MA SANTE`,
+      `Document généré le ${getToday()} - ${nomHopital}`,
       pageWidth / 2,
       287,
       {

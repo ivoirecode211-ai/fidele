@@ -110,9 +110,10 @@ class GeneralSettingsSerializer(serializers.ModelSerializer):
         model = Hospital
         fields = ["name", "code", "slogan", "address", "city", "district", "phone", "email", "currency",
                   "license_number", "opening_hours", "ticket_copies", "ticket_validity_days",
-                  "ticket_note", "ticket_exclusions"]
+                  "ticket_note", "ticket_exclusions", "logo"]
         # Le code termine les numéros de dossier déjà émis : il ne change plus.
-        read_only_fields = ["code"]
+        # Le logo se dépose par sa propre route (parametres/logo/), qui en vérifie le format.
+        read_only_fields = ["code", "logo"]
 
 
 class AuditLogSerializer(serializers.ModelSerializer):

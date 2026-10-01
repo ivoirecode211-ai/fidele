@@ -1,3 +1,4 @@
+import LogoEtablissement, { useEtablissement } from "../components/LogoEtablissement";
 import { useEffect, useMemo, useState } from "react";
 import Logo from "../components/Logo";
 import api from "../services/api";
@@ -774,6 +775,8 @@ export default function Stocks() {
    * ==========================================================
    */
 
+  const etablissement = useEtablissement();
+
   const imprimerRapport = () => {
     window.print();
   };
@@ -933,6 +936,15 @@ export default function Stocks() {
       ====================================================== */}
 
       <main className="stocks-main">
+
+        {/* En-tête du rapport imprimé : l'hôpital, son logo, la date. */}
+        <div className="stocks-entete-impression">
+          <LogoEtablissement logo={etablissement.logo} size={36} nom={etablissement.name} />
+          <div>
+            <strong>{etablissement.name || "MA SANTÉ"}</strong>
+            <span>Rapport de stock · édité le {new Date().toLocaleString("fr-FR")}</span>
+          </div>
+        </div>
 
         {/* HEADER */}
 

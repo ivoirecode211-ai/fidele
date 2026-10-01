@@ -90,3 +90,7 @@
 .pp-saisie textarea { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-xl); outline: none; background: var(--surface-50); color: var(--ink); font: inherit; font-size: 14.5px; resize: vertical; }
 .pp-saisie textarea:focus { border-color: var(--primary); background: white; }
 .pp-saisie .primary-button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+
+/* Logo de l'hôpital en tête de la carte d'accès */
+.pp-carte header { align-items: center; }
+.pp-carte header strong { margin-right: auto; }

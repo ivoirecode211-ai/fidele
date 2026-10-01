@@ -4,7 +4,7 @@ import { Printer, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import Chargement from "../components/Chargement";
-import Logo from "../components/Logo";
+import LogoEtablissement from "../components/LogoEtablissement";
 import api from "../services/api";
 import { argent } from "../accueil/api";
 import { A5_PORTRAIT, imprimer } from "../accueil/impression";
@@ -79,7 +79,7 @@ export default function RecuPharmacie({ ordonnance, onClose }) {
             <article className="recu-ph" id="recu-pharmacie">
               <header className="recu-ph-tete">
                 <div className="recu-ph-maison">
-                  <Logo size={34} />
+                  <LogoEtablissement logo={maison.logo} size={34} nom={maison.nom} />
                   <div>
                     <strong>{maison.nom || "—"}</strong>
                     {(maison.adresse || maison.quartier || maison.ville) && (

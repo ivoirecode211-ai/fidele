@@ -1482,3 +1482,59 @@
 .presta-inactive td { color: var(--ink-muted); }
 .etat.presta-non { border-color: var(--danger-soft-border); background: var(--danger-soft); color: var(--danger-soft-text); }
 @media (max-width: 640px) { .presta-filtres { flex-direction: column; } }
+
+/* Logo de l'hôpital (Paramètres généraux) */
+.admin-logo {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.admin-logo-apercu {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 112px;
+  height: 112px;
+  padding: 8px;
+  border: 1px dashed var(--surface-300);
+  border-radius: var(--radius-xl);
+  background: var(--surface-50);
+  color: var(--ink-ghost);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.admin-logo-apercu img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.admin-logo-actions {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-logo-actions .admin-settings-help { margin: 0; }
+
+.admin-logo-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-logo-choisir { cursor: pointer; }
+.admin-logo-choisir.occupe { opacity: .6; pointer-events: none; }
+
+.admin-logo-erreur {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 520px) {
+  .admin-logo { flex-direction: column; align-items: flex-start; }
+}

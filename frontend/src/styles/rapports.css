@@ -406,3 +406,7 @@
   .rp-barre select { width: 100%; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
   .rp-barre .rp-page-actions { flex-wrap: wrap; margin-left: 0; }
 }
+
+/* Logo de l'hôpital au centre de l'en-tête officiel */
+.rp-officiel-centre { justify-items: center; }
+.rp-officiel-logo { margin-bottom: 4px; }

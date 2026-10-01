@@ -78,7 +78,7 @@ def etablissement(user):
         "quartier": row.district, "telephone": row.phone, "email": row.email, "devise": row.currency,
         "agrement": row.license_number, "mentions_legales": row.ticket_note,
         "souches": row.ticket_copies, "validite_jours": row.ticket_validity_days,
-        "exclusions": row.ticket_exclusions,
+        "exclusions": row.ticket_exclusions, "logo": row.logo,
     }
 
 

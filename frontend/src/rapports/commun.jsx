@@ -1,3 +1,4 @@
+import LogoEtablissement, { useEtablissement } from "../components/LogoEtablissement";
 import { useState } from "react";
 import { Download, Printer, Search, SlidersHorizontal, X } from "lucide-react";
 
@@ -208,11 +209,14 @@ export function imprimerDocument() {
 
 export function DocumentOfficiel({ doc }) {
   const e = doc.entete;
+  const { logo } = useEtablissement();
   return (
     <article className="rp-document rp-officiel rp-doc-officiel">
       <header className="rp-officiel-entete">
         <div><strong>{e.ministere}</strong><span>★★★★★</span></div>
-        <div className="rp-officiel-centre"><strong>{e.etablissement}</strong>{e.contacts.map((c) => <span key={c}>{c}</span>)}</div>
+        <div className="rp-officiel-centre">
+          {logo && <LogoEtablissement logo={logo} size={46} className="rp-officiel-logo" nom={e.etablissement} />}
+          <strong>{e.etablissement}</strong>{e.contacts.map((c) => <span key={c}>{c}</span>)}</div>
         <div><strong>{e.republique}</strong><span>{e.devise}</span><span>★★★★★</span></div>
       </header>
 
