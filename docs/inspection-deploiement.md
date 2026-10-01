@@ -55,4 +55,9 @@ stock et un seul planning pour toute l'installation) : sans conséquence tant qu
 - `App.jsx` : aucune page chargée à la demande (`React.lazy`) ; à faire une fois ses modifications commitées.
 
 ## Reste à inspecter
-- Passe 4 : revue visuelle module par module (captures ordinateur et téléphone) contre la charte.
+- Passe 4 : revue visuelle module par module contre la charte. **En attente** : la charte est en cours de
+  refonte dans une autre session (bleu → vert sapin `#0B5F59`, plus d'orange, polices Inter et Manrope ;
+  `styles/variables.css` et `index.html` non commités). Le contrôle automatique des couleurs rendues
+  (toutes les pages, textes, fonds, bordures, graphiques SVG) est prêt et sera relancé sur la nouvelle charte.
+  Couleurs encore codées en dur à reprendre alors : la palette des services de la Direction
+  (`dashboard/services.py`, échelle bleue).
