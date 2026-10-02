@@ -1,1079 +1,335 @@
-/*
- * ============================================================
- * MA SANTÉ - PAGE DE CONNEXION
- * ============================================================
- *
- * Fichier :
- * src/styles/Login.css
- *
- * Image :
- * public/images/login-background.png
- *
- * ============================================================
- */
-
-
-/* ============================================================
-   RESET
-   ============================================================ */
-
-* {
-  box-sizing: border-box;
-}
-
-
-html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
-
-  margin: 0;
-  padding: 0;
-}
-
-
-body {
-  margin: 0;
-
-  font-family: var(--font);
-}
-
-
-/* ============================================================
-   PAGE
-   ============================================================ */
+/* =========================================================
+   MA SANTÉ — PAGE DE CONNEXION
+   Ordinateur : accueil de la clinique à gauche, formulaire à droite.
+   Téléphone  : bandeau photo, puis le formulaire sur toute la largeur.
+   Toutes les règles sont confinées à .login-page.
+   ========================================================= */
 
 .login-page {
-  position: relative;
-
-  width: 100%;
-  min-height: 100vh;
-
-  margin: 0;
-  padding: 0;
-
-  overflow: hidden;
-
-  background: var(--primary-50);
-}
-
-
-/* ============================================================
-   IMAGE DE FOND
-   ============================================================ */
-
-.login-background {
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  background-image:
-    url("/images/login-background.png");
-
-  background-size: cover;
-
-  background-position: center center;
-
-  background-repeat: no-repeat;
-
-  z-index: 0;
-}
-
-
-/* ============================================================
-   VOILE SUR L'IMAGE
-   ============================================================ */
-
-.login-background-overlay {
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  /*
-   * À gauche :
-   * l'image reste très visible.
-   *
-   * À droite :
-   * l'image devient progressivement claire
-   * pour faire ressortir le formulaire.
-   */
-  background:
-    linear-gradient(
-      90deg,
-
-      rgba(255, 255, 255, 0.02) 0%,
-
-      rgba(255, 255, 255, 0.03) 15%,
-
-      rgba(255, 255, 255, 0.05) 28%,
-
-      rgba(255, 255, 255, 0.12) 40%,
-
-      rgba(255, 255, 255, 0.28) 52%,
-
-      rgba(255, 255, 255, 0.52) 64%,
-
-      rgba(255, 255, 255, 0.76) 78%,
-
-      rgba(255, 255, 255, 0.91) 100%
-    );
-
-  z-index: 1;
-}
-
-
-/* ============================================================
-   CONTENU
-   ============================================================ */
-
-.login-content {
-  position: relative;
-
-  z-index: 2;
-
-  width: 100%;
-  min-height: 100vh;
-
-  /*
-   * Deux colonnes exactement égales.
-   */
+  --login-photo: url("/images/login-background.png");
   display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  align-items: center;
-
-  padding:
-    30px 5%;
+  grid-template-columns: minmax(0, 1.1fr) minmax(440px, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
 }
 
+.login-page ::selection { background: var(--primary-100); color: var(--primary-900); }
 
-/* ============================================================
-   PARTIE GAUCHE
-   ============================================================ */
+/* ---------- Accueil de la clinique (photo au vert de la charte) ---------- */
 
-.login-left {
-  width: 100%;
-
-  min-height: 500px;
-
+.login-visuel {
+  position: relative;
+  isolation: isolate;
   display: flex;
-
-  align-items: center;
-
-  justify-content: flex-start;
-
-  padding-left: 30px;
-}
-
-
-/* ============================================================
-   SLOGAN
-   ============================================================ */
-
-.login-slogan {
-  display: flex;
-
   flex-direction: column;
-
-  gap: 3px;
-
-  margin-top: 110px;
-
-  padding-left: 5px;
-
-  color: #ffffff;
-
-  font-size: 26px;
-
-  line-height: 1.3;
-
-  font-weight: 500;
-
-  text-shadow:
-    0 2px 6px rgba(3, 34, 32, 0.60),
-
-    0 1px 14px rgba(5, 48, 46, 0.40);
+  justify-content: space-between;
+  padding: clamp(28px, 4vw, 56px);
+  overflow: hidden;
+  background: var(--primary-900);
+  color: #fff;
 }
 
-
-.login-slogan span {
-  display: block;
+/* La photo d'accueil, sans sa dominante bleue, fondue dans le vert sapin. */
+.login-visuel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--login-photo) 30% center / cover no-repeat;
+  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: luminosity;
+  opacity: 0.55;
 }
 
+/* Lisibilité : plus sombre en haut (marque) et en bas (devise). */
+.login-visuel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(3, 34, 32, 0.72) 0%, rgba(3, 34, 32, 0.12) 32%, rgba(3, 34, 32, 0.18) 55%, rgba(3, 34, 32, 0.9) 100%),
+    linear-gradient(90deg, rgba(11, 95, 89, 0.35), rgba(11, 95, 89, 0));
+}
 
-/* ============================================================
-   PARTIE DROITE
-   ============================================================ */
-
-.login-right {
-  width: 100%;
-
-  min-height: 500px;
-
-  /*
-   * CENTRAGE HORIZONTAL
-   */
+.login-marque {
   display: flex;
-
-  justify-content: center;
-
-  /*
-   * CENTRAGE VERTICAL
-   */
   align-items: center;
-
-  /*
-   * Aucun déplacement artificiel.
-   */
-  margin: 0;
-
-  padding: 0;
+  gap: 14px;
 }
 
+.login-marque div { display: grid; gap: 2px; }
 
-/* ============================================================
-   FORMULAIRE
-   ============================================================ */
+.login-marque strong {
+  font-family: var(--font-titre);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.login-marque span { color: var(--primary-100); font-size: 14px; font-weight: 500; }
+
+.login-devise { display: grid; gap: 18px; max-width: 520px; }
+
+.login-devise-mots {
+  display: grid;
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: clamp(40px, 4.4vw, 64px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.login-devise-mots span:nth-child(2) { color: var(--primary-200); }
+
+.login-devise-phrase {
+  margin: 0;
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+/* ---------- Formulaire ---------- */
+
+.login-panneau {
+  display: grid;
+  place-items: center;
+  padding: clamp(32px, 5vw, 72px) clamp(20px, 5vw, 64px);
+  background: var(--surface);
+}
 
 .login-form {
+  display: grid;
+  gap: 22px;
   width: 100%;
-
-  max-width: 390px;
-
-  /*
-   * Important :
-   * margin auto permet de conserver
-   * le centrage du formulaire.
-   */
-  margin: 0 auto;
-
-  padding:
-    30px 38px 24px;
-
-  background:
-    rgba(255, 255, 255, 0.96);
-
-  border:
-    1px solid rgba(255, 255, 255, 0.95);
-
-  border-radius: 9px;
-
-  box-shadow:
-    0 14px 38px
-    rgba(8, 72, 68, 0.15),
-
-    0 3px 12px
-    rgba(7, 60, 57, 0.07);
-
-  backdrop-filter: blur(10px);
-
-  -webkit-backdrop-filter: blur(10px);
+  max-width: 420px;
 }
 
+.login-marque-mobile { display: none; }
 
-/* ============================================================
-   LOGO
-   ============================================================ */
-
-.login-brand {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 9px;
-
-  margin-bottom: 13px;
-}
-
-
-/* ============================================================
-   ICÔNE LOGO
-   ============================================================ */
-
-.login-brand-icon {
-  width: 43px;
-  height: 43px;
-
-  flex-shrink: 0;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 50%;
-
-  color: #ffffff;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--primary-600),
-      var(--primary-400)
-    );
-
-  box-shadow:
-    0 4px 10px
-    rgba(11, 95, 89, 0.20);
-}
-
-
-/* ============================================================
-   TEXTE LOGO
-   ============================================================ */
-
-.login-brand-text {
-  display: flex;
-
-  flex-direction: column;
-
-  line-height: 1;
-}
-
-
-/* ============================================================
-   NOM MA SANTÉ
-   ============================================================ */
-
-.login-brand-name {
-  color: var(--primary-600);
-
-  font-size: 22px;
-
+.login-tete h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-titre);
+  font-size: clamp(26px, 2.2vw, 30px);
   font-weight: 800;
-
-  letter-spacing: 0.2px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
-
-.login-brand-name strong {
-  color: var(--primary-600);
+.login-tete p {
+  margin: 10px 0 0;
+  color: var(--ink-faint);
+  font-size: 15px;
+  line-height: 1.5;
 }
-
-
-/* ============================================================
-   SOUS-TITRE LOGO
-   ============================================================ */
-
-.login-brand-subtitle {
-  margin-top: 4px;
-
-  color: var(--primary-600);
-
-  font-size: 11px;
-
-  font-weight: 600;
-
-  text-align: center;
-}
-
-
-/* ============================================================
-   TITRE
-   ============================================================ */
-
-.login-title {
-  margin:
-    0 0 21px;
-
-  color: var(--primary-800);
-
-  font-size: 16px;
-
-  line-height: 1.3;
-
-  font-weight: 700;
-
-  text-align: center;
-}
-
-
-/* ============================================================
-   ERREUR
-   ============================================================ */
 
 .login-error {
-  width: 100%;
-
-  padding:
-    9px 11px;
-
-  margin-bottom: 14px;
-
-  border:
-    1px solid var(--danger-soft-border);
-
-  border-radius: 6px;
-
-  background: #fff0f0;
-
-  color: var(--danger-hover);
-
-  font-size: 11px;
-
-  line-height: 1.4;
-
-  text-align: center;
-}
-
-
-/* ============================================================
-   GROUPE FORMULAIRE
-   ============================================================ */
-
-.form-group {
-  width: 100%;
-
-  margin-bottom: 13px;
-}
-
-
-/* ============================================================
-   LABEL
-   ============================================================ */
-
-.form-group label {
-  display: block;
-
-  margin-bottom: 5px;
-
-  color: var(--primary-800);
-
-  font-size: 11px;
-
-  line-height: 1.2;
-
-  font-weight: 700;
-}
-
-
-/* ============================================================
-   CONTENEUR INPUT
-   ============================================================ */
-
-.input-wrapper {
-  position: relative;
-
-  width: 100%;
-}
-
-
-/* ============================================================
-   ICÔNE INPUT
-   ============================================================ */
-
-.input-icon {
-  position: absolute;
-
-  left: 11px;
-
-  top: 50%;
-
-  transform:
-    translateY(-50%);
-
-  color: var(--primary-400);
-
-  pointer-events: none;
-
-  z-index: 2;
-}
-
-
-/* ============================================================
-   INPUT
-   ============================================================ */
-
-.input-wrapper input {
-  display: block;
-
-  width: 100%;
-
-  height: 39px;
-
-  padding:
-    0 38px 0 34px;
-
-  border:
-    1px solid var(--primary-200);
-
-  border-radius: 7px;
-
-  outline: none;
-
-  background:
-    rgba(255, 255, 255, 0.94);
-
-  color: var(--primary-800);
-
-  font-family: var(--font);
-
-  font-size: 11px;
-
-  transition:
-    border-color 0.2s ease,
-
-    box-shadow 0.2s ease,
-
-    background 0.2s ease;
-}
-
-
-/* ============================================================
-   PLACEHOLDER
-   ============================================================ */
-
-.input-wrapper input::placeholder {
-  color: var(--surface-300);
-
-  opacity: 1;
-}
-
-
-/* ============================================================
-   FOCUS
-   ============================================================ */
-
-.input-wrapper input:focus {
-  border-color: var(--primary-500);
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(43, 129, 119, 0.10);
-}
-
-
-/* ============================================================
-   BOUTON OEIL
-   ============================================================ */
-
-.password-toggle {
-  position: absolute;
-
-  right: 9px;
-
-  top: 50%;
-
-  transform:
-    translateY(-50%);
-
-  width: 27px;
-  height: 27px;
-
   display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
-
-  outline: none;
-
-  background: transparent;
-
-  color: var(--primary-400);
-
-  cursor: pointer;
-
-  transition:
-    color 0.2s ease;
-}
-
-
-.password-toggle:hover {
-  color: var(--primary-600);
-}
-
-
-.password-toggle:focus-visible {
-  color: var(--primary-600);
-
-  outline:
-    2px solid
-    rgba(11, 95, 89, 0.25);
-
-  outline-offset: 2px;
-
-  border-radius: 4px;
-}
-
-
-/* ============================================================
-   MOT DE PASSE OUBLIÉ
-   ============================================================ */
-
-.forgot-password-container {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: flex-end;
-
-  margin-top: -3px;
-
-  margin-bottom: 12px;
-}
-
-
-.forgot-password {
-  padding: 0;
-
-  border: none;
-
-  outline: none;
-
-  background: transparent;
-
-  color: var(--primary-600);
-
-  font-family: var(--font);
-
-  font-size: 10px;
-
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--danger-soft-border);
+  border-radius: var(--radius-xl);
+  background: var(--danger-soft);
+  color: var(--danger-soft-text);
+  font-size: 14.5px;
   font-weight: 600;
+  line-height: 1.4;
+}
 
+.login-error svg { flex-shrink: 0; margin-top: 1px; }
+
+.login-champ { display: grid; gap: 8px; }
+
+.login-champ-ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.login-champ label {
+  color: var(--ink-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-saisie {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-saisie > svg {
+  position: absolute;
+  left: 15px;
+  color: var(--ink-ghost);
+  pointer-events: none;
+  transition: color 0.15s ease;
+}
+
+.login-saisie input {
+  width: 100%;
+  height: 52px;
+  padding: 0 48px 0 46px;
+  border: 1px solid var(--surface-300);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* 16 px : pas de zoom automatique sur téléphone */
+  caret-color: var(--primary-600);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-saisie input::placeholder { color: var(--ink-ghost); }
+.login-saisie input:hover { border-color: var(--primary-300); }
+
+.login-saisie input:focus {
+  border-color: var(--primary-500);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--primary-100);
+}
+
+.login-saisie:focus-within > svg { color: var(--primary-600); }
+
+.login-oeil {
+  position: absolute;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--ink-faint);
   cursor: pointer;
-
-  transition:
-    color 0.2s ease;
 }
 
+.login-oeil:hover { background: var(--surface-100); color: var(--primary-700); }
 
-.forgot-password:hover {
+.login-lien {
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--primary-700);
-
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: underline;
+  text-decoration-color: var(--primary-200);
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
+.login-lien:hover { text-decoration-color: currentColor; }
 
-/* ============================================================
-   BOUTON CONNEXION
-   ============================================================ */
+.login-aide {
+  margin: 2px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-xl);
+  background: var(--primary-50);
+  color: var(--primary-800);
+  font-size: 14px;
+  line-height: 1.5;
+}
 
 .login-button {
-  display: flex;
-
+  display: inline-flex;
   align-items: center;
-
   justify-content: center;
-
-  width: 100%;
-
-  height: 39px;
-
-  padding:
-    0 15px;
-
-  border: none;
-
-  border-radius: 7px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--primary-600),
-      var(--primary-600)
-    );
-
-  color: #ffffff;
-
-  font-family: var(--font);
-
-  font-size: 12px;
-
+  gap: 10px;
+  height: 54px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: var(--primary-600);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
   font-weight: 700;
-
   cursor: pointer;
-
-  box-shadow:
-    0 5px 12px
-    rgba(11, 95, 89, 0.18);
-
-  transition:
-    transform 0.15s ease,
-
-    box-shadow 0.15s ease,
-
-    background 0.15s ease;
+  box-shadow: 0 8px 18px -10px rgba(11, 95, 89, 0.55);
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
+.login-button:hover:not(:disabled) { background: var(--primary-700); }
+.login-button:active:not(:disabled) { transform: translateY(1px); }
+.login-button:disabled { opacity: 0.7; cursor: progress; }
 
-/* ============================================================
-   HOVER BOUTON
-   ============================================================ */
-
-.login-button:hover:not(:disabled) {
-  background:
-    linear-gradient(
-      90deg,
-      var(--primary-600),
-      var(--primary-700)
-    );
-
-  box-shadow:
-    0 7px 16px
-    rgba(11, 95, 89, 0.25);
+.login-page :focus-visible {
+  outline: 3px solid var(--primary-300);
+  outline-offset: 2px;
 }
 
+.login-saisie input:focus-visible { outline: none; }
 
-/* ============================================================
-   ACTIVE
-   ============================================================ */
+/* ---------- Écran moyen : la photo se resserre ---------- */
 
-.login-button:active:not(:disabled) {
-  transform:
-    translateY(1px);
-
-  box-shadow:
-    0 3px 8px
-    rgba(11, 95, 89, 0.18);
+@media (max-width: 1100px) {
+  .login-page { grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1fr); }
+  .login-devise-phrase { font-size: 16px; }
 }
 
+/* ---------- Tablette et téléphone : bandeau puis formulaire ---------- */
 
-/* ============================================================
-   DÉSACTIVÉ
-   ============================================================ */
+@media (max-width: 860px) {
+  .login-page { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
 
-.login-button:disabled {
-  opacity: 0.65;
-
-  cursor: not-allowed;
-
-  transform: none;
-
-  box-shadow:
-    0 4px 10px
-    rgba(11, 95, 89, 0.10);
-}
-
-
-/* ============================================================
-   TEXTE FINAL
-   ============================================================ */
-
-.login-bottom-text {
-  margin-top: 19px;
-
-  color: var(--primary-500);
-
-  font-size: 9px;
-
-  line-height: 1.4;
-
-  font-weight: 400;
-
-  text-align: center;
-}
-
-
-/* ============================================================
-   TABLETTE
-   ============================================================ */
-
-@media (max-width: 1000px) {
-
-  .login-content {
-    grid-template-columns:
-      1fr 1fr;
-
-    gap: 20px;
-
-    padding:
-      30px 4%;
+  .login-visuel {
+    min-height: 210px;
+    padding: 22px 20px;
+    justify-content: flex-end;
   }
 
+  .login-marque { display: none; }
 
-  .login-left {
-    padding-left: 15px;
-  }
+  .login-devise { gap: 8px; }
+  .login-devise-mots { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 30px; }
+  .login-devise-phrase { font-size: 15px; }
 
+  .login-panneau { place-items: start center; padding: 28px 20px 40px; }
 
-  .login-right {
-    width: 100%;
-  }
-
-
-  .login-form {
-    max-width: 380px;
-
-    padding:
-      28px 30px 23px;
-  }
-
-
-  .login-slogan {
-    font-size: 23px;
-  }
-
-
-  .login-background-overlay {
-    background:
-      linear-gradient(
-        90deg,
-
-        rgba(255, 255, 255, 0.03) 0%,
-
-        rgba(255, 255, 255, 0.06) 25%,
-
-        rgba(255, 255, 255, 0.18) 42%,
-
-        rgba(255, 255, 255, 0.45) 58%,
-
-        rgba(255, 255, 255, 0.88) 100%
-      );
-  }
-}
-
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
-
-@media (max-width: 700px) {
-
-  .login-page {
-    min-height: 100vh;
-
-    overflow-y: auto;
-  }
-
-
-  .login-background {
-    background-position:
-      center center;
-  }
-
-
-  .login-background-overlay {
-    background:
-      linear-gradient(
-        180deg,
-
-        rgba(255, 255, 255, 0.08) 0%,
-
-        rgba(255, 255, 255, 0.22) 35%,
-
-        rgba(255, 255, 255, 0.62) 60%,
-
-        rgba(255, 255, 255, 0.94) 100%
-      );
-  }
-
-
-  .login-content {
-
-    min-height: 100vh;
-
+  .login-marque-mobile {
     display: flex;
-
-    flex-direction: column;
-
     align-items: center;
-
-    justify-content: center;
-
-    gap: 15px;
-
-    padding:
-      25px 18px;
-  }
-
-
-  .login-left {
-
-    width: 100%;
-
-    min-height: auto;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 0;
-
-    order: 2;
-  }
-
-
-  .login-slogan {
-
-    margin-top: 0;
-
-    padding: 0;
-
-    flex-direction: row;
-
-    align-items: center;
-
-    justify-content: center;
-
     gap: 10px;
-
-    font-size: 16px;
-
-    text-align: center;
-  }
-
-
-  .login-right {
-
-    width: 100%;
-
-    max-width: 420px;
-
-    min-height: auto;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 0;
-
-    order: 1;
-  }
-
-
-  .login-form {
-
-    width: 100%;
-
-    max-width: 420px;
-
-    margin: 0 auto;
-
-    padding:
-      25px 25px 20px;
-
-    border-radius: 9px;
+    color: var(--primary-800);
+    font-family: var(--font-titre);
+    font-size: 19px;
+    font-weight: 800;
   }
 }
 
-
-/* ============================================================
-   PETIT MOBILE
-   ============================================================ */
-
-@media (max-width: 450px) {
-
-  .login-content {
-    padding:
-      18px 12px;
-  }
-
-
-  .login-form {
-    padding:
-      22px 18px 18px;
-  }
-
-
-  .login-brand {
-    margin-bottom: 11px;
-  }
-
-
-  .login-brand-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-
-  .login-brand-name {
-    font-size: 20px;
-  }
-
-
-  .login-brand-subtitle {
-    font-size: 10px;
-  }
-
-
-  .login-title {
-    margin-bottom: 18px;
-
-    font-size: 15px;
-  }
-
-
-  .form-group {
-    margin-bottom: 12px;
-  }
-
-
-  .input-wrapper input {
-    height: 38px;
-  }
-
-
-  .login-button {
-    height: 38px;
-  }
-
-
-  .login-slogan {
-    font-size: 14px;
-
-    gap: 7px;
-  }
-
-
-  .login-bottom-text {
-    font-size: 8px;
-  }
+@media (max-width: 380px) {
+  .login-visuel { min-height: 170px; }
+  .login-devise-mots { font-size: 26px; }
+  .login-tete h1 { font-size: 24px; }
 }
 
-
-/* ============================================================
-   TRÈS PETIT ÉCRAN
-   ============================================================ */
-
-@media (max-width: 350px) {
-
-  .login-content {
-    padding:
-      12px 9px;
-  }
-
-
-  .login-form {
-    padding:
-      20px 15px 16px;
-  }
-
-
-  .login-brand-name {
-    font-size: 18px;
-  }
-
-
-  .login-title {
-    font-size: 14px;
-  }
-
-
-  .login-slogan {
-    font-size: 12px;
-
-    gap: 5px;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .login-page * { transition: none !important; }
 }
+
+/* =========================================================
+   RÈGLES COMMUNES HISTORIQUES
+   Ces classes habillent les formulaires d'autres modules (rendez-vous,
+   hygiène, stocks, RH, soins, hospitalisation, administration, laboratoire).
+   Elles vivaient ici : conservées à l'identique pour ne rien changer ailleurs.
+   ========================================================= */
+
+.form-group { width: 100%; margin-bottom: 13px; }
+.form-group label { display: block; margin-bottom: 5px; color: var(--primary-800); font-size: 11px; line-height: 1.2; font-weight: 700; }
+.input-wrapper { position: relative; width: 100%; }
+.input-wrapper input { display: block; width: 100%; height: 39px; padding: 0 38px 0 34px; border: 1px solid var(--primary-200); border-radius: 7px; outline: none; background: rgba(255, 255, 255, 0.94); color: var(--primary-800); font-family: var(--font); font-size: 11px; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+.input-wrapper input::placeholder { color: var(--surface-300); opacity: 1; }
+.input-wrapper input:focus { border-color: var(--primary-500); background: #ffffff; box-shadow: 0 0 0 3px rgba(43, 129, 119, 0.10); }

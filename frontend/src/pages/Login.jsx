@@ -3,70 +3,43 @@
  * MA SANTÉ - PAGE DE CONNEXION
  * ============================================================
  *
- * Fichier :
- * src/pages/Login.jsx
+ * Deux panneaux sur ordinateur : à gauche l'accueil de la
+ * clinique (photo teintée au vert de la charte, marque et
+ * devise), à droite le formulaire, à taille de lecture.
+ * Sur téléphone, la photo devient un bandeau au-dessus du
+ * formulaire.
  *
+ * Aucun identifiant n'est pré-rempli : la page est publique.
  * ============================================================
  */
 
 import { useState } from "react";
-
-import {
-  UserRound,
-  LockKeyhole,
-  Eye,
-  EyeOff,
-  HeartPulse,
-} from "lucide-react";
-
-import { useAuth } from "../context/AuthContext";
+import { AlertCircle, Eye, EyeOff, LockKeyhole, LogIn, UserRound } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import Chargement from "../components/Chargement";
+import Logo from "../components/Logo";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Login.css";
 
-
 export default function Login() {
-
-  /* ==========================================================
-     AUTHENTIFICATION
-     ========================================================== */
-
   const { login } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-
-  /* ==========================================================
-     ÉTATS
-     ========================================================== */
-
-  const [username, setUsername] = useState("admin");
-
-  const [password, setPassword] = useState("Admin@2026!");
-
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [aideOuverte, setAideOuverte] = useState(false);
   const [error, setError] = useState("");
-
   const [loading, setLoading] = useState(false);
 
-
-  /* ==========================================================
-     CONNEXION
-     ========================================================== */
-
   async function submit(e) {
-
     e.preventDefault();
-
     setError("");
-
     setLoading(true);
-
     try {
-
-      await login(username, password);
-
+      await login(username.trim(), password);
       /*
        * Après une connexion réussie, l'utilisateur est envoyé vers
        * les modules, ou vers la page qu'il voulait ouvrir (la fiche
@@ -75,308 +48,122 @@ export default function Login() {
        */
       const next = params.get("next");
       navigate(next && next.startsWith("/") && !next.startsWith("//") ? next : "/modules");
-
-    } catch (err) {
-
-      setError(
-        "Identifiant ou mot de passe incorrect."
-      );
-
+    } catch {
+      setError("Identifiant ou mot de passe incorrect. Vérifiez la saisie, puis réessayez.");
     } finally {
-
       setLoading(false);
-
     }
   }
 
-
-  /* ==========================================================
-     AFFICHAGE
-     ========================================================== */
-
   return (
-
     <div className="login-page">
+      {/* ── Accueil de la clinique ── */}
+      <aside className="login-visuel" aria-label="MA SANTÉ">
+        <div className="login-marque">
+          <Logo size={44} inverted />
+          <div>
+            <strong>MA SANTÉ</strong>
+            <span>Gestion de clinique</span>
+          </div>
+        </div>
 
-
-      {/* ======================================================
-          IMAGE DE FOND
-          ====================================================== */}
-
-      <div className="login-background">
-
-        <div className="login-background-overlay"></div>
-
-      </div>
-
-
-
-      {/* ======================================================
-          CONTENU PRINCIPAL
-          ====================================================== */}
-
-      <div className="login-content">
-
-
-        {/* ====================================================
-            PARTIE GAUCHE
-            ==================================================== */}
-
-        <div className="login-left">
-
-          <div className="login-slogan">
-
+        <div className="login-devise">
+          <p className="login-devise-mots">
             <span>Santé</span>
-
             <span>Proximité</span>
-
             <span>Confiance</span>
+          </p>
+          <p className="login-devise-phrase">Une clinique plus organisée, plus humaine et plus intelligente.</p>
+        </div>
+      </aside>
 
+      {/* ── Formulaire ── */}
+      <main className="login-panneau">
+        <form className="login-form" onSubmit={submit}>
+          <div className="login-marque-mobile">
+            <Logo size={36} />
+            <strong>MA SANTÉ</strong>
           </div>
 
-        </div>
+          <header className="login-tete">
+            <h1>Connectez-vous à votre espace</h1>
+            <p>Utilisez l'identifiant et le mot de passe remis par l'administrateur de votre établissement.</p>
+          </header>
 
+          {error && (
+            <p className="login-error" role="alert">
+              <AlertCircle size={18} aria-hidden="true" />
+              {error}
+            </p>
+          )}
 
-
-        {/* ====================================================
-            PARTIE DROITE
-            ==================================================== */}
-
-        <div className="login-right">
-
-
-          {/* ==================================================
-              FORMULAIRE
-              ================================================== */}
-
-          <form
-            className="login-form"
-            onSubmit={submit}
-          >
-
-
-            {/* =================================================
-                LOGO
-                ================================================= */}
-
-            <div className="login-brand">
-
-
-              <div className="login-brand-icon">
-
-                <HeartPulse
-                  size={32}
-                  strokeWidth={2.5}
-                />
-
-              </div>
-
-
-              <div className="login-brand-text">
-
-                <div className="login-brand-name">
-
-                  MA <strong>SANTÉ</strong>
-
-                </div>
-
-
-                <div className="login-brand-subtitle">
-
-                  Gestion de Clinique
-
-                </div>
-
-              </div>
-
+          <div className="login-champ">
+            <label htmlFor="username">Identifiant</label>
+            <div className="login-saisie">
+              <UserRound size={19} aria-hidden="true" />
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Identifiant ou e-mail"
+                autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                required
+                autoFocus
+              />
             </div>
+          </div>
 
-
-
-            {/* =================================================
-                TITRE
-                ================================================= */}
-
-            <h1 className="login-title">
-
-              Connectez-vous à votre espace
-
-            </h1>
-
-
-
-            {/* =================================================
-                ERREUR
-                ================================================= */}
-
-            {error && (
-
-              <div className="login-error">
-
-                {error}
-
-              </div>
-
-            )}
-
-
-
-            {/* =================================================
-                IDENTIFIANT
-                ================================================= */}
-
-            <div className="form-group">
-
-              <label htmlFor="username">
-
-                Identifiant
-
-              </label>
-
-
-              <div className="input-wrapper">
-
-
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) =>
-                    setUsername(e.target.value)
-                  }
-                  placeholder="Votre identifiant"
-                  autoComplete="username"
-                  required
-                />
-
-              </div>
-
-            </div>
-
-
-
-            {/* =================================================
-                MOT DE PASSE
-                ================================================= */}
-
-            <div className="form-group">
-
-              <label htmlFor="password">
-
-                Mot de passe
-
-              </label>
-
-
-              <div className="input-wrapper">
-
-
-                <input
-                  id="password"
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
-                  placeholder="Votre mot de passe"
-                  autoComplete="current-password"
-                  required
-                />
-
-
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() =>
-                    setShowPassword(
-                      (value) => !value
-                    )
-                  }
-                  aria-label={
-                    showPassword
-                      ? "Masquer le mot de passe"
-                      : "Afficher le mot de passe"
-                  }
-                >
-
-                  {showPassword ? (
-
-                    <EyeOff size={17} />
-
-                  ) : (
-
-                    <Eye size={17} />
-
-                  )}
-
-                </button>
-
-              </div>
-
-            </div>
-
-
-
-            {/* =================================================
-                MOT DE PASSE OUBLIÉ
-                ================================================= */}
-
-            <div className="forgot-password-container">
-
+          <div className="login-champ">
+            <div className="login-champ-ligne">
+              <label htmlFor="password">Mot de passe</label>
               <button
                 type="button"
-                className="forgot-password"
+                className="login-lien"
+                aria-expanded={aideOuverte}
+                aria-controls="aide-mot-de-passe"
+                onClick={() => setAideOuverte((v) => !v)}
               >
-
                 Mot de passe oublié ?
-
               </button>
-
             </div>
-
-
-
-            {/* =================================================
-                BOUTON DE CONNEXION
-                ================================================= */}
-
-            <button
-              type="submit"
-              className="login-button"
-              disabled={loading}
-            >
-
-              {loading
-                ? "Connexion..."
-                : "Se connecter"}
-
-            </button>
-
-
-
-            {/* =================================================
-                TEXTE FINAL
-                ================================================= */}
-
-            <div className="login-bottom-text">
-
-              Une clinique plus organisée,
-              plus humaine et plus intelligente
-
+            <div className="login-saisie">
+              <LockKeyhole size={19} aria-hidden="true" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Votre mot de passe"
+                autoComplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                className="login-oeil"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              >
+                {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+              </button>
             </div>
+            {aideOuverte && (
+              <p className="login-aide" id="aide-mot-de-passe">
+                Demandez à l'administrateur de votre établissement de vous attribuer un nouveau mot de passe
+                (Administration → Utilisateurs).
+              </p>
+            )}
+          </div>
 
-
-          </form>
-
-        </div>
-
-      </div>
-
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading
+              ? <><Chargement taille="petite" centre={false} couleur="currentColor" muet />Connexion…</>
+              : <><LogIn size={19} aria-hidden="true" />Se connecter</>}
+          </button>
+        </form>
+      </main>
     </div>
-
   );
 }
