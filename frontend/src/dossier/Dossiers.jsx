@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Activity, BedDouble, CalendarDays, FileText, FlaskConical, History, IdCard, KeyRound, Pencil,
-  Pill, Receipt, Search, Stethoscope, TriangleAlert, Droplet, ArrowLeft, Lock, Copy, Merge,
+  Pill, Receipt, Search, Stethoscope, TriangleAlert, Droplet, ArrowLeft, Lock, Copy, Merge, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 import "../styles/dossier.css";
@@ -72,16 +72,41 @@ function LignePatient({ p, extra }) {
   );
 }
 
+/* 20 lignes par page : tous les dossiers restent accessibles, sans liste sans fin. */
+const PAR_PAGE = 20;
+
+function Pagination({ page, pages, onPage }) {
+  if (pages <= 1) return null;
+  return (
+    <nav className="ds-pagination" aria-label="Pages">
+      <button type="button" className="secondary-button" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+        <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />Précédent
+      </button>
+      <span aria-live="polite">Page <strong>{page}</strong> sur {pages}</span>
+      <button type="button" className="secondary-button" disabled={page >= pages} onClick={() => onPage(page + 1)}>
+        Suivant<ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
+      </button>
+    </nav>
+  );
+}
+
 function Rechercher() {
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
   const [donnees, setDonnees] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
-      api.get("/dossier/patients/", { params: { q } }).then(({ data }) => setDonnees(data)).catch(() => setDonnees({ total: 0, patients: [] }));
+      api.get("/dossier/patients/", { params: { q, page } }).then(({ data }) => setDonnees(data))
+        .catch(() => setDonnees({ total: 0, page: 1, pages: 1, patients: [] }));
     }, 250);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [q, page]);
+
+  const changerPage = (n) => {
+    setPage(n);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <section className="bloc">
@@ -93,10 +118,13 @@ function Rechercher() {
       </div>
       <label className="recherche">
         <Search size={17} strokeWidth={2} aria-hidden="true" />
-        <input value={q} autoFocus onChange={(e) => setQ(e.target.value)} placeholder="Ex. KONE, P26F46MAS, 07 00…" aria-label="Rechercher un patient" />
+        <input value={q} autoFocus onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Ex. KONE, P26F46MAS, 07 00…" aria-label="Rechercher un patient" />
       </label>
       {!donnees ? <Chargement /> : donnees.patients.length === 0 ? <p className="vide">Aucun dossier ne correspond.</p> : (
-        <ul className="ds-resultats">{donnees.patients.map((p) => <LignePatient key={p.id} p={p} />)}</ul>
+        <>
+          <ul className="ds-resultats">{donnees.patients.map((p) => <LignePatient key={p.id} p={p} />)}</ul>
+          <Pagination page={donnees.page || 1} pages={donnees.pages || 1} onPage={changerPage} />
+        </>
       )}
     </section>
   );
@@ -110,14 +138,22 @@ const VIDES = {
 
 function Liste({ vue }) {
   const [donnees, setDonnees] = useState(null);
+  const [page, setPage] = useState(1);
   useEffect(() => {
+    setPage(1);
     api.get(`/dossier/listes/${vue}/`).then(({ data }) => setDonnees(data.patients)).catch(() => setDonnees([]));
   }, [vue]);
+  const pages = Math.max(1, Math.ceil((donnees?.length || 0) / PAR_PAGE));
   const extra = (p) => (vue === "recents" ? `ouvert le ${p.ouvertLe}` : vue === "hospitalises" ? `lit ${p.lit}, depuis le ${p.depuis}` : "");
   return (
     <section className="bloc">
       {!donnees ? <Chargement /> : donnees.length === 0 ? <p className="vide">{VIDES[vue]}</p> : (
-        <ul className="ds-resultats">{donnees.map((p) => <LignePatient key={p.id} p={p} extra={extra(p)} />)}</ul>
+        <>
+          <ul className="ds-resultats">
+            {donnees.slice((page - 1) * PAR_PAGE, page * PAR_PAGE).map((p) => <LignePatient key={p.id} p={p} extra={extra(p)} />)}
+          </ul>
+          <Pagination page={page} pages={pages} onPage={(n) => { setPage(n); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+        </>
       )}
     </section>
   );

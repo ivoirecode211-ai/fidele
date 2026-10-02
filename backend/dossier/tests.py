@@ -57,6 +57,20 @@ class DossierTests(APITestCase):
         visible = [c for c in self.ouvrir(self.medecin).data["consultations"] if c["confidentiel"]][0]
         self.assertEqual(visible["diagnostic"], "Suivi VIH")
 
+    def test_search_is_paginated_by_twenty(self):
+        for i in range(24):
+            Patient.objects.create(hospital=self.patient.hospital, patient_number=f"P26X{i:02d}MAS",
+                                   last_name=f"TEST{i}", first_names="Page", sex="F")
+        self.client.force_authenticate(self.accueil)
+        premiere = self.client.get(f"{BASE}/").data
+        self.assertEqual((premiere["total"], premiere["pages"], premiere["page"], len(premiere["patients"])), (25, 2, 1, 20))
+        seconde = self.client.get(f"{BASE}/", {"page": 2}).data
+        self.assertEqual(len(seconde["patients"]), 5)
+        codes = {p["code"] for p in premiere["patients"]} | {p["code"] for p in seconde["patients"]}
+        self.assertEqual(len(codes), 25)
+        # Une page hors limites ramène à la dernière.
+        self.assertEqual(self.client.get(f"{BASE}/", {"page": 99}).data["page"], 2)
+
     def test_search_and_edits_follow_the_roles(self):
         self.client.force_authenticate(self.accueil)
         self.assertEqual(self.client.get(f"{BASE}/", {"q": "kone"}).data["patients"][0]["code"], "P26D0SMAS")

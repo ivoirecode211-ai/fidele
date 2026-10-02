@@ -1241,7 +1241,8 @@ a.caisse-nav-item { font: inherit; }
 .caisse-page button, .caisse-page input, .caisse-page select, .caisse-page textarea { font: inherit; }
 .caisse-page button { cursor: pointer; }
 .caisse-page button:disabled { cursor: not-allowed; opacity: .55; }
-.caisse-page :focus-visible { outline: 3px solid var(--primary-500); outline-offset: 3px; }
+/* Les champs de saisie montrent déjà le focus par leur bordure ou leur cadre (.recherche) : pas de second contour. */
+.caisse-page :focus-visible:not(input, textarea, select) { outline: 3px solid var(--primary-500); outline-offset: 3px; }
 .caisse-page svg { flex-shrink: 0; }
 
 

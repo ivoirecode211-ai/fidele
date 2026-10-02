@@ -22,6 +22,9 @@ def own_patients(user):
     return Patient.objects.filter(hospital=hospital_of(user))
 
 
+PAR_PAGE = 20
+
+
 class SearchView(APIView):
     permission_classes = [DossierAccess]
 
@@ -31,9 +34,16 @@ class SearchView(APIView):
         if q:
             qs = qs.filter(Q(last_name__icontains=q) | Q(first_names__icontains=q) | Q(patient_number__icontains=q)
                            | Q(phone__icontains=q) | Q(insurance_number__icontains=q))
+        # Par pages de PAR_PAGE : tous les dossiers restent accessibles sans une liste sans fin.
         total = qs.count()
-        rows = list(qs.order_by("-created_at")[:30])
-        return Response({"total": total, "patients": [services.ligne(p) for p in rows]})
+        pages = max(1, -(-total // PAR_PAGE))
+        try:
+            page = min(max(1, int(request.query_params.get("page", 1))), pages)
+        except ValueError:
+            page = 1
+        rows = list(qs.order_by("-created_at", "-pk")[(page - 1) * PAR_PAGE:page * PAR_PAGE])
+        return Response({"total": total, "page": page, "pages": pages, "parPage": PAR_PAGE,
+                         "patients": [services.ligne(p) for p in rows]})
 
 
 def doublons(user):

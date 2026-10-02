@@ -150,8 +150,7 @@ export default function Login() {
             </div>
             {aideOuverte && (
               <p className="login-aide" id="aide-mot-de-passe">
-                Demandez à l'administrateur de votre établissement de vous attribuer un nouveau mot de passe
-                (Administration → Utilisateurs).
+                Demandez à l'administrateur de votre établissement de vous attribuer un nouveau mot de passe.
               </p>
             )}
           </div>
