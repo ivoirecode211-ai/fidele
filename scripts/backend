@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# MA SANTÉ — commande « backend » (serveur Django).
+#   backend run       libère le port 8000 si besoin, applique les migrations, lance le serveur
+#   backend migrate   applique seulement les migrations
+#   backend test      lance les tests
+set -euo pipefail
+
+RACINE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+BACKEND="$RACINE/backend"
+PYTHON="$BACKEND/venv/bin/python"
+PORT="${PORT_BACKEND:-8000}"
+
+if [ ! -x "$PYTHON" ]; then
+  echo "Environnement Python introuvable ($PYTHON)." >&2
+  echo "Créez-le : cd \"$BACKEND\" && python3 -m venv venv && venv/bin/pip install -r requirements.txt" >&2
+  exit 1
+fi
+
+# shellcheck source=ports.sh
+. "$RACINE/scripts/ports.sh"
+
+cd "$BACKEND"
+case "${1:-}" in
+  run)
+    # Un ancien backend (ou un autre programme) tient le port : on le récupère.
+    liberer_port "$PORT" || exit 1
+    "$PYTHON" manage.py migrate --noinput
+    echo
+    echo "Backend MA SANTÉ : http://127.0.0.1:$PORT/api/   (Ctrl + C pour arrêter)"
+    exec "$PYTHON" manage.py runserver "127.0.0.1:$PORT"
+    ;;
+  migrate)
+    exec "$PYTHON" manage.py migrate
+    ;;
+  test)
+    shift
+    exec "$PYTHON" manage.py test --noinput "$@"
+    ;;
+  *)
+    echo "Usage : backend run | backend migrate | backend test [module]" >&2
+    exit 1
+    ;;
+esac

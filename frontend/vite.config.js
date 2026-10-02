@@ -11,7 +11,13 @@ const VENDORS = {
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173
+    port: 5173,
+    // L'interface et l'API sur le même port : le navigateur appelle /api, Vite le relaie au backend.
+    // (« frontend run » fixe VITE_API_URL=/api pour l'utiliser.)
+    proxy: {
+      "/api": { target: "http://127.0.0.1:8000", changeOrigin: true },
+      "/media": { target: "http://127.0.0.1:8000", changeOrigin: true }
+    }
   },
   build: {
     rollupOptions: {

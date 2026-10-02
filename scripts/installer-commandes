@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Rend « backend run » et « frontend run » disponibles dès que le venv est activé
+# (à relancer seulement si le venv backend/venv est recréé).
+set -euo pipefail
+RACINE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+BIN="$RACINE/backend/venv/bin"
+[ -d "$BIN" ] || { echo "Venv introuvable : $BIN" >&2; exit 1; }
+for commande in backend frontend; do
+  ln -sf "$RACINE/scripts/$commande" "$BIN/$commande"
+done
+echo "Commandes installées. Activez le venv (source backend/venv/bin/activate) puis : backend run / frontend run"

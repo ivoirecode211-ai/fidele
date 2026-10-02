@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# MA SANTÉ — commande « frontend » (Vite).
+#   frontend run     libère le port 5173 si besoin et lance l'interface ; le navigateur ne parle qu'à ce port,
+#                    Vite relaie /api et /media au backend (port 8000)
+#   frontend build   construit la version de production dans frontend/dist
+set -euo pipefail
+
+RACINE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+FRONTEND="$RACINE/frontend"
+PORT="${PORT_FRONTEND:-5173}"
+
+if ! command -v npm >/dev/null; then
+  echo "npm est introuvable : installez Node.js." >&2
+  exit 1
+fi
+
+# shellcheck source=ports.sh
+. "$RACINE/scripts/ports.sh"
+
+cd "$FRONTEND"
+[ -d node_modules ] || npm install
+
+case "${1:-}" in
+  run)
+    # Un ancien frontend (ou un autre programme) tient le port : on le récupère.
+    liberer_port "$PORT" || exit 1
+    if ! port_occupe "${PORT_BACKEND:-8000}"; then
+      echo "Attention : le backend ne répond pas encore. Lancez « backend run » dans un autre terminal."
+    fi
+    IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+    echo "Interface MA SANTÉ : http://localhost:$PORT${IP:+   (téléphone sur le même Wi-Fi : http://$IP:$PORT)}"
+    # L'API passe par le même port que l'interface : Vite la relaie au backend.
+    VITE_API_URL=/api exec npx vite --host 0.0.0.0 --port "$PORT" --strictPort
+    ;;
+  build)
+    exec npx vite build
+    ;;
+  *)
+    echo "Usage : frontend run | frontend build" >&2
+    exit 1
+    ;;
+esac
