@@ -123,13 +123,6 @@
   text-wrap: balance;
 }
 
-.login-tete p {
-  margin: 10px 0 0;
-  color: var(--ink-faint);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
 .login-error {
   display: flex;
   align-items: flex-start;
@@ -157,9 +150,9 @@
 }
 
 .login-champ label {
-  color: var(--ink-muted);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 700;
 }
 
 .login-saisie {
@@ -171,18 +164,19 @@
 .login-saisie > svg {
   position: absolute;
   left: 15px;
-  color: var(--ink-ghost);
+  color: var(--ink-faint);
   pointer-events: none;
   transition: color 0.15s ease;
 }
 
 .login-saisie input {
   width: 100%;
-  height: 52px;
+  height: 54px;
   padding: 0 48px 0 46px;
-  border: 1px solid var(--surface-300);
+  border: 1.5px solid var(--ink-ghost);
   border-radius: var(--radius-xl);
-  background: var(--surface);
+  background: var(--surface-50);
+  box-shadow: inset 0 1px 2px rgba(15, 31, 36, 0.05);
   color: var(--ink);
   font: inherit;
   font-size: 16px; /* 16 px : pas de zoom automatique sur téléphone */
@@ -190,12 +184,13 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.login-saisie input::placeholder { color: var(--ink-ghost); }
-.login-saisie input:hover { border-color: var(--primary-300); }
+.login-saisie input::placeholder { color: var(--ink-faint); }
+.login-saisie input:hover { border-color: var(--primary-500); }
 
 .login-saisie input:focus {
-  border-color: var(--primary-500);
+  border-color: var(--primary-600);
   outline: none;
+  background: var(--surface);
   box-shadow: 0 0 0 4px var(--primary-100);
 }
 

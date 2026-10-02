@@ -87,7 +87,6 @@ export default function Login() {
 
           <header className="login-tete">
             <h1>Connectez-vous à votre espace</h1>
-            <p>Utilisez l'identifiant et le mot de passe remis par l'administrateur de votre établissement.</p>
           </header>
 
           {error && (
