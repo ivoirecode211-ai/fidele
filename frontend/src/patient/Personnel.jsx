@@ -1,6 +1,6 @@
 import LogoEtablissement, { useEtablissement } from "../components/LogoEtablissement";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { KeyRound, MessageCircle, Printer, Search, Send, ShieldOff } from "lucide-react";
+import { useEffect, useState } from "react";
+import { KeyRound, Megaphone, Printer, Search, ShieldCheck, ShieldOff, Trash2, Unlock, UsersRound } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import "../styles/patient-personnel.css";
@@ -20,12 +20,17 @@ import { imprimer } from "../accueil/impression";
  *   Accès patients   l'accueil active l'espace d'un patient et
  *                    lui remet sa carte : QR code (son code
  *                    patient déjà rempli) + PIN provisoire
- *   Messages         le médecin lit et répond à ses patients
+ *   Suivi des comptes  les espaces activés, par état : bloqués à
+ *                    débloquer, jamais connectés, désactivés
+ *   Annonces         une information pour tous les patients de
+ *                    l'hôpital, dans leur espace et en notification
+ *
+ * La messagerie des médecins est dans le module Consultation
+ * (medecine/Messagerie.jsx) : chacun n'y voit que ses patients.
  * ============================================================
  */
 
 const ACCES = ["ADMIN", "DIRECTOR", "RECEPTION"];
-const MEDECINS = ["ADMIN", "DIRECTOR", "DOCTOR"];
 
 export default function Personnel() {
   const { user } = useAuth();
@@ -33,7 +38,8 @@ export default function Personnel() {
   const peut = (liste) => user?.is_superuser || roles.some((r) => liste.includes(r));
   const ecrans = [
     peut(ACCES) && { id: "acces", label: "Accès patients", icone: KeyRound, titre: "Accès des patients", sous: "Activer l'espace patient et remettre la carte d'accès" },
-    peut(MEDECINS) && { id: "messages", label: "Messages", icone: MessageCircle, titre: "Messages des patients", sous: "Échanger avec les patients que vous avez consultés" },
+    peut(ACCES) && { id: "suivi", label: "Suivi des comptes", icone: UsersRound, titre: "Suivi des comptes", sous: "Débloquer, désactiver, relancer les patients qui ne se connectent pas" },
+    peut(ACCES) && { id: "annonces", label: "Annonces", icone: Megaphone, titre: "Annonces aux patients", sous: "Une information pour tous les patients de l'hôpital" },
   ].filter(Boolean);
   const demande = new URLSearchParams(window.location.search).get("vue");
   const [choix, setEcran] = useState(demande);
@@ -43,10 +49,11 @@ export default function Personnel() {
   if (!user) return <Chargement taille="grande" pleine />;
   return (
     <Coquille ecrans={ecrans} ecran={ecran} onEcran={setEcran}
-      titre="Espace patients" sous="Réservé à l'accueil et aux médecins">
+      titre="Espace patients" sous="Réservé à l'accueil">
       {ecran === "acces" && <Acces />}
-      {ecran === "messages" && <Messagerie />}
-      {!ecrans.length && <p className="bandeau attention"><span>Cet espace est réservé à l'accueil et aux médecins.</span></p>}
+      {ecran === "suivi" && <Suivi />}
+      {ecran === "annonces" && <Annonces />}
+      {!ecrans.length && <p className="bandeau attention"><span>Cet espace est réservé à l'accueil.</span></p>}
     </Coquille>
   );
 }
@@ -69,7 +76,6 @@ function Acces() {
   }, [q, version]);
 
   async function agir(patient, action) {
-    if (action === "desactiver" && !window.confirm(`Désactiver l'espace patient de ${patient.name} ?`)) return;
     if (action === "activer" && patient.status !== "Aucun accès"
         && !window.confirm("Un nouveau PIN provisoire va remplacer l'actuel. Le patient devra en choisir un nouveau. Continuer ?")) return;
     try {
@@ -108,11 +114,6 @@ function Acces() {
                       <button type="button" className="primary-button" onClick={() => agir(p, "activer")}>
                         <KeyRound size={15} strokeWidth={2} />{p.status === "Aucun accès" ? "Activer" : "Nouveau PIN"}
                       </button>
-                      {!["Aucun accès", "Désactivé"].includes(p.status) && (
-                        <button type="button" className="secondary-button" title="Désactiver" onClick={() => agir(p, "desactiver")}>
-                          <ShieldOff size={15} strokeWidth={2} />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -169,87 +170,171 @@ function CarteAcces({ carte, hopital, onClose }) {
   );
 }
 
+
 /* ============================================================
-   MESSAGERIE DU MÉDECIN
+   SUIVI DES COMPTES
    ============================================================ */
 
-export function Messagerie() {
-  const [fils, setFils] = useState(null);
-  const [choisi, setChoisi] = useState(null);
-  const [version, setVersion] = useState(0);
+const FILTRES = [["tous", "Tous"], ["Actif", "Actifs"], ["PIN provisoire", "PIN provisoire"], ["Bloqué", "Bloqués"],
+  ["jamais", "Jamais connectés"], ["Désactivé", "Désactivés"]];
 
-  useEffect(() => {
-    api.get("/portail/medecin/messages/").then(({ data }) => setFils(data)).catch(() => setFils([]));
-  }, [version]);
+function Suivi() {
+  const [donnees, setDonnees] = useState(null);
+  const [filtre, setFiltre] = useState("tous");
+  const [q, setQ] = useState("");
+
+  const charger = () => api.get("/portail/suivi/").then(({ data }) => setDonnees(data)).catch(() => setDonnees({ comptes: [], compteurs: {} }));
+  useEffect(() => { charger(); }, []);
+
+  async function agir(compte, action) {
+    const questions = { desactiver: `Désactiver l'espace patient de ${compte.name} ? Il sera déconnecté tout de suite.` };
+    if (questions[action] && !window.confirm(questions[action])) return;
+    try {
+      const { data } = await api.post(`/portail/suivi/${compte.id}/${action}/`);
+      setDonnees((d) => ({ ...d, comptes: d.comptes.map((c) => (c.id === data.id ? data : c)) }));
+      charger();
+    } catch (e) { alert(messageErreur(e)); }
+  }
+
+  if (!donnees) return <Chargement />;
+  const terme = q.trim().toLowerCase();
+  const visibles = donnees.comptes
+    .filter((c) => filtre === "tous" || (filtre === "jamais" ? c.neverConnected && c.status !== "Désactivé" : c.status === filtre))
+    .filter((c) => !terme || `${c.name} ${c.code} ${c.phone}`.toLowerCase().includes(terme));
+  const compte = (id) => (id === "tous" ? donnees.comptes.length : id === "jamais" ? donnees.compteurs["Jamais connecté"] : donnees.compteurs[id]) || 0;
 
   return (
-    <section className="bloc pp-messagerie">
-      <div className="pp-fils">
-        <h2>Conversations</h2>
-        {!fils ? <Chargement /> : fils.length === 0 ? (
-          <p className="vide">Aucun message. Vos patients peuvent vous écrire depuis leur espace après une consultation.</p>
-        ) : (
-          <ul>
-            {fils.map((f) => (
-              <li key={f.patientId}>
-                <button type="button" className={choisi === f.patientId ? "actif" : ""} onClick={() => setChoisi(f.patientId)}>
-                  <strong>{f.patient}</strong>
-                  <span>{f.lastMessage.fromPatient ? "" : "Vous : "}{f.lastMessage.text}</span>
-                  <small>{f.code} · {f.lastMessage.sentAt}</small>
-                  {f.unread > 0 && <b>{f.unread}</b>}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+    <section className="bloc">
+      <div className="pp-filtres" role="radiogroup" aria-label="État du compte">
+        {FILTRES.map(([id, nom]) => (
+          <button key={id} type="button" role="radio" aria-checked={filtre === id} className={filtre === id ? "actif" : ""}
+            onClick={() => setFiltre(id)}>{nom}<b>{compte(id)}</b></button>
+        ))}
       </div>
-      <div className="pp-fil">
-        {choisi ? <Fil patientId={choisi} onChange={() => setVersion((n) => n + 1)} />
-          : <p className="vide">Choisissez une conversation.</p>}
-      </div>
+      <label className="recherche">
+        <Search size={17} strokeWidth={2} aria-hidden="true" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nom, téléphone ou code patient…" aria-label="Rechercher un compte" />
+      </label>
+      {visibles.length === 0 ? <p className="vide">Aucun compte dans cette liste.</p> : (
+        <div className="tableau">
+          <table>
+            <thead><tr><th>Code</th><th>Patient</th><th>État</th><th>Activé le</th><th>Dernière connexion</th><th /></tr></thead>
+            <tbody>
+              {visibles.map((c) => (
+                <tr key={c.id}>
+                  <td><code>{c.code}</code></td>
+                  <td><strong>{c.name}</strong><small>{c.phone || ""}</small></td>
+                  <td><span className={`etat ${ETATS[c.status] || ""}`}>{c.status}</span></td>
+                  <td>{c.activatedAt}<small>{c.activatedBy}</small></td>
+                  <td>{c.lastLogin || "Jamais"}</td>
+                  <td>
+                    <div className="pp-actions">
+                      {c.status === "Bloqué" && (
+                        <button type="button" className="primary-button" onClick={() => agir(c, "debloquer")}>
+                          <Unlock size={15} strokeWidth={2} />Débloquer
+                        </button>
+                      )}
+                      {c.status === "Désactivé" ? (
+                        <button type="button" className="secondary-button" onClick={() => agir(c, "reactiver")}>
+                          <ShieldCheck size={15} strokeWidth={2} />Réactiver
+                        </button>
+                      ) : (
+                        <button type="button" className="secondary-button" onClick={() => agir(c, "desactiver")}>
+                          <ShieldOff size={15} strokeWidth={2} />Désactiver
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   );
 }
 
-function Fil({ patientId, onChange }) {
-  const [fil, setFil] = useState(null);
-  const [texte, setTexte] = useState("");
+/* ============================================================
+   ANNONCES
+   ============================================================ */
+
+function Annonces() {
+  const [liste, setListe] = useState(null);
+  const [form, setForm] = useState({ titre: "", texte: "", jusquAu: "" });
   const [envoi, setEnvoi] = useState(false);
-  const bas = useRef(null);
+  const [info, setInfo] = useState("");
 
-  const charger = useCallback(() => api.get(`/portail/medecin/messages/${patientId}/`)
-    .then(({ data }) => { setFil(data); onChange(); }).catch(() => {}), [patientId]);
+  const charger = () => api.get("/portail/personnel/annonces/").then(({ data }) => setListe(data)).catch(() => setListe([]));
+  useEffect(() => { charger(); }, []);
 
-  useEffect(() => { setFil(null); charger(); const t = setInterval(charger, 20000); return () => clearInterval(t); }, [charger]);
-  useEffect(() => { bas.current?.scrollIntoView({ block: "end" }); }, [fil?.messages.length]);
-
-  async function envoyer(event) {
+  async function publier(event) {
     event.preventDefault();
-    if (!texte.trim()) return;
-    setEnvoi(true);
-    try { await api.post(`/portail/medecin/messages/${patientId}/`, { text: texte }); setTexte(""); await charger(); }
-    catch (e) { alert(messageErreur(e)); }
+    if (!window.confirm("Publier cette annonce ? Tous les patients de l'hôpital la verront, et ceux qui ont activé les notifications la recevront sur leur téléphone.")) return;
+    setEnvoi(true); setInfo("");
+    try {
+      const { data } = await api.post("/portail/personnel/annonces/", form);
+      setForm({ titre: "", texte: "", jusquAu: "" });
+      setInfo(`Annonce publiée. ${data.envoyees} notification${data.envoyees > 1 ? "s" : ""} envoyée${data.envoyees > 1 ? "s" : ""}.`);
+      charger();
+    } catch (e) { alert(messageErreur(e)); }
     finally { setEnvoi(false); }
   }
 
-  if (!fil) return <Chargement />;
+  async function retirer(a) {
+    if (!window.confirm(`Retirer l'annonce « ${a.titre} » ? Elle disparaît de l'espace des patients.`)) return;
+    try { await api.delete(`/portail/personnel/annonces/${a.id}/`); charger(); } catch (e) { alert(messageErreur(e)); }
+  }
+
+  const aujourdhui = new Date().toISOString().slice(0, 10);
   return (
-    <>
-      <header className="pp-fil-tete"><strong>{fil.patient}</strong><code>{fil.code}</code></header>
-      <div className="pp-bulles">
-        {fil.messages.map((m) => (
-          <div key={m.id} className={`pp-bulle ${m.fromPatient ? "patient" : "medecin"}`}>
-            <p>{m.text}</p><span>{m.sentAt}</span>
-          </div>
-        ))}
-        <div ref={bas} />
-      </div>
-      <form className="pp-saisie" onSubmit={envoyer}>
-        <textarea rows={2} value={texte} maxLength={2000} placeholder="Votre réponse… (le patient est prévenu sur son téléphone)"
-          onChange={(e) => setTexte(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) envoyer(e); }} />
-        <button type="submit" className="primary-button" disabled={envoi || !texte.trim()}><Send size={16} />Envoyer</button>
-      </form>
-    </>
+    <div className="pp-annonces">
+      <section className="bloc">
+        <h2>Nouvelle annonce</h2>
+        <form className="pp-annonce-form" onSubmit={publier}>
+          <label className="field"><span>Titre<span className="required">*</span></span>
+            <input value={form.titre} maxLength={120} placeholder="Ex. Campagne de vaccination"
+              onChange={(e) => setForm({ ...form, titre: e.target.value })} /></label>
+          <label className="field"><span>Message<span className="required">*</span></span>
+            <textarea rows={4} value={form.texte} maxLength={1000}
+              onChange={(e) => setForm({ ...form, texte: e.target.value })} /></label>
+          <label className="field pp-annonce-date"><span>Visible jusqu'au</span>
+            <input type="date" value={form.jusquAu} min={aujourdhui} onChange={(e) => setForm({ ...form, jusquAu: e.target.value })} /></label>
+          <button type="submit" className="primary-button" disabled={envoi || !form.titre.trim() || !form.texte.trim()}>
+            <Megaphone size={16} strokeWidth={2} />{envoi ? "Publication…" : "Publier"}
+          </button>
+        </form>
+        {info && <p className="bandeau succes" role="status"><span>{info}</span></p>}
+      </section>
+
+      <section className="bloc">
+        <h2>Annonces publiées</h2>
+        {!liste ? <Chargement /> : liste.length === 0 ? <p className="vide">Aucune annonce pour le moment.</p> : (
+          <ul className="pp-annonce-liste">
+            {liste.map((a) => (
+              <li key={a.id} className={a.enCours ? "" : "terminee"}>
+                <div>
+                  <strong>{a.titre}</strong>
+                  <p>{a.texte}</p>
+                  <small>
+                    {a.publieeLe}{a.auteur ? ` · ${a.auteur}` : ""}
+                    {a.jusquAu ? ` · jusqu'au ${a.jusquAu.split("-").reverse().join("/")}` : ""}
+                    {` · ${a.envoyees} notification${a.envoyees > 1 ? "s" : ""}`}
+                  </small>
+                </div>
+                <div className="pp-annonce-etat">
+                  <span className={`etat ${a.enCours ? "regle" : ""}`}>{a.enCours ? "En ligne" : a.retiree ? "Retirée" : "Terminée"}</span>
+                  {a.enCours && (
+                    <button type="button" className="secondary-button" title="Retirer" onClick={() => retirer(a)}>
+                      <Trash2 size={15} strokeWidth={2} />Retirer
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }

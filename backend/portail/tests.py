@@ -196,3 +196,44 @@ class MessagerieTests(PortailBase):
         self.assertEqual(self.client.get(f"{BASE}/medecin/messages/").data, [])
         self.client.force_authenticate(self.medecin)
         self.assertEqual(len(self.client.get(f"{BASE}/medecin/messages/").data), 1)
+
+
+class SuiviComptesTests(PortailBase):
+    def test_compteurs_debloquer_et_desactiver(self):
+        self.activer()
+        PatientAccess.objects.update(failed_attempts=5, locked_until=timezone.now() + timedelta(minutes=15))
+        self.client.force_authenticate(self.accueil)
+        data = self.client.get(f"{BASE}/suivi/").data
+        self.assertEqual((data["compteurs"]["Bloqué"], data["compteurs"]["Jamais connecté"]), (1, 1))
+        self.assertEqual(self.client.post(f"{BASE}/suivi/{self.patient.pk}/debloquer/").data["status"], "PIN provisoire")
+        self.assertEqual(self.client.post(f"{BASE}/suivi/{self.patient.pk}/desactiver/").data["status"], "Désactivé")
+        self.assertEqual(self.client.post(f"{BASE}/suivi/{self.patient.pk}/reactiver/").data["status"], "PIN provisoire")
+
+    def test_reserve_a_l_accueil(self):
+        self.client.force_authenticate(self.medecin)
+        self.assertEqual(self.client.get(f"{BASE}/suivi/").status_code, 403)
+
+
+class AnnoncesTests(PortailBase):
+    @mock.patch("portail.push.send", return_value=1)
+    def test_annonce_publiee_vue_par_le_patient_puis_retiree(self, send):
+        self.en_patient()
+        patient_credentials = self.client._credentials
+        from portail.models import PushSubscription
+        PushSubscription.objects.create(patient=self.patient, endpoint="https://push.example/a", p256dh="k", auth="a")
+        self.client.credentials()
+        self.client.force_authenticate(self.accueil)
+        self.assertEqual(self.client.post(f"{BASE}/personnel/annonces/", {"titre": "", "texte": "x"}, format="json").status_code, 400)
+        annonce = self.client.post(f"{BASE}/personnel/annonces/", {"titre": "Campagne de vaccination",
+                                   "texte": "Vaccination gratuite des enfants samedi."}, format="json").data
+        self.assertEqual((annonce["envoyees"], send.call_count), (1, 1))
+        self.client.force_authenticate(None)
+        self.client.credentials(**patient_credentials)
+        self.assertEqual([a["titre"] for a in self.client.get(f"{BASE}/annonces/").data], ["Campagne de vaccination"])
+        self.assertEqual(len(self.client.get(f"{BASE}/accueil/").data["annonces"]), 1)
+        self.client.credentials()
+        self.client.force_authenticate(self.accueil)
+        self.client.delete(f"{BASE}/personnel/annonces/{annonce['id']}/")
+        self.client.force_authenticate(None)
+        self.client.credentials(**patient_credentials)
+        self.assertEqual(self.client.get(f"{BASE}/annonces/").data, [])

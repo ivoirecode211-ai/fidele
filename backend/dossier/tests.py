@@ -167,3 +167,35 @@ class ParcoursEntreModulesTests(ParcoursBase):
         dossier = self.client.get(f"/api/dossier/patients/{patient.pk}/").data
         self.assertTrue(dossier["hospitalisations"][0]["enCours"])
         self.assertTrue(dossier["resume"]["hospitaliseLe"])
+
+
+class ListesEtFusionTests(DossierTests):
+    def test_recents_et_doublons(self):
+        from datetime import date
+
+        self.client.force_authenticate(self.medecin)
+        self.client.get(f"/api/dossier/patients/{self.patient.pk}/")
+        recents = self.client.get("/api/dossier/listes/recents/").data["patients"]
+        self.assertEqual([p["code"] for p in recents], ["P26D0SMAS"])
+        Patient.objects.filter(pk=self.patient.pk).update(birth_date=date(1990, 5, 1))
+        Patient.objects.create(hospital=self.hospital, patient_number="P26ZZZMAS", last_name="kone",
+                               first_names=self.patient.first_names, sex="F", birth_date=date(1990, 5, 1))
+        groupes = self.client.get("/api/dossier/listes/doublons/").data["groupes"]
+        self.assertEqual(len(groupes), 1)
+        self.assertEqual(len(groupes[0]["patients"]), 2)
+
+    def test_fusion_rattache_tout_au_dossier_garde(self):
+        doublon = Patient.objects.create(hospital=self.hospital, patient_number="P26ZZYMAS", last_name="KONE",
+                                         first_names="Awa", sex="F", phone="0700000099")
+        Consultation.objects.create(patient=doublon, doctor=self.medecin, reason="Toux", completed_at=timezone.now())
+        avant = Consultation.objects.filter(patient=self.patient).count()
+        self.client.force_authenticate(self.medecin)
+        self.assertEqual(self.client.post("/api/dossier/fusion/", {"garde": self.patient.pk, "doublon": doublon.pk},
+                                          format="json").status_code, 403)
+        directeur = User.objects.create_user(username="dirf", password="x", role="DIRECTOR")
+        self.client.force_authenticate(directeur)
+        r = self.client.post("/api/dossier/fusion/", {"garde": self.patient.pk, "doublon": doublon.pk}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertFalse(Patient.objects.filter(pk=doublon.pk).exists())
+        self.assertEqual(Consultation.objects.filter(patient=self.patient).count(), avant + 1)
+        self.assertTrue(AuditLog.objects.filter(action="Fusion").exists())

@@ -131,3 +131,24 @@ class PushKeys(models.Model):
     class Meta:
         verbose_name = "clés de notification"
         verbose_name_plural = "clés de notification"
+
+
+class Annonce(models.Model):
+    """Une information de l'hôpital pour tous ses patients : affichée dans leur espace, envoyée en notification."""
+    hospital = models.ForeignKey("accounts.Hospital", on_delete=models.CASCADE, related_name="annonces_patients")
+    titre = models.CharField(max_length=120)
+    texte = models.TextField(max_length=1000)
+    # Une annonce se retire d'elle-même après cette date (campagne, fermeture exceptionnelle…).
+    jusqu_au = models.DateField(null=True, blank=True)
+    retiree = models.BooleanField(default=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+    envoyees = models.PositiveIntegerField("notifications envoyées", default=0)
+
+    class Meta:
+        verbose_name = "annonce aux patients"
+        verbose_name_plural = "annonces aux patients"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.titre

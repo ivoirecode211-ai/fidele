@@ -20,6 +20,7 @@ import {
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
 import api from "../services/api";
+import { useModuleView } from "../layouts/AppLayout";
 import "../styles/hygiene.css";
 
 // Données servies par l'API (/api/hygiene/).
@@ -36,6 +37,8 @@ const TASK_STATUS_TONES = {
 const EMPTY_TASK_FORM = { zone: "", type: "Nettoyage", responsible: "", date: "", hour: "" };
 
 export default function Hygiene() {
+  // Sous-module : tâches, déchets, produits ou audits — un seul panneau, sur toute la largeur.
+  const vue = useModuleView("/hygiene");
   const [data, setData] = useState({
     updatedAt: "—",
     stats: { compliance: null, inProgress: 0, late: 0, incidents: 0 },
@@ -125,7 +128,7 @@ export default function Hygiene() {
   };
 
   return (
-    <div className="hygiene-page">
+    <div className="hygiene-page" data-vue={vue.id}>
       <header className="hygiene-header">
 
         <button type="button" className="hygiene-primary-button" onClick={openNewTask}>

@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  BellRing, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Droplet, House, LogOut,
-  MessageCircle, Pill, Send, Stethoscope, TriangleAlert,
-} from "lucide-react";
+import { BellRing, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Droplet, House, LogOut, Megaphone, MessageCircle, Pill, Send, Stethoscope, TriangleAlert } from "lucide-react";
 
 import "../styles/patient.css";
 
@@ -137,11 +134,19 @@ function Titre({ children, sous }) {
 
 function Accueil({ donnees, aller, rafraichir }) {
   if (!donnees) return <Chargement taille="grande" pleine texte="Ouverture de votre espace…" />;
-  const { todayIntakes: prises, nextAppointment: rdv, unreadMessages, lastConsultation } = donnees;
+  const { todayIntakes: prises, nextAppointment: rdv, unreadMessages, lastConsultation, annonces = [] } = donnees;
   return (
     <>
       <Titre sous="Ce qui compte pour vous aujourd'hui.">Bienvenue</Titre>
       <ActiverRappels />
+
+      {annonces.map((a) => (
+        <section key={a.id} className="pt-carte pt-annonce" role="note">
+          <div className="pt-carte-tete"><Megaphone size={20} strokeWidth={2} /><h2>{a.titre}</h2></div>
+          <p>{a.texte}</p>
+          <small>Votre hôpital · {a.publieeLe.slice(0, 10)}</small>
+        </section>
+      ))}
 
       <section className="pt-carte">
         <div className="pt-carte-tete"><Pill size={20} strokeWidth={2} /><h2>Médicaments d'aujourd'hui</h2></div>

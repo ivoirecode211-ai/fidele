@@ -2197,3 +2197,15 @@ a.caisse-nav-item { font: inherit; }
 @media print {
   body:not(:has(#ticket)) .bilan-entete-impression { display: flex; align-items: center; gap: 8px; }
 }
+
+/* Gabarit des listes de sous-modules (components/Liste.jsx) */
+.liste-sm-chiffres { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin: 0 0 16px; }
+.liste-sm-chiffres div { padding: 12px 14px; border: 1px solid var(--surface-200); border-radius: var(--radius-xl); background: var(--surface-50); }
+.liste-sm-chiffres dt { color: var(--ink-faint); font-size: 12.5px; }
+.liste-sm-chiffres dd { margin: 4px 0 0; color: var(--ink); font-family: var(--font-titre); font-size: 22px; font-weight: 700; }
+.liste-sm-chiffres .alerte { border-color: var(--danger-soft-border); background: var(--danger-soft); }
+.liste-sm-chiffres .alerte dd { color: var(--danger); }
+.liste-sm-chiffres .fait dd { color: var(--green); }
+.liste-sm td small { display: block; color: var(--ink-faint); font-size: 12.5px; }
+.liste-sm .montant { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.etat.bleu { border-color: var(--primary-200); background: var(--primary-50); color: var(--primary-700); }

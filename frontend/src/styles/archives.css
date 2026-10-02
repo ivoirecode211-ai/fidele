@@ -919,3 +919,12 @@
     width: 100%;
   }
 }
+/* Sous-modules des Archives */
+.archives-page[data-vue="documents"] .categories-panel,
+.archives-page[data-vue="documents"] .archives-toolbar,
+.archives-page[data-vue="recherche"] .categories-panel,
+.archives-page[data-vue="recherche"] .archives-stats,
+.archives-page[data-vue="categories"] .archives-toolbar { display: none; }
+.archives-page[data-vue="documents"] .archives-content-grid,
+.archives-page[data-vue="recherche"] .archives-content-grid { grid-template-columns: 1fr !important; }
+.archives-page[data-vue="recherche"] .archives-toolbar { padding: 18px; border: 1px solid var(--primary-200); border-radius: var(--radius-xl); background: var(--primary-50); }

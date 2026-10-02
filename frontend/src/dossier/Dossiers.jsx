@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Activity, BedDouble, CalendarDays, FileText, FlaskConical, History, IdCard, KeyRound, Pencil,
-  Pill, Receipt, Search, Stethoscope, TriangleAlert, Droplet, ArrowLeft, Lock,
+  Pill, Receipt, Search, Stethoscope, TriangleAlert, Droplet, ArrowLeft, Lock, Copy, Merge,
 } from "lucide-react";
 
 import "../styles/dossier.css";
 
 import Chargement from "../components/Chargement";
 import Coquille from "../components/Coquille";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { messageErreur } from "../accueil/api";
 
@@ -35,8 +36,43 @@ export default function Dossiers() {
    RECHERCHE
    ============================================================ */
 
+const LISTES = [
+  { id: "recherche", label: "Rechercher", icone: Search, titre: "Dossiers patients", sous: "Tout l'historique d'un patient, tous modules confondus" },
+  { id: "jour", label: "Patients du jour", icone: CalendarDays, titre: "Patients du jour", sous: "Passés à la caisse aujourd'hui" },
+  { id: "recents", label: "Récemment ouverts", icone: History, titre: "Récemment ouverts", sous: "Les derniers dossiers que vous avez consultés" },
+  { id: "hospitalises", label: "Hospitalisés", icone: BedDouble, titre: "Patients hospitalisés", sous: "Actuellement dans un lit" },
+  { id: "doublons", label: "Doublons", icone: Copy, titre: "Dossiers en double", sous: "Même nom et même date de naissance, ou même téléphone" },
+];
+
 function Recherche() {
+  const [ecran, setEcran] = useState("recherche");
+  return (
+    <Coquille ecrans={LISTES} ecran={ecran} onEcran={setEcran}>
+      {ecran === "recherche" && <Rechercher />}
+      {["jour", "recents", "hospitalises"].includes(ecran) && <Liste key={ecran} vue={ecran} />}
+      {ecran === "doublons" && <Doublons />}
+    </Coquille>
+  );
+}
+
+function LignePatient({ p, extra }) {
   const navigate = useNavigate();
+  return (
+    <li>
+      <button type="button" onClick={() => navigate(`/dossiers/${p.id}`)}>
+        <span className="ds-avatar">{p.name.split(" ").map((m) => m[0]).join("").slice(0, 2)}</span>
+        <div>
+          <strong>{p.name}</strong>
+          <span>{[p.sex, p.age !== null ? `${p.age} ans` : "", p.phone, extra].filter(Boolean).join(" · ")}</span>
+        </div>
+        <code>{p.code}</code>
+        {p.allergies && <span className="ds-puce-alerte" title="Allergies signalées"><TriangleAlert size={15} /></span>}
+      </button>
+    </li>
+  );
+}
+
+function Rechercher() {
   const [q, setQ] = useState("");
   const [donnees, setDonnees] = useState(null);
 
@@ -48,38 +84,82 @@ function Recherche() {
   }, [q]);
 
   return (
-    <Coquille ecrans={[{ id: "recherche", label: "Rechercher", icone: Search, titre: "Dossiers patients", sous: "Tout l'historique d'un patient, tous modules confondus" }]}
-      ecran="recherche">
-      <section className="bloc">
-        <div className="bloc-tete">
-          <div>
-            <h2>Rechercher un dossier</h2>
-            <p>{donnees ? `${donnees.total} dossier(s) dans l'hôpital.` : "…"} Nom, code patient, téléphone ou n° d'assuré.</p>
-          </div>
+    <section className="bloc">
+      <div className="bloc-tete">
+        <div>
+          <h2>Rechercher un dossier</h2>
+          <p>{donnees ? `${donnees.total} dossier(s) dans l'hôpital.` : "…"} Nom, code patient, téléphone ou n° d'assuré.</p>
         </div>
-        <label className="recherche">
-          <Search size={17} strokeWidth={2} aria-hidden="true" />
-          <input value={q} autoFocus onChange={(e) => setQ(e.target.value)} placeholder="Ex. KONE, P26F46MAS, 07 00…" aria-label="Rechercher un patient" />
-        </label>
-        {!donnees ? <Chargement /> : donnees.patients.length === 0 ? <p className="vide">Aucun dossier ne correspond.</p> : (
-          <ul className="ds-resultats">
-            {donnees.patients.map((p) => (
-              <li key={p.id}>
-                <button type="button" onClick={() => navigate(`/dossiers/${p.id}`)}>
-                  <span className="ds-avatar">{p.name.split(" ").map((m) => m[0]).join("").slice(0, 2)}</span>
-                  <div>
-                    <strong>{p.name}</strong>
-                    <span>{[p.sex, p.age !== null ? `${p.age} ans` : "", p.phone].filter(Boolean).join(" · ")}</span>
-                  </div>
-                  <code>{p.code}</code>
-                  {p.allergies && <span className="ds-puce-alerte" title="Allergies signalées"><TriangleAlert size={15} /></span>}
-                </button>
-              </li>
+      </div>
+      <label className="recherche">
+        <Search size={17} strokeWidth={2} aria-hidden="true" />
+        <input value={q} autoFocus onChange={(e) => setQ(e.target.value)} placeholder="Ex. KONE, P26F46MAS, 07 00…" aria-label="Rechercher un patient" />
+      </label>
+      {!donnees ? <Chargement /> : donnees.patients.length === 0 ? <p className="vide">Aucun dossier ne correspond.</p> : (
+        <ul className="ds-resultats">{donnees.patients.map((p) => <LignePatient key={p.id} p={p} />)}</ul>
+      )}
+    </section>
+  );
+}
+
+const VIDES = {
+  jour: "Aucun patient n'est passé à la caisse aujourd'hui.",
+  recents: "Vous n'avez encore ouvert aucun dossier.",
+  hospitalises: "Aucun patient n'est hospitalisé en ce moment.",
+};
+
+function Liste({ vue }) {
+  const [donnees, setDonnees] = useState(null);
+  useEffect(() => {
+    api.get(`/dossier/listes/${vue}/`).then(({ data }) => setDonnees(data.patients)).catch(() => setDonnees([]));
+  }, [vue]);
+  const extra = (p) => (vue === "recents" ? `ouvert le ${p.ouvertLe}` : vue === "hospitalises" ? `lit ${p.lit}, depuis le ${p.depuis}` : "");
+  return (
+    <section className="bloc">
+      {!donnees ? <Chargement /> : donnees.length === 0 ? <p className="vide">{VIDES[vue]}</p> : (
+        <ul className="ds-resultats">{donnees.map((p) => <LignePatient key={p.id} p={p} extra={extra(p)} />)}</ul>
+      )}
+    </section>
+  );
+}
+
+function Doublons() {
+  const { user } = useAuth();
+  const peutFusionner = user?.is_superuser || [user?.role, ...(user?.roles || [])].some((r) => ["ADMIN", "DIRECTOR"].includes(r));
+  const [groupes, setGroupes] = useState(null);
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    api.get("/dossier/listes/doublons/").then(({ data }) => setGroupes(data.groupes)).catch(() => setGroupes([]));
+  }, [version]);
+
+  async function fusionner(garde, doublon) {
+    if (!window.confirm(`Fusionner ${doublon.code} dans ${garde.code} ?\n\nTout ce qui est rattaché à ${doublon.code} (passages, consultations, ordonnances, documents…) passera dans ${garde.code}, puis ${doublon.code} sera supprimé. Cette opération est inscrite au journal et ne peut pas être annulée.`)) return;
+    try { await api.post("/dossier/fusion/", { garde: garde.id, doublon: doublon.id }); setVersion((n) => n + 1); }
+    catch (e) { alert(messageErreur(e)); }
+  }
+
+  if (!groupes) return <Chargement />;
+  if (groupes.length === 0) return <section className="bloc"><p className="vide">Aucun dossier en double détecté.</p></section>;
+  return (
+    <div className="ds-doublons">
+      {!peutFusionner && <p className="bandeau info"><span>Signalez ces doublons à l'administration : elle seule peut les fusionner.</span></p>}
+      {groupes.map((g) => {
+        const [garde, ...autres] = g.patients;
+        return (
+          <section key={g.patients.map((p) => p.id).join("-")} className="bloc ds-doublon">
+            <p className="ds-doublon-critere">{g.critere}</p>
+            <ul className="ds-resultats">
+              {g.patients.map((p, i) => <LignePatient key={p.id} p={p} extra={`créé le ${p.createdAt}${i === 0 ? " · le plus ancien, gardé" : ""}`} />)}
+            </ul>
+            {peutFusionner && autres.map((d) => (
+              <button key={d.id} type="button" className="secondary-button" onClick={() => fusionner(garde, d)}>
+                <Merge size={16} strokeWidth={2} />Fusionner {d.code} dans {garde.code}
+              </button>
             ))}
-          </ul>
-        )}
-      </section>
-    </Coquille>
+          </section>
+        );
+      })}
+    </div>
   );
 }
 

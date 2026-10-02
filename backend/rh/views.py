@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from accounts.tenancy import hospital_of
 from parcours.permissions import RoleAccess
 
-from .models import Employee
+from .models import Absence, Employee
 
 
 class RhAccess(RoleAccess):
@@ -33,7 +33,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ["id", "matricule", "nom", "prenom", "sexe", "telephone", "email", "poste",
-                  "departement", "dateEmbauche", "contrat", "statut"]
+                  "departement", "dateEmbauche", "contrat", "dateFinContrat", "statut"]
 
     def validate_matricule(self, value):
         value = value.strip().upper()
@@ -85,4 +85,55 @@ class EmployeeView(APIView):
 
     def delete(self, request, pk):
         get_object_or_404(employes(hospital_of(request.user)), pk=pk).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+# ------------------------------------------------------------------ congés et absences
+
+class AbsenceSerializer(serializers.ModelSerializer):
+    employeNom = serializers.SerializerMethodField()
+    jours = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Absence
+        fields = ["id", "employe", "employeNom", "type", "debut", "fin", "motif", "jours"]
+
+    def get_employeNom(self, obj):
+        return f"{obj.employe.nom} {obj.employe.prenom}"
+
+    def get_jours(self, obj):
+        return (obj.fin - obj.debut).days + 1
+
+    def validate_employe(self, employe):
+        if employe.hospital_id != self.context["hospital"].pk:
+            raise serializers.ValidationError("Employé inconnu dans cet hôpital.")
+        return employe
+
+    def validate(self, attrs):
+        if attrs["fin"] < attrs["debut"]:
+            raise serializers.ValidationError({"fin": "La fin doit suivre le début."})
+        return attrs
+
+
+class AbsencesView(APIView):
+    permission_classes = [RhAccess]
+
+    def get(self, request):
+        absences = Absence.objects.filter(hospital=hospital_of(request.user)).select_related("employe")[:500]
+        return Response(AbsenceSerializer(absences, many=True).data)
+
+    def post(self, request):
+        hopital = hospital_of(request.user)
+        serializer = AbsenceSerializer(data=request.data, context={"hospital": hopital})
+        serializer.is_valid(raise_exception=True)
+        absence = serializer.save(hospital=hopital)
+        return Response(AbsenceSerializer(absence).data, status=status.HTTP_201_CREATED)
+
+
+class AbsenceView(APIView):
+    permission_classes = [RhAccess]
+
+    def delete(self, request, pk):
+        get_object_or_404(Absence, pk=pk, hospital=hospital_of(request.user)).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

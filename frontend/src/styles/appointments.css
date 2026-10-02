@@ -929,3 +929,24 @@
   background: var(--danger-soft);
   color: var(--danger-hover);
 }
+
+/* Agenda de la semaine */
+.ag-semaine { padding: 18px; }
+.ag-barre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.ag-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.ag-barre select { height: 40px; padding: 0 12px; border: 1px solid var(--surface-200); border-radius: var(--radius-lg); background: #fff; font: inherit; }
+.ag-grille { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.ag-jour { min-height: 220px; padding: 8px; border: 1px solid var(--surface-200); border-radius: var(--radius-xl); background: var(--surface-50); }
+.ag-jour.aujourdhui { border-color: var(--primary-400); background: var(--primary-50); }
+.ag-jour header { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; color: var(--ink-faint); font-size: 13px; }
+.ag-jour header strong { color: var(--ink); font-family: var(--font-titre); font-size: 20px; }
+.ag-jour header b { margin-left: auto; padding: 0 7px; border-radius: 999px; background: var(--primary-600); color: #fff; font-size: 11.5px; }
+.ag-vide { margin: 0; color: var(--ink-ghost); text-align: center; }
+.ag-rdv { display: grid; gap: 1px; margin-bottom: 6px; padding: 7px 8px; border-radius: var(--radius-lg); background: #fff; border: 1px solid var(--surface-200); font-size: 12.5px; }
+.ag-rdv time { color: var(--primary-700); font-weight: 700; }
+.ag-rdv strong { color: var(--ink); }
+.ag-rdv span, .ag-rdv small { color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-rdv.absent { border-color: var(--danger-soft-border); background: var(--danger-soft); }
+.ag-rdv.fait { opacity: .6; }
+@media (max-width: 1100px) { .ag-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .ag-grille { grid-template-columns: 1fr; } }

@@ -887,3 +887,15 @@
     display: none;
   }
 }
+/* Sous-modules : chaque écran ne montre que son panneau, en pleine largeur. */
+.hygiene-page[data-vue] .hygiene-main-grid,
+.hygiene-page[data-vue] .hygiene-bottom-grid { grid-template-columns: 1fr; }
+.hygiene-page[data-vue]:not([data-vue="taches"]) .tasks-panel,
+.hygiene-page[data-vue]:not([data-vue="taches"]) .hygiene-toolbar,
+.hygiene-page[data-vue]:not([data-vue="produits"]) .products-panel,
+.hygiene-page[data-vue]:not([data-vue="dechets"]) .waste-panel,
+.hygiene-page[data-vue]:not([data-vue="audits"]) .audit-panel { display: none; }
+.hygiene-page[data-vue="taches"] .hygiene-bottom-grid,
+.hygiene-page[data-vue="produits"] .hygiene-bottom-grid,
+.hygiene-page[data-vue="dechets"] .hygiene-main-grid,
+.hygiene-page[data-vue="audits"] .hygiene-main-grid { display: none; }

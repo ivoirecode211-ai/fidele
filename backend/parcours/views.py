@@ -274,6 +274,41 @@ class PharmacyHistoryView(APIView):
         return Response(dispensing_history(served))
 
 
+class CaisseSessionsView(APIView):
+    """Comptabilité : les sessions de caisse (ouvertures, clôtures, écarts), les plus récentes d'abord."""
+    permission_classes = [AccountingAccess]
+
+    def get(self, request):
+        from .caisse_views import serialize_session
+        from .models import CashSession
+
+        sessions = (CashSession.objects.filter(hospital=hospital_of(request.user))
+                    .select_related("cashier", "validated_by").order_by("-opened_at")[:200])
+        return Response([serialize_session(s) for s in sessions])
+
+
+class TicketsAnnulesView(APIView):
+    """Comptabilité : les tickets annulés, avec le motif et l'agent qui a annulé."""
+    permission_classes = [AccountingAccess]
+
+    def get(self, request):
+        from django.utils import timezone as tz
+
+        tickets = (Admission.objects.of_hospital(hospital_of(request.user)).filter(cancelled_at__isnull=False)
+                   .select_related("patient", "cancelled_by", "created_by").order_by("-cancelled_at")[:300])
+
+        def nom(u):
+            return (f"{u.last_name.upper()} {u.first_name}".strip() or u.username) if u else ""
+
+        return Response([{
+            "id": a.pk, "reference": a.reference or "—",
+            "patient": f"{a.patient.last_name} {a.patient.first_names}", "code": a.patient.patient_number,
+            "prestation": a.service_name, "montant": float(a.cost), "creeLe": tz.localtime(a.created_at).strftime("%d/%m/%Y %H:%M"),
+            "annuleLe": tz.localtime(a.cancelled_at).strftime("%d/%m/%Y %H:%M"), "annulePar": nom(a.cancelled_by),
+            "caissier": nom(a.created_by), "motif": a.cancel_reason,
+        } for a in tickets])
+
+
 class PaymentsView(APIView):
     """Encaissements de la Caisse pour la Comptabilité."""
     permission_classes = [AccountingAccess]

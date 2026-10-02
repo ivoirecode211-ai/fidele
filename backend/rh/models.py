@@ -19,6 +19,8 @@ class Employee(models.Model):
     departement = models.CharField(max_length=120)
     dateEmbauche = models.DateField()
     contrat = models.CharField(max_length=20, choices=CONTRACTS, default="CDI")
+    # Fin d'un CDD, d'un stage ou d'une prestation : le sous-module « Contrats » prévient avant l'échéance.
+    dateFinContrat = models.DateField(null=True, blank=True)
     statut = models.CharField(max_length=20, choices=STATUSES, default="Actif")
 
     class Meta:
@@ -36,3 +38,25 @@ class Employee(models.Model):
 
             self.hospital_id = premier_hopital_id()
         super().save(*args, **kwargs)
+
+
+
+class Absence(models.Model):
+    """Un congé ou une absence d'un employé (sous-module « Congés et absences »)."""
+    TYPES = [(t, t) for t in ("Congé annuel", "Maladie", "Maternité", "Paternité", "Formation", "Permission", "Absence injustifiée")]
+
+    hospital = models.ForeignKey("accounts.Hospital", on_delete=models.PROTECT, related_name="+")
+    employe = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="absences")
+    type = models.CharField(max_length=30, choices=TYPES, default="Congé annuel")
+    debut = models.DateField()
+    fin = models.DateField()
+    motif = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "absence"
+        verbose_name_plural = "congés et absences"
+        ordering = ["-debut"]
+
+    def __str__(self):
+        return f"{self.employe} — {self.type} du {self.debut} au {self.fin}"

@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import "../styles/Laboratory.css";
 
 import {
   BarChart3,
+  BookOpen,
+  ListChecks,
   Check,
   CircleCheck,
   Download,
@@ -58,7 +60,8 @@ const getInitials = (name = "") => {
 
 function Laboratory() {
   // Sous-modules : les analyses, et le rapport du laborantin.
-  const [ecranLabo, setEcranLabo] = useState("analyses");
+  // Sous-modules : demandes à traiter, en cours, résultats rendus, toutes, catalogue, rapport.
+  const [ecranLabo, setEcranLabo] = useState("attente");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
 
@@ -131,9 +134,12 @@ function Laboratory() {
         statusFilter === "Tous" ||
         analysis.statut === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      const parEcran = { attente: "En attente", encours: "En cours", rendus: "Terminée" }[ecranLabo];
+      const matchesEcran = !parEcran || analysis.statut === parEcran;
+
+      return matchesSearch && matchesStatus && matchesEcran;
     });
-  }, [analyses, search, statusFilter]);
+  }, [analyses, search, statusFilter, ecranLabo]);
 
   /* ==========================================================
      EXAMENS SÉLECTIONNÉS
@@ -689,7 +695,9 @@ function Laboratory() {
         </div>
 
         <nav className="lab-nav" aria-label="Sous-modules du laboratoire">
-          {[["analyses", "Analyses", FlaskConical], ["rapports", "Mon rapport", BarChart3]].map(([id, label, Icone]) => (
+          {[["attente", "Demandes à traiter", Hourglass], ["encours", "En cours", FlaskConical], ["rendus", "Résultats rendus", CircleCheck],
+            ["analyses", "Toutes les analyses", ListChecks], ["catalogue", "Catalogue des examens", BookOpen],
+            ["rapports", "Mon rapport", BarChart3]].map(([id, label, Icone]) => (
             <button key={id} type="button" className={`lab-nav-item ${ecranLabo === id ? "active" : ""}`}
               aria-current={ecranLabo === id ? "page" : undefined} onClick={() => setEcranLabo(id)}>
               <Icone size={18} strokeWidth={2} aria-hidden="true" />{label}
@@ -704,7 +712,7 @@ function Laboratory() {
       {/* CONTENU PRINCIPAL */}
 
       <main className="laboratory-main">
-        {ecranLabo === "rapports" ? <RapportsPraticien /> : <>
+        {ecranLabo === "rapports" ? <RapportsPraticien /> : ecranLabo === "catalogue" ? <CatalogueExamens exams={EXAMS} /> : <>
 
         {/* HEADER */}
 
@@ -1562,6 +1570,46 @@ function Laboratory() {
       </main>
 
     </div>
+  );
+}
+
+/* Catalogue des examens : ce que le laboratoire réalise, avec prix, unité et valeurs de référence. */
+function CatalogueExamens({ exams }) {
+  const [q, setQ] = useState("");
+  const terme = q.trim().toLowerCase();
+  const visibles = exams.filter((e) => !terme || `${e.name} ${e.category} ${e.id}`.toLowerCase().includes(terme));
+  const categories = [...new Set(visibles.map((e) => e.category))].sort();
+  return (
+    <section className="laboratory-table-card lab-catalogue">
+      <div className="lab-catalogue-tete">
+        <div><h2>Catalogue des examens</h2><p>{exams.length} examen(s) proposé(s) par le laboratoire</p></div>
+        <label className="laboratory-search lab-catalogue-recherche">
+          <Search size={17} aria-hidden="true" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un examen…" />
+        </label>
+      </div>
+      <div className="laboratory-table-container">
+        <table className="laboratory-table">
+          <thead><tr><th>Examen</th><th>Code</th><th>Unité</th><th>Valeurs de référence</th><th>Prix</th></tr></thead>
+          <tbody>
+            {categories.map((c) => (
+              <Fragment key={c}>
+                <tr className="lab-catalogue-categorie"><td colSpan={5}>{c}</td></tr>
+                {visibles.filter((e) => e.category === c).map((e) => (
+                  <tr key={e.id}>
+                    <td><strong>{e.name}</strong></td>
+                    <td><code>{e.id}</code></td>
+                    <td>{e.unit || "—"}</td>
+                    <td>{e.reference || "—"}</td>
+                    <td>{formatMoney(e.price)}</td>
+                  </tr>
+                ))}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 

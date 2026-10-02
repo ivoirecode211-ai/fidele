@@ -16,7 +16,7 @@ import Assistant from "./Assistant";
 import Consultation from "./Consultation";
 import { SignauxPatient, identite } from "./EntetePatient";
 import { Consultes, Examens, FileAttente, Ordonnances, RendezVous, Sejours } from "./Listes";
-import { Messagerie } from "../patient/Personnel";
+import Messagerie, { compterNonLus } from "./Messagerie";
 import RapportsPraticien from "../rapports/RapportsPraticien";
 
 /*
@@ -66,6 +66,15 @@ export default function ModuleConsultation() {
 
   const rafraichir = useCallback(() => setVersion((n) => n + 1), []);
 
+  /* Pastille de « Messages » : les messages non lus de CE praticien, revus avec la salle d'attente. */
+  const [nonLus, setNonLus] = useState(0);
+  useEffect(() => {
+    const charger = () => compterNonLus().then(setNonLus).catch(() => {});
+    charger();
+    const minuteur = setInterval(charger, RAFRAICHISSEMENT);
+    return () => clearInterval(minuteur);
+  }, []);
+
   /* Une notification peut ouvrir un écran précis : /consultations?vue=messages. */
   useEffect(() => {
     const vue = new URLSearchParams(search).get("vue");
@@ -97,7 +106,7 @@ export default function ModuleConsultation() {
     { id: "examens", label: "Examens", icone: FlaskConical, titre: "Examens demandés", sous: "" },
     { id: "rdv", label: "Rendez-vous", icone: CalendarDays, titre: "Rendez-vous", sous: "" },
     { id: "sejours", label: "Hospitalisations", icone: BedDouble, titre: "Hospitalisations", sous: "" },
-    { id: "messages", label: "Messages", icone: MessageCircle, titre: "Messages des patients", sous: "" },
+    { id: "messages", label: "Messages", icone: MessageCircle, titre: "Messages des patients", sous: "", compte: nonLus },
     { id: "rapports", label: "Rapports", icone: BarChart3, titre: "Mes rapports", sous: "" },
     { id: "assistant", label: "Assistant IA", icone: Sparkles, titre: "Assistant IA", sous: "" },
   ];
@@ -166,7 +175,7 @@ export default function ModuleConsultation() {
         {ecran === "examens" && suivi && <Examens lignes={suivi.examens} />}
         {ecran === "rdv" && suivi && <RendezVous lignes={suivi.rendezVous} />}
         {ecran === "sejours" && suivi && <Sejours lignes={suivi.sejours} />}
-        {ecran === "messages" && <Messagerie />}
+        {ecran === "messages" && <Messagerie onNonLus={setNonLus} />}
         {ecran === "rapports" && <RapportsPraticien consultation />}
       </>}
     </Coquille>

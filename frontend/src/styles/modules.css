@@ -506,10 +506,15 @@
 }
 
 
-/* Survol : la tuile se teinte et sa bordure passe au vert, sans bouger ni déborder sur ses voisines. */
+/* Survol : la tuile se soulève, son bas s'épaissit, l'icône grossit un peu. */
 .module-card:hover {
+  transform: translateY(-4px);
+
   background: var(--primary-100);
+  border-bottom-width: 4px;
   border-bottom-color: var(--primary-600);
+
+  box-shadow: var(--shadow-tuile);
 }
 
 
@@ -547,8 +552,8 @@
 }
 
 
-/* Au survol, la teinte fonce : l'icône reste dans son cadre, sans déborder sur ses voisines. */
 .module-card:hover .module-icon {
+  transform: scale(1.1);
   background: var(--primary-700);
 }
 

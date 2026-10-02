@@ -353,3 +353,46 @@ def dossier(patient, user):
         **sections,
         "chronologie": chronologie(listes),
     }
+
+
+# ------------------------------------------------------------------ fusion de doublons
+
+def fusionner(*, garde, doublon):
+    """Rattache au dossier gardé tout ce qui appartient au doublon, puis supprime le doublon.
+
+    Rien n'est perdu : passages, consultations, ordonnances, séjours, documents… changent
+    seulement de dossier. Les champs vides du dossier gardé sont complétés par le doublon.
+    """
+    from django.db import transaction
+
+    from portail.models import Conversation
+
+    with transaction.atomic():
+        # Une seule conversation par patient et par médecin : les messages rejoignent le fil existant.
+        for conv in Conversation.objects.filter(patient=doublon):
+            existante = Conversation.objects.filter(patient=garde, doctor=conv.doctor).first()
+            if existante:
+                conv.messages.update(conversation=existante)
+                conv.delete()
+        for relation in doublon._meta.related_objects:
+            modele, champ = relation.related_model, relation.field.name
+            if relation.one_to_one:
+                objet = modele.objects.filter(**{champ: doublon}).first()
+                if objet is None:
+                    continue
+                if modele.objects.filter(**{champ: garde}).exists():
+                    objet.delete()          # le dossier gardé a déjà le sien (accès à l'espace, couverture)
+                else:
+                    setattr(objet, champ, garde)
+                    objet.save(update_fields=[champ])
+            else:
+                modele.objects.filter(**{champ: doublon}).update(**{champ: garde})
+        complets = []
+        for champ in CHAMPS_IDENTITE + CHAMPS_MEDICAUX:
+            if not getattr(garde, champ) and getattr(doublon, champ):
+                setattr(garde, champ, getattr(doublon, champ))
+                complets.append(champ)
+        if complets:
+            garde.save(update_fields=complets)
+        doublon.delete()
+    return garde

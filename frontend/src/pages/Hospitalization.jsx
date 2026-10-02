@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
+import { useModuleView } from "../layouts/AppLayout";
 import "../styles/Hospitalization.css";
 
 
@@ -31,9 +32,9 @@ const Hospitalization = () => {
   // ÉTATS PRINCIPAUX
   // ==========================================================
 
-  const [activeTab, setActiveTab] = useState(
-    "hospitalisations"
-  );
+  // Sous-module de la barre latérale : patients hospitalisés, lits, sorties prévues, historique.
+  const vue = useModuleView("/hospitalization");
+  const activeTab = vue.id === "lits" ? "chambres" : "hospitalisations";
 
   const [search, setSearch] = useState("");
 
@@ -172,9 +173,16 @@ const Hospitalization = () => {
             item.status === statusFilter;
 
 
+          const demain = new Date(Date.now() + 86400000).toLocaleDateString("fr-FR");
+          const matchesVue =
+            vue.id === "historique" ? item.status === "Sortie"
+              : vue.id === "sorties" ? item.status === "Sortie prévue" || (item.status !== "Sortie" && item.sortiePrevue === demain)
+                : item.status !== "Sortie";
+
           return (
             matchesSearch &&
-            matchesStatus
+            matchesStatus &&
+            matchesVue
           );
 
         }
@@ -184,6 +192,7 @@ const Hospitalization = () => {
       hospitalizations,
       search,
       statusFilter,
+      vue.id,
     ]);
 
 
@@ -539,42 +548,7 @@ const Hospitalization = () => {
           ONGLETS
       ====================================================== */}
 
-      <div className="hospitalization-tabs">
-
-        <button
-          className={
-            activeTab ===
-            "hospitalisations"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveTab(
-              "hospitalisations"
-            )
-          }
-        >
-          Hospitalisations
-        </button>
-
-
-        <button
-          className={
-            activeTab ===
-            "chambres"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveTab(
-              "chambres"
-            )
-          }
-        >
-          Chambres & lits
-        </button>
-
-      </div>
+      {/* Les onglets sont devenus des sous-modules de la barre latérale. */}
 
 
       {/* ======================================================

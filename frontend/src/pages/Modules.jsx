@@ -282,7 +282,6 @@ const DEFAULT_ROLE_MODULES = {
     "laboratory",
     "pharmacy",
     "ia",
-    "patient-space",
     "ged",
   ],
 

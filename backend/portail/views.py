@@ -14,7 +14,7 @@ from prescriptions.models import PrescriptionItem
 from . import push, services
 from .auth import (CodeInvalide, IsPatient, IsPatientReady, LoginThrottle, PatientAuthentication, connecter,
                    emettre_jeton, pin_provisoire, pin_valide)
-from .models import Conversation, PatientAccess, PushSubscription, Reminder
+from .models import Annonce, Conversation, PatientAccess, PushSubscription, Reminder
 
 
 def refus(message, code=status.HTTP_400_BAD_REQUEST):
@@ -80,6 +80,7 @@ class HomeView(PatientView):
             "todayIntakes": services.prises_du_jour(self.patient),
             "unreadMessages": sum(f["unread"] for f in fils),
             "lastConsultation": dernieres[0] if dernieres else None,
+            "annonces": [annonce_data(a) for a in annonces_en_cours(self.patient.hospital)[:3]],
         })
 
 
@@ -233,6 +234,130 @@ class AccessActionView(APIView):
         patient.refresh_from_db()
         return Response({**access_row(patient), "temporaryPin": pin,
                          "hospital": patient.hospital.name if patient.hospital_id else ""})
+
+
+# ------------------------------------------------------------------ suivi des comptes
+
+ETATS_COMPTE = ["Actif", "PIN provisoire", "Bloqué", "Désactivé", "Jamais connecté"]
+
+
+def suivi_row(access):
+    row = access_row(access.patient)
+    row.update({
+        "activatedAt": timezone.localtime(access.activated_at).strftime("%d/%m/%Y"),
+        "activatedBy": (f"{access.activated_by.last_name.upper()} {access.activated_by.first_name}".strip()
+                        if access.activated_by else ""),
+        "neverConnected": access.last_login is None,
+        "failedAttempts": access.failed_attempts,
+    })
+    return row
+
+
+class SuiviView(APIView):
+    """Tous les espaces activés de l'hôpital, avec les compteurs par état."""
+    permission_classes = [AccessAdmin]
+
+    def get(self, request):
+        acces = list(PatientAccess.objects.filter(patient__hospital=hospital_of(request.user))
+                     .select_related("patient", "activated_by").order_by("-activated_at"))
+        rows = [suivi_row(a) for a in acces]
+        compte = {e: 0 for e in ETATS_COMPTE}
+        for r in rows:
+            compte[r["status"]] += 1
+            if r["neverConnected"] and r["status"] not in ("Désactivé",):
+                compte["Jamais connecté"] += 1
+        return Response({"comptes": rows, "compteurs": compte})
+
+
+class SuiviActionView(APIView):
+    """Débloquer un compte (après 5 erreurs de PIN), le désactiver ou le réactiver."""
+    permission_classes = [AccessAdmin]
+
+    def post(self, request, pk, action):
+        access = get_object_or_404(PatientAccess, patient_id=pk, patient__hospital=hospital_of(request.user))
+        if action == "debloquer":
+            access.failed_attempts, access.locked_until = 0, None
+        elif action == "desactiver":
+            access.active = False
+            access.token_version += 1   # le patient est déconnecté sur-le-champ
+        elif action == "reactiver":
+            access.active = True
+        else:
+            return refus("Action inconnue.", status.HTTP_404_NOT_FOUND)
+        access.save()
+        return Response(suivi_row(PatientAccess.objects.select_related("patient", "activated_by").get(pk=access.pk)))
+
+
+# ------------------------------------------------------------------ annonces
+
+def annonce_data(a):
+    return {
+        "id": a.id, "titre": a.titre, "texte": a.texte,
+        "jusquAu": a.jusqu_au.isoformat() if a.jusqu_au else "",
+        "retiree": a.retiree,
+        "enCours": not a.retiree and (a.jusqu_au is None or a.jusqu_au >= timezone.localdate()),
+        "publieeLe": timezone.localtime(a.created_at).strftime("%d/%m/%Y %H:%M"),
+        "auteur": f"{a.created_by.last_name.upper()} {a.created_by.first_name}".strip() if a.created_by else "",
+        "envoyees": a.envoyees,
+    }
+
+
+def annonces_en_cours(hospital):
+    return (Annonce.objects.filter(hospital=hospital, retiree=False)
+            .filter(Q(jusqu_au__isnull=True) | Q(jusqu_au__gte=timezone.localdate())))
+
+
+class AnnoncesView(APIView):
+    """L'accueil publie une information pour tous les patients de l'hôpital."""
+    permission_classes = [AccessAdmin]
+
+    def get(self, request):
+        return Response([annonce_data(a) for a in Annonce.objects.filter(hospital=hospital_of(request.user))
+                         .select_related("created_by")[:100]])
+
+    def post(self, request):
+        titre = str(request.data.get("titre", "")).strip()
+        texte = str(request.data.get("texte", "")).strip()
+        if not titre or not texte:
+            return refus("Le titre et le texte de l'annonce sont obligatoires.")
+        jusqu_au = request.data.get("jusquAu") or None
+        if jusqu_au:
+            from datetime import date
+            try:
+                jusqu_au = date.fromisoformat(str(jusqu_au))
+            except ValueError:
+                return refus("Date de fin invalide.")
+            if jusqu_au < timezone.localdate():
+                return refus("La date de fin est déjà passée.")
+        hopital = hospital_of(request.user)
+        annonce = Annonce.objects.create(hospital=hopital, titre=titre[:120], texte=texte[:1000],
+                                         jusqu_au=jusqu_au, created_by=request.user)
+        # Chaque patient de l'hôpital abonné aux notifications la reçoit sur son téléphone.
+        envoyees = 0
+        abonnes = Patient.objects.filter(hospital=hopital, push_subscriptions__isnull=False,
+                                         portal_access__active=True).distinct()
+        for patient in abonnes:
+            envoyees += push.send(patient, title=titre[:60], body=texte[:120], url="/patient/espace", tag=f"annonce-{annonce.pk}")
+        annonce.envoyees = envoyees
+        annonce.save(update_fields=["envoyees"])
+        return Response(annonce_data(annonce), status=status.HTTP_201_CREATED)
+
+
+class AnnonceView(APIView):
+    permission_classes = [AccessAdmin]
+
+    def delete(self, request, pk):
+        annonce = get_object_or_404(Annonce, pk=pk, hospital=hospital_of(request.user))
+        annonce.retiree = True
+        annonce.save(update_fields=["retiree"])
+        return Response(annonce_data(annonce))
+
+
+class AnnoncesPatientView(PatientView):
+    """Les annonces en cours de l'hôpital du patient."""
+
+    def get(self, request):
+        return Response([annonce_data(a) for a in annonces_en_cours(self.patient.hospital)[:10]])
 
 
 class DoctorAccess(RoleAccess):

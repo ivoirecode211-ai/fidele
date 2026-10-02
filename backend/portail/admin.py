@@ -34,3 +34,8 @@ class ReminderAdmin(admin.ModelAdmin):
 
 admin.site.register(Intake)
 admin.site.register(PushSubscription)
+
+
+from .models import Annonce  # noqa: E402
+
+admin.site.register(Annonce)

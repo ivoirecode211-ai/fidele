@@ -884,3 +884,20 @@
     max-height: calc(100vh - 20px);
   }
 }
+/* Congés et absences */
+.rh-absence-form { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr; gap: 12px; align-items: end; margin-top: 12px; }
+.rh-absence-form .field { margin: 0; }
+.rh-absence-motif { grid-column: 1 / 4; }
+.rh-absence-form button { justify-self: start; }
+@media (max-width: 900px) { .rh-absence-form { grid-template-columns: 1fr 1fr; } .rh-absence-motif { grid-column: 1 / -1; } }
+
+/* Organigramme */
+.rh-organigramme { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.rh-service { border: 1px solid var(--surface-200); border-radius: var(--radius-xl); overflow: hidden; }
+.rh-service header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--primary-600); color: #fff; }
+.rh-service header span { padding: 1px 8px; border-radius: 999px; background: rgba(255, 255, 255, .2); font-size: 12px; }
+.rh-service ul { margin: 0; padding: 6px 0; list-style: none; }
+.rh-service li { display: grid; padding: 7px 14px; border-bottom: 1px solid var(--surface-100); }
+.rh-service li:last-child { border-bottom: 0; }
+.rh-service li span { color: var(--ink-faint); font-size: 13px; }
+.rh-service li.absent { opacity: .62; }

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import api from "../services/api";
+import { useModuleView } from "../layouts/AppLayout";
 import "../styles/archives.css";
 
 // Données de démonstration — seront reliées aux API Django/PostgreSQL.
@@ -53,6 +54,8 @@ function DocumentIcon({ type }) {
 }
 
 export default function Archives() {
+  // Sous-module : documents archivés, par catégorie, recherche avancée.
+  const vue = useModuleView("/archives");
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState("Tous les types");
   const [selectedYear, setSelectedYear] = useState(String(new Date().getFullYear()));
@@ -133,7 +136,7 @@ export default function Archives() {
   };
 
   return (
-    <div className="archives-page">
+    <div className="archives-page" data-vue={vue.id}>
       <header className="archives-header">
 
         <div className="archives-user-status">

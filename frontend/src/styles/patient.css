@@ -397,3 +397,9 @@
 @media (prefers-reduced-motion: reduce) {
   .pt-connexion *, .pt-espace * { transition: none !important; animation: none !important; }
 }
+
+/* Annonce de l'hôpital, en tête de l'accueil du patient. */
+.pt-annonce { border-color: var(--primary-200); background: var(--primary-50); }
+.pt-annonce .pt-carte-tete { color: var(--primary-700); }
+.pt-annonce p { margin: 6px 0 4px; color: var(--ink); white-space: pre-line; }
+.pt-annonce small { color: var(--ink-faint); font-size: 12.5px; }

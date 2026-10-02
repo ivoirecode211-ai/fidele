@@ -31,3 +31,12 @@ class RhTests(APITestCase):
         self.assertEqual(self.employee(statut="Retraité").status_code, 400)
         self.client.force_authenticate(User.objects.create_user(username="n", password="x", role="NURSE"))
         self.assertEqual(self.client.get("/api/rh/employes/").status_code, 403)
+
+    def test_absences_et_fin_de_contrat(self):
+        pk = self.employee(contrat="CDD", dateFinContrat="2026-12-31").data["id"]
+        self.assertEqual(self.client.get("/api/rh/employes/").data[0]["dateFinContrat"], "2026-12-31")
+        r = self.client.post("/api/rh/absences/", {"employe": pk, "type": "Maladie", "debut": "2026-10-01", "fin": "2026-10-03"}, format="json")
+        self.assertEqual((r.status_code, r.data["jours"]), (201, 3))
+        self.assertEqual(self.client.post("/api/rh/absences/", {"employe": pk, "debut": "2026-10-05", "fin": "2026-10-01"},
+                                          format="json").status_code, 400)
+        self.assertEqual(self.client.delete(f"/api/rh/absences/{r.data['id']}/").status_code, 204)

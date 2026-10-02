@@ -17,6 +17,7 @@ import {
   Phone,
 } from "lucide-react";
 import api from "../services/api";
+import { useModuleView } from "../layouts/AppLayout";
 import "../styles/appointments.css";
 
 const emptyForm = {
@@ -60,8 +61,18 @@ function Appointments() {
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
+  // Sous-module de la barre latérale : aujourd'hui, agenda, à venir, manqués, tous.
+  const vue = useModuleView("/appointments");
+  const aujourdhui = new Date().toISOString().slice(0, 10);
+  const dansLaVue = (a) => {
+    if (vue.id === "aujourdhui") return a.date === aujourdhui;
+    if (vue.id === "avenir") return a.date > aujourdhui && !["Annulé", "Terminé", "Absent"].includes(a.status);
+    if (vue.id === "manques") return a.status === "Absent" || (a.date < aujourdhui && ["En attente", "Confirmé"].includes(a.status));
+    return true;
+  };
+
   const filteredAppointments = useMemo(() => {
-    return appointments.filter((appointment) => {
+    return appointments.filter(dansLaVue).filter((appointment) => {
       const searchValue = search.toLowerCase();
 
       const matchesSearch =
@@ -79,7 +90,8 @@ function Appointments() {
 
       return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [appointments, search, statusFilter, dateFilter]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appointments, search, statusFilter, dateFilter, vue.id]);
 
   const statistics = {
     total: appointments.length,
@@ -389,6 +401,7 @@ function Appointments() {
           TABLEAU
           ====================================================== */}
 
+      {vue.id === "agenda" ? <AgendaSemaine rendezVous={appointments} /> : (
       <div className="appointments-card">
 
         <div className="appointments-card-header">
@@ -643,6 +656,7 @@ function Appointments() {
 
         </div>
       </div>
+      )}
 
       {/* ======================================================
           MODAL RENDEZ-VOUS
@@ -882,6 +896,64 @@ function Appointments() {
 
       )}
 
+    </div>
+  );
+}
+
+/* ============================================================
+   AGENDA DE LA SEMAINE
+   ============================================================
+   Une colonne par jour, du lundi au dimanche ; filtre par médecin.
+   ============================================================ */
+
+const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const isoLocal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+function AgendaSemaine({ rendezVous }) {
+  const [decalage, setDecalage] = useState(0);
+  const [medecin, setMedecin] = useState("");
+  const lundi = new Date();
+  lundi.setHours(0, 0, 0, 0);
+  lundi.setDate(lundi.getDate() - ((lundi.getDay() + 6) % 7) + decalage * 7);
+  const jours = Array.from({ length: 7 }, (_, i) => { const d = new Date(lundi); d.setDate(lundi.getDate() + i); return d; });
+  const medecins = [...new Set(rendezVous.map((r) => r.doctor))].sort();
+  const aujourdhui = isoLocal(new Date());
+  const duJour = (iso) => rendezVous.filter((r) => r.date === iso && (!medecin || r.doctor === medecin) && r.status !== "Annulé")
+    .sort((a, b) => a.time.localeCompare(b.time));
+
+  return (
+    <div className="appointments-card ag-semaine">
+      <div className="ag-barre">
+        <div className="ag-nav">
+          <button type="button" className="secondary-button" onClick={() => setDecalage(decalage - 1)}>Semaine précédente</button>
+          <button type="button" className="secondary-button" onClick={() => setDecalage(0)} disabled={decalage === 0}>Cette semaine</button>
+          <button type="button" className="secondary-button" onClick={() => setDecalage(decalage + 1)}>Semaine suivante</button>
+        </div>
+        <strong>Du {jours[0].toLocaleDateString("fr-FR")} au {jours[6].toLocaleDateString("fr-FR")}</strong>
+        <select value={medecin} onChange={(e) => setMedecin(e.target.value)} aria-label="Médecin">
+          <option value="">Tous les médecins</option>
+          {medecins.map((m) => <option key={m}>{m}</option>)}
+        </select>
+      </div>
+      <div className="ag-grille">
+        {jours.map((d, i) => {
+          const iso = isoLocal(d);
+          const liste = duJour(iso);
+          return (
+            <section key={iso} className={`ag-jour ${iso === aujourdhui ? "aujourdhui" : ""}`}>
+              <header><span>{JOURS[i]}</span><strong>{d.getDate()}</strong><b>{liste.length || ""}</b></header>
+              {liste.length === 0 ? <p className="ag-vide">—</p> : liste.map((r) => (
+                <article key={r.id} className={`ag-rdv ${r.status === "Absent" ? "absent" : r.status === "Terminé" ? "fait" : ""}`}>
+                  <time>{r.time}</time>
+                  <strong>{r.patient}</strong>
+                  <span>{r.doctor}</span>
+                  {r.motif && <small>{r.motif}</small>}
+                </article>
+              ))}
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 }

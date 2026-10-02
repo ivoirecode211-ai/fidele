@@ -1,6 +1,10 @@
 
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
-import { Activity, BarChart3, Bot, Clock3, History, Menu, Tags, UserCheck, Users, X } from "lucide-react";
+import {
+  Activity, Archive, Ban, BarChart3, BedDouble, Bot, CalendarCheck, CalendarClock, CalendarOff, CalendarRange, CalendarX2,
+  ClipboardCheck, Clock3, FileSignature, FolderTree, History, Landmark, LayoutGrid, List, LogOut, Menu, Network, Package,
+  Search, ShieldCheck, SprayCan, Tags, Trash2, UserCheck, Users, Wallet, X,
+} from "lucide-react";
 import { useState } from "react";
 import Logo from "../components/Logo";
 import SidebarFooter from "../components/SidebarFooter";
@@ -49,6 +53,42 @@ export const MODULE_VIEWS = {
     { id: "attente", label: "Patients en attente", icon: Clock3 },
     { id: "recus", label: "Patients reçus", icon: UserCheck },
     { id: "rapports", label: "Mon rapport", icon: BarChart3 },
+  ],
+  "/appointments": [
+    { id: "aujourdhui", label: "Aujourd'hui", icon: CalendarCheck },
+    { id: "agenda", label: "Agenda de la semaine", icon: CalendarRange },
+    { id: "avenir", label: "À venir", icon: CalendarClock },
+    { id: "manques", label: "Manqués", icon: CalendarX2 },
+    { id: "tous", label: "Tous les rendez-vous", icon: List },
+  ],
+  "/hospitalization": [
+    { id: "patients", label: "Patients hospitalisés", icon: BedDouble },
+    { id: "lits", label: "Lits et chambres", icon: LayoutGrid },
+    { id: "sorties", label: "Sorties prévues", icon: LogOut },
+    { id: "historique", label: "Historique des séjours", icon: History },
+  ],
+  "/billing": [
+    { id: "encaissements", label: "Encaissements", icon: Wallet },
+    { id: "sessions", label: "Sessions de caisse", icon: Landmark },
+    { id: "assurances", label: "Assurances", icon: ShieldCheck },
+    { id: "annules", label: "Tickets annulés", icon: Ban },
+  ],
+  "/employees": [
+    { id: "personnel", label: "Personnel", icon: Users },
+    { id: "conges", label: "Congés et absences", icon: CalendarOff },
+    { id: "contrats", label: "Contrats", icon: FileSignature },
+    { id: "organigramme", label: "Organigramme", icon: Network },
+  ],
+  "/hygiene": [
+    { id: "taches", label: "Tâches de nettoyage", icon: SprayCan },
+    { id: "dechets", label: "Déchets médicaux", icon: Trash2 },
+    { id: "produits", label: "Produits d'hygiène", icon: Package },
+    { id: "audits", label: "Audits", icon: ClipboardCheck },
+  ],
+  "/archives": [
+    { id: "documents", label: "Documents archivés", icon: Archive },
+    { id: "categories", label: "Par catégorie", icon: FolderTree },
+    { id: "recherche", label: "Recherche avancée", icon: Search },
   ],
 };
 

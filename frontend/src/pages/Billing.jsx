@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 
 import api from "../services/api";
+import Liste from "../components/Liste";
+import { useModuleView } from "../layouts/AppLayout";
 
 import "../styles/billing.css";
 
@@ -188,6 +190,7 @@ function normalizePayment(item, index) {
 export default function Billing() {
 
   const [payments, setPayments] = useState([]);
+  const vue = useModuleView("/billing");
 
   const [loading, setLoading] = useState(true);
 
@@ -667,6 +670,11 @@ export default function Billing() {
   /* ==========================================================
      AFFICHAGE
      ========================================================== */
+
+  // Sous-modules : encaissements (cette page), sessions de caisse, assurances, tickets annulés.
+  if (vue.id === "sessions") return <div className="billing-page"><SessionsCaisse /></div>;
+  if (vue.id === "assurances") return <div className="billing-page"><ParAssurance paiements={payments} /></div>;
+  if (vue.id === "annules") return <div className="billing-page"><TicketsAnnules /></div>;
 
   return (
 
@@ -1881,5 +1889,83 @@ export default function Billing() {
 
     </div>
 
+  );
+}
+
+
+/* ============================================================
+   SOUS-MODULES
+   ============================================================ */
+
+const fcfa = (v) => (v === null || v === undefined ? "—" : `${new Intl.NumberFormat("fr-FR").format(Math.round(Number(v)))} FCFA`);
+
+function SessionsCaisse() {
+  const [lignes, setLignes] = useState(null);
+  useEffect(() => { api.get("/parcours/comptabilite/sessions/").then(({ data }) => setLignes(data)).catch(() => setLignes([])); }, []);
+  const ecarts = (lignes || []).filter((l) => l.ecart && Number(l.ecart) !== 0);
+  return (
+    <Liste titre="Sessions de caisse" sous="Ouvertures, clôtures et écarts de chaque caissier"
+      lignes={lignes} chercher={(l) => `${l.caissier} ${l.date} ${l.statutLibelle}`} vide="Aucune session de caisse."
+      chiffres={[
+        { libelle: "Sessions", valeur: (lignes || []).length },
+        { libelle: "Ouvertes", valeur: (lignes || []).filter((l) => l.statut === "ouverte").length },
+        { libelle: "À valider", valeur: (lignes || []).filter((l) => l.statut === "en_attente").length },
+        { libelle: "Avec un écart", valeur: ecarts.length, ton: ecarts.length ? "alerte" : "" },
+      ]}
+      colonnes={[
+        { titre: "Date", rendu: (l) => <>{l.date}<small>{l.ouverteLe}{l.fermeeLe && l.fermeeLe !== "—" ? ` → ${l.fermeeLe}` : ""}</small></> },
+        { titre: "Caissier", rendu: (l) => <strong>{l.caissier}</strong> },
+        { titre: "État", rendu: (l) => <span className={`etat ${l.statut === "validee" ? "regle" : l.statut === "en_attente" ? "bleu" : ""}`}>{l.statutLibelle}</span> },
+        { titre: "Tickets", rendu: (l) => l.tickets ?? "—", classe: "montant" },
+        { titre: "Attendu", rendu: (l) => fcfa(l.attendu), classe: "montant" },
+        { titre: "Compté", rendu: (l) => fcfa(l.compte), classe: "montant" },
+        { titre: "Écart", classe: "montant", rendu: (l) => (l.ecart && Number(l.ecart) !== 0
+          ? <strong style={{ color: "var(--danger)" }}>{fcfa(l.ecart)}</strong> : l.ecart === null || l.ecart === undefined ? "—" : "0") },
+        { titre: "Validée par", rendu: (l) => l.valideePar || "—" },
+      ]} />
+  );
+}
+
+function ParAssurance({ paiements }) {
+  const groupes = {};
+  for (const p of paiements) {
+    const nom = p.insuranceName || "Sans assurance";
+    const g = (groupes[nom] ||= { nom, passages: 0, total: 0, patients: 0, assurance: 0 });
+    g.passages += 1; g.total += p.totalAmount || 0; g.patients += p.patientAmount || 0; g.assurance += p.insuranceAmount || 0;
+  }
+  const lignes = Object.values(groupes).sort((a, b) => b.assurance - a.assurance);
+  const aReclamer = lignes.filter((l) => l.nom !== "Sans assurance").reduce((t, l) => t + l.assurance, 0);
+  return (
+    <Liste titre="Assurances" sous="Ce que chaque assureur doit à l'établissement" cle={(l) => l.nom}
+      lignes={lignes} vide="Aucun encaissement."
+      chiffres={[{ libelle: "À réclamer aux assurances", valeur: fcfa(aReclamer) }, { libelle: "Assureurs", valeur: lignes.filter((l) => l.nom !== "Sans assurance").length }]}
+      colonnes={[
+        { titre: "Assurance", rendu: (l) => <strong>{l.nom}</strong> },
+        { titre: "Passages", rendu: (l) => l.passages, classe: "montant" },
+        { titre: "Montant des prestations", rendu: (l) => fcfa(l.total), classe: "montant" },
+        { titre: "Payé par les patients", rendu: (l) => fcfa(l.patients), classe: "montant" },
+        { titre: "Part de l'assurance", rendu: (l) => <strong>{fcfa(l.assurance)}</strong>, classe: "montant" },
+      ]} />
+  );
+}
+
+function TicketsAnnules() {
+  const [lignes, setLignes] = useState(null);
+  useEffect(() => { api.get("/parcours/comptabilite/annules/").then(({ data }) => setLignes(data)).catch(() => setLignes([])); }, []);
+  return (
+    <Liste titre="Tickets annulés" sous="Chaque annulation, son motif et l'agent qui l'a faite"
+      lignes={lignes} chercher={(l) => `${l.reference} ${l.patient} ${l.code} ${l.prestation} ${l.annulePar} ${l.motif}`}
+      vide="Aucun ticket annulé."
+      chiffres={[{ libelle: "Tickets annulés", valeur: (lignes || []).length },
+        { libelle: "Montant annulé", valeur: fcfa((lignes || []).reduce((t, l) => t + l.montant, 0)) }]}
+      colonnes={[
+        { titre: "Annulé le", rendu: (l) => <>{l.annuleLe}<small>créé le {l.creeLe}</small></> },
+        { titre: "Ticket", rendu: (l) => <code>{l.reference}</code> },
+        { titre: "Patient", rendu: (l) => <>{l.patient}<small>{l.code}</small></> },
+        { titre: "Prestation", rendu: (l) => l.prestation },
+        { titre: "Montant", rendu: (l) => fcfa(l.montant), classe: "montant" },
+        { titre: "Annulé par", rendu: (l) => <>{l.annulePar || "—"}<small>caissier : {l.caissier}</small></> },
+        { titre: "Motif", rendu: (l) => l.motif || "—" },
+      ]} />
   );
 }

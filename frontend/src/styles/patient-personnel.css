@@ -94,3 +94,31 @@
 /* Logo de l'hôpital en tête de la carte d'accès */
 .pp-carte header { align-items: center; }
 .pp-carte header strong { margin-right: auto; }
+
+/* Suivi des comptes : filtres par état, avec leur nombre. */
+.pp-filtres { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.pp-filtres button {
+  display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px;
+  border: 1px solid var(--surface-200); border-radius: var(--radius-pill); background: #fff;
+  color: var(--ink-muted); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.pp-filtres button b { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: var(--surface-100); color: var(--ink-faint); font-size: 12px; text-align: center; }
+.pp-filtres button.actif { border-color: var(--primary-600); background: var(--primary-600); color: #fff; }
+.pp-filtres button.actif b { background: rgba(255, 255, 255, .2); color: #fff; }
+
+/* Annonces */
+.pp-annonces { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 18px; align-items: start; }
+.pp-annonces h2 { margin: 0 0 14px; font-size: 18px; }
+.pp-annonce-form { display: grid; gap: 12px; }
+.pp-annonce-form .field { margin: 0; }
+.pp-annonce-form textarea { resize: vertical; }
+.pp-annonce-date { max-width: 220px; }
+.pp-annonce-form button { justify-self: start; display: inline-flex; align-items: center; gap: 6px; }
+.pp-annonce-liste { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pp-annonce-liste li { display: flex; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--surface-200); border-radius: var(--radius-xl); }
+.pp-annonce-liste li.terminee { opacity: .62; }
+.pp-annonce-liste p { margin: 4px 0 6px; color: var(--ink-muted); font-size: 14px; white-space: pre-line; }
+.pp-annonce-liste small { color: var(--ink-faint); font-size: 12.5px; }
+.pp-annonce-etat { display: grid; align-content: start; justify-items: end; gap: 8px; }
+.pp-annonce-etat button { display: inline-flex; align-items: center; gap: 5px; }
+@media (max-width: 900px) { .pp-annonces { grid-template-columns: 1fr; } }

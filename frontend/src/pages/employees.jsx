@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 
 import api from "../services/api";
+import Liste from "../components/Liste";
+import { useModuleView } from "../layouts/AppLayout";
 import "../styles/employees.css";
 
 const emptyForm = {
@@ -39,6 +41,7 @@ const emptyForm = {
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
+  const vue = useModuleView("/employees");
 
   // Personnel servi par l'API (/api/rh/employes/).
   const loadEmployees = () =>
@@ -282,6 +285,11 @@ function Employees() {
         return "";
     }
   };
+
+  // Sous-modules : personnel (cette page), congés et absences, contrats, organigramme.
+  if (vue.id === "conges") return <div className="employees-page"><Conges employes={employees} /></div>;
+  if (vue.id === "contrats") return <div className="employees-page"><Contrats employes={employees} onChange={loadEmployees} /></div>;
+  if (vue.id === "organigramme") return <div className="employees-page"><Organigramme employes={employees} /></div>;
 
   return (
     <div className="employees-page">
@@ -1240,6 +1248,127 @@ function Employees() {
       )}
 
     </div>
+  );
+}
+
+/* ============================================================
+   SOUS-MODULES DES RESSOURCES HUMAINES
+   ============================================================ */
+
+const dateFr = (iso) => (iso ? iso.split("-").reverse().join("/") : "—");
+const isoJour = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const TYPES_ABSENCE = ["Congé annuel", "Maladie", "Maternité", "Paternité", "Formation", "Permission", "Absence injustifiée"];
+
+function Conges({ employes }) {
+  const [lignes, setLignes] = useState(null);
+  const [form, setForm] = useState({ employe: "", type: "Congé annuel", debut: "", fin: "", motif: "" });
+  const charger = () => api.get("/rh/absences/").then(({ data }) => setLignes(data)).catch(() => setLignes([]));
+  useEffect(() => { charger(); }, []);
+  const aujourdhui = isoJour(new Date());
+  const enCours = (lignes || []).filter((a) => a.debut <= aujourdhui && a.fin >= aujourdhui);
+
+  async function enregistrer(event) {
+    event.preventDefault();
+    try { await api.post("/rh/absences/", form); setForm({ ...form, employe: "", debut: "", fin: "", motif: "" }); charger(); }
+    catch (e) { const d = e.response?.data; alert(d && typeof d === "object" ? Object.values(d).flat().join("\n") : "Enregistrement impossible."); }
+  }
+  async function supprimer(a) {
+    if (!window.confirm(`Supprimer l'absence de ${a.employeNom} ?`)) return;
+    await api.delete(`/rh/absences/${a.id}/`).catch(() => {}); charger();
+  }
+
+  return (
+    <>
+      <section className="bloc">
+        <h2>Enregistrer un congé ou une absence</h2>
+        <form className="rh-absence-form" onSubmit={enregistrer}>
+          <label className="field"><span>Employé</span>
+            <select value={form.employe} onChange={(e) => setForm({ ...form, employe: e.target.value })} required>
+              <option value="">Choisir…</option>
+              {employes.map((e) => <option key={e.id} value={e.id}>{e.nom} {e.prenom} · {e.poste}</option>)}
+            </select></label>
+          <label className="field"><span>Type</span>
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+              {TYPES_ABSENCE.map((t) => <option key={t}>{t}</option>)}
+            </select></label>
+          <label className="field"><span>Du</span><input type="date" required value={form.debut} onChange={(e) => setForm({ ...form, debut: e.target.value })} /></label>
+          <label className="field"><span>Au</span><input type="date" required value={form.fin} min={form.debut} onChange={(e) => setForm({ ...form, fin: e.target.value })} /></label>
+          <label className="field rh-absence-motif"><span>Motif</span><input value={form.motif} onChange={(e) => setForm({ ...form, motif: e.target.value })} /></label>
+          <button type="submit" className="primary-button">Enregistrer</button>
+        </form>
+      </section>
+      <Liste titre="Congés et absences" lignes={lignes} vide="Aucune absence enregistrée."
+        chercher={(a) => `${a.employeNom} ${a.type} ${a.motif}`}
+        chiffres={[{ libelle: "Absents aujourd'hui", valeur: enCours.length, ton: enCours.length ? "alerte" : "" },
+          { libelle: "À venir", valeur: (lignes || []).filter((a) => a.debut > aujourdhui).length }]}
+        colonnes={[
+          { titre: "Employé", rendu: (a) => <strong>{a.employeNom}</strong> },
+          { titre: "Type", rendu: (a) => a.type },
+          { titre: "Période", rendu: (a) => <>du {dateFr(a.debut)} au {dateFr(a.fin)}<small>{a.jours} jour(s)</small></> },
+          { titre: "État", rendu: (a) => (a.fin < aujourdhui ? <span className="etat">Terminée</span>
+            : a.debut <= aujourdhui ? <span className="etat bleu">En cours</span> : <span className="etat">À venir</span>) },
+          { titre: "Motif", rendu: (a) => a.motif || "—" },
+          { titre: "", rendu: (a) => <button type="button" className="secondary-button" onClick={() => supprimer(a)}>Supprimer</button> },
+        ]} />
+    </>
+  );
+}
+
+function Contrats({ employes, onChange }) {
+  const aujourdhui = new Date();
+  const dans60 = isoJour(new Date(aujourdhui.getTime() + 60 * 86400000));
+  const iso = isoJour(aujourdhui);
+  const lignes = [...employes].sort((a, b) => (a.dateFinContrat || "9999").localeCompare(b.dateFinContrat || "9999"));
+  async function fixerFin(e, valeur) {
+    try { await api.patch(`/rh/employes/${e.id}/`, { dateFinContrat: valeur || null }); onChange(); }
+    catch { alert("Date de fin non enregistrée."); }
+  }
+  const proches = employes.filter((e) => e.dateFinContrat && e.dateFinContrat >= iso && e.dateFinContrat <= dans60);
+  return (
+    <Liste titre="Contrats" sous="Fins de CDD, de stage et de prestation à anticiper" lignes={lignes}
+      chercher={(e) => `${e.nom} ${e.prenom} ${e.poste} ${e.contrat}`}
+      chiffres={[
+        { libelle: "CDI", valeur: employes.filter((e) => e.contrat === "CDI").length },
+        { libelle: "CDD", valeur: employes.filter((e) => e.contrat === "CDD").length },
+        { libelle: "Stages et prestataires", valeur: employes.filter((e) => ["Stage", "Prestataire"].includes(e.contrat)).length },
+        { libelle: "Fin dans 60 jours", valeur: proches.length, ton: proches.length ? "alerte" : "" },
+      ]}
+      colonnes={[
+        { titre: "Employé", rendu: (e) => <><strong>{e.nom} {e.prenom}</strong><small>{e.matricule} · {e.poste}</small></> },
+        { titre: "Contrat", rendu: (e) => e.contrat },
+        { titre: "Embauche", rendu: (e) => dateFr(e.dateEmbauche) },
+        { titre: "Fin du contrat", rendu: (e) => (e.contrat === "CDI" ? "—" : (
+          <input type="date" defaultValue={e.dateFinContrat || ""} onBlur={(ev) => ev.target.value !== (e.dateFinContrat || "") && fixerFin(e, ev.target.value)} />
+        )) },
+        { titre: "", rendu: (e) => (!e.dateFinContrat ? "" : e.dateFinContrat < iso ? <span className="etat critique">Échu</span>
+          : e.dateFinContrat <= dans60 ? <span className="etat critique">Bientôt</span> : <span className="etat regle">En cours</span>) },
+      ]} />
+  );
+}
+
+function Organigramme({ employes }) {
+  const services = {};
+  for (const e of employes) (services[e.departement || "Sans service"] ||= []).push(e);
+  const noms = Object.keys(services).sort();
+  return (
+    <section className="bloc">
+      <div className="bloc-tete"><div><h2>Organigramme</h2><p>{employes.length} employé(s) dans {noms.length} service(s)</p></div></div>
+      <div className="rh-organigramme">
+        {noms.map((n) => (
+          <article key={n} className="rh-service">
+            <header><strong>{n}</strong><span>{services[n].length}</span></header>
+            <ul>
+              {services[n].sort((a, b) => a.poste.localeCompare(b.poste)).map((e) => (
+                <li key={e.id} className={e.statut !== "Actif" ? "absent" : ""}>
+                  <strong>{e.nom} {e.prenom}</strong>
+                  <span>{e.poste}{e.statut !== "Actif" ? ` · ${e.statut}` : ""}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
